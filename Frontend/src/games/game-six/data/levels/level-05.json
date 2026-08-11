@@ -1,0 +1,19 @@
+{
+  "id": "game-six-level-05",
+  "gameType": "GAME_SIX",
+  "levelNumber": 5,
+  "seedVersion": 2,
+  "title": "Syntax Rain Typing: Compiler Tempest",
+  "subtitle": "Type twenty-five falling terms in the hardest storm.",
+  "objective": "Type twenty-five falling terms in the hardest storm.",
+  "settings": {
+    "targetWords": 25,
+    "seconds": 480,
+    "lives": 5,
+    "rewardEvery": 3
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

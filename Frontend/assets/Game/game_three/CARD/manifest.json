@@ -1,0 +1,309 @@
+{
+  "generatedAt": "2026-04-28T09:09:27.383Z",
+  "cards": [
+    {
+      "svg": 1,
+      "index": 0,
+      "file": "svg01-card00.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 6266
+    },
+    {
+      "svg": 1,
+      "index": 1,
+      "file": "svg01-card01.png",
+      "width": 360,
+      "height": 360,
+      "bytes": 21060
+    },
+    {
+      "svg": 1,
+      "index": 2,
+      "file": "svg01-card02.png",
+      "width": 256,
+      "height": 256,
+      "bytes": 41963
+    },
+    {
+      "svg": 1,
+      "index": 3,
+      "file": "svg01-card03.png",
+      "width": 500,
+      "height": 500,
+      "bytes": 62485
+    },
+    {
+      "svg": 1,
+      "index": 4,
+      "file": "svg01-card04.png",
+      "width": 1000,
+      "height": 1500,
+      "bytes": 223141
+    },
+    {
+      "svg": 2,
+      "index": 0,
+      "file": "svg02-card00.png",
+      "width": 360,
+      "height": 360,
+      "bytes": 21060
+    },
+    {
+      "svg": 2,
+      "index": 1,
+      "file": "svg02-card01.png",
+      "width": 256,
+      "height": 256,
+      "bytes": 41963
+    },
+    {
+      "svg": 2,
+      "index": 2,
+      "file": "svg02-card02.png",
+      "width": 500,
+      "height": 500,
+      "bytes": 62485
+    },
+    {
+      "svg": 2,
+      "index": 3,
+      "file": "svg02-card03.png",
+      "width": 1000,
+      "height": 1500,
+      "bytes": 223141
+    },
+    {
+      "svg": 3,
+      "index": 0,
+      "file": "svg03-card00.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 6266
+    },
+    {
+      "svg": 4,
+      "index": 0,
+      "file": "svg04-card00.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 141764
+    },
+    {
+      "svg": 4,
+      "index": 1,
+      "file": "svg04-card01.png",
+      "width": 768,
+      "height": 768,
+      "bytes": 13922
+    },
+    {
+      "svg": 4,
+      "index": 2,
+      "file": "svg04-card02.png",
+      "width": 575,
+      "height": 377,
+      "bytes": 70437
+    },
+    {
+      "svg": 5,
+      "index": 0,
+      "file": "svg05-card00.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 141764
+    },
+    {
+      "svg": 5,
+      "index": 1,
+      "file": "svg05-card01.png",
+      "width": 575,
+      "height": 377,
+      "bytes": 70437
+    },
+    {
+      "svg": 6,
+      "index": 0,
+      "file": "svg06-card00.png",
+      "width": 768,
+      "height": 768,
+      "bytes": 13922
+    },
+    {
+      "svg": 6,
+      "index": 1,
+      "file": "svg06-card01.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 82574
+    },
+    {
+      "svg": 7,
+      "index": 0,
+      "file": "svg07-card00.png",
+      "width": 612,
+      "height": 878,
+      "bytes": 257868
+    },
+    {
+      "svg": 7,
+      "index": 1,
+      "file": "svg07-card01.png",
+      "width": 1200,
+      "height": 1200,
+      "bytes": 126908
+    },
+    {
+      "svg": 7,
+      "index": 2,
+      "file": "svg07-card02.png",
+      "width": 1000,
+      "height": 1000,
+      "bytes": 232687
+    },
+    {
+      "svg": 7,
+      "index": 3,
+      "file": "svg07-card03.png",
+      "width": 640,
+      "height": 640,
+      "bytes": 23980
+    },
+    {
+      "svg": 7,
+      "index": 4,
+      "file": "svg07-card04.png",
+      "width": 371,
+      "height": 376,
+      "bytes": 20201
+    },
+    {
+      "svg": 7,
+      "index": 5,
+      "file": "svg07-card05.png",
+      "width": 53,
+      "height": 52,
+      "bytes": 1530
+    },
+    {
+      "svg": 8,
+      "index": 0,
+      "file": "svg08-card00.png",
+      "width": 1200,
+      "height": 1200,
+      "bytes": 126908
+    },
+    {
+      "svg": 8,
+      "index": 1,
+      "file": "svg08-card01.png",
+      "width": 62,
+      "height": 61,
+      "bytes": 1830
+    },
+    {
+      "svg": 9,
+      "index": 0,
+      "file": "svg09-card00.png",
+      "width": 612,
+      "height": 878,
+      "bytes": 257868
+    },
+    {
+      "svg": 9,
+      "index": 1,
+      "file": "svg09-card01.png",
+      "width": 1000,
+      "height": 1000,
+      "bytes": 232687
+    },
+    {
+      "svg": 9,
+      "index": 2,
+      "file": "svg09-card02.png",
+      "width": 640,
+      "height": 640,
+      "bytes": 23980
+    },
+    {
+      "svg": 9,
+      "index": 3,
+      "file": "svg09-card03.png",
+      "width": 371,
+      "height": 376,
+      "bytes": 20201
+    },
+    {
+      "svg": 10,
+      "index": 0,
+      "file": "svg10-card00.png",
+      "width": 784,
+      "height": 784,
+      "bytes": 163151
+    },
+    {
+      "svg": 10,
+      "index": 1,
+      "file": "svg10-card01.png",
+      "width": 801,
+      "height": 1068,
+      "bytes": 126289
+    },
+    {
+      "svg": 10,
+      "index": 2,
+      "file": "svg10-card02.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 83541
+    },
+    {
+      "svg": 10,
+      "index": 3,
+      "file": "svg10-card03.png",
+      "width": 736,
+      "height": 1104,
+      "bytes": 69426
+    },
+    {
+      "svg": 11,
+      "index": 0,
+      "file": "svg11-card00.png",
+      "width": 980,
+      "height": 980,
+      "bytes": 224786
+    },
+    {
+      "svg": 11,
+      "index": 1,
+      "file": "svg11-card01.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 31986
+    },
+    {
+      "svg": 12,
+      "index": 0,
+      "file": "svg12-card00.png",
+      "width": 901,
+      "height": 1201,
+      "bytes": 142134
+    },
+    {
+      "svg": 12,
+      "index": 1,
+      "file": "svg12-card01.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 83541
+    },
+    {
+      "svg": 12,
+      "index": 2,
+      "file": "svg12-card02.png",
+      "width": 736,
+      "height": 1104,
+      "bytes": 69426
+    }
+  ]
+}

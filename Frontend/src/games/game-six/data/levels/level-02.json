@@ -1,0 +1,19 @@
+{
+  "id": "game-six-level-02",
+  "gameType": "GAME_SIX",
+  "levelNumber": 2,
+  "seedVersion": 2,
+  "title": "Syntax Rain Typing: Drizzle",
+  "subtitle": "Type ten falling terms in five minutes.",
+  "objective": "Type ten falling terms in five minutes.",
+  "settings": {
+    "targetWords": 10,
+    "seconds": 300,
+    "lives": 5,
+    "rewardEvery": 3
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

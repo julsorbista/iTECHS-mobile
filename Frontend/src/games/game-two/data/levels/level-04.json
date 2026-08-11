@@ -1,0 +1,205 @@
+{
+  "id": "game-two-level-04",
+  "gameType": "GAME_TWO",
+  "levelNumber": 4,
+  "seedVersion": 3,
+  "title": "Code Quest Lab: Method Forge",
+  "subtitle": "Complete reusable methods and return values.",
+  "objective": "Build Java methods with parameters, returns, and calls.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 300,
+    "maxMistakes": 3,
+    "targetPoints": 1150,
+    "bonusPerSecond": 3
+  },
+  "tasks": [
+    {
+      "id": "g2l4-t1",
+      "type": "complete",
+      "title": "Method Keyword",
+      "prompt": "Complete the Java method declaration.",
+      "snippet": "public static int add(int a, int b) { ____ a + b; }",
+      "answer": "return",
+      "acceptedAnswers": [
+        "return"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "send"
+        },
+        {
+          "id": "b",
+          "label": "return"
+        },
+        {
+          "id": "c",
+          "label": "print"
+        },
+        {
+          "id": "d",
+          "label": "int"
+        }
+      ],
+      "points": 130,
+      "coinReward": 1,
+      "coach": "Java methods use return to send a value back.",
+      "hints": [
+        "It is the keyword that sends back a value.",
+        "It starts with r."
+      ]
+    },
+    {
+      "id": "g2l4-t2",
+      "type": "complete",
+      "title": "Call The Method",
+      "prompt": "Drag the expression that calls add with 2 and 3.",
+      "snippet": "int total = ____;",
+      "answer": "add(2, 3)",
+      "acceptedAnswers": [
+        "add(2, 3)",
+        "add(2,3)"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "add[2, 3]"
+        },
+        {
+          "id": "b",
+          "label": "add(2, 3)"
+        },
+        {
+          "id": "c",
+          "label": "add 2, 3"
+        },
+        {
+          "id": "d",
+          "label": "add(\"2\", \"3\")"
+        }
+      ],
+      "points": 140,
+      "coinReward": 1,
+      "coach": "Method calls use parentheses for arguments.",
+      "hints": [
+        "Use the method name add.",
+        "Put 2 and 3 inside parentheses."
+      ]
+    },
+    {
+      "id": "g2l4-t3",
+      "type": "debug",
+      "title": "Return The Result",
+      "prompt": "The method uses the wrong keyword. Drag the repaired line into the blank.",
+      "snippet": "public static int getTotal() {\n  int total = 10;\n  ____\n}",
+      "answer": "return total;",
+      "acceptedAnswers": [
+        "return total;"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "send total;"
+        },
+        {
+          "id": "b",
+          "label": "return total;"
+        },
+        {
+          "id": "c",
+          "label": "return total"
+        },
+        {
+          "id": "d",
+          "label": "print total;"
+        }
+      ],
+      "points": 150,
+      "coinReward": 1,
+      "coach": "Java methods use return to send a value back.",
+      "hints": [
+        "The keyword is return.",
+        "Keep the semicolon."
+      ]
+    },
+    {
+      "id": "g2l4-t4",
+      "type": "choice",
+      "title": "Parameter Meaning",
+      "prompt": "What is a Java method parameter?",
+      "correctOptionId": "a",
+      "points": 130,
+      "coinReward": 1,
+      "coach": "A parameter is the named input a method receives.",
+      "options": [
+        {
+          "id": "a",
+          "label": "A named value received by a method"
+        },
+        {
+          "id": "b",
+          "label": "A loop that never stops"
+        },
+        {
+          "id": "c",
+          "label": "A type of syntax error"
+        },
+        {
+          "id": "d",
+          "label": "A file extension"
+        }
+      ],
+      "hints": [
+        "Think method input.",
+        "It appears inside the method parentheses."
+      ]
+    },
+    {
+      "id": "g2l4-t5",
+      "type": "reorder",
+      "title": "Reusable Discount",
+      "prompt": "Drag the Java method and call into the correct order.",
+      "points": 220,
+      "coinReward": 2,
+      "coach": "Define the method, return the computed value, close it, then call it from main.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "public static int discount(int price) {"
+        },
+        {
+          "id": "b",
+          "code": "  return price - 10;"
+        },
+        {
+          "id": "c",
+          "code": "}"
+        },
+        {
+          "id": "d",
+          "code": "System.out.println(discount(100));"
+        }
+      ],
+      "initialOrder": [
+        "d",
+        "a",
+        "c",
+        "b"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "hints": [
+        "The call belongs after the method definition.",
+        "return goes inside the braces."
+      ]
+    }
+  ]
+}

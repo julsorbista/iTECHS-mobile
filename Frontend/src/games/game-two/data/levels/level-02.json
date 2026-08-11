@@ -1,0 +1,210 @@
+{
+  "id": "game-two-level-02",
+  "gameType": "GAME_TWO",
+  "levelNumber": 2,
+  "seedVersion": 3,
+  "title": "Code Quest Lab: Logic Gates",
+  "subtitle": "Debug comparisons and complete conditional logic.",
+  "objective": "Practice Java comparisons, booleans, and if/else decisions.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 240,
+    "maxMistakes": 4,
+    "targetPoints": 850,
+    "bonusPerSecond": 2
+  },
+  "tasks": [
+    {
+      "id": "g2l2-t1",
+      "type": "complete",
+      "title": "Boolean Flag",
+      "prompt": "Complete the statement so passed stores true.",
+      "snippet": "boolean passed = ____;",
+      "answer": "true",
+      "acceptedAnswers": [
+        "true"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "\"true\""
+        },
+        {
+          "id": "b",
+          "label": "true"
+        },
+        {
+          "id": "c",
+          "label": "yes"
+        },
+        {
+          "id": "d",
+          "label": "1"
+        }
+      ],
+      "points": 120,
+      "coinReward": 1,
+      "coach": "Java booleans are true or false without quotes.",
+      "hints": [
+        "Do not use quotes.",
+        "The value is true."
+      ]
+    },
+    {
+      "id": "g2l2-t2",
+      "type": "debug",
+      "title": "Fix Equality",
+      "prompt": "The if statement uses assignment by mistake. Drag the repaired header into the blank.",
+      "snippet": "____\n  System.out.println(\"Level 2\");\n}",
+      "answer": "if (level == 2) {",
+      "acceptedAnswers": [
+        "if (level == 2) {"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "if (level = 2) {"
+        },
+        {
+          "id": "b",
+          "label": "if (level == 2) {"
+        },
+        {
+          "id": "c",
+          "label": "if level == 2) {"
+        },
+        {
+          "id": "d",
+          "label": "if (level equals 2) {"
+        }
+      ],
+      "points": 150,
+      "coinReward": 1,
+      "coach": "A single equals sign assigns. Double equals compares primitive values.",
+      "hints": [
+        "Use two equals signs.",
+        "Keep the parentheses."
+      ]
+    },
+    {
+      "id": "g2l2-t3",
+      "type": "choice",
+      "title": "Choose The Else",
+      "prompt": "Which Java block correctly handles the false branch?",
+      "correctOptionId": "c",
+      "points": 130,
+      "coinReward": 1,
+      "coach": "else follows the closing brace of if.",
+      "options": [
+        {
+          "id": "a",
+          "label": "else (score < 50) {"
+        },
+        {
+          "id": "b",
+          "label": "if else {"
+        },
+        {
+          "id": "c",
+          "label": "} else {"
+        },
+        {
+          "id": "d",
+          "label": "otherwise {"
+        }
+      ],
+      "hints": [
+        "else does not need a condition.",
+        "It appears after the if block closes."
+      ]
+    },
+    {
+      "id": "g2l2-t4",
+      "type": "complete",
+      "title": "Check A Range",
+      "prompt": "Drag the condition that checks score is at least 75 into the if statement.",
+      "snippet": "if (____) {\n  System.out.println(\"Pass\");\n}",
+      "answer": "score >= 75",
+      "acceptedAnswers": [
+        "score >= 75"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "score > 75"
+        },
+        {
+          "id": "b",
+          "label": "score >= 75"
+        },
+        {
+          "id": "c",
+          "label": "score <= 75"
+        },
+        {
+          "id": "d",
+          "label": "score = 75"
+        }
+      ],
+      "points": 140,
+      "coinReward": 1,
+      "coach": "Greater-than-or-equal checks the lower boundary.",
+      "hints": [
+        "Use >=.",
+        "Do not include if this time."
+      ]
+    },
+    {
+      "id": "g2l2-t5",
+      "type": "reorder",
+      "title": "Decision Flow",
+      "prompt": "Drag the blocks into a valid Java if/else program.",
+      "points": 180,
+      "coinReward": 2,
+      "coach": "The else branch comes after the if branch.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "if (score >= 75) {"
+        },
+        {
+          "id": "b",
+          "code": "  System.out.println(\"Pass\");"
+        },
+        {
+          "id": "c",
+          "code": "} else {"
+        },
+        {
+          "id": "d",
+          "code": "  System.out.println(\"Try again\");"
+        },
+        {
+          "id": "e",
+          "code": "}"
+        }
+      ],
+      "initialOrder": [
+        "a",
+        "c",
+        "b",
+        "e",
+        "d"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "hints": [
+        "Open if first.",
+        "The final closing brace ends the whole block."
+      ]
+    }
+  ]
+}

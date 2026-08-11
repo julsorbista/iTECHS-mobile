@@ -1,0 +1,60 @@
+{
+  "id": "game-four-level-05",
+  "gameType": "GAME_FOUR",
+  "levelNumber": 5,
+  "title": "Variable Master Catch",
+  "subtitle": "Finish the catch challenge with multi-type Java variable declarations.",
+  "objective": "Complete all Java Variables rounds by catching the right parts, avoiding hazards, and arranging each declaration correctly.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "randomizeStatements": true,
+    "spawnIntervalMs": 740,
+    "fallSpeed": 290,
+    "moveSpeed": 520,
+    "maxMistakes": 4,
+    "lives": 3,
+    "coinRewardPerRound": 1,
+    "statementReward": 170
+  },
+  "rounds": [
+    {
+      "id": "g4-l5-r1",
+      "topic": "Java Variables",
+      "prompt": "Build a valid String variable declaration for userName.",
+      "targetTokens": ["String", "userName", "=", "\"Coder\"", ";"],
+      "distractorTokens": ["char", "'Coder'", "boolean", "void"],
+      "hints": [
+        "String values use double quotation marks.",
+        "userName is the variable identifier, not the value.",
+        "Keep the declaration in the standard Java order."
+      ]
+    },
+    {
+      "id": "g4-l5-r2",
+      "topic": "Java Variables",
+      "prompt": "Build a valid int variable declaration for attemptCount.",
+      "targetTokens": ["int", "attemptCount", "=", "1", ";"],
+      "distractorTokens": ["double", "\"1\"", "println", "main"],
+      "hints": [
+        "attemptCount stores a whole number.",
+        "Do not wrap the number in quotation marks.",
+        "The semicolon always ends the declaration."
+      ]
+    },
+    {
+      "id": "g4-l5-r3",
+      "topic": "Java Variables",
+      "prompt": "Build a valid boolean variable declaration for debugMode.",
+      "targetTokens": ["boolean", "debugMode", "=", "true", ";"],
+      "distractorTokens": ["String", "\"true\"", "if", "class"],
+      "hints": [
+        "Boolean variables store either true or false.",
+        "debugMode is the name of the variable.",
+        "The value belongs after the equals sign."
+      ]
+    }
+  ]
+}

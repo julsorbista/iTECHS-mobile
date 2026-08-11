@@ -1,0 +1,19 @@
+{
+  "id": "game-six-level-03",
+  "gameType": "GAME_SIX",
+  "levelNumber": 3,
+  "seedVersion": 2,
+  "title": "Syntax Rain Typing: Shower",
+  "subtitle": "Type fifteen falling terms as speed rises.",
+  "objective": "Type fifteen falling terms as speed rises.",
+  "settings": {
+    "targetWords": 15,
+    "seconds": 360,
+    "lives": 5,
+    "rewardEvery": 3
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

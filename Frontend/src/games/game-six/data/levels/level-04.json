@@ -1,0 +1,19 @@
+{
+  "id": "game-six-level-04",
+  "gameType": "GAME_SIX",
+  "levelNumber": 4,
+  "seedVersion": 2,
+  "title": "Syntax Rain Typing: Storm",
+  "subtitle": "Type twenty falling terms with faster drops.",
+  "objective": "Type twenty falling terms with faster drops.",
+  "settings": {
+    "targetWords": 20,
+    "seconds": 420,
+    "lives": 5,
+    "rewardEvery": 3
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

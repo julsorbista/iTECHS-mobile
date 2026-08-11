@@ -1,0 +1,788 @@
+.actual-game-tutorial-motion,
+.actual-game-tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+}
+
+.actual-game-tutorial-overlay {
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.actual-game-tutorial-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at var(--tutorial-focus-x, 50%) var(--tutorial-focus-y, 52%), transparent 0 92px, rgba(2, 6, 23, 0.18) 126px, rgba(2, 6, 23, 0.7) 100%),
+    rgba(2, 6, 23, 0.28);
+  backdrop-filter: blur(1.5px);
+}
+
+.actual-game-tutorial-callout {
+  position: absolute;
+  left: clamp(16px, 4vw, 54px);
+  top: clamp(16px, 5vh, 48px);
+  z-index: 5;
+  width: min(430px, calc(100vw - 32px));
+  border: 1px solid rgba(226, 232, 240, 0.55);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.88);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+  color: #f8fafc;
+  padding: 1rem;
+}
+
+.actual-game-tutorial-callout p {
+  margin: 0 0 0.35rem;
+  color: #a7f3d0;
+  font-size: 0.76rem;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.actual-game-tutorial-callout h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  font-weight: 1000;
+  line-height: 1.05;
+}
+
+.actual-game-tutorial-callout span {
+  display: block;
+  margin-top: 0.6rem;
+  color: #dbeafe;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.actual-game-tutorial-controls {
+  display: grid;
+  gap: 0.48rem;
+  margin-top: 0.85rem;
+}
+
+.actual-game-tutorial-controls strong {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #e2e8f0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.actual-game-tutorial-controls kbd {
+  min-width: 122px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: inset 0 -2px 0 rgba(15, 23, 42, 0.5);
+  color: #f8fafc;
+  padding: 0.34rem 0.55rem;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.actual-game-tutorial-controls em {
+  color: #bfdbfe;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.actual-game-tutorial-guidelines {
+  display: grid;
+  gap: 0.42rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.actual-game-tutorial-guidelines li {
+  position: relative;
+  padding-left: 1.25rem;
+  color: #e0f2fe;
+  font-size: 0.86rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.actual-game-tutorial-guidelines li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.48em;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.16);
+}
+
+.actual-game-tutorial-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+}
+
+.actual-tutorial-highlight {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  border: 3px solid rgba(250, 204, 21, 0.98);
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 9999px rgba(2, 6, 23, 0.08),
+    0 0 0 10px rgba(250, 204, 21, 0.16),
+    0 0 26px rgba(250, 204, 21, 0.86);
+  animation: actualTutorialPulse 1.35s ease-in-out infinite;
+}
+
+.actual-tutorial-highlight span {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 10px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #fef3c7;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.actual-tutorial-arc {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.actual-tutorial-arc path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.76);
+  stroke-width: 0.72;
+  stroke-linecap: round;
+  stroke-dasharray: 4 3;
+  animation: actualTutorialDash 1.2s linear infinite;
+}
+
+.actual-tutorial-arc .actual-tutorial-arrow-head {
+  fill: rgba(255, 255, 255, 0.82);
+  stroke: none;
+}
+
+.actual-game-tutorial-visuals {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.actual-game-tutorial-visuals img {
+  display: block;
+  object-fit: contain;
+}
+
+.actual-game-tutorial-cursor {
+  position: absolute;
+  z-index: 5;
+  width: clamp(64px, 8vw, 112px);
+  height: clamp(64px, 8vw, 112px);
+  object-fit: contain;
+  filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.55));
+  transform-origin: 22% 18%;
+}
+
+.actual-game-tutorial-overlay-platform {
+  --tutorial-focus-x: 68%;
+  --tutorial-focus-y: 58%;
+}
+
+.actual-game-tutorial-overlay-drag {
+  --tutorial-focus-x: 68%;
+  --tutorial-focus-y: 50%;
+}
+
+.actual-game-tutorial-overlay-cards {
+  --tutorial-focus-x: 50%;
+  --tutorial-focus-y: 48%;
+}
+
+.actual-game-tutorial-overlay-catch {
+  --tutorial-focus-x: 54%;
+  --tutorial-focus-y: 58%;
+}
+
+.actual-game-tutorial-overlay-guess {
+  --tutorial-focus-x: 50%;
+  --tutorial-focus-y: 70%;
+}
+
+.actual-game-tutorial-overlay-type {
+  --tutorial-focus-x: 54%;
+  --tutorial-focus-y: 62%;
+}
+
+.actual-tutorial-highlight-player { left: 18%; top: 58%; width: 88px; height: 88px; }
+.actual-tutorial-highlight-goal { left: 70%; top: 46%; width: 94px; height: 94px; }
+.actual-tutorial-highlight-fall { left: 48%; top: 24%; width: 86px; height: 86px; }
+.actual-tutorial-highlight-basket { left: 44%; top: 68%; width: 168px; height: 78px; border-radius: 22px; }
+
+.actual-tutorial-platform {
+  position: absolute;
+  width: clamp(140px, 17vw, 250px);
+  filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.5));
+}
+
+.actual-tutorial-platform.platform-a {
+  left: 12%;
+  top: 70%;
+}
+
+.actual-tutorial-platform.platform-b {
+  left: 60%;
+  top: 58%;
+}
+
+.actual-tutorial-player {
+  position: absolute;
+  left: 17%;
+  top: 50%;
+  width: clamp(96px, 12vw, 160px);
+  height: clamp(96px, 12vw, 160px);
+  object-fit: cover;
+  object-position: left top;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.58));
+  animation: actualTutorialFloat 1.6s ease-in-out infinite;
+}
+
+.actual-tutorial-portal {
+  position: absolute;
+  left: 67%;
+  top: 42%;
+  width: clamp(112px, 13vw, 178px);
+  height: clamp(112px, 13vw, 178px);
+  object-fit: cover;
+  object-position: left top;
+  filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.82));
+}
+
+.actual-tutorial-part-card,
+.actual-tutorial-board-slot,
+.actual-tutorial-card,
+.actual-tutorial-code-token,
+.actual-tutorial-bomb,
+.actual-tutorial-basket-img,
+.actual-tutorial-word-preview,
+.actual-tutorial-keyboard,
+.actual-tutorial-guess-progress,
+.actual-tutorial-falling-word,
+.actual-tutorial-type-input,
+.actual-tutorial-enter-button {
+  position: absolute;
+}
+
+.actual-tutorial-card {
+  width: clamp(86px, 9vw, 124px);
+  height: clamp(118px, 13vw, 166px);
+  perspective: 900px;
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 1000;
+  text-align: center;
+}
+
+.actual-tutorial-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 14px 0 rgba(15, 23, 42, 0.56));
+}
+
+.actual-tutorial-card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+.actual-tutorial-card-front {
+  background: linear-gradient(180deg, #f8fafc, #dbeafe);
+  transform: rotateY(180deg);
+}
+
+.actual-tutorial-card-back {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.28) 0 18%, transparent 19%),
+    linear-gradient(160deg, #1d4ed8, #0891b2 55%, #0f172a);
+  color: #eff6ff;
+}
+
+.actual-tutorial-card-back span {
+  display: grid;
+  place-items: center;
+  width: 52%;
+  aspect-ratio: 1;
+  border: 3px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.28);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.actual-tutorial-card img {
+  width: 68%;
+  height: 58%;
+  object-fit: contain;
+}
+
+.actual-tutorial-card.card-match-a {
+  left: 35%;
+  top: 36%;
+}
+
+.actual-tutorial-card.card-match-a .actual-tutorial-card-inner {
+  animation: actualTutorialCardFlipA 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-card.card-match-b {
+  left: 51%;
+  top: 36%;
+}
+
+.actual-tutorial-card.card-match-b .actual-tutorial-card-inner {
+  animation: actualTutorialCardFlipB 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-card.card-decoy {
+  left: 67%;
+  top: 36%;
+  opacity: 0.58;
+  transform: scale(0.9);
+}
+
+.actual-tutorial-card.card-decoy .actual-tutorial-card-inner {
+  transform: rotateY(180deg);
+}
+
+.actual-tutorial-code-token {
+  left: 48%;
+  top: 22%;
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 62px;
+  border: 3px solid #fef3c7;
+  border-radius: 16px;
+  background: #facc15;
+  color: #111827;
+  box-shadow: 0 12px 0 rgba(15, 23, 42, 0.48);
+  font-size: 1.35rem;
+  font-weight: 1000;
+  animation: actualTutorialTokenFall 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-bomb {
+  left: 66%;
+  top: 26%;
+  width: 70px;
+  height: 70px;
+  opacity: 0.62;
+  filter: grayscale(0.2) drop-shadow(0 12px 16px rgba(0, 0, 0, 0.52));
+}
+
+.actual-tutorial-basket-img {
+  left: 43%;
+  top: 66%;
+  width: clamp(126px, 16vw, 220px);
+  filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.56));
+  animation: actualTutorialBasketMove 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-word-preview {
+  left: 29%;
+  top: 35%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em;
+  width: clamp(230px, 25vw, 360px);
+  height: 84px;
+  border: 4px solid #bae6fd;
+  border-radius: 20px;
+  background: rgba(248, 250, 252, 0.94);
+  box-shadow: 0 16px 0 rgba(15, 23, 42, 0.5);
+  color: #0f172a;
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-weight: 1000;
+  letter-spacing: 0.18em;
+}
+
+.actual-tutorial-word-preview-guess {
+  top: 30%;
+}
+
+.actual-tutorial-word-preview span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 0.9em;
+}
+
+.actual-tutorial-input-letter {
+  position: relative;
+  color: transparent;
+  animation: actualTutorialInputLetter 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-input-letter::before {
+  content: "_";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #0f172a;
+  animation: actualTutorialInputBlank 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-keyboard {
+  display: grid;
+  gap: 0.38rem;
+  width: max-content;
+  border: 3px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.82);
+  box-shadow: 0 15px 0 rgba(15, 23, 42, 0.45);
+  padding: 0.65rem;
+}
+
+.actual-tutorial-keyboard-guess {
+  left: 50%;
+  top: 54%;
+  transform: translateX(-50%);
+}
+
+.actual-tutorial-keyboard-type {
+  left: 50%;
+  top: 62%;
+  transform: translateX(-50%);
+}
+
+.actual-tutorial-keyboard div {
+  display: flex;
+  justify-content: center;
+  gap: 0.38rem;
+}
+
+.actual-tutorial-keyboard span {
+  display: grid;
+  place-items: center;
+  width: clamp(34px, 3.7vw, 54px);
+  height: clamp(32px, 3.5vw, 48px);
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f8fafc, #cbd5e1);
+  box-shadow: 0 6px 0 rgba(30, 41, 59, 0.85);
+  color: #0f172a;
+  font-size: clamp(0.82rem, 1.5vw, 1.1rem);
+  font-weight: 1000;
+}
+
+.actual-tutorial-keyboard-guess span,
+.actual-tutorial-keyboard-type span {
+  width: clamp(31px, 3vw, 46px);
+  height: clamp(30px, 2.9vw, 42px);
+  font-size: clamp(0.76rem, 1.2vw, 0.95rem);
+}
+
+.actual-tutorial-keyboard span.actual-tutorial-space-key {
+  width: clamp(122px, 14vw, 210px);
+}
+
+.actual-tutorial-keyboard span.key-click-one {
+  animation: actualTutorialKeyClickOne 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-keyboard span.key-click-two {
+  animation: actualTutorialKeyClickTwo 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-keyboard span.key-click-three {
+  animation: actualTutorialKeyClickThree 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-guess-progress {
+  left: 50%;
+  top: 43%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  transform: translateX(-50%);
+  border: 3px solid rgba(191, 219, 254, 0.9);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 12px 0 rgba(15, 23, 42, 0.44);
+  padding: 0.45rem 0.75rem;
+}
+
+.actual-tutorial-guess-progress span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 42px;
+  border-bottom: 4px solid #93c5fd;
+  color: #dbeafe;
+  font-size: 1.35rem;
+  font-weight: 1000;
+}
+
+.actual-tutorial-guess-progress span:first-child {
+  animation: actualTutorialTypedTile 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-falling-word {
+  left: 45%;
+  top: 25%;
+  border: 3px solid #fef3c7;
+  border-radius: 999px;
+  background: #fde68a;
+  color: #111827;
+  padding: 0.55rem 1.1rem;
+  box-shadow: 0 12px 0 rgba(15, 23, 42, 0.52);
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  font-weight: 1000;
+  animation: actualTutorialWordDrop 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-type-input {
+  left: 50%;
+  top: 47%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: clamp(260px, 28vw, 410px);
+  height: 66px;
+  border: 4px solid #93c5fd;
+  border-radius: 18px;
+  background: #eff6ff;
+  box-shadow: 0 14px 0 rgba(15, 23, 42, 0.52);
+  color: #1e3a8a;
+  font-size: clamp(1.05rem, 2.2vw, 1.65rem);
+  font-weight: 1000;
+  transform: translateX(-50%);
+}
+
+.actual-tutorial-type-input span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1em;
+  opacity: 0.2;
+}
+
+.actual-tutorial-type-input-demo span:nth-child(1) {
+  animation: actualTutorialTypeLetterOne 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-type-input-demo span:nth-child(2) {
+  animation: actualTutorialTypeLetterTwo 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-type-input-demo span:nth-child(3) {
+  animation: actualTutorialTypeLetterThree 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-enter-button {
+  left: 68%;
+  top: 48%;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 56px;
+  border: 3px solid #dcfce7;
+  border-radius: 16px;
+  background: #22c55e;
+  box-shadow: 0 10px 0 rgba(15, 23, 42, 0.52);
+  color: #052e16;
+  font-weight: 1000;
+}
+
+.actual-tutorial-cursor-platform {
+  animation: actualCursorPlatform 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-cursor-drag {
+  animation: actualCursorDrag 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-cursor-cards {
+  animation: actualCursorCards 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-cursor-catch {
+  animation: actualCursorCatch 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-cursor-guess {
+  animation: actualCursorGuess 2.7s ease-in-out infinite;
+}
+
+.actual-tutorial-cursor-type {
+  animation: actualCursorType 2.7s ease-in-out infinite;
+}
+
+@keyframes actualTutorialPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes actualTutorialDash {
+  to { stroke-dashoffset: -7; }
+}
+
+@keyframes actualCursorPlatform {
+  0%, 100% { left: 18%; top: 59%; transform: rotate(-14deg) scale(0.94); }
+  42% { left: 43%; top: 42%; transform: rotate(-10deg) scale(0.94); }
+  70% { left: 70%; top: 48%; transform: rotate(-8deg) scale(0.82); }
+}
+
+@keyframes actualCursorDrag {
+  0%, 100% { right: 14%; top: 36%; transform: rotate(-16deg) scale(0.94); }
+  18% { transform: rotate(-16deg) scale(0.8); }
+  62% { right: 48%; top: 48%; transform: rotate(-8deg) scale(0.94); }
+  78% { right: 48%; top: 48%; transform: rotate(-8deg) scale(0.8); }
+}
+
+@keyframes actualCursorCards {
+  0%, 100% { left: 38%; top: 43%; transform: rotate(-16deg) scale(0.94); }
+  17% { transform: rotate(-16deg) scale(0.8); }
+  50% { left: 54%; top: 43%; transform: rotate(-12deg) scale(0.94); }
+  68% { left: 54%; top: 43%; transform: rotate(-12deg) scale(0.8); }
+}
+
+@keyframes actualCursorCatch {
+  0%, 100% { left: 33%; top: 70%; transform: rotate(-14deg) scale(0.94); }
+  44% { left: 49%; top: 70%; transform: rotate(-10deg) scale(0.94); }
+  74% { left: 49%; top: 54%; transform: rotate(-8deg) scale(0.82); }
+}
+
+@keyframes actualCursorGuess {
+  0%, 100% { left: 39%; top: 67%; transform: rotate(-14deg) scale(0.94); }
+  18% { transform: rotate(-14deg) scale(0.8); }
+  34% { left: 39%; top: 67%; transform: rotate(-14deg) scale(0.94); }
+  58% { left: 38%; top: 39%; transform: rotate(-10deg) scale(0.94); }
+}
+
+@keyframes actualCursorType {
+  0%, 100% { left: 39%; top: 64%; transform: rotate(-14deg) scale(0.94); }
+  14% { transform: rotate(-14deg) scale(0.8); }
+  34% { left: 50%; top: 74%; transform: rotate(-10deg) scale(0.94); }
+  48% { left: 50%; top: 74%; transform: rotate(-10deg) scale(0.8); }
+  68% { left: 59%; top: 64%; transform: rotate(-9deg) scale(0.94); }
+  82% { left: 59%; top: 64%; transform: rotate(-9deg) scale(0.8); }
+}
+
+@keyframes actualTutorialFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes actualTutorialCardFlipA {
+  0%, 9%, 100% { transform: translateY(0) scale(1) rotateY(0deg); }
+  14% { transform: translateY(8px) scale(0.96) rotateY(0deg); }
+  24%, 84% { transform: translateY(0) scale(1) rotateY(180deg); }
+  92% { transform: translateY(0) scale(1) rotateY(0deg); }
+}
+
+@keyframes actualTutorialCardFlipB {
+  0%, 46%, 100% { transform: translateY(0) scale(1) rotateY(0deg); }
+  56% { transform: translateY(8px) scale(0.96) rotateY(0deg); }
+  66%, 84% { transform: translateY(0) scale(1) rotateY(180deg); }
+  92% { transform: translateY(0) scale(1) rotateY(0deg); }
+}
+
+@keyframes actualTutorialTokenFall {
+  0%, 100% { transform: translateY(0); }
+  72% { transform: translateY(34vh); }
+}
+
+@keyframes actualTutorialBasketMove {
+  0%, 100% { transform: translateX(-12vw); }
+  48%, 80% { transform: translateX(0); }
+}
+
+@keyframes actualTutorialKeyClickOne {
+  0%, 100% { transform: translateY(0); background: linear-gradient(180deg, #f8fafc, #cbd5e1); }
+  16% { transform: translateY(6px) scale(0.95); background: #86efac; }
+  31% { transform: translateY(0); background: linear-gradient(180deg, #f8fafc, #cbd5e1); }
+}
+
+@keyframes actualTutorialKeyClickTwo {
+  0%, 32%, 100% { transform: translateY(0); background: linear-gradient(180deg, #f8fafc, #cbd5e1); }
+  46% { transform: translateY(6px) scale(0.95); background: #86efac; }
+  59% { transform: translateY(0); background: linear-gradient(180deg, #f8fafc, #cbd5e1); }
+}
+
+@keyframes actualTutorialKeyClickThree {
+  0%, 62%, 100% { transform: translateY(0); background: linear-gradient(180deg, #f8fafc, #cbd5e1); }
+  77% { transform: translateY(6px) scale(0.95); background: #86efac; }
+  90% { transform: translateY(0); background: linear-gradient(180deg, #f8fafc, #cbd5e1); }
+}
+
+@keyframes actualTutorialInputLetter {
+  0%, 38%, 100% { color: transparent; transform: translateY(0); }
+  48%, 84% { color: #0f172a; transform: translateY(-2px); }
+}
+
+@keyframes actualTutorialInputBlank {
+  0%, 38%, 100% { opacity: 1; }
+  48%, 84% { opacity: 0; }
+}
+
+@keyframes actualTutorialTypedTile {
+  0%, 38%, 100% { color: transparent; transform: translateY(0); }
+  48%, 84% { color: #86efac; transform: translateY(-3px); }
+}
+
+@keyframes actualTutorialTypeLetterOne {
+  0%, 8%, 100% { opacity: 0.2; color: #1e3a8a; transform: translateY(0); }
+  18%, 86% { opacity: 1; color: #1e3a8a; transform: translateY(-2px); }
+}
+
+@keyframes actualTutorialTypeLetterTwo {
+  0%, 28%, 100% { opacity: 0.2; color: #1e3a8a; transform: translateY(0); }
+  40%, 86% { opacity: 1; color: #1e3a8a; transform: translateY(-2px); }
+}
+
+@keyframes actualTutorialTypeLetterThree {
+  0%, 50%, 100% { opacity: 0.2; color: #1e3a8a; transform: translateY(0); }
+  62%, 86% { opacity: 1; color: #1e3a8a; transform: translateY(-2px); }
+}
+
+@keyframes actualTutorialWordDrop {
+  0%, 100% { transform: translateY(0); }
+  54% { transform: translateY(30vh); }
+}

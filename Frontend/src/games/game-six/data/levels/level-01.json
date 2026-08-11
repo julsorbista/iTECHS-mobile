@@ -1,0 +1,19 @@
+{
+  "id": "game-six-level-01",
+  "gameType": "GAME_SIX",
+  "levelNumber": 1,
+  "seedVersion": 2,
+  "title": "Syntax Rain Typing: Warmup",
+  "subtitle": "Type five falling programming terms in two minutes.",
+  "objective": "Type five falling programming terms in two minutes.",
+  "settings": {
+    "targetWords": 5,
+    "seconds": 120,
+    "lives": 5,
+    "rewardEvery": 3
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

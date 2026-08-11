@@ -1,0 +1,203 @@
+{
+  "id": "game-two-level-01",
+  "gameType": "GAME_TWO",
+  "levelNumber": 1,
+  "seedVersion": 4,
+  "title": "Code Quest Lab: First Compile",
+  "subtitle": "Drag the correct Java snippets into broken code.",
+  "objective": "Repair beginner Java code by dropping the one correct snippet into each messed-up program.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 210,
+    "maxMistakes": 4,
+    "targetPoints": 700,
+    "bonusPerSecond": 2
+  },
+  "tasks": [
+    {
+      "id": "g2l1-t1",
+      "type": "complete",
+      "title": "Print A Message",
+      "prompt": "The program is missing the line that prints Hello, iTECHS! Drag the correct snippet into the blank.",
+      "snippet": "public class HelloWorld {\n  public static void main(String[] args) {\n    ____\n  }\n}",
+      "answer": "System.out.println(\"Hello, iTECHS!\");",
+      "acceptedAnswers": [
+        "System.out.println(\"Hello, iTECHS!\");"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "System.out.print(\"Hello, iTECHS!\")"
+        },
+        {
+          "id": "b",
+          "label": "System.out.println(\"Hello, iTECHS!\");"
+        },
+        {
+          "id": "c",
+          "label": "print(\"Hello, iTECHS!\");"
+        },
+        {
+          "id": "d",
+          "label": "System.out.println(Hello, iTECHS!);"
+        }
+      ],
+      "points": 120,
+      "coinReward": 1,
+      "coach": "Console output is a fast way to inspect what your program is doing.",
+      "hints": [
+        "Use System.out.println.",
+        "The message must be inside double quotes.",
+        "End the statement with a semicolon."
+      ],
+      "feedback": {
+        "correct": "Output line compiled.",
+        "wrong": "Check System.out.println, quotes, and semicolon."
+      }
+    },
+    {
+      "id": "g2l1-t2",
+      "type": "complete",
+      "title": "Store A Score",
+      "prompt": "Complete the missing code so score stores the number 10.",
+      "snippet": "int score = ____;",
+      "answer": "10",
+      "acceptedAnswers": [
+        "10"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "\"10\""
+        },
+        {
+          "id": "b",
+          "label": "ten"
+        },
+        {
+          "id": "c",
+          "label": "10"
+        },
+        {
+          "id": "d",
+          "label": "10;"
+        }
+      ],
+      "points": 110,
+      "coinReward": 1,
+      "coach": "Java int variables can store whole numbers directly.",
+      "hints": [
+        "No quotes are needed for a number.",
+        "The value is ten."
+      ]
+    },
+    {
+      "id": "g2l1-t3",
+      "type": "choice",
+      "title": "Find The Syntax Error",
+      "prompt": "Which line correctly creates an int variable named coins with value 5?",
+      "correctOptionId": "b",
+      "points": 130,
+      "coinReward": 1,
+      "coach": "Java needs a type before the variable name.",
+      "options": [
+        {
+          "id": "a",
+          "label": "int coins == 5;"
+        },
+        {
+          "id": "b",
+          "label": "int coins = 5;"
+        },
+        {
+          "id": "c",
+          "label": "coins int = 5;"
+        },
+        {
+          "id": "d",
+          "label": "int coins: 5;"
+        }
+      ],
+      "hints": [
+        "Assignment uses one equals sign.",
+        "The type comes before the name."
+      ]
+    },
+    {
+      "id": "g2l1-t4",
+      "type": "debug",
+      "title": "Repair The Condition",
+      "prompt": "The condition line is missing the correct if header. Drag the snippet that repairs it.",
+      "snippet": "____\n  System.out.println(\"Unlocked\");\n}",
+      "answer": "if (score >= 10) {",
+      "acceptedAnswers": [
+        "if (score >= 10) {"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "if score >= 10) {"
+        },
+        {
+          "id": "b",
+          "label": "if (score >= 10) {"
+        },
+        {
+          "id": "c",
+          "label": "if (score => 10) {"
+        },
+        {
+          "id": "d",
+          "label": "when (score >= 10) {"
+        }
+      ],
+      "points": 140,
+      "coinReward": 1,
+      "coach": "Java conditions need parentheses around the test.",
+      "hints": [
+        "The test goes inside ( ).",
+        "Keep the opening brace at the end."
+      ]
+    },
+    {
+      "id": "g2l1-t5",
+      "type": "reorder",
+      "title": "Build A Tiny Program",
+      "prompt": "Arrange the blocks into a sensible program order.",
+      "points": 160,
+      "coinReward": 2,
+      "coach": "Define the variables before using name in the output.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "let name = \"Ada\";"
+        },
+        {
+          "id": "b",
+          "code": "console.log(name);"
+        },
+        {
+          "id": "c",
+          "code": "let ready = true;"
+        }
+      ],
+      "initialOrder": [
+        "b",
+        "c",
+        "a"
+      ],
+      "correctOrder": [
+        "a",
+        "c",
+        "b"
+      ],
+      "hints": [
+        "Create name before printing it.",
+        "Set the ready variable before the output."
+      ]
+    }
+  ]
+}

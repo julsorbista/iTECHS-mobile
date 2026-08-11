@@ -1,0 +1,203 @@
+{
+  "id": "game-two-level-03",
+  "gameType": "GAME_TWO",
+  "levelNumber": 3,
+  "seedVersion": 3,
+  "title": "Code Quest Lab: Loop Runner",
+  "subtitle": "Repair loops and indexes.",
+  "objective": "Use Java loops to repeat work without repeating yourself.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 270,
+    "maxMistakes": 3,
+    "targetPoints": 1000,
+    "bonusPerSecond": 2
+  },
+  "tasks": [
+    {
+      "id": "g2l3-t1",
+      "type": "complete",
+      "title": "Loop Start",
+      "prompt": "Complete the loop so i starts at 0.",
+      "snippet": "for (int i = ____; i < 3; i++) {",
+      "answer": "0",
+      "acceptedAnswers": [
+        "0"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "1"
+        },
+        {
+          "id": "b",
+          "label": "0"
+        },
+        {
+          "id": "c",
+          "label": "\"0\""
+        },
+        {
+          "id": "d",
+          "label": "i"
+        }
+      ],
+      "points": 120,
+      "coinReward": 1,
+      "coach": "Most array and loop counters start at zero.",
+      "hints": [
+        "The first index is zero."
+      ]
+    },
+    {
+      "id": "g2l3-t2",
+      "type": "debug",
+      "title": "Fix Infinite Loop",
+      "prompt": "The loop counts the wrong way. Drag the repaired loop header into the blank.",
+      "snippet": "____\n  System.out.println(i);\n}",
+      "answer": "for (int i = 0; i < 5; i++) {",
+      "acceptedAnswers": [
+        "for (int i = 0; i < 5; i++) {"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "for (int i = 0; i < 5; i--) {"
+        },
+        {
+          "id": "b",
+          "label": "for (int i = 0; i < 5; i++) {"
+        },
+        {
+          "id": "c",
+          "label": "for (int i = 0; i < 5) {"
+        },
+        {
+          "id": "d",
+          "label": "for (i = 0; i < 5; i++) {"
+        }
+      ],
+      "points": 160,
+      "coinReward": 1,
+      "coach": "If i gets smaller while the condition waits for i < 5, the loop may never stop.",
+      "hints": [
+        "The update should increase i.",
+        "Use i++."
+      ]
+    },
+    {
+      "id": "g2l3-t3",
+      "type": "complete",
+      "title": "Array Access",
+      "prompt": "Drag the expression that reads the first item in items.",
+      "snippet": "String first = ____;",
+      "answer": "items[0]",
+      "acceptedAnswers": [
+        "items[0]"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "items[1]"
+        },
+        {
+          "id": "b",
+          "label": "items(0)"
+        },
+        {
+          "id": "c",
+          "label": "items[0]"
+        },
+        {
+          "id": "d",
+          "label": "items.first"
+        }
+      ],
+      "points": 130,
+      "coinReward": 1,
+      "coach": "Array positions start at index 0.",
+      "hints": [
+        "Use square brackets.",
+        "First item means index 0."
+      ]
+    },
+    {
+      "id": "g2l3-t4",
+      "type": "choice",
+      "title": "Loop Count",
+      "prompt": "How many times does this Java loop run? for (int i = 0; i < 4; i++)",
+      "correctOptionId": "d",
+      "points": 130,
+      "coinReward": 1,
+      "coach": "The values are 0, 1, 2, and 3.",
+      "options": [
+        {
+          "id": "a",
+          "label": "0 times"
+        },
+        {
+          "id": "b",
+          "label": "3 times"
+        },
+        {
+          "id": "c",
+          "label": "5 times"
+        },
+        {
+          "id": "d",
+          "label": "4 times"
+        }
+      ],
+      "hints": [
+        "Count every value before 4.",
+        "It includes 0."
+      ]
+    },
+    {
+      "id": "g2l3-t5",
+      "type": "reorder",
+      "title": "Loop Program",
+      "prompt": "Drag the Java blocks so the program prints each name.",
+      "points": 200,
+      "coinReward": 2,
+      "coach": "Create the array, loop through it, print each item, then close the loop.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "String[] names = {\"Ada\", \"Lin\"};"
+        },
+        {
+          "id": "b",
+          "code": "for (int i = 0; i < names.length; i++) {"
+        },
+        {
+          "id": "c",
+          "code": "  System.out.println(names[i]);"
+        },
+        {
+          "id": "d",
+          "code": "}"
+        }
+      ],
+      "initialOrder": [
+        "b",
+        "a",
+        "d",
+        "c"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "hints": [
+        "The array must exist before the loop.",
+        "The print line belongs inside the loop."
+      ]
+    }
+  ]
+}

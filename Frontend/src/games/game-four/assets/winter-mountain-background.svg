@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Pixel winter mountain background">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4d89bd"/>
+      <stop offset="45%" stop-color="#73c7f7"/>
+      <stop offset="100%" stop-color="#bfe8ff"/>
+    </linearGradient>
+    <linearGradient id="snowShade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d6efff"/>
+    </linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#sky)"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+
+  <g fill="#d5f1ff" opacity=".45">
+    <rect x="16" y="42" width="108" height="8"/>
+    <rect x="132" y="38" width="122" height="7"/>
+    <rect x="278" y="48" width="88" height="6"/>
+    <rect x="402" y="40" width="140" height="7"/>
+    <rect x="1005" y="52" width="126" height="8"/>
+  </g>
+
+  <g fill="#f4fbff">
+    <path d="M120 118l32-18 40 22 22-12 44 18 24-8 52 24 14 16H82z"/>
+    <path d="M710 82l36-20 52 26 18-10 58 20 22 24H676z"/>
+    <path d="M880 112l28-16 40 18 18-8 44 18 20 18H848z"/>
+    <path d="M545 134l18-10 22 12 12-6 24 12 10 12H534z"/>
+  </g>
+
+  <g>
+    <path d="M64 334l126-162 92 162z" fill="#e9f8ff"/>
+    <path d="M190 334l122-148 100 148z" fill="#eefaff"/>
+    <path d="M316 334l154-176 114 176z" fill="#f8feff"/>
+    <path d="M492 334l138-158 102 158z" fill="#eaf7ff"/>
+    <path d="M644 334l162-194 120 194z" fill="#f9feff"/>
+    <path d="M818 334l132-154 102 154z" fill="#eefaff"/>
+    <path d="M960 334l152-206 88 206z" fill="#faffff"/>
+  </g>
+
+  <g fill="#8fc9f0" opacity=".55">
+    <path d="M0 340h1200v120H0z"/>
+  </g>
+
+  <g fill="#1b5d6f">
+    <rect x="58" y="316" width="10" height="78"/>
+    <rect x="142" y="292" width="11" height="92"/>
+    <rect x="245" y="300" width="10" height="84"/>
+    <rect x="331" y="298" width="10" height="88"/>
+    <rect x="430" y="314" width="10" height="82"/>
+    <rect x="535" y="304" width="10" height="92"/>
+    <rect x="690" y="286" width="12" height="108"/>
+    <rect x="812" y="268" width="12" height="116"/>
+    <rect x="928" y="274" width="12" height="110"/>
+    <rect x="1088" y="302" width="12" height="92"/>
+  </g>
+
+  <g fill="#2f8d76">
+    <path d="M10 344l54-104 54 104H10z"/>
+    <path d="M76 332l66-128 66 128H76z"/>
+    <path d="M180 346l60-116 60 116H180z"/>
+    <path d="M282 340l56-110 56 110H282z"/>
+    <path d="M380 354l56-102 56 102H380z"/>
+    <path d="M484 350l58-116 58 116H484z"/>
+    <path d="M624 340l70-132 70 132H624z"/>
+    <path d="M742 330l74-144 74 144H742z"/>
+    <path d="M864 336l64-124 64 124H864z"/>
+    <path d="M990 344l70-138 70 138H990z"/>
+  </g>
+
+  <g fill="#dff4ff">
+    <path d="M0 458c170 16 294 18 418-12 126-30 246-22 356-10 128 14 266 28 426-8v247H0z"/>
+    <path d="M734 554c134-18 278-6 466 18v103H618c20-52 54-93 116-121z" fill="#b9e1fb"/>
+    <path d="M0 536c128 24 272 20 404-12-44 40-86 84-110 151H0z" fill="#eaf8ff"/>
+  </g>
+
+  <g fill="#ffffff" opacity=".85">
+    <rect x="72" y="596" width="58" height="4"/>
+    <rect x="324" y="564" width="42" height="4"/>
+    <rect x="688" y="622" width="68" height="4"/>
+    <rect x="910" y="586" width="54" height="4"/>
+  </g>
+</svg>

@@ -1,0 +1,60 @@
+{
+  "id": "game-four-level-01",
+  "gameType": "GAME_FOUR",
+  "levelNumber": 1,
+  "title": "Variable Catch Basics",
+  "subtitle": "Catch the tokens and build simple Java variable declarations.",
+  "objective": "Collect the correct code parts, avoid hazards, and arrange each Java variable statement in the right order.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "randomizeStatements": true,
+    "spawnIntervalMs": 920,
+    "fallSpeed": 230,
+    "moveSpeed": 460,
+    "maxMistakes": 3,
+    "lives": 3,
+    "coinRewardPerRound": 1,
+    "statementReward": 120
+  },
+  "rounds": [
+    {
+      "id": "g4-l1-r1",
+      "topic": "Java Variables",
+      "prompt": "Build a valid integer variable declaration for score.",
+      "targetTokens": ["int", "score", "=", "10", ";"],
+      "distractorTokens": ["boolean", "print", "false", "void"],
+      "hints": [
+        "Start with the data type keyword.",
+        "The variable name comes before the equals sign.",
+        "A Java statement ends with a semicolon."
+      ]
+    },
+    {
+      "id": "g4-l1-r2",
+      "topic": "Java Variables",
+      "prompt": "Build a valid String variable declaration for name.",
+      "targetTokens": ["String", "name", "=", "\"Java\"", ";"],
+      "distractorTokens": ["int", "return", "class", "main"],
+      "hints": [
+        "String text values are wrapped in quotation marks.",
+        "The identifier should describe what the value stores.",
+        "Keep the declaration in type-name-equals-value order."
+      ]
+    },
+    {
+      "id": "g4-l1-r3",
+      "topic": "Java Variables",
+      "prompt": "Build a valid boolean variable declaration for isReady.",
+      "targetTokens": ["boolean", "isReady", "=", "true", ";"],
+      "distractorTokens": ["String", "\"true\"", "println", "public"],
+      "hints": [
+        "Boolean variables store only true or false.",
+        "Do not put true inside quotation marks.",
+        "Use a descriptive variable name after the type."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "appId": "com.itechs.student",
+  "appName": "iTECHS Student",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http"
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#16876d",
+      "showSpinner": false
+    },
+    "Keyboard": {
+      "resize": "body"
+    }
+  }
+}

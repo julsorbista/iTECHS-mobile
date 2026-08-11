@@ -1,0 +1,211 @@
+{
+  "id": "game-two-level-05",
+  "gameType": "GAME_TWO",
+  "levelNumber": 5,
+  "seedVersion": 3,
+  "title": "Code Quest Lab: Debug Boss",
+  "subtitle": "Solve a mixed Java coding gauntlet under pressure.",
+  "objective": "Combine variables, arrays, loops, methods, and debugging in one final sprint.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 330,
+    "maxMistakes": 3,
+    "targetPoints": 1300,
+    "bonusPerSecond": 3
+  },
+  "tasks": [
+    {
+      "id": "g2l5-t1",
+      "type": "debug",
+      "title": "Fix The Method Header",
+      "prompt": "The method header is missing parameter parentheses. Drag the repaired header into the blank.",
+      "snippet": "____\n  System.out.println(\"Hello \" + name);\n}",
+      "answer": "public static void greet(String name) {",
+      "acceptedAnswers": [
+        "public static void greet(String name) {"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "public static void greet String name) {"
+        },
+        {
+          "id": "b",
+          "label": "public static void greet(String name) {"
+        },
+        {
+          "id": "c",
+          "label": "public static greet(String name) {"
+        },
+        {
+          "id": "d",
+          "label": "public static void greet[String name] {"
+        }
+      ],
+      "points": 160,
+      "coinReward": 1,
+      "coach": "The parameter list must be wrapped in parentheses.",
+      "hints": [
+        "Put String name inside parentheses.",
+        "Keep the opening brace."
+      ]
+    },
+    {
+      "id": "g2l5-t2",
+      "type": "complete",
+      "title": "Text Output",
+      "prompt": "Complete the missing expression to print the player name.",
+      "snippet": "System.out.println(\"Player: \" + ____);",
+      "answer": "name",
+      "acceptedAnswers": [
+        "name"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "\"name\""
+        },
+        {
+          "id": "b",
+          "label": "player"
+        },
+        {
+          "id": "c",
+          "label": "name"
+        },
+        {
+          "id": "d",
+          "label": "String name"
+        }
+      ],
+      "points": 150,
+      "coinReward": 1,
+      "coach": "String concatenation can join text with a variable.",
+      "hints": [
+        "Use the variable name.",
+        "No quotes around the variable."
+      ]
+    },
+    {
+      "id": "g2l5-t3",
+      "type": "choice",
+      "title": "Best Debug Step",
+      "prompt": "A Java loop is skipping the first array item. What should you inspect first?",
+      "correctOptionId": "b",
+      "points": 150,
+      "coinReward": 1,
+      "coach": "Skipped first items often point to a starting index problem.",
+      "options": [
+        {
+          "id": "a",
+          "label": "The CSS color"
+        },
+        {
+          "id": "b",
+          "label": "The loop starting index"
+        },
+        {
+          "id": "c",
+          "label": "The file name only"
+        },
+        {
+          "id": "d",
+          "label": "The image size"
+        }
+      ],
+      "hints": [
+        "Arrays start at 0.",
+        "Look at the first value of i."
+      ]
+    },
+    {
+      "id": "g2l5-t4",
+      "type": "complete",
+      "title": "Guard Condition",
+      "prompt": "Drag the condition that checks lives is greater than 0 and score is at least 100.",
+      "snippet": "if (____) {\n  System.out.println(\"Bonus round\");\n}",
+      "answer": "lives > 0 && score >= 100",
+      "acceptedAnswers": [
+        "lives > 0 && score >= 100",
+        "score >= 100 && lives > 0"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "lives > 0 || score >= 100"
+        },
+        {
+          "id": "b",
+          "label": "lives > 0 && score >= 100"
+        },
+        {
+          "id": "c",
+          "label": "lives >= 0 && score > 100"
+        },
+        {
+          "id": "d",
+          "label": "lives = 0 && score = 100"
+        }
+      ],
+      "points": 180,
+      "coinReward": 1,
+      "coach": "Both conditions must be true, so use logical AND.",
+      "hints": [
+        "Use && between the two checks.",
+        "One check is lives > 0."
+      ]
+    },
+    {
+      "id": "g2l5-t5",
+      "type": "reorder",
+      "title": "Final Compile",
+      "prompt": "Drag the Java mini-program so it computes and prints the total.",
+      "points": 260,
+      "coinReward": 2,
+      "coach": "Declare values, create total, test it, print the result, then close the block.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "int[] coins = {5, 10, 15};"
+        },
+        {
+          "id": "b",
+          "code": "int total = coins[0] + coins[1] + coins[2];"
+        },
+        {
+          "id": "c",
+          "code": "if (total >= 30) {"
+        },
+        {
+          "id": "d",
+          "code": "  System.out.println(\"Bonus unlocked\");"
+        },
+        {
+          "id": "e",
+          "code": "}"
+        }
+      ],
+      "initialOrder": [
+        "c",
+        "a",
+        "d",
+        "b",
+        "e"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "hints": [
+        "The array must exist before total uses it.",
+        "The print line belongs inside the if block."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "game_one-level-05",
+  "gameType": "GAME_ONE",
+  "levelNumber": 5,
+  "title": "Level 05",
+  "subtitle": "",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "questions": [],
+  "rooms": [
+    {
+      "id": "room-1",
+      "backgroundKey": "tutorialGrove",
+      "objective": "Configure this level in the admin editor.",
+      "postUnlockObjective": "",
+      "spawn": {
+        "x": 160,
+        "y": 560
+      },
+      "platforms": [
+        {
+          "id": "floor",
+          "x": 640,
+          "y": 684,
+          "width": 1280,
+          "bodyHeight": 72,
+          "textureKey": "grass"
+        }
+      ],
+      "unlockPlatforms": [],
+      "barriers": [],
+      "coins": [],
+      "ghosts": [],
+      "projectileEnemies": [],
+      "villain": null,
+      "portal": {
+        "x": 1135,
+        "y": 556,
+        "locked": false,
+        "targetRoomId": null,
+        "endsLevel": true
+      }
+    }
+  ]
+}

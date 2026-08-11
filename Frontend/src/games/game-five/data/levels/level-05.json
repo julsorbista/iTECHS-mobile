@@ -1,0 +1,18 @@
+{
+  "id": "game-five-level-05",
+  "gameType": "GAME_FIVE",
+  "levelNumber": 5,
+  "seedVersion": 2,
+  "title": "Code Snowman: Compiler Freeze",
+  "subtitle": "Guess ten harder programming terms before the final melt.",
+  "objective": "Guess ten harder programming terms before the final melt.",
+  "settings": {
+    "targetWords": 10,
+    "seconds": 120,
+    "lives": 5
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

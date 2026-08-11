@@ -1,0 +1,673 @@
+{
+  "id": "game-three-level-01",
+  "gameType": "GAME_THREE",
+  "levelNumber": 1,
+  "title": "Data Basics",
+  "subtitle": "4 cards | 2 pairs",
+  "objective": "Find 2 matching pairs of programming concepts. Each solved pair reveals a multiple-choice question about that term.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "columns": 2,
+    "previewMs": 1400,
+    "flipBackMs": 1000
+  },
+  "pairs": [
+    {
+      "id": "variable-l1",
+      "label": "Variable",
+      "accent": "#34d399",
+      "badge": "01",
+      "cardArt": "variable",
+      "spriteKey": "variable",
+      "question": {
+        "prompt": "What is a variable in programming?",
+        "options": [
+          {
+            "id": "a",
+            "label": "A named storage location that holds a value"
+          },
+          {
+            "id": "b",
+            "label": "A function that returns a fixed number"
+          },
+          {
+            "id": "c",
+            "label": "A type of computer hardware"
+          },
+          {
+            "id": "d",
+            "label": "A loop that runs forever"
+          }
+        ],
+        "correctOptionId": "a",
+        "hints": [
+          "Think of it as a labeled box for data.",
+          "Its value can be read and updated by name."
+        ],
+        "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope."
+      },
+      "questions": [
+        {
+          "prompt": "What is a variable in programming?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A function that returns a fixed number"
+            },
+            {
+              "id": "b",
+              "label": "A type of computer hardware"
+            },
+            {
+              "id": "c",
+              "label": "A named storage location that holds a value"
+            },
+            {
+              "id": "d",
+              "label": "A loop that runs forever"
+            }
+          ],
+          "correctOptionId": "c",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-1",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which option best defines Variable?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A type of computer hardware"
+            },
+            {
+              "id": "b",
+              "label": "A loop that runs forever"
+            },
+            {
+              "id": "c",
+              "label": "A method that performs a reusable task"
+            },
+            {
+              "id": "d",
+              "label": "A labeled container for storing data"
+            }
+          ],
+          "correctOptionId": "d",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-2",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "What does Variable usually mean in programming?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A named value holder used in code"
+            },
+            {
+              "id": "b",
+              "label": "A loop that runs forever"
+            },
+            {
+              "id": "c",
+              "label": "A method that performs a reusable task"
+            },
+            {
+              "id": "d",
+              "label": "A loop that repeats a block of code"
+            }
+          ],
+          "correctOptionId": "a",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-3",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which statement is true about Variable?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A method that performs a reusable task"
+            },
+            {
+              "id": "b",
+              "label": "A place in a program where a value is stored"
+            },
+            {
+              "id": "c",
+              "label": "A loop that repeats a block of code"
+            },
+            {
+              "id": "d",
+              "label": "A class blueprint used to create objects"
+            }
+          ],
+          "correctOptionId": "b",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-4",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "How is Variable correctly understood in code?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A loop that repeats a block of code"
+            },
+            {
+              "id": "b",
+              "label": "A class blueprint used to create objects"
+            },
+            {
+              "id": "c",
+              "label": "A name that refers to stored data"
+            },
+            {
+              "id": "d",
+              "label": "A condition that chooses between branches"
+            }
+          ],
+          "correctOptionId": "c",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-5",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which answer matches the purpose of Variable?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A class blueprint used to create objects"
+            },
+            {
+              "id": "b",
+              "label": "A condition that chooses between branches"
+            },
+            {
+              "id": "c",
+              "label": "An import statement that loads a package"
+            },
+            {
+              "id": "d",
+              "label": "A reusable name for a value in memory"
+            }
+          ],
+          "correctOptionId": "d",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-6",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "What should a beginner remember about Variable?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A storage spot that can be read by name"
+            },
+            {
+              "id": "b",
+              "label": "A condition that chooses between branches"
+            },
+            {
+              "id": "c",
+              "label": "An import statement that loads a package"
+            },
+            {
+              "id": "d",
+              "label": "An operator that compares two values"
+            }
+          ],
+          "correctOptionId": "a",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-7",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which choice correctly describes Variable?",
+          "options": [
+            {
+              "id": "a",
+              "label": "An import statement that loads a package"
+            },
+            {
+              "id": "b",
+              "label": "A container whose value can be used later"
+            },
+            {
+              "id": "c",
+              "label": "An operator that compares two values"
+            },
+            {
+              "id": "d",
+              "label": "A text value written inside quotation marks"
+            }
+          ],
+          "correctOptionId": "b",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-8",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "What is the main role of Variable?",
+          "options": [
+            {
+              "id": "a",
+              "label": "An operator that compares two values"
+            },
+            {
+              "id": "b",
+              "label": "A text value written inside quotation marks"
+            },
+            {
+              "id": "c",
+              "label": "A named data holder that a program can update"
+            },
+            {
+              "id": "d",
+              "label": "A collection that stores multiple elements"
+            }
+          ],
+          "correctOptionId": "c",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-9",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which explanation fits Variable best?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A text value written inside quotation marks"
+            },
+            {
+              "id": "b",
+              "label": "A collection that stores multiple elements"
+            },
+            {
+              "id": "c",
+              "label": "A return statement that exits a method"
+            },
+            {
+              "id": "d",
+              "label": "A label connected to a value in a program"
+            }
+          ],
+          "correctOptionId": "d",
+          "hints": [
+            "Think of it as a labeled box for data.",
+            "Its value can be read and updated by name."
+          ],
+          "explanation": "A variable is a named storage location that holds a value. The value can be read, reassigned, and referenced anywhere in scope.",
+          "id": "variable-ai-10",
+          "source": "AI_GENERATED_BANK"
+        }
+      ]
+    },
+    {
+      "id": "boolean-l1",
+      "label": "Boolean",
+      "accent": "#10b981",
+      "badge": "02",
+      "cardArt": "boolean",
+      "spriteKey": "boolean",
+      "question": {
+        "prompt": "What values can a boolean hold?",
+        "options": [
+          {
+            "id": "a",
+            "label": "true or false only"
+          },
+          {
+            "id": "b",
+            "label": "Any whole number"
+          },
+          {
+            "id": "c",
+            "label": "Any text string"
+          },
+          {
+            "id": "d",
+            "label": "null only"
+          }
+        ],
+        "correctOptionId": "a",
+        "hints": [
+          "It has exactly two possible states.",
+          "Conditionals depend on this type."
+        ],
+        "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations."
+      },
+      "questions": [
+        {
+          "prompt": "What values can a boolean hold?",
+          "options": [
+            {
+              "id": "a",
+              "label": "true or false only"
+            },
+            {
+              "id": "b",
+              "label": "Any whole number"
+            },
+            {
+              "id": "c",
+              "label": "Any text string"
+            },
+            {
+              "id": "d",
+              "label": "null only"
+            }
+          ],
+          "correctOptionId": "a",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-1",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which option best defines Boolean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Any text string"
+            },
+            {
+              "id": "b",
+              "label": "Only the values true and false"
+            },
+            {
+              "id": "c",
+              "label": "null only"
+            },
+            {
+              "id": "d",
+              "label": "A method that performs a reusable task"
+            }
+          ],
+          "correctOptionId": "b",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-2",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "What does Boolean usually mean in programming?",
+          "options": [
+            {
+              "id": "a",
+              "label": "null only"
+            },
+            {
+              "id": "b",
+              "label": "A method that performs a reusable task"
+            },
+            {
+              "id": "c",
+              "label": "A value that is either true or false"
+            },
+            {
+              "id": "d",
+              "label": "A loop that repeats a block of code"
+            }
+          ],
+          "correctOptionId": "c",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-3",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which statement is true about Boolean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A method that performs a reusable task"
+            },
+            {
+              "id": "b",
+              "label": "A loop that repeats a block of code"
+            },
+            {
+              "id": "c",
+              "label": "A class blueprint used to create objects"
+            },
+            {
+              "id": "d",
+              "label": "One of two logical states"
+            }
+          ],
+          "correctOptionId": "d",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-4",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "How is Boolean correctly understood in code?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A yes-or-no style logic value"
+            },
+            {
+              "id": "b",
+              "label": "A loop that repeats a block of code"
+            },
+            {
+              "id": "c",
+              "label": "A class blueprint used to create objects"
+            },
+            {
+              "id": "d",
+              "label": "A condition that chooses between branches"
+            }
+          ],
+          "correctOptionId": "a",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-5",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which answer matches the purpose of Boolean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A class blueprint used to create objects"
+            },
+            {
+              "id": "b",
+              "label": "A data type with exactly two possible values"
+            },
+            {
+              "id": "c",
+              "label": "A condition that chooses between branches"
+            },
+            {
+              "id": "d",
+              "label": "An import statement that loads a package"
+            }
+          ],
+          "correctOptionId": "b",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-6",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "What should a beginner remember about Boolean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A condition that chooses between branches"
+            },
+            {
+              "id": "b",
+              "label": "An import statement that loads a package"
+            },
+            {
+              "id": "c",
+              "label": "A logical value used by conditions"
+            },
+            {
+              "id": "d",
+              "label": "An operator that compares two values"
+            }
+          ],
+          "correctOptionId": "c",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-7",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which choice correctly describes Boolean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "An import statement that loads a package"
+            },
+            {
+              "id": "b",
+              "label": "An operator that compares two values"
+            },
+            {
+              "id": "c",
+              "label": "A text value written inside quotation marks"
+            },
+            {
+              "id": "d",
+              "label": "Either true or false, nothing else"
+            }
+          ],
+          "correctOptionId": "d",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-8",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "What is the main role of Boolean?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A binary logic value"
+            },
+            {
+              "id": "b",
+              "label": "An operator that compares two values"
+            },
+            {
+              "id": "c",
+              "label": "A text value written inside quotation marks"
+            },
+            {
+              "id": "d",
+              "label": "A collection that stores multiple elements"
+            }
+          ],
+          "correctOptionId": "a",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-9",
+          "source": "AI_GENERATED_BANK"
+        },
+        {
+          "prompt": "Which explanation fits Boolean best?",
+          "options": [
+            {
+              "id": "a",
+              "label": "A text value written inside quotation marks"
+            },
+            {
+              "id": "b",
+              "label": "The two boolean literals: true and false"
+            },
+            {
+              "id": "c",
+              "label": "A collection that stores multiple elements"
+            },
+            {
+              "id": "d",
+              "label": "A return statement that exits a method"
+            }
+          ],
+          "correctOptionId": "b",
+          "hints": [
+            "It has exactly two possible states.",
+            "Conditionals depend on this type."
+          ],
+          "explanation": "A boolean is a primitive type that holds one of two values: true or false. It is the foundation of all conditional and logical operations.",
+          "id": "boolean-ai-10",
+          "source": "AI_GENERATED_BANK"
+        }
+      ]
+    }
+  ]
+}

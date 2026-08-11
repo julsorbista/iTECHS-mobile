@@ -1,0 +1,20 @@
+ALTER TABLE `level_definitions`
+    MODIFY `gameType` ENUM('GAME_ONE', 'GAME_TWO', 'GAME_THREE', 'GAME_FOUR') NOT NULL;
+
+ALTER TABLE `dynamic_question_variants`
+    MODIFY `gameType` ENUM('GAME_ONE', 'GAME_TWO', 'GAME_THREE', 'GAME_FOUR') NOT NULL DEFAULT 'GAME_ONE';
+
+ALTER TABLE `dynamic_question_assignments`
+    MODIFY `gameType` ENUM('GAME_ONE', 'GAME_TWO', 'GAME_THREE', 'GAME_FOUR') NOT NULL DEFAULT 'GAME_ONE';
+
+ALTER TABLE `game_sessions`
+    MODIFY `gameType` ENUM('GAME_ONE', 'GAME_TWO', 'GAME_THREE', 'GAME_FOUR') NOT NULL;
+
+ALTER TABLE `level_attempts`
+    MODIFY `gameType` ENUM('GAME_ONE', 'GAME_TWO', 'GAME_THREE', 'GAME_FOUR') NOT NULL;
+
+ALTER TABLE `content_flags`
+    MODIFY `gameType` ENUM('GAME_ONE', 'GAME_TWO', 'GAME_THREE', 'GAME_FOUR') NOT NULL DEFAULT 'GAME_ONE';
+
+ALTER TABLE `teacher_level_workspaces`
+    MODIFY `gameType` ENUM('GAME_ONE', 'GAME_TWO', 'GAME_THREE', 'GAME_FOUR') NOT NULL DEFAULT 'GAME_ONE';
