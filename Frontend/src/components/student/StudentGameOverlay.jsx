@@ -49,7 +49,7 @@ const LEVEL_LOADING_TIPS = Object.freeze([
   },
   {
     title: 'Game Two tip',
-    body: 'Place the component first, then answer its quiz card to earn the point.',
+    body: 'Read the Java Code guide, slice the correct gold syntax cards in order, and avoid bombs or red decoys.',
   },
   {
     title: 'Game Three tip',
@@ -88,7 +88,7 @@ const getLevelObjective = (levelData, normalizedGameType) => {
   }
 
   if (normalizedGameType === 'GAME_TWO') {
-    return 'Place each Java code block in the correct slot, then answer the quiz to build your star rating.';
+    return 'Slice the correct Java syntax cards in order, complete the required outputs, and avoid bombs or decoys.';
   }
 
   if (normalizedGameType === 'GAME_THREE') {
@@ -646,7 +646,7 @@ const StudentGameOverlay = ({
         className={`student-shell-overlay ${normalizedGameType === 'GAME_ONE' ? 'student-shell-warm' : ''}`}
       >
         <main className={`student-shell-main ${isSidebarLayout ? 'student-shell-main-game-three' : ''} ${starting ? 'student-shell-main-loading' : ''}`}>
-          {!starting && sessionInfo && activeLevelData ? (
+          {!starting && sessionInfo && activeLevelData && !isGameTwo && !isGameFour ? (
             <button
               type="button"
               className="student-preview-chip student-game-tutorial-test-button transition hover:brightness-95"
@@ -884,10 +884,14 @@ const StudentGameOverlay = ({
                         onRetry={handleRetry}
                         onBack={onClose}
                         onNextLevel={handleNextLevel}
+                        onTutorialRequest={() => setGameTutorialRequest((request) => request + 1)}
                         suppressIntroTutorial={!autoShowGameTutorial}
                         showLevelGuideline
                         continueToTutorialAfterGuide={continueToTutorialAfterGuide}
                         gameTutorialRequested={gameTutorialRequest}
+                        playerId={user?.id || 'guest'}
+                        initialCoins={sharedCoinBalance}
+                        onCoinBalanceChange={setSharedCoinBalance}
                       />
                     ) : isGameFive ? (
                       <GameCanvasGameFive

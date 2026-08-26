@@ -34,7 +34,7 @@ const NativeLifecycle = () => {
         .trim()
         .replace(/-/g, '_')
         .toUpperCase();
-      const isLandscapeGameScreen = ['GAME_ONE', 'GAME_FOUR'].includes(activeGameType);
+      const isLandscapeGameScreen = ['GAME_ONE', 'GAME_TWO', 'GAME_FOUR'].includes(activeGameType);
       await ScreenOrientation.lock({
         orientation: isLandscapeGameScreen ? 'landscape-primary' : 'portrait-primary',
       }).catch(() => undefined);

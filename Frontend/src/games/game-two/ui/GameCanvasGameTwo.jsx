@@ -1,226 +1,290 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import '../gameTwoCodeLab.css';
-import { AnimatePresence, motion } from 'framer-motion';
-import { createPortal } from 'react-dom';
-import {
-  AlertCircle,
-  CheckCircle2,
-  Coins,
-  Grip,
-  HelpCircle,
-  Info,
-  Lock,
-  Loader2,
-  LogOut,
-  RotateCcw,
-} from 'lucide-react';
-import { getGameTwoSprite } from '../systems/com1Slices';
-import { getStudentMusicPreference } from '../../../utils/studentMenuAudio';
-import { levelAPI } from '../../../utils/api';
-import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import { AlertCircle, CheckCircle2, Loader2, RotateCcw } from 'lucide-react';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
-import PlayableTutorialCoach from '../../shared/ui/PlayableTutorialCoach';
-import CongratulatoryOverlay from '../../shared/ui/CongratulatoryOverlay';
-import { buildGameTwoGuideContent } from '../../shared/ui/levelGuideBuilders';
-import {
-  applyCorrectDrop,
-  createInitialPlacementMap,
-  getPlacedCount,
-  isCodingAnswerCorrect,
-  isCorrectDrop,
-  isLevelCompleted,
-} from '../systems/gameTwoValidation';
-import { calculateQuestionStars } from '../systems/progressBridge';
+import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import industrialFrameBackground from '../../../assets/game-two/industrial-frame-background.png';
+import { getStudentMusicPreference } from '../../../utils/studentMenuAudio';
 
-const GAME_TWO_BACKGROUND_MUSIC_SRC = '/videos/game2-bg.mp4';
-const GAME_TWO_CORRECT_SOUND_SRC = new URL(
-  '../../../../assets/Game/game_two/Game 2_ Hardware/Music & Sound Effects/correct answer sf.mp3',
-  import.meta.url,
-).href;
-const GAME_TWO_INCORRECT_SOUND_SRC = new URL(
-  '../../../../assets/Game/game_two/Game 2_ Hardware/Music & Sound Effects/incorrect answer sf.mp3',
-  import.meta.url,
-).href;
-const GAME_TWO_HINT_SOUND_SRC = new URL(
-  '../../../../assets/Game/game_two/Game 2_ Hardware/Music & Sound Effects/hint sf.mp3',
-  import.meta.url,
-).href;
-const GAME_TWO_LOCK_SOUND_SRC = new URL(
-  '../../../../assets/Game/game_two/Game 2_ Hardware/Music & Sound Effects/lock.mp3',
-  import.meta.url,
-).href;
-const GAME_TWO_LOCK_SOUND_OFFSET_SECONDS = 0.18;
+const SWORD_SLICE_SOUND_SRC = new URL('../assets/processed/swordslice.mp3', import.meta.url).href;
+const SYNTAX_SLICE_SOUND_SRC = new URL('../assets/processed/sfxgame2.mp3', import.meta.url).href;
+const BOMB_ERROR_SOUND_SRC = new URL('../assets/processed/error.mp3', import.meta.url).href;
+const COMBO_SOUND_SRC = new URL('../assets/processed/game2combo.mp3', import.meta.url).href;
+const BACKGROUND_MUSIC_SRC = new URL('../assets/processed/game2background.mp3', import.meta.url).href;
 
+const LEVEL_CONFIG = Object.freeze({
+  1: { target: 2, spawnRate: 1750, speed: 90, bombChance: 0.12, decoyChance: 0.22, correctChance: 0.42, correctGap: 1, maxObjects: 4 },
+  2: { target: 4, spawnRate: 1220, speed: 128, bombChance: 0.16, decoyChance: 0.28, correctChance: 0.36, correctGap: 1, maxObjects: 6 },
+  3: { target: 6, spawnRate: 980, speed: 155, bombChance: 0.21, decoyChance: 0.35, correctChance: 0.33, correctGap: 1, maxObjects: 7 },
+  4: { target: 8, spawnRate: 780, speed: 180, bombChance: 0.25, decoyChance: 0.43, correctChance: 0.3, correctGap: 2, maxObjects: 8 },
+  5: { target: 10, spawnRate: 640, speed: 205, bombChance: 0.29, decoyChance: 0.5, correctChance: 0.28, correctGap: 2, maxObjects: 9 },
+});
 
+const AFK_TIMEOUT_MS = 20000;
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-
-const soundEffectPools = new Map();
-
-const getGameTwoSoundEffectPool = (src, volume = 0.72) => {
-  if (typeof window === 'undefined' || typeof window.Audio === 'undefined') {
-    return [];
-  }
-
-  if (!soundEffectPools.has(src)) {
-    const pool = Array.from({ length: 4 }, () => {
-      const soundEffect = new Audio(src);
-      soundEffect.preload = 'auto';
-      soundEffect.volume = volume;
-      soundEffect.load();
-      return soundEffect;
-    });
-
-    soundEffectPools.set(src, pool);
-  }
-
-  const pool = soundEffectPools.get(src) || [];
-  pool.forEach((soundEffect) => {
-    soundEffect.volume = volume;
-  });
-
-  return pool;
-};
-
-const playGameTwoSoundEffect = (src, volume = 0.72) => {
-  const pool = getGameTwoSoundEffectPool(src, volume);
-  if (pool.length === 0) {
-    return;
-  }
-
-  const soundEffect = pool.find((candidate) => candidate.paused) || pool[0];
-  soundEffect.currentTime = 0;
-
-  const playPromise = soundEffect.play();
-  if (playPromise?.catch) {
-    playPromise.catch(() => {
-      // The browser may block sound until the next direct user gesture.
-    });
-  }
-};
-
-const renderScreenModal = (content) => (
-  typeof document !== 'undefined'
-    ? createPortal(content, document.body)
-    : null
-);
-
-const GAME_TWO_TUTORIAL_STEPS = Object.freeze([
-  { title: 'Practice Tutorial', body: 'This tutorial teaches dragging code snippets into broken Java code. You can take your time before the real Level 1 starts.', buttonLabel: 'Start Practice' },
-  { title: 'Drag A Code Snippet', body: 'Pick up a snippet from the choices panel and drop it into the empty code slot.', buttonLabel: 'Try Dragging' },
-  { title: 'Answer The Check', body: 'Some blocks ask a quick question after they lock in. Read the prompt, choose an answer, then continue.', buttonLabel: 'Answer Check' },
-  { title: 'Complete The Board', body: 'When all required blocks are placed and checks are answered, the tutorial ends and you can start Level 1.', buttonLabel: 'Finish Tutorial' },
+const FALLBACK_DECOYS = Object.freeze([
+  'System.out.printline',
+  'int score == 10;',
+  'if score >= 10',
+  'retrun;',
+  'clas CodeLab',
+  'boolean ready = yes;',
+  'for int i = 0;',
+  'whlie (isRunning)',
+  'new Scaner(System.in)',
 ]);
 
-const normalizeCodeAnswer = (value) => String(value || '').trim().replace(/\s+/g, ' ');
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const rand = (min, max) => min + Math.random() * (max - min);
+const pick = (items) => items[Math.floor(Math.random() * items.length)];
+const normalize = (value) => String(value || '').trim().replace(/\s+/g, ' ');
 
-const getTaskInitialOrder = (task) => {
-  if (!Array.isArray(task?.blocks)) {
-    return [];
-  }
-
-  const validIds = new Set(task.blocks.map((block) => block.id));
-  const orderedIds = Array.isArray(task.initialOrder)
-    ? task.initialOrder.filter((id) => validIds.has(id))
-    : [];
-  const missingIds = task.blocks.map((block) => block.id).filter((id) => !orderedIds.includes(id));
-  return [...orderedIds, ...missingIds];
+const drawCoverImage = (ctx, image, width, height) => {
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+  ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
 };
 
-const getTaskAcceptedAnswers = (task) => {
-  if (Array.isArray(task?.acceptedAnswers) && task.acceptedAnswers.length > 0) {
-    return task.acceptedAnswers;
-  }
+const getLevelConfig = (levelNumber) => (
+  LEVEL_CONFIG[clamp(Math.round(Number(levelNumber) || 1), 1, 5)] || LEVEL_CONFIG[1]
+);
 
-  return task?.answer ? [task.answer] : [];
+const getCorrectOptionLabel = (task) => (
+  (Array.isArray(task?.options) ? task.options : [])
+    .find((option) => String(option.id) === String(task?.correctOptionId))
+    ?.label || task?.answer || ''
+);
+
+const getReorderCode = (task) => {
+  const blocks = Array.isArray(task?.blocks) ? task.blocks : [];
+  const blockMap = new Map(blocks.map((block) => [block.id, block.code]));
+  const order = Array.isArray(task?.correctOrder) && task.correctOrder.length
+    ? task.correctOrder
+    : blocks.map((block) => block.id);
+  return order.map((id) => blockMap.get(id)).filter(Boolean).join('\n');
 };
 
-const createSnippetId = (task, suffix) => `${task.id}-${suffix}`;
+const getTaskTargetCode = (task) => {
+  if (task?.type === 'reorder') return getReorderCode(task);
+  if (task?.type === 'choice') return getCorrectOptionLabel(task);
+  return String(task?.acceptedAnswers?.[0] || task?.answer || '').trim();
+};
 
-const createCodeChoiceSnippets = (task) => {
-  if (Array.isArray(task?.options) && task.options.length > 0) {
-    return task.options.map((option) => ({
-      id: option.id,
-      code: option.label,
-      label: `Option ${String(option.id || '').toUpperCase()}`,
-    }));
-  }
+const smartJoin = (pieces) => (
+  pieces.reduce((line, piece) => {
+    if (!line) return piece;
+    if (/^[;,){}\]]/.test(piece) || piece.startsWith('.')) return `${line}${piece}`;
+    if (line.endsWith('(') || line.endsWith('.') || line.endsWith('[')) return `${line}${piece}`;
+    return `${line} ${piece}`;
+  }, '')
+);
 
-  const acceptedAnswers = getTaskAcceptedAnswers(task);
-  const snippets = acceptedAnswers.map((answer, index) => ({
-    id: createSnippetId(task, `answer-${index}`),
-    code: answer,
-    label: index === 0 ? 'Correct snippet' : 'Accepted snippet',
-  }));
-  const answer = String(task?.answer || acceptedAnswers[0] || '').trim();
-  const brokenSnippet = String(task?.snippet || '').trim();
-  const distractors = [
-    task?.type === 'complete' && answer && `"${answer}"`,
-    task?.type === 'complete' && answer && `${answer};`,
-    task?.type === 'debug' && brokenSnippet,
-    task?.type === 'typing' && answer && `${answer};`,
-    task?.type === 'typing' && answer && answer.replace(/\s*&&\s*/g, ' || '),
-  ]
-    .filter(Boolean)
-    .filter((value) => !acceptedAnswers.some((accepted) => normalizeCodeAnswer(accepted) === normalizeCodeAnswer(value)));
+const formatCodePieces = (pieces, type) => (
+  type === 'reorder' ? pieces.join('\n') : smartJoin(pieces)
+);
 
-  distractors.slice(0, 3).forEach((code, index) => {
-    if (!snippets.some((snippet) => normalizeCodeAnswer(snippet.code) === normalizeCodeAnswer(code))) {
-      snippets.push({
-        id: createSnippetId(task, `distractor-${index}`),
-        code,
-        label: 'Extra snippet',
-      });
+const splitCodePieces = (code) => {
+  const value = String(code || '').trim();
+  if (!value) return [];
+  if (value.includes('\n')) return value.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  const printlnMatch = value.match(/^System\.out\.println\s*(\(.*\))\s*;?$/);
+  if (printlnMatch) return ['System', '.out', '.println', printlnMatch[1], ';'];
+  const tokens = value.match(/"[^"]*"|==|>=|<=|!=|\+\+|--|&&|\|\||[A-Za-z_$][\w$]*|\d+|[(){}[\].,;=<>+\-*/]/g) || [value];
+  const pieces = [];
+  for (let i = 0; i < tokens.length; i += 1) {
+    const token = tokens[i];
+    if ((token === 'System' && tokens[i + 1] === '.' && tokens[i + 2] === 'out')
+      || (token === 'out' && tokens[i + 1] === '.' && tokens[i + 2] === 'println')) {
+      pieces.push(token);
+      continue;
     }
-  });
-
-  return snippets;
+    if (token === '.' && pieces.length) {
+      pieces[pieces.length - 1] = `${pieces[pieces.length - 1]}.`;
+      continue;
+    }
+    if (/^["\d]/.test(token) && pieces[pieces.length - 1] === '(' && tokens[i + 1] === ')') {
+      pieces[pieces.length - 1] = `(${token})`;
+      i += 1;
+      continue;
+    }
+    pieces.push(token);
+  }
+  return pieces.filter(Boolean);
 };
 
-const createTaskDragModel = (task) => {
-  if (!task) {
-    return { snippets: [], slots: [], isReorder: false, beforeBlank: '', afterBlank: '' };
-  }
+const renderCodePreview = (challenge, pieceIndex) => {
+  const pieces = challenge.pieces || [];
+  const correctCode = formatCodePieces(pieces, challenge.type);
+  const slicedCode = formatCodePieces(pieces.slice(0, pieceIndex), challenge.type);
+  return `CORRECT CODE:\n${correctCode}\n\nSLICED CODE:\n${slicedCode || '____'}`;
+};
 
-  if (task.type === 'reorder') {
-    const blocks = Array.isArray(task.blocks) ? task.blocks : [];
-    const correctOrder = Array.isArray(task.correctOrder) ? task.correctOrder : blocks.map((block) => block.id);
+const inferOutput = (task, targetCode) => {
+  const source = `${task?.snippet || ''}\n${targetCode || ''}`;
+  const printed = [...source.matchAll(/System\.out\.println\s*\(\s*"([^"]*)"\s*\)\s*;?/g)]
+    .map((match) => match[1]);
+  if (printed.length) return printed.join('\n');
+  if (task?.type === 'choice') return getCorrectOptionLabel(task);
+  const assignment = String(targetCode || '').match(/(?:int|double|String|boolean)\s+([A-Za-z_$][\w$]*)\s*=\s*([^;]+);?/);
+  if (assignment) return `${assignment[1]} = ${assignment[2].replace(/^"|"$/g, '')}`;
+  if (String(task?.prompt || '').toLowerCase().includes('how many times')) return targetCode;
+  return targetCode || 'Compiled';
+};
 
-    return {
-      isReorder: true,
-      snippets: blocks.map((block) => ({
-        id: block.id,
-        code: block.code,
-        label: 'Code block',
-      })),
-      slots: correctOrder.map((blockId, index) => ({
-        id: `${task.id}-slot-${index}`,
-        label: `Line ${index + 1}`,
-        correctBlockId: blockId,
-      })),
-      beforeBlank: '',
-      afterBlank: '',
-    };
-  }
+const makeDecoy = (piece) => {
+  const value = String(piece || '').trim();
+  if (!value) return pick(FALLBACK_DECOYS);
+  return value
+    .replace(/\bSystem\b/g, 'Systme')
+    .replace(/\bprintln\b/g, 'printline')
+    .replace(/\bpublic\b/g, 'publik')
+    .replace(/\bstatic\b/g, 'statik')
+    .replace(/\bvoid\b/g, 'viod')
+    .replace(/\bclass\b/g, 'clas')
+    .replace(/==/g, '=')
+    .replace(/>=/g, '=>')
+    .replace(/;/g, '');
+};
 
-  const [beforeBlank, afterBlank] = String(task.snippet || '').split('____');
-
+const taskToChallenge = (task, index) => {
+  const targetCode = getTaskTargetCode(task);
+  const pieces = splitCodePieces(targetCode);
+  const optionDecoys = (Array.isArray(task?.options) ? task.options : [])
+    .map((option) => option.label)
+    .filter((label) => normalize(label) !== normalize(targetCode));
   return {
-    isReorder: false,
-    snippets: createCodeChoiceSnippets(task),
-    slots: [{
-      id: `${task.id}-slot-0`,
-      label: task.type === 'choice' ? 'Best snippet' : 'Place your answer here',
-      correctBlockId: task.type === 'choice' ? task.correctOptionId : '',
-    }],
-    beforeBlank: beforeBlank || '',
-    afterBlank: afterBlank || '',
+    id: task?.id || `game-two-slice-${index}`,
+    title: task?.title || `Code Challenge ${index + 1}`,
+    prompt: task?.prompt || 'Slice the code pieces in order.',
+    type: task?.type || 'complete',
+    template: task?.snippet || targetCode,
+    targetCode,
+    pieces: pieces.length ? pieces : [targetCode],
+    output: inferOutput(task, targetCode),
+    decoys: [...optionDecoys, ...pieces.map(makeDecoy), ...FALLBACK_DECOYS].filter(Boolean),
   };
 };
 
-const GameTwoHardwareDragCanvas = ({
+const buildChallenges = (levelData, target) => {
+  const sourceTasks = Array.isArray(levelData?.tasks) && levelData.tasks.length
+    ? levelData.tasks
+    : [{
+      id: 'fallback-print',
+      title: 'Print Hello',
+      prompt: 'Slice the Java pieces that build a console output statement.',
+      snippet: '____',
+      answer: 'System.out.println("Hello");',
+      acceptedAnswers: ['System.out.println("Hello");'],
+    }];
+  const base = sourceTasks.map(taskToChallenge).filter((challenge) => challenge.pieces.length);
+  return Array.from({ length: target }, (_, index) => ({
+    ...base[index % base.length],
+    id: `${base[index % base.length].id}-${index}`,
+  }));
+};
+
+const buildScoreProfile = (levelData, config) => {
+  const challenges = buildChallenges(levelData, config.target);
+  let combo = 0;
+  let noMistakeScore = 0;
+  let requiredSlices = 0;
+  challenges.forEach((challenge) => {
+    challenge.pieces.forEach((_, index) => {
+      combo = Math.min(3, combo + 1);
+      noMistakeScore += 40 + combo * 10;
+      requiredSlices += 1;
+      if (index === challenge.pieces.length - 1) {
+        noMistakeScore += 120 + combo * 15;
+      }
+    });
+  });
+  return {
+    requiredSlices,
+    noMistakeScore,
+    averagePieces: challenges.length ? Math.round(requiredSlices / challenges.length) : 0,
+  };
+};
+
+const buildGuideContent = (levelData, config) => {
+  const levelNumber = levelData?.levelNumber || 1;
+  const scoreProfile = buildScoreProfile(levelData, config);
+  return {
+    kicker: `Game 2 · Level ${levelNumber}`,
+    title: 'Code Ninja Guide',
+    lead: 'Read the slicing rules, code guide, hazards, lives, scoring, and passing requirement for this level.',
+    summary: [
+      `Complete ${config.target} Java output${config.target === 1 ? '' : 's'} to clear Level ${levelNumber}.`,
+      'Slice gold syntax cards in the exact order shown by Java Code.',
+      'Avoid red decoy cards and bombs while protecting your 3 Lives.',
+    ],
+    sections: [
+      {
+        title: `Level ${levelNumber} Mechanics Guide`,
+        items: [
+          `Complete ${config.target} Java output${config.target === 1 ? '' : 's'} by slicing the required syntax cards in the order shown by Java Code.`,
+          'Correct Code is the guide for the current challenge; Sliced Code shows the pieces already collected.',
+          'Use mouse, touch, or pointer drag to cut moving syntax cards and bombs.',
+          `Objects spawn every ${config.spawnRate} ms with ${config.speed} movement speed and up to ${config.maxObjects} active objects on screen.`,
+          `This level includes about ${Math.round(config.decoyChance * 100)}% decoy pressure and ${Math.round(config.bombChance * 100)}% bomb pressure when hazards appear.`,
+        ],
+      },
+      {
+        title: 'Correct & Decoy Syntax',
+        items: [
+          'Gold/yellow mechanical cards are correct syntax targets and move your Sliced Code forward.',
+          'Red/crimson mechanical cards are decoys or wrong-order syntax; avoid slicing them.',
+          'Both card types can look similar, so match the card text against the next Java Code piece before cutting.',
+        ],
+      },
+      {
+        title: 'Bombs, Lives, and Attempts',
+        items: [
+          'Every level attempt begins with 3 Lives.',
+          'Slicing a red decoy removes 1 Life and resets Combo to 0x.',
+          'Slicing a bomb removes 1 Life and resets Combo to 0x.',
+          'If you do not slice anything for 20 consecutive seconds, the game ends due to inactivity.',
+          'Losing all Lives ends the attempt; use Retry to restart the same level.',
+        ],
+      },
+      {
+        title: `Level ${levelNumber} Score`,
+        items: [
+          'The on-screen correct syntax reward is 40 points plus Combo bonus per slice.',
+          'Each completed Java output adds a 120-point completion reward plus 15 points per current Combo level.',
+          `Recorded base score: syntax slice rewards + (${config.target} completed outputs × completion reward) − decoy/bomb penalties.`,
+          `With no decoy or bomb mistakes, the estimated Level ${levelNumber} base score is ${scoreProfile.noMistakeScore} points across about ${scoreProfile.requiredSlices} required syntax slices.`,
+          'Combo is bonus scoring for accurate slicing and does not directly change the required Output target.',
+        ],
+      },
+      {
+        title: 'Stars and Passing',
+        items: [
+          `Clear ${config.target} / ${config.target} Outputs to pass this level.`,
+          'A completed run earns up to 3 Stars for Game 2.',
+          'Mistakes, lost Lives, and retries can lower the quality of the attempt even when the level is cleared.',
+          'Passing the level unlocks the next available Game 2 level.',
+        ],
+      },
+    ],
+  };
+};
+
+const makeOutcome = ({ outcome, score, outputs, target, mistakes, levelNumber }) => ({
+  outcome,
+  points: score,
+  completedTasks: outputs,
+  totalTasks: target,
+  mistakes,
+  hintsUsed: 0,
+  starsEarned: outcome === 'COMPLETED' ? 3 : 0,
+  levelNumber,
+});
+
+const GameCanvasGameTwo = ({
   levelData,
   onLevelComplete,
+  onLevelFail,
   onExitRequest,
   resultData,
   isSubmitting,
@@ -229,99 +293,95 @@ const GameTwoHardwareDragCanvas = ({
   onRetry,
   onBack,
   onNextLevel,
-  hintCoinCost = 1,
-  freeMistakes = 3,
-  hintStarCost = 1,
-  initialCoins,
-  suppressIntroTutorial = false,
   showLevelGuideline = false,
-  gameTutorialRequested = false,
-  continueToTutorialAfterGuide = false,
+  gameTutorialRequested = 0,
+  autoFirstHandGuide = false,
 }) => {
-  const slots = useMemo(() => (Array.isArray(levelData?.slots) ? levelData.slots : []), [levelData]);
-  const parts = useMemo(() => (Array.isArray(levelData?.parts) ? levelData.parts : []), [levelData]);
-  const shouldScrollPartsPanel = Number(levelData?.levelNumber || 0) >= 2 && Number(levelData?.levelNumber || 0) <= 5;
-  const isTutorialLevel = Boolean(levelData?.isTutorialLevel);
-  const isFirstLevelGuide = Number(levelData?.levelNumber || 1) === 1;
-  const guideContent = useMemo(
-    () => buildGameTwoGuideContent(levelData, { freeMistakes, hintCoinCost, hintStarCost }),
-    [freeMistakes, hintCoinCost, hintStarCost, levelData],
-  );
-
-  const initialPlacements = useMemo(() => createInitialPlacementMap(slots), [slots]);
-
-  const [placements, setPlacements] = useState(initialPlacements);
-  const [mistakes, setMistakes] = useState(0);
-  const [draggingPartId, setDraggingPartId] = useState(null);
-  const [shakePartId, setShakePartId] = useState('');
-  const [shakeSlotId, setShakeSlotId] = useState('');
-  const [infoCard, setInfoCard] = useState(null);
-  const [activeQuestionPartId, setActiveQuestionPartId] = useState('');
-  const [questionFeedback, setQuestionFeedback] = useState(null);
-  const [answeredQuestionMap, setAnsweredQuestionMap] = useState({});
-  const [points, setPoints] = useState(0);
-  const [coins, setCoins] = useState(0);
-  const [hintsUsed, setHintsUsed] = useState(0);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [showGuide, setShowGuide] = useState(showLevelGuideline && !isTutorialLevel);
-  const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
-  const [tutorialCoachOpen, setTutorialCoachOpen] = useState(isTutorialLevel);
-  const [revealedHintCount, setRevealedHintCount] = useState(0);
-  const [hintNotice, setHintNotice] = useState('');
-
-  const infoTimerRef = useRef(null);
-  const shakeTimerRef = useRef(null);
+  const canvasRef = useRef(null);
+  const appRef = useRef(null);
+  const animationRef = useRef(0);
+  const stateRef = useRef(null);
+  const pointerRef = useRef(null);
+  const submittedRef = useRef(false);
+  const backgroundRef = useRef(null);
+  const levelNumber = clamp(Math.round(Number(levelData?.levelNumber) || 1), 1, 5);
+  const shouldAutoOpenFirstHandGuide = Boolean(autoFirstHandGuide && levelNumber === 1);
+  const config = useMemo(() => getLevelConfig(levelNumber), [levelNumber]);
+  const challenges = useMemo(() => buildChallenges(levelData, config.target), [config.target, levelData]);
+  const guideContent = useMemo(() => buildGuideContent(levelData, config), [config, levelData]);
+  const [showTutorial, setShowTutorial] = useState(Boolean(showLevelGuideline));
+  const [tutorialView, setTutorialView] = useState(showLevelGuideline ? 'guide' : null);
+  const showGuide = showTutorial && tutorialView === 'guide';
+  const showFirstHandGuide = showTutorial && tutorialView === 'tutorial';
+  const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [outputs, setOutputs] = useState(0);
+  const [challengeTitle, setChallengeTitle] = useState(challenges[0]?.title || 'Code Challenge');
+  const [codePreview, setCodePreview] = useState('');
+  const [outputText, setOutputText] = useState(challenges[0]?.output || '');
+  const [flash, setFlash] = useState(null);
+  const [sliceFeedback, setSliceFeedback] = useState(null);
+  const [localResult, setLocalResult] = useState(null);
+  const swordSliceSoundRef = useRef(null);
+  const syntaxSliceSoundRef = useRef(null);
+  const bombErrorSoundRef = useRef(null);
+  const comboSoundRef = useRef(null);
   const backgroundMusicRef = useRef(null);
   const backgroundMusicBlockedRef = useRef(false);
-  const lockAudioContextRef = useRef(null);
-  const lockAudioBufferRef = useRef(null);
-  const submittedRef = useRef(false);
-  const shouldPauseForTutorialCoach = Boolean(isTutorialLevel && tutorialCoachOpen);
-  const shouldPauseForIntroGuide = Boolean(showGuide && !isTutorialLevel);
 
-  useEffect(() => {
-    if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
-      setShowGuide(false);
-      setShowTutorial(true);
+  const playSound = useCallback((soundRef, soundSrc) => {
+    if (typeof window === 'undefined' || typeof window.Audio === 'undefined' || !getStudentMusicPreference()) {
+      return;
     }
-  }, [gameTutorialRequested, isTutorialLevel]);
 
-  const handleContinueTutorialStep = () => {
-    if (tutorialStepIndex === 0) {
-      setTutorialStepIndex(1);
-    }
-    setTutorialCoachOpen(false);
-  };
+    try {
+      if (!soundRef.current) {
+        soundRef.current = new Audio(soundSrc);
+        soundRef.current.preload = 'auto';
+        soundRef.current.volume = 0.78;
+      } else {
+        soundRef.current.currentTime = 0;
+      }
 
-  useEffect(() => () => {
-    if (infoTimerRef.current) {
-      clearTimeout(infoTimerRef.current);
-    }
-    if (shakeTimerRef.current) {
-      clearTimeout(shakeTimerRef.current);
-    }
-    if (backgroundMusicRef.current) {
-      backgroundMusicRef.current.pause();
-      backgroundMusicRef.current.currentTime = 0;
-    }
-    if (lockAudioContextRef.current) {
-      lockAudioContextRef.current.close?.();
+      soundRef.current.play().catch(() => {});
+    } catch (error) {
+      // Ignore sound playback errors.
     }
   }, []);
 
+  const triggerSliceFeedback = useCallback((type, title, detail) => {
+    const id = `${type}-${Date.now()}-${Math.random()}`;
+    setSliceFeedback({ id, type, title, detail });
+    window.setTimeout(() => {
+      setSliceFeedback((current) => (current?.id === id ? null : current));
+    }, 900);
+  }, []);
+
+  useEffect(() => () => {
+    [
+      swordSliceSoundRef,
+      syntaxSliceSoundRef,
+      bombErrorSoundRef,
+      comboSoundRef,
+    ].forEach((soundRef) => {
+      if (soundRef.current) {
+        soundRef.current.pause();
+        soundRef.current.currentTime = 0;
+        soundRef.current = null;
+      }
+    });
+  }, []);
+
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.Audio === 'undefined') {
+    if (typeof window === 'undefined' || typeof window.Audio === 'undefined' || !getStudentMusicPreference()) {
       return undefined;
     }
 
-    if (!getStudentMusicPreference()) {
-      return undefined;
-    }
-
-    const backgroundMusic = new Audio(GAME_TWO_BACKGROUND_MUSIC_SRC);
+    const backgroundMusic = new Audio(BACKGROUND_MUSIC_SRC);
     backgroundMusic.loop = true;
     backgroundMusic.preload = 'auto';
-    backgroundMusic.volume = 0.55;
+    backgroundMusic.volume = 0.22;
     backgroundMusicRef.current = backgroundMusic;
 
     const playPromise = backgroundMusic.play();
@@ -350,12 +410,10 @@ const GameTwoHardwareDragCanvas = ({
 
     window.addEventListener('pointerdown', resumeBackgroundMusic);
     window.addEventListener('keydown', resumeBackgroundMusic);
-    window.addEventListener('dragstart', resumeBackgroundMusic);
 
     return () => {
       window.removeEventListener('pointerdown', resumeBackgroundMusic);
       window.removeEventListener('keydown', resumeBackgroundMusic);
-      window.removeEventListener('dragstart', resumeBackgroundMusic);
       backgroundMusic.pause();
       backgroundMusic.currentTime = 0;
       backgroundMusicBlockedRef.current = false;
@@ -365,1615 +423,785 @@ const GameTwoHardwareDragCanvas = ({
     };
   }, []);
 
-  useEffect(() => {
-    getGameTwoSoundEffectPool(GAME_TWO_LOCK_SOUND_SRC, 0.9);
-    getGameTwoSoundEffectPool(GAME_TWO_CORRECT_SOUND_SRC, 0.72);
-    getGameTwoSoundEffectPool(GAME_TWO_INCORRECT_SOUND_SRC, 0.72);
-    getGameTwoSoundEffectPool(GAME_TWO_HINT_SOUND_SRC, 0.65);
-  }, []);
+  const syncHud = useCallback(() => {
+    const state = stateRef.current;
+    if (!state) return;
+    const challenge = challenges[state.challengeIndex] || challenges[0];
+    setScore(state.score);
+    setCombo(state.combo);
+    setLives(state.lives);
+    setOutputs(state.outputs);
+    setChallengeTitle(challenge?.title || 'Code Challenge');
+    setCodePreview(challenge ? renderCodePreview(challenge, state.pieceIndex) : '');
+    setOutputText(challenge?.output || '');
+  }, [challenges]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) {
-      return undefined;
-    }
-
-    let disposed = false;
-    const audioContext = new AudioContextClass();
-    lockAudioContextRef.current = audioContext;
-
-    fetch(GAME_TWO_LOCK_SOUND_SRC)
-      .then((response) => response.arrayBuffer())
-      .then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer))
-      .then((audioBuffer) => {
-        if (!disposed) {
-          lockAudioBufferRef.current = audioBuffer;
-        }
-      })
-      .catch(() => {
-        lockAudioBufferRef.current = null;
-      });
-
-    return () => {
-      disposed = true;
-      lockAudioBufferRef.current = null;
-      if (lockAudioContextRef.current === audioContext) {
-        lockAudioContextRef.current = null;
-      }
-      audioContext.close?.();
-    };
-  }, []);
-
-  const partMap = useMemo(
-    () => new Map(parts.map((part) => [part.id, part])),
-    [parts],
-  );
-  const spriteMap = useMemo(
-    () => new Map(parts.map((part) => [part.id, getGameTwoSprite(part.sliceKey)])),
-    [parts],
-  );
-
-  const board = levelData?.board || {};
-  const boardWidth = Number(board.renderWidth) || 560;
-  const boardHeight = Number(board.renderHeight) || 560;
-  const boardSprite = getGameTwoSprite(board.sliceKey || 'motherboard');
-  const isCodeLab = board.theme === 'code-lab';
-
-  const placedPartIds = useMemo(
-    () => new Set(Object.values(placements).filter(Boolean)),
-    [placements],
-  );
-
-  const availableParts = useMemo(
-    () => parts.filter((part) => !placedPartIds.has(part.id)),
-    [parts, placedPartIds],
-  );
-  const activeQuestionPart = activeQuestionPartId ? partMap.get(activeQuestionPartId) : null;
-  const activeHints = useMemo(
-    () => (Array.isArray(activeQuestionPart?.question?.hints)
-      ? activeQuestionPart.question.hints
-        .map((hint) => String(hint || '').trim())
-        .filter(Boolean)
-      : []),
-    [activeQuestionPart],
-  );
-  const questionParts = useMemo(
-    () => parts.filter((part) => Array.isArray(part?.question?.options) && part.question.options.length > 0),
-    [parts],
-  );
-  const totalSlots = slots.length;
-  const totalQuestions = questionParts.length;
-  const earnedStars = calculateQuestionStars(points, totalQuestions, mistakes);
-  const resolvedHintCoinCost = clamp(Math.round(Number(hintCoinCost) || 0), 0, 9);
-  const resolvedStartingCoins = useMemo(() => {
-    const explicitStart = Number(initialCoins);
-    if (Number.isFinite(explicitStart) && explicitStart >= 0) {
-      return Math.round(explicitStart);
-    }
-
-    if (totalQuestions > 0) {
-      return Math.max(resolvedHintCoinCost, totalQuestions);
-    }
-
-    return Math.max(0, resolvedHintCoinCost);
-  }, [initialCoins, resolvedHintCoinCost, totalQuestions]);
-
-  useEffect(() => {
-    setPlacements(initialPlacements);
-    setMistakes(0);
-    setDraggingPartId(null);
-    setShakePartId('');
-    setShakeSlotId('');
-    setInfoCard(null);
-    setActiveQuestionPartId('');
-    setQuestionFeedback(null);
-    setAnsweredQuestionMap({});
-    setPoints(0);
-    setCoins(resolvedStartingCoins);
-    setHintsUsed(0);
-    setShowTutorial(false);
-    setShowGuide(showLevelGuideline && !isTutorialLevel);
-    setTutorialStepIndex(0);
-    setTutorialCoachOpen(isTutorialLevel);
-    setRevealedHintCount(0);
-    setHintNotice('');
+  const resetRun = useCallback(() => {
     submittedRef.current = false;
-  }, [initialPlacements, isFirstLevelGuide, isTutorialLevel, resolvedStartingCoins, showLevelGuideline]);
-
-  const placedCount = getPlacedCount(placements);
-  const answeredQuestionsCount = Object.keys(answeredQuestionMap).length;
-
-  useEffect(() => {
-    setRevealedHintCount(0);
-    setHintNotice('');
-  }, [activeQuestionPartId]);
-
-  const showInfo = (part) => {
-    if (!part) {
-      return;
-    }
-
-    setInfoCard({
-      title: part.label,
-      description: part.info,
-    });
-
-    if (infoTimerRef.current) {
-      clearTimeout(infoTimerRef.current);
-    }
-
-    infoTimerRef.current = setTimeout(() => {
-      setInfoCard(null);
-    }, 2600);
-  };
-
-  const showWrongFeedback = (partId, slotId) => {
-    playGameTwoSoundEffect(GAME_TWO_INCORRECT_SOUND_SRC);
-    setMistakes((value) => value + 1);
-    setShakePartId(partId);
-    setShakeSlotId(slotId);
-
-    if (shakeTimerRef.current) {
-      clearTimeout(shakeTimerRef.current);
-    }
-
-    shakeTimerRef.current = setTimeout(() => {
-      setShakePartId('');
-      setShakeSlotId('');
-    }, 380);
-  };
-
-  const playGameTwoLockSound = () => {
-    const audioContext = lockAudioContextRef.current;
-    const audioBuffer = lockAudioBufferRef.current;
-
-    if (!audioContext || !audioBuffer) {
-      playGameTwoSoundEffect(GAME_TWO_LOCK_SOUND_SRC, 1);
-      return;
-    }
-
-    const source = audioContext.createBufferSource();
-    const gainNode = audioContext.createGain();
-    source.buffer = audioBuffer;
-    gainNode.gain.value = 1.25;
-    source.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    const startSound = () => {
-      const offset = Math.min(GAME_TWO_LOCK_SOUND_OFFSET_SECONDS, Math.max(0, audioBuffer.duration - 0.05));
-      source.start(0, offset);
+    const firstChallenge = challenges[0];
+    stateRef.current = {
+      width: 1280,
+      height: 720,
+      items: [],
+      particles: [],
+      trails: [],
+      sliceBursts: [],
+      score: 0,
+      combo: 0,
+      lives: 3,
+      outputs: 0,
+      mistakes: 0,
+      challengeIndex: 0,
+      pieceIndex: 0,
+      outputText: firstChallenge?.output || '',
+      last: performance.now(),
+      lastSliceAt: performance.now(),
+      spawnClock: config.spawnRate * 0.65,
+      lastSpawnKind: null,
+      correctGapRemaining: 0,
+      hazardsSinceCorrect: 0,
+      running: !showTutorial,
+      finished: false,
     };
-
-    if (audioContext.state === 'suspended') {
-      audioContext.resume().then(startSound).catch(() => {
-        playGameTwoSoundEffect(GAME_TWO_LOCK_SOUND_SRC, 1);
-      });
-      return;
-    }
-
-    startSound();
-  };
-
-  const resolvePartIdFromDrop = (event) => {
-    const fromTransfer = event?.dataTransfer?.getData('application/x-itechs-part-id');
-    if (fromTransfer) {
-      return fromTransfer;
-    }
-
-    return draggingPartId || '';
-  };
-
-  const handleDropOnSlot = (event, slot) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (showGuide || showTutorial || shouldPauseForTutorialCoach) {
-      return;
-    }
-
-    const partId = resolvePartIdFromDrop(event);
-    if (!partId || placements[slot.id]) {
-      return;
-    }
-
-    const part = partMap.get(partId);
-    if (!part) {
-      return;
-    }
-
-    if (!isCorrectDrop(slot, partId)) {
-      showWrongFeedback(partId, slot.id);
-      return;
-    }
-    
-    playGameTwoLockSound();
-    setPlacements((previous) => applyCorrectDrop(previous, slot.id, partId));
-    if (isTutorialLevel && tutorialStepIndex < 2) {
-      setTutorialStepIndex(part.question?.correctOptionId && Array.isArray(part.question?.options) ? 2 : 3);
-      setTutorialCoachOpen(true);
-    }
-
-    if (part.question?.correctOptionId && Array.isArray(part.question?.options)) {
-      setInfoCard(null);
-      setActiveQuestionPartId(part.id);
-      setQuestionFeedback(null);
-      return;
-    }
-
-    showInfo(part);
-  };
-
-  const findSlotAtBoardPoint = (clientX, clientY, boardElement) => {
-    if (!boardElement) {
-      return null;
-    }
-
-    const bounds = boardElement.getBoundingClientRect();
-    if (!bounds.width || !bounds.height) {
-      return null;
-    }
-
-    const xPercent = ((clientX - bounds.left) / bounds.width) * 100;
-    const yPercent = ((clientY - bounds.top) / bounds.height) * 100;
-
-    return slots.find((slot) => {
-      const slotWidth = clamp(Number(slot.width) || 12, 8, 80);
-      const slotHeight = clamp(Number(slot.height) || 12, 8, 80);
-      const slotX = clamp(Number(slot.x) || 0, 0, 100);
-      const slotY = clamp(Number(slot.y) || 0, 0, 100);
-
-      return xPercent >= slotX - slotWidth / 2
-        && xPercent <= slotX + slotWidth / 2
-        && yPercent >= slotY - slotHeight / 2
-        && yPercent <= slotY + slotHeight / 2;
-    }) || null;
-  };
-
-  const handleDropOnBoard = (event) => {
-    event.preventDefault();
-
-    const targetSlot = findSlotAtBoardPoint(event.clientX, event.clientY, event.currentTarget);
-    if (targetSlot) {
-      handleDropOnSlot(event, targetSlot);
-    }
-  };
-
-  const handleQuestionAnswer = (optionId) => {
-    if (!activeQuestionPart || questionFeedback) {
-      return;
-    }
-
-    const correctOptionId = activeQuestionPart.question?.correctOptionId;
-    const isCorrect = optionId === correctOptionId;
-
-    setQuestionFeedback({
-      selectedOptionId: optionId,
-      correctOptionId,
-      isCorrect,
-    });
-
-    setAnsweredQuestionMap((current) => (
-      current[activeQuestionPart.id]
-        ? current
-        : { ...current, [activeQuestionPart.id]: true }
-    ));
-
-    if (isCorrect) {
-      playGameTwoSoundEffect(GAME_TWO_CORRECT_SOUND_SRC);
-      setPoints((current) => current + 1);
-      setCoins((current) => current + 1);
-      if (isTutorialLevel && tutorialStepIndex < 3) {
-        setTutorialStepIndex(3);
-        setTutorialCoachOpen(true);
-      }
-    } else {
-      playGameTwoSoundEffect(GAME_TWO_INCORRECT_SOUND_SRC);
-    }
-  };
-
-  const handleRevealHint = () => {
-    if (!activeQuestionPart || activeHints.length === 0 || revealedHintCount >= activeHints.length) {
-      return;
-    }
-
-    if (resolvedHintCoinCost > 0 && coins < resolvedHintCoinCost) {
-      setHintNotice(`Not enough coins. Need ${resolvedHintCoinCost}, you have ${coins}.`);
-      return;
-    }
-
-    if (resolvedHintCoinCost > 0) {
-      setCoins((current) => Math.max(0, current - resolvedHintCoinCost));
-    }
-
-    setHintsUsed((current) => current + 1);
-    setHintNotice('');
-    setRevealedHintCount((value) => Math.min(activeHints.length, value + 1));
-    playGameTwoSoundEffect(GAME_TWO_HINT_SOUND_SRC, 0.65);
-  };
-
-  const handleContinueFromQuestion = () => {
-    if (!activeQuestionPart) {
-      return;
-    }
-
-    showInfo(activeQuestionPart);
-    setActiveQuestionPartId('');
-    setQuestionFeedback(null);
-    setRevealedHintCount(0);
-    setHintNotice('');
-  };
+    setScore(0);
+    setCombo(0);
+    setLives(3);
+    setOutputs(0);
+    setChallengeTitle(firstChallenge?.title || 'Code Challenge');
+    setCodePreview(firstChallenge ? renderCodePreview(firstChallenge, 0) : '');
+    setOutputText(firstChallenge?.output || '');
+    setFlash({ title: 'READY', tone: 'good' });
+    setLocalResult(null);
+    window.setTimeout(() => {
+      setFlash({ title: 'GO!', tone: 'good' });
+      window.setTimeout(() => setFlash(null), 560);
+    }, 520);
+  }, [challenges, config.spawnRate, showTutorial]);
 
   useEffect(() => {
-    if (submittedRef.current) {
-      return;
+    resetRun();
+  }, [resetRun]);
+
+  useEffect(() => {
+    const image = new Image();
+    image.src = industrialFrameBackground;
+    backgroundRef.current = image;
+  }, []);
+
+  useEffect(() => {
+    setShowTutorial(Boolean(showLevelGuideline));
+    setTutorialView(showLevelGuideline ? 'guide' : null);
+  }, [levelNumber, shouldAutoOpenFirstHandGuide, showLevelGuideline]);
+
+  useEffect(() => {
+    if (Number(gameTutorialRequested) > 0) {
+      setTutorialView('tutorial');
+      setShowTutorial(true);
     }
+  }, [gameTutorialRequested]);
 
-    const allQuestionsResolved = totalQuestions === 0 || answeredQuestionsCount >= totalQuestions;
-
-    if (!isLevelCompleted(placements, slots)) {
-      return;
-    }
-
-    if (!allQuestionsResolved || activeQuestionPartId) {
-      return;
-    }
-
+  const finishRun = useCallback((outcome) => {
+    const state = stateRef.current;
+    if (!state || submittedRef.current) return;
     submittedRef.current = true;
-
-    onLevelComplete?.({
-      outcome: 'COMPLETED',
-      mistakes,
-      correctPlacements: slots.length,
-      totalPlacements: slots.length,
-      points,
-      starsEarned: earnedStars,
-      coinsRemaining: coins,
-      hintsUsed,
-      answeredQuestions: answeredQuestionsCount,
-      totalQuestions,
-      completedTasks: slots.length,
-      totalTasks: slots.length,
+    state.running = false;
+    state.finished = true;
+    const payload = makeOutcome({
+      outcome,
+      score: state.score,
+      outputs: state.outputs,
+      target: config.target,
+      mistakes: state.mistakes,
+      levelNumber,
     });
-  }, [activeQuestionPartId, answeredQuestionsCount, coins, earnedStars, hintsUsed, mistakes, onLevelComplete, placements, points, slots, totalQuestions]);
+    setLocalResult(outcome);
+    if (outcome === 'COMPLETED') onLevelComplete?.(payload);
+    else onLevelFail?.(payload);
+  }, [config.target, levelNumber, onLevelComplete, onLevelFail]);
+
+  const sizeCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const host = appRef.current;
+    const state = stateRef.current;
+    if (!canvas || !host || !state) return;
+    const rect = host.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.max(640, Math.round(rect.width));
+    const height = Math.max(460, Math.round(rect.height));
+    const isMobileLandscape = rect.width <= 960 && rect.height <= 560;
+    const mobileUiScale = isMobileLandscape
+      ? clamp(Math.min(rect.width / 1020, rect.height / 620), 0.46, 0.64)
+      : 1;
+    const backingWidth = Math.round(width * dpr);
+    const backingHeight = Math.round(height * dpr);
+    if (canvas.width !== backingWidth) canvas.width = backingWidth;
+    if (canvas.height !== backingHeight) canvas.height = backingHeight;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+    state.width = width;
+    state.height = height;
+    state.mobileUiScale = mobileUiScale;
+    state.mobileSafeTop = isMobileLandscape ? Math.max(92, height * 0.2) : 0;
+    state.mobileSafeBottom = isMobileLandscape ? height - Math.max(44, height * 0.09) : height;
+  }, []);
+
+  const currentChallenge = () => {
+    const state = stateRef.current;
+    return state ? challenges[state.challengeIndex] || challenges[0] : challenges[0];
+  };
+
+  const createItem = useCallback((kind) => {
+    const canvas = canvasRef.current;
+    const state = stateRef.current;
+    const challenge = currentChallenge();
+    if (!canvas || !state || !challenge) return;
+    const ctx = canvas.getContext('2d');
+    let text = 'BUG';
+    if (kind === 'correct') text = challenge.pieces[state.pieceIndex] || challenge.pieces[0];
+    if (kind === 'wrong') text = pick(challenge.decoys.length ? challenge.decoys : FALLBACK_DECOYS);
+    const mobileUiScale = state.mobileUiScale || 1;
+    let width = 118 * mobileUiScale;
+    let height = 138 * mobileUiScale;
+    if (kind !== 'bomb') {
+      ctx.save();
+      ctx.font = `800 ${24 * mobileUiScale}px "Space Mono", "Courier New", monospace`;
+      width = Math.max(190 * mobileUiScale, Math.min(410 * mobileUiScale, (108 * mobileUiScale) + ctx.measureText(text).width));
+      height = 108 * mobileUiScale;
+      ctx.restore();
+    }
+    const isWide = state.width >= 820;
+    const playLeft = isWide ? Math.max(360, state.width * 0.28) : state.width * 0.22;
+    const playRight = isWide ? Math.min(state.width - 360, state.width * 0.72) : state.width * 0.78;
+    const x = rand(playLeft, Math.max(playLeft + 1, playRight));
+    const launchDirection = x < state.width / 2 ? 1 : -1;
+    const safeTop = state.mobileSafeTop || 0;
+    const safeBottom = state.mobileSafeBottom || state.height;
+    const spawnY = mobileUiScale < 1 ? safeBottom + height * 0.62 + rand(8, 28) : state.height + height + rand(22, 86);
+    const gravity = 330 + config.speed;
+    const mobileLaunchVelocity = -Math.sqrt(Math.max(1, 2 * gravity * Math.max(140, spawnY - safeTop - rand(18, 54))));
+    state.items.push({
+      id: `${Date.now()}-${Math.random()}`,
+      kind,
+      text,
+      x: clamp(x, width / 2 + 20, state.width - width / 2 - 20),
+      y: spawnY,
+      width,
+      height,
+      renderScale: mobileUiScale,
+      vx: launchDirection * rand(22, 82),
+      vy: mobileUiScale < 1 ? mobileLaunchVelocity : -(560 + config.speed * 1.45 + rand(-30, 70)),
+      gravity,
+      drift: rand(-10, 10),
+      phase: rand(0, Math.PI * 2),
+      spin: rand(-0.08, 0.08),
+      dead: false,
+    });
+  }, [challenges, config.speed]);
+
+  const spawnWave = useCallback(() => {
+    const state = stateRef.current;
+    if (!state || state.items.length >= config.maxObjects) return;
+    const hasNeededPiece = state.items.some((item) => item.kind === 'correct' && !item.dead);
+    const spawnHazard = () => {
+      const hazardTotal = config.bombChance + config.decoyChance;
+      const bombRoll = hazardTotal > 0 ? config.bombChance / hazardTotal : 0.35;
+      const kind = Math.random() < bombRoll ? 'bomb' : 'wrong';
+      createItem(kind);
+      state.lastSpawnKind = kind;
+      state.correctGapRemaining = Math.max(0, (state.correctGapRemaining || 0) - 1);
+      state.hazardsSinceCorrect = (state.hazardsSinceCorrect || 0) + 1;
+    };
+    const canSpawnCorrect = !hasNeededPiece && state.lastSpawnKind !== 'correct' && (state.correctGapRemaining || 0) <= 0;
+    if (canSpawnCorrect && (Math.random() < config.correctChance || (state.hazardsSinceCorrect || 0) >= 3)) {
+      createItem('correct');
+      state.lastSpawnKind = 'correct';
+      state.correctGapRemaining = config.correctGap;
+      state.hazardsSinceCorrect = 0;
+    } else {
+      spawnHazard();
+    }
+    if (levelNumber >= 4 && Math.random() < 0.24 && state.items.length < config.maxObjects) {
+      const extraKind = Math.random() < 0.65 ? 'wrong' : 'bomb';
+      createItem(extraKind);
+      state.lastSpawnKind = extraKind;
+      state.correctGapRemaining = Math.max(0, (state.correctGapRemaining || 0) - 1);
+      state.hazardsSinceCorrect = (state.hazardsSinceCorrect || 0) + 1;
+    }
+  }, [config.bombChance, config.correctChance, config.correctGap, config.decoyChance, config.maxObjects, createItem, levelNumber]);
+
+  const burst = (ctx, x, y, color, count = 18) => {
+    const state = stateRef.current;
+    if (!state) return;
+    for (let i = 0; i < count; i += 1) {
+      state.particles.push({ x, y, vx: rand(-190, 190), vy: rand(-230, 80), life: rand(0.35, 0.8), color });
+    }
+  };
+
+  const addCorrectSliceEffect = (item, a, b) => {
+    const state = stateRef.current;
+    if (!state) return;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const ux = dx / length;
+    const uy = dy / length;
+    const slashLength = clamp(length, 70, 150);
+    state.sliceBursts.push({
+      id: `${Date.now()}-${Math.random()}`,
+      x: item.x,
+      y: item.y,
+      a: {
+        x: item.x - ux * slashLength * 0.5,
+        y: item.y - uy * slashLength * 0.5,
+      },
+      b: {
+        x: item.x + ux * slashLength * 0.5,
+        y: item.y + uy * slashLength * 0.5,
+      },
+      life: 0.48,
+      maxLife: 0.48,
+    });
+  };
+
+  const completeChallenge = useCallback((ctx, state, challenge) => {
+    state.outputs += 1;
+    state.pieceIndex = 0;
+    state.challengeIndex = Math.min(challenges.length - 1, state.challengeIndex + 1);
+    state.outputText = (challenges[state.challengeIndex] || challenge)?.output || '';
+    state.items = state.items.filter((item) => item.kind === 'bomb');
+    burst(ctx, state.width / 2, state.height * 0.42, '#ffd15d', 34);
+    setFlash({ title: 'OUTPUT DONE', tone: 'good' });
+    window.setTimeout(() => setFlash(null), 820);
+    if (state.outputs >= config.target) finishRun('COMPLETED');
+  }, [challenges.length, config.target, finishRun]);
+
+  const cutItem = useCallback((item, sliceStart, sliceEnd) => {
+    const canvas = canvasRef.current;
+    const state = stateRef.current;
+    const challenge = currentChallenge();
+    if (!canvas || !state || !challenge || item.dead || state.finished) return;
+    const ctx = canvas.getContext('2d');
+    item.dead = true;
+    state.lastSliceAt = performance.now();
+    playSound(swordSliceSoundRef, SWORD_SLICE_SOUND_SRC);
+    if (item.kind === 'correct' && item.text === challenge.pieces[state.pieceIndex]) {
+      const previousCombo = state.combo;
+      state.combo = Math.min(3, state.combo + 1);
+      if (previousCombo < 3 && state.combo === 3 && state.lives < 3) {
+        state.lives = Math.min(3, state.lives + 1);
+      }
+      playSound(syntaxSliceSoundRef, SYNTAX_SLICE_SOUND_SRC);
+      state.pieceIndex += 1;
+      state.score += 40 + state.combo * 10;
+      burst(ctx, item.x, item.y, '#ffd15d', 18);
+      addCorrectSliceEffect(item, sliceStart || { x: item.x - 52, y: item.y + 36 }, sliceEnd || { x: item.x + 52, y: item.y - 36 });
+      if (previousCombo < 3 && state.combo === 3) {
+        playSound(comboSoundRef, COMBO_SOUND_SRC);
+        triggerSliceFeedback('combo', '3x Combo', 'Combo streak!');
+      }
+      if (state.pieceIndex >= challenge.pieces.length) {
+        state.score += 120 + state.combo * 15;
+        completeChallenge(ctx, state, challenge);
+      }
+      syncHud();
+      return;
+    }
+    state.combo = 0;
+    state.lives -= 1;
+    state.mistakes += 1;
+    state.score = Math.max(0, state.score - (item.kind === 'bomb' ? 100 : 70));
+    burst(ctx, item.x, item.y, '#ff334f', item.kind === 'bomb' ? 36 : 22);
+    if (item.kind === 'bomb' || item.kind === 'wrong') {
+      playSound(bombErrorSoundRef, BOMB_ERROR_SOUND_SRC);
+      triggerSliceFeedback('bomb', item.kind === 'bomb' ? 'Life Lost' : 'Wrong Syntax', `${Math.max(0, state.lives)} / 3 Lives`);
+      if (typeof window !== 'undefined' && typeof window.navigator?.vibrate === 'function') {
+        window.navigator.vibrate(item.kind === 'bomb' ? [80, 40, 80] : 120);
+      }
+      appRef.current?.classList.remove('game-two-fruit-shake');
+      void appRef.current?.offsetWidth;
+      appRef.current?.classList.add('game-two-fruit-shake');
+    }
+    setFlash({ title: item.kind === 'bomb' ? 'BOMB HIT' : 'DECOY HIT', tone: 'bad' });
+    window.setTimeout(() => setFlash(null), 700);
+    syncHud();
+    if (state.lives <= 0) finishRun('FAILED');
+  }, [completeChallenge, finishRun, playSound, syncHud, triggerSliceFeedback]);
+
+  const hit = (item, a, b) => {
+    const radius = item.kind === 'bomb' ? 58 : Math.max(item.width * 0.45, item.height * 0.55);
+    const vx = b.x - a.x;
+    const vy = b.y - a.y;
+    const wx = item.x - a.x;
+    const wy = item.y - a.y;
+    const len = vx * vx + vy * vy || 1;
+    const t = clamp((wx * vx + wy * vy) / len, 0, 1);
+    const px = a.x + vx * t;
+    const py = a.y + vy * t;
+    const dx = item.x - px;
+    const dy = item.y - py;
+    return dx * dx + dy * dy <= radius * radius;
+  };
+
+  const pointFromEvent = (event) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  };
+
+  const drawSyntaxCard = (ctx, item, textColor) => {
+    const ww = item.width;
+    const hh = item.height;
+    const l = -ww / 2;
+    const t = -hh / 2;
+    const r = ww / 2;
+    const b = hh / 2;
+    ctx.save();
+    ctx.translate(item.x, item.y);
+    ctx.rotate(Math.sin(performance.now() / 720 + item.phase) * 0.06 + item.spin);
+    ctx.shadowColor = textColor;
+    ctx.shadowBlur = 16;
+    ctx.fillStyle = 'rgba(255,185,30,.06)';
+    ctx.beginPath();
+    ctx.roundRect(l + 4, t + 4, ww - 8, hh - 8, 12);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    const shell = ctx.createLinearGradient(0, t, 0, b);
+    shell.addColorStop(0, '#c6bda9');
+    shell.addColorStop(0.12, '#5e5b55');
+    shell.addColorStop(0.5, '#272622');
+    shell.addColorStop(0.88, '#696257');
+    shell.addColorStop(1, '#171614');
+    ctx.fillStyle = shell;
+    ctx.strokeStyle = '#090807';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(l, t, ww, hh, 12);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#171512';
+    ctx.beginPath();
+    ctx.roundRect(l + 14, t + 13, ww - 28, hh - 26, 7);
+    ctx.fill();
+    const inset = ctx.createLinearGradient(0, t + 13, 0, b - 13);
+    inset.addColorStop(0, 'rgba(255,206,107,.08)');
+    inset.addColorStop(0.5, 'rgba(0,0,0,.18)');
+    inset.addColorStop(1, 'rgba(255,206,107,.04)');
+    ctx.fillStyle = inset;
+    ctx.fill();
+    ctx.strokeStyle = '#4a4034';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#3f3c36';
+    [[l + 6, t + 6], [r - 34, t + 6], [l + 6, b - 26], [r - 34, b - 26]].forEach((p) => {
+      ctx.beginPath();
+      ctx.roundRect(p[0], p[1], 28, 20, 5);
+      ctx.fill();
+      ctx.strokeStyle = '#1a1815';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#141311';
+      ctx.beginPath();
+      ctx.arc(p[0] + 10, p[1] + 10, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#8c8373';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#3f3c36';
+    });
+    ctx.strokeStyle = 'rgba(238,139,43,.6)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 6; i += 1) {
+      const sx = l + 36 + i * ((ww - 72) / 5);
+      const sy = t + 17 + (i % 3) * 15;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + 12, sy - 4);
+      ctx.stroke();
+    }
+    ctx.save();
+    ctx.translate(r - 48, t + 13);
+    ctx.strokeStyle = '#70695d';
+    ctx.fillStyle = '#2a2926';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < 12; i += 1) {
+      const a = i * Math.PI / 6;
+      const rad = i % 2 ? 14 : 18;
+      ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(0, 0, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    ctx.shadowColor = textColor;
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = textColor;
+    ctx.font = `800 ${24 * (item.renderScale || 1)}px "Space Mono", "Courier New", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(item.text, 0, 2, ww - 58);
+    ctx.restore();
+  };
+
+  const drawBomb = (ctx, item) => {
+    ctx.save();
+    const scale = item.renderScale || 1;
+    ctx.translate(item.x, item.y + (14 * scale));
+    ctx.scale(scale, scale);
+    ctx.rotate(Math.sin(performance.now() / 720 + item.phase) * 0.045 + item.spin);
+    ctx.shadowColor = '#ff526b';
+    ctx.shadowBlur = 22;
+    const body = ctx.createRadialGradient(-18, -23, 4, 0, 7, 56);
+    body.addColorStop(0, '#ff554d');
+    body.addColorStop(0.32, '#e92027');
+    body.addColorStop(0.72, '#ae0814');
+    body.addColorStop(1, '#67030b');
+    ctx.fillStyle = body;
+    ctx.strokeStyle = '#4c050b';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 7, 48, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,.24)';
+    ctx.beginPath();
+    ctx.ellipse(-20, -13, 13, 7, -0.65, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(74,0,7,.75)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, 7, 42, 0.15, 1.2);
+    ctx.stroke();
+    ctx.fillStyle = '#41464a';
+    ctx.beginPath();
+    ctx.ellipse(0, -39, 23, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#1f252a';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.fillStyle = '#676d70';
+    ctx.beginPath();
+    ctx.ellipse(0, -43, 13, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#25292b';
+    ctx.lineWidth = 9;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, -47);
+    ctx.quadraticCurveTo(10, -65, 23, -71);
+    ctx.stroke();
+    ctx.strokeStyle = '#eafaff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(2, -50);
+    ctx.quadraticCurveTo(11, -64, 20, -68);
+    ctx.stroke();
+    ctx.shadowColor = '#ff6a25';
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = '#f52a16';
+    ctx.beginPath();
+    ctx.moveTo(21, -72);
+    ctx.bezierCurveTo(28, -96, 46, -100, 54, -94);
+    ctx.bezierCurveTo(49, -85, 58, -85, 60, -77);
+    ctx.bezierCurveTo(47, -70, 39, -69, 30, -62);
+    ctx.bezierCurveTo(31, -71, 25, -67, 21, -72);
+    ctx.fill();
+    ctx.fillStyle = '#ffd15d';
+    ctx.beginPath();
+    ctx.moveTo(28, -76);
+    ctx.bezierCurveTo(31, -88, 42, -91, 47, -88);
+    ctx.bezierCurveTo(43, -82, 49, -80, 47, -76);
+    ctx.bezierCurveTo(38, -73, 35, -69, 30, -68);
+    ctx.fill();
+    ctx.restore();
+  };
+
+  const drawFrame = useCallback((now) => {
+    sizeCanvas();
+    const canvas = canvasRef.current;
+    const state = stateRef.current;
+    if (!canvas || !state) return;
+    const ctx = canvas.getContext('2d');
+    const dt = Math.min(0.04, (now - state.last) / 1000 || 0);
+    state.last = now;
+    ctx.clearRect(0, 0, state.width, state.height);
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(0, 0, state.width, state.height);
+    const background = backgroundRef.current;
+    if (background?.complete && background.naturalWidth > 0) {
+      drawCoverImage(ctx, background, state.width, state.height);
+    }
+    if (state.running && !state.finished) {
+      if (now - state.lastSliceAt >= AFK_TIMEOUT_MS) {
+        setFlash({ title: 'AFK', tone: 'bad' });
+        finishRun('FAILED');
+        return;
+      }
+      state.spawnClock += dt * 1000;
+      if (state.spawnClock >= config.spawnRate) {
+        state.spawnClock = 0;
+        spawnWave();
+      }
+      state.items.forEach((item) => {
+        item.vy += item.gravity * dt;
+        item.y += item.vy * dt;
+        item.x += (item.vx || 0) * dt + Math.sin(now / 700 + item.phase) * item.drift * dt;
+        if (
+          (item.vy > 0 && item.y - item.height / 2 > (state.mobileSafeBottom || state.height) + 18)
+          || item.x + item.width < -90
+          || item.x - item.width > state.width + 90
+        ) {
+          item.dead = true;
+        }
+        if (!item.dead) {
+          if (item.kind === 'bomb') drawBomb(ctx, item);
+          else drawSyntaxCard(ctx, item, item.kind === 'correct' ? '#ffd15d' : '#ff334f');
+        }
+      });
+      state.items = state.items.filter((item) => !item.dead);
+    }
+    state.particles.forEach((particle) => {
+      particle.x += particle.vx * dt;
+      particle.y += particle.vy * dt;
+      particle.vy += 350 * dt;
+      particle.life -= dt;
+      ctx.globalAlpha = Math.max(0, particle.life * 1.5);
+      ctx.fillStyle = particle.color;
+      ctx.fillRect(particle.x - 3, particle.y - 3, 6, 6);
+    });
+    state.particles = state.particles.filter((particle) => particle.life > 0);
+    state.sliceBursts.forEach((effect) => {
+      effect.life -= dt;
+      const progress = 1 - Math.max(0, effect.life / effect.maxLife);
+      const alpha = Math.max(0, effect.life / effect.maxLife);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = '#ffd15d';
+      ctx.shadowBlur = 16 * alpha;
+      ctx.strokeStyle = '#ffd15d';
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.moveTo(effect.a.x, effect.a.y);
+      ctx.lineTo(effect.b.x, effect.b.y);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#fff3b0';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.font = '900 22px "Space Mono", "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffd15d';
+      ctx.shadowColor = '#ff9f27';
+      ctx.shadowBlur = 10;
+      ctx.fillText('+1', effect.x + 26, effect.y - 38 - progress * 16);
+      ctx.restore();
+    });
+    state.sliceBursts = state.sliceBursts.filter((effect) => effect.life > 0);
+    state.trails.forEach((trail) => {
+      trail.life -= dt;
+      ctx.globalAlpha = trail.life / 0.18;
+      ctx.strokeStyle = '#bcff74';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(trail.a.x, trail.a.y);
+      ctx.lineTo(trail.b.x, trail.b.y);
+      ctx.stroke();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    });
+    state.trails = state.trails.filter((trail) => trail.life > 0);
+    ctx.globalAlpha = 1;
+    animationRef.current = requestAnimationFrame(drawFrame);
+  }, [config.spawnRate, finishRun, sizeCanvas, spawnWave]);
+
+  useEffect(() => {
+    const state = stateRef.current;
+    if (state) state.running = !showTutorial && !localResult && !resultData;
+  }, [localResult, resultData, showTutorial]);
+
+  useEffect(() => {
+    sizeCanvas();
+    const host = appRef.current;
+    const resizeObserver = typeof ResizeObserver !== 'undefined' && host
+      ? new ResizeObserver(() => sizeCanvas())
+      : null;
+    resizeObserver?.observe(host);
+    window.addEventListener('resize', sizeCanvas);
+    animationRef.current = requestAnimationFrame(drawFrame);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', sizeCanvas);
+      cancelAnimationFrame(animationRef.current);
+    };
+  }, [drawFrame, sizeCanvas]);
+
+  const handlePointerDown = (event) => {
+    pointerRef.current = pointFromEvent(event);
+    canvasRef.current?.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerMove = (event) => {
+    const state = stateRef.current;
+    if (!state || !pointerRef.current || !state.running || state.finished) return;
+    const nextPoint = pointFromEvent(event);
+    state.lastSliceAt = performance.now();
+    state.trails.push({ a: pointerRef.current, b: nextPoint, life: 0.18 });
+    state.items.forEach((item) => {
+      if (hit(item, pointerRef.current, nextPoint)) cutItem(item, pointerRef.current, nextPoint);
+    });
+    pointerRef.current = nextPoint;
+  };
+
+  const handlePointerUp = () => {
+    pointerRef.current = null;
+  };
+
+  const handleLocalRetry = () => {
+    onRetry?.();
+    resetRun();
+  };
 
   return (
-    <div className="game-two-shell">
-      <div className="game-two-layout">
-        <section className="game-two-board-wrap">
-          <div
-            className={`game-two-board ${board.transparentBackground ? 'game-two-board-transparent' : ''} ${isCodeLab ? 'game-two-board-code-lab' : ''}`}
-            style={{ width: `${boardWidth}px`, height: `${boardHeight}px` }}
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={handleDropOnBoard}
-          >
-            <div className="game-two-board-image">
-              {isCodeLab ? (
-                <div className="game-two-code-program" aria-hidden="true">
-                  <div className="game-two-code-line"><span>public class AssemblyLab {'{'}</span></div>
-                  <div className="game-two-code-line game-two-code-indent"><span>public static void main(String[] args) {'{'}</span></div>
-                  <div className="game-two-code-line game-two-code-indent-2"><span>// repair the missing Java code blocks</span></div>
-                  <div className="game-two-code-line game-two-code-indent"><span>{'}'}</span></div>
-                  <div className="game-two-code-line"><span>{'}'}</span></div>
-                </div>
-              ) : boardSprite && (
-                <img
-                  src={boardSprite.url}
-                  alt={levelData?.title || 'Code layout'}
-                  className="game-two-board-image-sprite"
-                  draggable={false}
-                />
-              )}
-            </div>
+    <div ref={appRef} className="game-two-fruit-shell">
+      <canvas
+        ref={canvasRef}
+        className="game-two-fruit-canvas"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        aria-label="Fruit Ninja programming syntax gameplay area"
+      />
 
-            {slots.map((slot) => {
-              const slotWidth = clamp(Number(slot.width) || 12, 8, 80);
-              const slotHeight = clamp(Number(slot.height) || 12, 8, 80);
-              const slotX = clamp(Number(slot.x) || 0, 0, 100);
-              const slotY = clamp(Number(slot.y) || 0, 0, 100);
-              const placedPartId = placements[slot.id];
-              const placedPart = placedPartId ? partMap.get(placedPartId) : null;
-              const placedSprite = placedPartId ? spriteMap.get(placedPartId) : null;
-              const placedRotation = Number(slot.rotation ?? placedPart?.placedRotation ?? 0) || 0;
-              const placedWidth = clamp(Number(slot.placedWidth) || 100, 20, 3000);
-              const placedHeight = clamp(Number(slot.placedHeight) || 100, 20, 3000);
-              const placedOffsetX = clamp(Number(slot.placedOffsetX) || 0, -100, 100);
-              const placedOffsetY = clamp(Number(slot.placedOffsetY) || 0, -100, 100);
-              const placedScale = clamp(Number(slot.placedScale) || 1, 0.25, 8);
-              const placedImageTransform = [
-                placedRotation ? `rotate(${placedRotation}deg)` : '',
-                placedScale !== 1 ? `scale(${placedScale})` : '',
-              ].filter(Boolean).join(' ');
-
-              return (
-                <div
-                  key={slot.id}
-                  className={`game-two-slot ${isCodeLab ? 'game-two-slot-code-lab' : ''} ${slot.hidden ? 'game-two-slot-hidden' : ''} ${placedPart ? 'game-two-slot-locked' : ''} ${shakeSlotId === slot.id ? 'game-two-shake' : ''}`}
-                  style={{
-                    left: `${slotX}%`,
-                    top: `${slotY}%`,
-                    width: `${slotWidth}%`,
-                    height: `${slotHeight}%`,
-                  }}
-                  aria-label={placedPart ? `${placedPart.label} placed` : 'Drop zone'}
-                  title={placedPart ? placedPart.label : slot.label}
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={(event) => handleDropOnSlot(event, slot)}
-                >
-                  {placedPart ? (
-                    <div
-                      className="game-two-part-in-slot"
-                      style={{
-                        width: `${placedWidth}%`,
-                        height: `${placedHeight}%`,
-                        transform: `translate(${placedOffsetX}%, ${placedOffsetY}%)`,
-                      }}
-                    >
-                      {placedSprite ? (
-                        <img
-                          src={placedSprite.url}
-                          alt={placedPart.label}
-                          className="game-two-part-in-slot-image"
-                          style={placedImageTransform ? { transform: placedImageTransform } : undefined}
-                          draggable={false}
-                        />
-                      ) : (
-                        <code className="game-two-code-block game-two-code-block-placed">
-                          {placedPart.code || placedPart.label}
-                        </code>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="game-two-slot-label">{slot.label}</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="game-two-metrics">
-            <span className="student-stat-chip">Placed {placedCount}/{totalSlots}</span>
-            <span className="student-stat-chip">Mistakes {mistakes}</span>
-            <span className="student-stat-chip">Stars {earnedStars}/3</span>
-            <span className="student-stat-chip">Correct {points}/{totalQuestions}</span>
-            <span className="student-stat-chip inline-flex items-center gap-1">
-              <Coins className="h-3.5 w-3.5" />
-              Coins {coins}
-            </span>
-            <button type="button" className="student-stat-chip inline-flex items-center gap-1" onClick={onExitRequest}>
-              <LogOut className="h-3.5 w-3.5" />
-              Exit Level
-            </button>
-          </div>
-        </section>
-
-        <aside className={`game-two-parts-wrap ${shouldScrollPartsPanel ? 'game-two-parts-wrap-scroll' : ''}`}>
-          <div className="game-two-parts-head">
-            <p className="student-mini-kicker">Code Blocks</p>
-            <h3>Drag To Matching Slot</h3>
-          </div>
-
-          <div className="game-two-parts-grid">
-            {availableParts.map((part) => {
-              const partSprite = spriteMap.get(part.id);
-
-              return (
-                <div
-                  key={part.id}
-                  draggable
-                  className={`game-two-part-card ${draggingPartId === part.id ? 'game-two-part-dragging' : ''} ${shakePartId === part.id ? 'game-two-shake' : ''}`}
-                  onDragStart={(event) => {
-                    event.dataTransfer.setData('application/x-itechs-part-id', part.id);
-                    event.dataTransfer.effectAllowed = 'move';
-
-                    const previewImage = event.currentTarget.querySelector('.game-two-part-preview-image');
-                    if (previewImage && event.dataTransfer?.setDragImage) {
-                      event.dataTransfer.setDragImage(
-                        previewImage,
-                        previewImage.clientWidth / 2,
-                        previewImage.clientHeight / 2,
-                      );
-                    }
-
-                    setDraggingPartId(part.id);
-                  }}
-                  onDragEnd={() => setDraggingPartId('')}
-                >
-                  <div className="game-two-part-meta">
-                    <Grip className="h-3.5 w-3.5" />
-                    <span>{part.label}</span>
-                  </div>
-                  <div className="game-two-part-preview">
-                    {partSprite ? (
-                      <img
-                        src={partSprite.url}
-                        alt={part.label}
-                        className="game-two-part-preview-image"
-                        draggable={false}
-                      />
-                    ) : (
-                      <code className="game-two-code-block">
-                        {part.code || part.label}
-                      </code>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-
-            {availableParts.length === 0 && (
-              <div className="game-two-empty-state">
-                <CheckCircle2 className="h-5 w-5" />
-                <p>All required blocks are locked in place.</p>
-              </div>
-            )}
-          </div>
-        </aside>
+      <div className="game-two-fruit-code-rain" aria-hidden="true">
+        <span>{'public static void main'}</span>
+        <span>{'System.out.println();'}</span>
+        <span>{'if () { return; }'}</span>
+        <span>{'class JavaSlice'}</span>
       </div>
 
-      {renderScreenModal(
-        <AnimatePresence>
-          {shouldPauseForIntroGuide && !shouldPauseForTutorialCoach && (
-            <motion.div
-              className="actual-game-tutorial-motion"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <GameGuideOverlay
-                kicker={guideContent.kicker}
-                title={guideContent.title}
-                lead={guideContent.lead}
-                summary={guideContent.summary}
-                sections={guideContent.sections}
-                onExit={onExitRequest}
-                onStart={() => {
-                  setShowGuide(false);
-                  setShowTutorial(continueToTutorialAfterGuide);
-                }}
-                startLabel="Next"
-              />
-            </motion.div>
-          )}
-          {showTutorial && !showGuide && !shouldPauseForTutorialCoach && (
-            <motion.div
-              className="actual-game-tutorial-motion"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <GameTutorialOverlay
-                gameType="GAME_TWO"
-                levelNumber={levelData?.levelNumber || 1}
-                onExit={onExitRequest}
-                onStart={() => setShowTutorial(false)}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>,
+      <div className="game-two-fruit-score">
+        <span>Player Score</span>
+        <strong>{score}</strong>
+      </div>
+
+      <div className="game-two-fruit-lives">
+        <span>Lives</span>
+        <strong>{'♥'.repeat(Math.max(0, lives))}{'♡'.repeat(Math.max(0, 3 - lives))}</strong>
+      </div>
+
+      <div className="game-two-fruit-mission">
+        <strong>Level {levelNumber}</strong>
+      </div>
+
+      <div className="game-two-fruit-actions" aria-label="Game 2 controls">
+        <button
+          type="button"
+          className="game-two-fruit-action-button game-two-fruit-tutorial-button"
+          onClick={() => {
+            setTutorialView('tutorial');
+            setShowTutorial(true);
+          }}
+        >
+          Game Tutorial
+        </button>
+        <button
+          type="button"
+          className="game-two-fruit-action-button game-two-fruit-back-button"
+          onClick={onExitRequest}
+        >
+          Back
+        </button>
+      </div>
+
+      <aside className="game-two-fruit-left">
+        <section className="game-two-fruit-card game-two-fruit-combo">
+          <span>Combo</span>
+          <strong>{combo}x</strong>
+        </section>
+        <section className="game-two-fruit-card game-two-fruit-code">
+          <span>Java Code</span>
+          <strong className="game-two-fruit-challenge-title">{challengeTitle}</strong>
+          <code>{codePreview}</code>
+        </section>
+      </aside>
+
+      <aside className="game-two-fruit-right">
+        <section className="game-two-fruit-card game-two-fruit-output">
+          <span>Output</span>
+          <code>{outputText}</code>
+          <strong>{outputs} / {config.target}</strong>
+        </section>
+      </aside>
+
+      {flash && (
+        <div className={`game-two-fruit-flash game-two-fruit-flash-${flash.tone}`}>
+          {flash.title}
+        </div>
       )}
 
-      {isTutorialLevel && shouldPauseForTutorialCoach && (
-        <PlayableTutorialCoach
-          steps={GAME_TWO_TUTORIAL_STEPS}
-          stepIndex={tutorialStepIndex}
-          stats={[
-            { label: 'Placed', value: `${placedCount}/${totalSlots}` },
-            { label: 'Checks', value: `${answeredQuestionsCount}/${totalQuestions}` },
-          ]}
-          onContinue={handleContinueTutorialStep}
+      {sliceFeedback && (
+        <div
+          key={sliceFeedback.id}
+          className={`game-two-slice-feedback game-two-slice-feedback-${sliceFeedback.type}`}
+          aria-hidden="true"
+        >
+          <strong>{sliceFeedback.title}</strong>
+          {sliceFeedback.detail && <span>{sliceFeedback.detail}</span>}
+        </div>
+      )}
+
+      {showGuide && (
+        <GameGuideOverlay
+          kicker={guideContent.kicker}
+          title={guideContent.title}
+          lead={guideContent.lead}
+          summary={guideContent.summary}
+          sections={guideContent.sections}
+          onExit={onExitRequest}
+          onStart={() => {
+            if (shouldAutoOpenFirstHandGuide) {
+              setTutorialView('tutorial');
+              return;
+            }
+            setTutorialView(null);
+            setShowTutorial(false);
+            const state = stateRef.current;
+            if (state) {
+              state.running = true;
+              state.last = performance.now();
+              state.lastSliceAt = performance.now();
+            }
+          }}
+          startLabel="Next"
         />
       )}
 
-      <AnimatePresence>
-        {infoCard && (
-          <motion.div
-            key={infoCard.title}
-            className="game-two-info-card"
-            initial={{ opacity: 0, y: 12, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-          >
-            <div className="game-two-info-title">
-              <Info className="h-4 w-4" />
-              {infoCard.title} Locked
-            </div>
-            <p>{infoCard.description}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {activeQuestionPart && (
-          <motion.div
-            className="game-two-question-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="game-two-question-card"
-              initial={{ opacity: 0, scale: 0.92, y: 18 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="game-two-question-head">
-                <div className="game-two-question-copy">
-                  <p className="student-mini-kicker">Code Block Locked</p>
-                  <h3>{activeQuestionPart.label}</h3>
-                  <p>{activeQuestionPart.info}</p>
-                </div>
-                <div className="game-two-question-points">
-                  <span>Question Reward</span>
-                  <strong>+1 Correct</strong>
-                </div>
-              </div>
-
-              <div className="game-two-question-prompt">
-                {activeQuestionPart.question?.prompt}
-              </div>
-
-              <div className="game-two-hint-panel">
-                <div className="game-two-hint-head">
-                  <span className="student-mini-kicker">AI Hint</span>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleRevealHint}
-                    disabled={
-                      activeHints.length === 0
-                      || revealedHintCount >= activeHints.length
-                      || (resolvedHintCoinCost > 0 && coins < resolvedHintCoinCost)
-                    }
-                  >
-                    {activeHints.length === 0
-                      ? 'No Hints'
-                      : revealedHintCount < activeHints.length
-                        ? (resolvedHintCoinCost > 0
-                          ? `Reveal Hint (-${resolvedHintCoinCost} coin${resolvedHintCoinCost === 1 ? '' : 's'})`
-                          : 'Reveal Hint')
-                        : 'All Hints Shown'}
-                  </button>
-                </div>
-
-                {hintNotice && (
-                  <p className="game-two-hint-empty text-rose-600">{hintNotice}</p>
-                )}
-                {!hintNotice && resolvedHintCoinCost > 0 && coins < resolvedHintCoinCost && activeHints.length > 0 && (
-                  <p className="game-two-hint-empty text-amber-700">
-                    Need {resolvedHintCoinCost} coin{resolvedHintCoinCost === 1 ? '' : 's'} to reveal the next hint.
-                  </p>
-                )}
-
-                {revealedHintCount > 0 ? (
-                  <ul className="game-two-hint-list">
-                    {activeHints.slice(0, revealedHintCount).map((hint, index) => (
-                      <li key={`${activeQuestionPart.id}-hint-${index}`}>{hint}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="game-two-hint-empty">
-                    {activeHints.length === 0
-                      ? 'No AI hint is available for this question.'
-                      : 'Need a clue? Reveal an AI hint before choosing.'}
-                  </p>
-                )}
-              </div>
-
-              <div className="game-two-question-options">
-                {activeQuestionPart.question?.options?.map((option) => {
-                  const isSelected = questionFeedback?.selectedOptionId === option.id;
-                  const isCorrect = questionFeedback?.correctOptionId === option.id;
-                  const isWrongSelected = Boolean(questionFeedback && isSelected && !questionFeedback.isCorrect);
-
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      className={`game-two-question-option ${isSelected ? 'game-two-question-option-selected' : ''} ${isCorrect && questionFeedback ? 'game-two-question-option-correct' : ''} ${isWrongSelected ? 'game-two-question-option-wrong' : ''}`}
-                      onClick={() => handleQuestionAnswer(option.id)}
-                      disabled={Boolean(questionFeedback)}
-                    >
-                      <span className="game-two-question-option-index">{option.id.toUpperCase()}</span>
-                      <span>{option.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="game-two-question-footer">
-                {questionFeedback ? (
-                  <p className={`game-two-question-feedback ${questionFeedback.isCorrect ? 'game-two-question-feedback-correct' : 'game-two-question-feedback-wrong'}`}>
-                    {questionFeedback.isCorrect ? (
-                      <>
-                        <CheckCircle2 className="h-4 w-4" />
-                        Correct. This answer helps your 3-star rating.
-                      </>
-                    ) : (
-                      <>
-                        <AlertCircle className="h-4 w-4" />
-                        No correct-answer point awarded. Correct answer:{' '}
-                        {activeQuestionPart.question?.options?.find((option) => option.id === questionFeedback.correctOptionId)?.label || questionFeedback.correctOptionId}
-                      </>
-                    )}
-                  </p>
-                ) : (
-                  <p className="game-two-question-hint">Answer to improve your 3-star rating.</p>
-                )}
-
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleContinueFromQuestion}
-                  disabled={!questionFeedback}
-                >
-                  Continue
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {(isSubmitting || (resultData && !hideResultOverlay)) && (
-        <div className="game-two-result-overlay">
-          {isSubmitting ? (
-            <div className="game-two-result-card">
-              <Loader2 className="h-6 w-6 animate-spin text-emerald-700" />
-              <p className="text-lg font-black text-slate-900">Submitting Result...</p>
-            </div>
-          ) : (
-            <div className="game-two-result-card">
-              <div className="game-two-result-title">
-                {resultData?.result === 'COMPLETED' ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-700" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-amber-700" />
-                )}
-                <span>{resultData?.result === 'COMPLETED' ? 'Level Cleared' : 'Try Again'}</span>
-              </div>
-
-              <div className="game-two-result-stats">
-                <span>Correct answers: <strong>{points}</strong> / {totalQuestions}</span>
-                <span>Local stars: <strong>{earnedStars}</strong> / 3</span>
-                <span>Placed blocks: <strong>{placedCount}</strong> / {totalSlots}</span>
-                <span>Coins left: <strong>{coins}</strong></span>
-                <span>Stars earned: <strong>{resultData?.starsEarned ?? 0}</strong></span>
-              </div>
-
-              <div className="game-two-result-actions">
-                <button type="button" className="btn btn-secondary" onClick={onRetry}>
-                  <RotateCcw className="h-4 w-4" />
-                  Retry
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={onBack}>
-                  Back
-                </button>
-                {canAdvanceLevel && (
-                  <button type="button" className="btn btn-primary" onClick={onNextLevel}>
-                    Next Level
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const GameTwoCodeLabCanvas = ({
-  levelData,
-  onLevelComplete,
-  onLevelFail,
-  onExitRequest,
-  resultData,
-  isSubmitting,
-  canAdvanceLevel,
-  hideResultOverlay = false,
-  onRetry,
-  onBack,
-  onNextLevel,
-  hintCoinCost = 1,
-  freeMistakes = 3,
-  hintStarCost = 1,
-  initialCoins,
-  playerId = 'guest',
-  suppressIntroTutorial = false,
-  showLevelGuideline = false,
-  gameTutorialRequested = false,
-  continueToTutorialAfterGuide = false,
-}) => {
-  const tasks = useMemo(() => (Array.isArray(levelData?.tasks) ? levelData.tasks : []), [levelData]);
-  const guideContent = useMemo(
-    () => buildGameTwoGuideContent(levelData, { freeMistakes, hintCoinCost, hintStarCost }),
-    [freeMistakes, hintCoinCost, hintStarCost, levelData],
-  );
-  const isTutorialLevel = Boolean(levelData?.isTutorialLevel);
-  const [activeTaskIndex, setActiveTaskIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [completedTaskMap, setCompletedTaskMap] = useState({});
-  const [failedTaskMap, setFailedTaskMap] = useState({});
-  const [compileChecksUsed, setCompileChecksUsed] = useState({});
-  const [submittedAnswerSignatures, setSubmittedAnswerSignatures] = useState({});
-  const [mistakes, setMistakes] = useState(0);
-  const [coins, setCoins] = useState(0);
-  const [hintsUsed, setHintsUsed] = useState(0);
-  const [revealedHintCounts, setRevealedHintCounts] = useState({});
-  const [generatedHints, setGeneratedHints] = useState({});
-  const [isGeneratingHint, setIsGeneratingHint] = useState(false);
-  const [hintNotice, setHintNotice] = useState('');
-
-  useEffect(() => {
-    if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
-      setShowGuide(false);
-      setShowTutorial(true);
-    }
-  }, [gameTutorialRequested, isTutorialLevel]);
-  const [feedback, setFeedback] = useState(null);
-  const [showGuide, setShowGuide] = useState(showLevelGuideline && !isTutorialLevel);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [draggedSnippetId, setDraggedSnippetId] = useState('');
-  const [touchDrag, setTouchDrag] = useState(null);
-  const submittedRef = useRef(false);
-  const backgroundMusicRef = useRef(null);
-  const backgroundMusicBlockedRef = useRef(false);
-
-  useEffect(() => {
-    if (
-      typeof window === 'undefined'
-      || typeof window.Audio === 'undefined'
-      || !getStudentMusicPreference()
-    ) {
-      return undefined;
-    }
-
-    const backgroundMusic = new Audio(GAME_TWO_BACKGROUND_MUSIC_SRC);
-    backgroundMusic.loop = true;
-    backgroundMusic.preload = 'auto';
-    backgroundMusic.volume = 0.55;
-    backgroundMusicRef.current = backgroundMusic;
-
-    const attemptPlayback = () => {
-      if (!getStudentMusicPreference()) {
-        backgroundMusic.pause();
-        return;
-      }
-
-      const playPromise = backgroundMusic.play();
-      if (playPromise?.then) {
-        playPromise
-          .then(() => {
-            backgroundMusicBlockedRef.current = false;
-          })
-          .catch(() => {
-            backgroundMusicBlockedRef.current = true;
-          });
-      }
-    };
-
-    attemptPlayback();
-    window.addEventListener('pointerdown', attemptPlayback);
-    window.addEventListener('keydown', attemptPlayback);
-    window.addEventListener('dragstart', attemptPlayback);
-
-    return () => {
-      window.removeEventListener('pointerdown', attemptPlayback);
-      window.removeEventListener('keydown', attemptPlayback);
-      window.removeEventListener('dragstart', attemptPlayback);
-      backgroundMusic.pause();
-      backgroundMusic.currentTime = 0;
-      backgroundMusicBlockedRef.current = false;
-      if (backgroundMusicRef.current === backgroundMusic) {
-        backgroundMusicRef.current = null;
-      }
-    };
-  }, []);
-
-  const activeTask = tasks[activeTaskIndex] || null;
-  const taskDragModel = useMemo(() => createTaskDragModel(activeTask), [activeTask]);
-  const snippetMap = useMemo(
-    () => new Map(taskDragModel.snippets.map((snippet) => [snippet.id, snippet])),
-    [taskDragModel.snippets],
-  );
-  const resolvedHintCoinCost = clamp(Math.round(Number(hintCoinCost) || 0), 0, 9);
-  const resolvedCount = tasks.filter((task) => completedTaskMap[task.id] || failedTaskMap[task.id]).length;
-  const correctCount = Object.values(completedTaskMap).filter(Boolean).length;
-  const requiredCorrectCount = Math.max(1, Math.ceil(tasks.length * 0.8));
-  const earnedStars = calculateQuestionStars(correctCount, tasks.length, mistakes);
-  const rawPoints = tasks.reduce((sum, task) => (
-    completedTaskMap[task.id] ? sum + (Number(task.points) || 0) : sum
-  ), 0);
-
-  useEffect(() => {
-    const startingAnswers = {};
-    tasks.forEach((task) => {
-      if (task.type === 'reorder') {
-        const slotCount = Array.isArray(task.correctOrder) ? task.correctOrder.length : getTaskInitialOrder(task).length;
-        startingAnswers[task.id] = Array.from({ length: slotCount }, () => '');
-      } else {
-        startingAnswers[task.id] = '';
-      }
-    });
-
-    setActiveTaskIndex(0);
-    setAnswers(startingAnswers);
-    setCompletedTaskMap({});
-    setFailedTaskMap({});
-    setCompileChecksUsed({});
-    setSubmittedAnswerSignatures({});
-    setMistakes(0);
-    setCoins(Math.max(Number(initialCoins) || 0, tasks.length));
-    setHintsUsed(0);
-    setRevealedHintCounts({});
-    setGeneratedHints({});
-    setIsGeneratingHint(false);
-    setHintNotice('');
-    setFeedback(null);
-    setShowGuide(showLevelGuideline && !isTutorialLevel);
-    setShowTutorial(false);
-    setDraggedSnippetId('');
-    submittedRef.current = false;
-  }, [initialCoins, isTutorialLevel, levelData?.levelNumber, showLevelGuideline, tasks]);
-
-  useEffect(() => {
-    setHintNotice('');
-    setFeedback(null);
-  }, [activeTaskIndex]);
-
-  useEffect(() => {
-    if (submittedRef.current || tasks.length === 0 || resolvedCount < tasks.length) {
-      return;
-    }
-
-    submittedRef.current = true;
-    const passed = correctCount >= requiredCorrectCount;
-    const payload = {
-      outcome: passed ? 'COMPLETED' : 'FAILED',
-      mistakes,
-      correctPlacements: correctCount,
-      totalPlacements: tasks.length,
-      points: correctCount,
-      rawPoints,
-      starsEarned: earnedStars,
-      coinsRemaining: coins,
-      hintsUsed,
-      answeredQuestions: resolvedCount,
-      totalQuestions: tasks.length,
-      completedTasks: correctCount,
-      totalTasks: tasks.length,
-    };
-    if (passed) onLevelComplete?.(payload);
-    else onLevelFail?.(payload);
-  }, [coins, correctCount, earnedStars, hintsUsed, mistakes, onLevelComplete, onLevelFail, rawPoints, requiredCorrectCount, resolvedCount, tasks.length]);
-
-  const activeHints = useMemo(
-    () => (Array.isArray(activeTask?.hints)
-      ? activeTask.hints.map((hint) => String(hint || '').trim()).filter(Boolean)
-      : []),
-    [activeTask],
-  );
-  const revealedHintCount = activeTask ? Number(revealedHintCounts[activeTask.id] || 0) : 0;
-
-  const resolveSnippetIdFromDrop = (event) => (
-    event?.dataTransfer?.getData('application/x-itechs-code-snippet-id') || draggedSnippetId || ''
-  );
-
-  const currentTaskAnswer = activeTask ? answers[activeTask.id] : '';
-  const placedSnippetIds = useMemo(() => {
-    if (Array.isArray(currentTaskAnswer)) {
-      return new Set(currentTaskAnswer.filter(Boolean));
-    }
-
-    return new Set(currentTaskAnswer ? [currentTaskAnswer] : []);
-  }, [currentTaskAnswer]);
-  const availableSnippets = useMemo(
-    () => taskDragModel.snippets.filter((snippet) => !placedSnippetIds.has(snippet.id)),
-    [placedSnippetIds, taskDragModel.snippets],
-  );
-  const isActiveTaskReady = useMemo(() => {
-    if (!activeTask) {
-      return false;
-    }
-
-    if (taskDragModel.isReorder) {
-      return Array.isArray(answers[activeTask.id])
-        && answers[activeTask.id].length >= taskDragModel.slots.length
-        && answers[activeTask.id].slice(0, taskDragModel.slots.length).every(Boolean);
-    }
-
-    return Boolean(answers[activeTask.id]);
-  }, [activeTask, answers, taskDragModel.isReorder, taskDragModel.slots.length]);
-
-  const handleDropSnippet = (task, slotIndex, snippetId) => {
-    if (!task || completedTaskMap[task.id] || failedTaskMap[task.id] || !snippetMap.has(snippetId)) {
-      return;
-    }
-
-    setAnswers((current) => {
-      if (taskDragModel.isReorder) {
-        const slotCount = taskDragModel.slots.length;
-        const nextSlots = Array.isArray(current[task.id])
-          ? current[task.id].slice(0, slotCount)
-          : Array.from({ length: slotCount }, () => '');
-
-        while (nextSlots.length < slotCount) {
-          nextSlots.push('');
-        }
-
-        const existingIndex = nextSlots.indexOf(snippetId);
-        if (existingIndex >= 0) {
-          nextSlots[existingIndex] = '';
-        }
-        nextSlots[slotIndex] = snippetId;
-
-        return { ...current, [task.id]: nextSlots };
-      }
-
-      return { ...current, [task.id]: snippetId };
-    });
-  };
-
-  const handleDropOnCodeSlot = (event, task, slotIndex) => {
-    event.preventDefault();
-    const snippetId = resolveSnippetIdFromDrop(event);
-    handleDropSnippet(task, slotIndex, snippetId);
-  };
-
-  const handleTouchDragStart = (event, snippet) => {
-    if (event.pointerType === 'mouse' || completedTaskMap[activeTask.id]) return;
-    event.preventDefault();
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-    setDraggedSnippetId(snippet.id);
-    setTouchDrag({
-      pointerId: event.pointerId,
-      snippetId: snippet.id,
-      label: snippet.label,
-      code: snippet.code,
-      x: event.clientX,
-      y: event.clientY,
-    });
-  };
-
-  const handleTouchDragMove = (event) => {
-    if (!touchDrag || touchDrag.pointerId !== event.pointerId) return;
-    event.preventDefault();
-    setTouchDrag((current) => (current ? { ...current, x: event.clientX, y: event.clientY } : null));
-  };
-
-  const handleTouchDragEnd = (event) => {
-    if (!touchDrag || touchDrag.pointerId !== event.pointerId) return;
-    event.preventDefault();
-    const dropTarget = document
-      .elementFromPoint(event.clientX, event.clientY)
-      ?.closest?.('[data-game-two-code-slot]');
-
-    if (dropTarget) {
-      const slotIndex = Number(dropTarget.getAttribute('data-game-two-code-slot'));
-      if (Number.isInteger(slotIndex)) {
-        handleDropSnippet(activeTask, slotIndex, touchDrag.snippetId);
-      }
-    }
-
-    setTouchDrag(null);
-    setDraggedSnippetId('');
-  };
-
-  const handleTapCodeSlot = (task, slotIndex) => {
-    if (!draggedSnippetId) return;
-    handleDropSnippet(task, slotIndex, draggedSnippetId);
-    setDraggedSnippetId('');
-  };
-
-  const handleSelectCodeSnippet = (task, snippetId) => {
-    if (!task || !snippetId || completedTaskMap[task.id] || failedTaskMap[task.id]) return;
-
-    // A single blank can be filled immediately on phones. Reorder tasks still
-    // select the snippet first so the player can choose its destination line.
-    if (!taskDragModel.isReorder && taskDragModel.slots.length === 1) {
-      handleDropSnippet(task, 0, snippetId);
-      setDraggedSnippetId('');
-      return;
-    }
-
-    setDraggedSnippetId((current) => (current === snippetId ? '' : snippetId));
-  };
-
-  const handleClearCodeSlot = (task, slotIndex) => {
-    if (!task || completedTaskMap[task.id] || failedTaskMap[task.id]) {
-      return;
-    }
-
-    setAnswers((current) => {
-      if (taskDragModel.isReorder) {
-        const nextSlots = Array.isArray(current[task.id])
-          ? [...current[task.id]]
-          : Array.from({ length: taskDragModel.slots.length }, () => '');
-        nextSlots[slotIndex] = '';
-        return { ...current, [task.id]: nextSlots };
-      }
-
-      return { ...current, [task.id]: '' };
-    });
-  };
-
-  const markTaskComplete = (task, isCorrect, answerSignature) => {
-    if (isCorrect) {
-      setCompletedTaskMap((current) => ({ ...current, [task.id]: true }));
-      playGameTwoSoundEffect(GAME_TWO_CORRECT_SOUND_SRC);
-      setCoins((current) => current + (Number(task.coinReward) || 1));
-      setFeedback({
-        taskId: task.id,
-        isCorrect: true,
-        message: task.feedback?.correct || task.coach || 'Correct. Code accepted.',
-      });
-    } else {
-      const previousChecksUsed = Number(compileChecksUsed[task.id] || 0);
-      const nextChecksUsed = previousChecksUsed + 1;
-      const checksLeft = Math.max(0, 3 - nextChecksUsed);
-      playGameTwoSoundEffect(GAME_TWO_INCORRECT_SOUND_SRC);
-      setMistakes((current) => current + 1);
-      setCompileChecksUsed((current) => ({ ...current, [task.id]: nextChecksUsed }));
-      setSubmittedAnswerSignatures((current) => ({
-        ...current,
-        [task.id]: [...(current[task.id] || []), answerSignature],
-      }));
-      if (checksLeft === 0) {
-        setFailedTaskMap((current) => ({ ...current, [task.id]: true }));
-      }
-      setAnswers((current) => ({
-        ...current,
-        [task.id]: task.type === 'reorder'
-          ? Array.from({ length: taskDragModel.slots.length }, () => '')
-          : '',
-      }));
-      setDraggedSnippetId('');
-      setFeedback({
-        taskId: task.id,
-        isCorrect: false,
-        message: checksLeft === 0
-          ? 'No compile checks remain. This task is unsuccessful; the correct answer stays hidden.'
-          : nextChecksUsed === 1
-            ? `Compilation failed. Review the code structure and data types. ${checksLeft} checks remain.`
-            : `Compilation still fails. Rebuild the full answer or use a hint to inspect the task. ${checksLeft} check remains.`,
-      });
-    }
-  };
-
-  const handleSubmitTask = (task) => {
-    if (!task || completedTaskMap[task.id] || failedTaskMap[task.id]) {
-      return;
-    }
-
-    const answerSignature = Array.isArray(answers[task.id])
-      ? answers[task.id].join('|')
-      : String(answers[task.id] || '');
-    if ((submittedAnswerSignatures[task.id] || []).includes(answerSignature)) {
-      setFeedback({
-        taskId: task.id,
-        isCorrect: false,
-        message: 'You already compiled that exact answer. Change the code before using another check.',
-      });
-      return;
-    }
-
-    if (task.type === 'choice') {
-      markTaskComplete(task, answers[task.id] === task.correctOptionId, answerSignature);
-      return;
-    }
-
-    if (task.type === 'reorder') {
-      const currentOrder = Array.isArray(answers[task.id]) ? answers[task.id] : [];
-      markTaskComplete(task, isCodingAnswerCorrect(task, currentOrder), answerSignature);
-      return;
-    }
-
-    const acceptedAnswers = Array.isArray(task.acceptedAnswers) && task.acceptedAnswers.length > 0
-      ? task.acceptedAnswers
-      : [task.answer];
-    const selectedSnippet = snippetMap.get(answers[task.id]);
-    const submittedAnswer = normalizeCodeAnswer(selectedSnippet?.code);
-    const isCorrect = acceptedAnswers.some((answer) => normalizeCodeAnswer(answer) === submittedAnswer);
-    markTaskComplete(task, isCorrect, answerSignature);
-  };
-
-  const handleRevealHint = async () => {
-    if (!activeTask || isGeneratingHint || activeHints.length === 0 || revealedHintCount >= activeHints.length) {
-      return;
-    }
-
-    if (resolvedHintCoinCost > 0 && coins < resolvedHintCoinCost) {
-      setHintNotice(`Need ${resolvedHintCoinCost} coin${resolvedHintCoinCost === 1 ? '' : 's'} to reveal the next hint.`);
-      return;
-    }
-
-    const fallbackHint = activeHints[revealedHintCount] || 'Inspect the Java syntax around the blank.';
-    const placedCodes = (Array.isArray(currentTaskAnswer) ? currentTaskAnswer : [currentTaskAnswer])
-      .filter(Boolean)
-      .map((snippetId) => snippetMap.get(snippetId)?.code)
-      .filter(Boolean);
-    setIsGeneratingHint(true);
-    setHintNotice('');
-    let resolvedHint = fallbackHint;
-    try {
-      const response = await levelAPI.generateGameHint('GAME_TWO', levelData?.levelNumber || 1, {
-        topic: activeTask.title,
-        objective: activeTask.prompt,
-        availableTokens: taskDragModel.snippets.map((snippet) => snippet.code),
-        assembledTokens: placedCodes,
-        hintNumber: revealedHintCount + 1,
-        fallbackHint,
-        forbiddenAnswer: activeTask.answer
-          || activeTask.options?.find((option) => option.id === activeTask.correctOptionId)?.label
-          || '',
-      });
-      const aiHint = String(response?.data?.hint || '').trim();
-      if (response?.status === 'success' && aiHint) resolvedHint = aiHint;
-    } catch {
-      // Use the validated task hint when AI is unavailable.
-    } finally {
-      setIsGeneratingHint(false);
-    }
-
-    if (resolvedHintCoinCost > 0) setCoins((current) => Math.max(0, current - resolvedHintCoinCost));
-    setHintsUsed((current) => current + 1);
-    setGeneratedHints((current) => ({
-      ...current,
-      [activeTask.id]: [...(current[activeTask.id] || []), resolvedHint],
-    }));
-    setRevealedHintCounts((current) => ({
-      ...current,
-      [activeTask.id]: Math.min(activeHints.length, revealedHintCount + 1),
-    }));
-    playGameTwoSoundEffect(GAME_TWO_HINT_SOUND_SRC, 0.65);
-  };
-
-  const goToNextTask = () => {
-    setActiveTaskIndex((current) => Math.min(tasks.length - 1, current + 1));
-  };
-
-  const handleRetryGame = () => {
-    onRetry?.();
-  };
-
-  if (tasks.length === 0 || !activeTask) {
-    return (
-      <div className="game-two-shell">
-        <section className="game-two-empty-state">
-          <AlertCircle className="h-5 w-5" />
-          <p>No Java code lab tasks are available for this level.</p>
-        </section>
-      </div>
-    );
-  }
-
-  return (
-    <div className="game-two-shell game-two-code-lab-shell">
-      <div className="game-two-code-lab-layout">
-        <section className="game-two-code-lab-main">
-          <div className="game-two-code-lab-terminal">
-            <div className="game-two-code-lab-terminal-bar">
-              <span className="student-mini-kicker">Java Code Lab</span>
-              <span>{levelData?.title || 'Code Lab'}</span>
-            </div>
-            <pre>{`public class CodeLab {
-  public static void main(String[] args) {
-    // Drag the correct snippet into the broken code, then compile.
-  }
-}`}</pre>
-          </div>
-
-          <div className="game-two-code-lab-task">
-            <p className="student-mini-kicker">Task {activeTaskIndex + 1} of {tasks.length}</p>
-            <h3>{activeTask.title}</h3>
-            <p>{activeTask.prompt}</p>
-
-            <div className="game-two-code-drop-workspace">
-              <div className="game-two-code-structure game-two-guide-code-target" aria-label="Code structure">
-                <div className="game-two-code-lab-terminal-bar">
-                  <span className="student-mini-kicker">Code Structure</span>
-                  <span>{taskDragModel.isReorder ? 'Drop each line in order' : 'Repair the blank'}</span>
-                </div>
-
-                {activeTask.snippet && activeTask.type === 'debug' && (
-                  <code className="game-two-code-lab-snippet game-two-code-lab-broken">{activeTask.snippet}</code>
-                )}
-
-                {taskDragModel.isReorder ? (
-                  <div className="game-two-code-slot-stack">
-                    {taskDragModel.slots.map((slot, index) => {
-                      const placedSnippetId = Array.isArray(answers[activeTask.id]) ? answers[activeTask.id][index] : '';
-                      const placedSnippet = placedSnippetId ? snippetMap.get(placedSnippetId) : null;
-
-                      return (
-                        <div key={slot.id} className="game-two-code-structure-line">
-                          <span className="game-two-code-line-number">{index + 1}</span>
-                          <div
-                            data-game-two-code-slot={index}
-                            className={`game-two-code-drop-slot ${placedSnippet ? 'game-two-code-drop-slot-filled' : ''}`}
-                            onDragOver={(event) => event.preventDefault()}
-                            onDrop={(event) => handleDropOnCodeSlot(event, activeTask, index)}
-                            onClick={() => handleTapCodeSlot(activeTask, index)}
-                          >
-                            {placedSnippet ? (
-                              <div
-                                draggable={!completedTaskMap[activeTask.id]}
-                                className="game-two-code-placed-snippet"
-                                onDragStart={(event) => {
-                                  event.dataTransfer.setData('application/x-itechs-code-snippet-id', placedSnippet.id);
-                                  event.dataTransfer.effectAllowed = 'move';
-                                  setDraggedSnippetId(placedSnippet.id);
-                                }}
-                                onDragEnd={() => setDraggedSnippetId('')}
-                              >
-                                <Grip className="h-4 w-4" />
-                                <code>{placedSnippet.code}</code>
-                                {!completedTaskMap[activeTask.id] && (
-                                  <button
-                                    type="button"
-                                    className="game-two-code-clear-slot"
-                                    onClick={() => handleClearCodeSlot(activeTask, index)}
-                                    aria-label="Remove snippet"
-                                  >
-                                    x
-                                  </button>
-                                )}
-                              </div>
-                            ) : (
-                              <span>{slot.label}</span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="game-two-code-fill-line">
-                    {taskDragModel.beforeBlank && <code>{taskDragModel.beforeBlank}</code>}
-                    <div
-                      data-game-two-code-slot="0"
-                      className={`game-two-code-drop-slot ${answers[activeTask.id] ? 'game-two-code-drop-slot-filled' : ''}`}
-                      onDragOver={(event) => event.preventDefault()}
-                      onDrop={(event) => handleDropOnCodeSlot(event, activeTask, 0)}
-                      onClick={() => handleTapCodeSlot(activeTask, 0)}
-                    >
-                      {answers[activeTask.id] ? (
-                        <div
-                          draggable={!completedTaskMap[activeTask.id]}
-                          className="game-two-code-placed-snippet"
-                          onDragStart={(event) => {
-                            event.dataTransfer.setData('application/x-itechs-code-snippet-id', answers[activeTask.id]);
-                            event.dataTransfer.effectAllowed = 'move';
-                            setDraggedSnippetId(answers[activeTask.id]);
-                          }}
-                          onDragEnd={() => setDraggedSnippetId('')}
-                        >
-                          <Grip className="h-4 w-4" />
-                          <code>{snippetMap.get(answers[activeTask.id])?.code || ''}</code>
-                          {!completedTaskMap[activeTask.id] && (
-                            <button
-                              type="button"
-                              className="game-two-code-clear-slot"
-                              onClick={() => handleClearCodeSlot(activeTask, 0)}
-                              aria-label="Remove snippet"
-                            >
-                              x
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <span>{taskDragModel.slots[0]?.label || 'Drop snippet here'}</span>
-                      )}
-                    </div>
-                    {taskDragModel.afterBlank && <code>{taskDragModel.afterBlank}</code>}
-                    {!activeTask.snippet && activeTask.type !== 'choice' && (
-                      <span className="game-two-code-expression-note">snippet</span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="game-two-code-snippet-tray game-two-guide-snippets-target">
-                <div className="game-two-code-lab-terminal-bar">
-                  <span className="student-mini-kicker">Code Choices</span>
-                  <span>Drag, or tap a choice then its slot</span>
-                </div>
-                <div className="game-two-code-drag-list">
-                  {availableSnippets.map((snippet) => (
-                    <div
-                      key={snippet.id}
-                      draggable={!completedTaskMap[activeTask.id]}
-                      className={`game-two-part-card game-two-code-drag-card ${draggedSnippetId === snippet.id ? 'game-two-part-dragging' : ''}`}
-                      role="button"
-                      tabIndex={0}
-                      aria-pressed={draggedSnippetId === snippet.id}
-                      onClick={() => handleSelectCodeSnippet(activeTask, snippet.id)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          handleSelectCodeSnippet(activeTask, snippet.id);
-                        }
-                      }}
-                      onDragStart={(event) => {
-                        event.dataTransfer.setData('application/x-itechs-code-snippet-id', snippet.id);
-                        event.dataTransfer.effectAllowed = 'move';
-                        setDraggedSnippetId(snippet.id);
-                      }}
-                      onDragEnd={() => setDraggedSnippetId('')}
-                    >
-                      <span
-                        className="game-two-code-touch-handle"
-                        aria-label={`Drag ${snippet.label}`}
-                        onPointerDown={(event) => handleTouchDragStart(event, snippet)}
-                        onPointerMove={handleTouchDragMove}
-                        onPointerUp={handleTouchDragEnd}
-                        onPointerCancel={() => {
-                          setTouchDrag(null);
-                          setDraggedSnippetId('');
-                        }}
-                      >
-                        <Grip className="h-4 w-4" />
-                      </span>
-                      <div>
-                        <span>{snippet.label}</span>
-                        <code>{snippet.code}</code>
-                      </div>
-                    </div>
-                  ))}
-
-                  {availableSnippets.length === 0 && (
-                    <div className="game-two-empty-state">
-                      <CheckCircle2 className="h-5 w-5" />
-                      <p>All snippets are placed.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {feedback?.taskId === activeTask.id && (
-              <p className={`game-two-question-feedback ${feedback.isCorrect ? 'game-two-question-feedback-correct' : 'game-two-question-feedback-wrong'}`}>
-                {feedback.isCorrect ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                {feedback.message}
-              </p>
-            )}
-
-            <div className="game-two-question-footer">
-              <button
-                type="button"
-                className="btn btn-secondary game-two-guide-hint-target"
-                onClick={handleRevealHint}
-                disabled={isGeneratingHint || activeHints.length === 0 || revealedHintCount >= activeHints.length}
-              >
-                {isGeneratingHint ? <Loader2 className="h-4 w-4 animate-spin" /> : <HelpCircle className="h-4 w-4" />}
-                {isGeneratingHint ? 'Thinking...' : 'Hint'}
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary game-two-guide-compile-target"
-                onClick={() => ((completedTaskMap[activeTask.id] || failedTaskMap[activeTask.id]) ? goToNextTask() : handleSubmitTask(activeTask))}
-                disabled={Boolean(
-                  ((completedTaskMap[activeTask.id] || failedTaskMap[activeTask.id]) && activeTaskIndex >= tasks.length - 1)
-                  || (!completedTaskMap[activeTask.id] && !failedTaskMap[activeTask.id] && !isActiveTaskReady),
-                )}
-              >
-                {(completedTaskMap[activeTask.id] || failedTaskMap[activeTask.id]) ? 'Next Task' : 'Compile Answer'}
-              </button>
-            </div>
-
-            <p className="game-two-hint-empty">
-              Compile checks: {Math.max(0, 3 - Number(compileChecksUsed[activeTask.id] || 0))}/3 remaining
-            </p>
-
-            {hintNotice && <p className="game-two-hint-empty text-rose-600">{hintNotice}</p>}
-            {revealedHintCount > 0 && (
-              <ul className="game-two-hint-list">
-                {(generatedHints[activeTask.id] || activeHints.slice(0, revealedHintCount)).map((hint, index) => (
-                  <li key={`${activeTask.id}-hint-${index}`}>{hint}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
-
-        <aside className="game-two-code-lab-sidebar">
-          <div className="game-two-side-card game-two-guide-progress-target">
-            <span className="student-stat-chip">Resolved {resolvedCount}/{tasks.length}</span>
-            <span className="student-stat-chip">Correct {correctCount}/{tasks.length}</span>
-            <span className="student-stat-chip">Need {requiredCorrectCount}/{tasks.length}</span>
-            <span className="student-stat-chip">Mistakes {mistakes}</span>
-            <span className="student-stat-chip">Stars {earnedStars}/3</span>
-            <span className="student-stat-chip inline-flex items-center gap-1 game-two-guide-coins-target">
-              <Coins className="h-3.5 w-3.5" />
-              Coins {coins}
-            </span>
-            <button type="button" className="student-stat-chip inline-flex items-center gap-1" onClick={onExitRequest}>
-              <LogOut className="h-3.5 w-3.5" />
-              Exit Level
-            </button>
-          </div>
-
-          <div className="game-two-task-list game-two-guide-tasks-target">
-            {tasks.map((task, index) => {
-              const previousTaskId = tasks[index - 1]?.id;
-              const isUnlocked = index === 0 || Boolean(completedTaskMap[previousTaskId] || failedTaskMap[previousTaskId]);
-              return (
-                <button
-                  key={task.id}
-                  type="button"
-                  className={`game-two-task-tab ${index === activeTaskIndex ? 'game-two-task-tab-active' : ''} ${completedTaskMap[task.id] ? 'game-two-task-tab-done' : ''} ${failedTaskMap[task.id] ? 'game-two-task-tab-failed' : ''} ${!isUnlocked ? 'game-two-task-tab-locked' : ''}`}
-                  onClick={() => {
-                    if (isUnlocked) setActiveTaskIndex(index);
-                  }}
-                  disabled={!isUnlocked}
-                  aria-label={`${task.title}${isUnlocked ? '' : ' (locked)'}`}
-                >
-                  <span>{isUnlocked ? index + 1 : <Lock className="h-3.5 w-3.5" />}</span>
-                  <strong>{task.title}</strong>
-                </button>
-              );
-            })}
-          </div>
-        </aside>
-      </div>
-
-      {touchDrag && createPortal(
-        <div
-          className="game-two-code-touch-ghost"
-          style={{ left: touchDrag.x, top: touchDrag.y }}
-          aria-hidden="true"
-        >
-          <strong>{touchDrag.label}</strong>
-          <code>{touchDrag.code}</code>
-        </div>,
-        document.body,
-      )}
-
-      {renderScreenModal(
-        <AnimatePresence>
-          {showGuide && (
-            <motion.div
-              className="actual-game-tutorial-motion"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <GameGuideOverlay
-                kicker={guideContent.kicker}
-                title={guideContent.title}
-                lead={guideContent.lead}
-                summary={guideContent.summary}
-                sections={guideContent.sections}
-                onExit={onExitRequest}
-                onStart={() => {
-                  setShowGuide(false);
-                  setShowTutorial(continueToTutorialAfterGuide);
-                }}
-                startLabel="Next"
-              />
-            </motion.div>
-          )}
-          {showTutorial && !showGuide && (
-            <motion.div
-              className="actual-game-tutorial-motion"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <GameTutorialOverlay
-                gameType="GAME_TWO"
-                levelNumber={levelData?.levelNumber || 1}
-                onExit={onExitRequest}
-                onStart={() => setShowTutorial(false)}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>,
+      {showFirstHandGuide && (
+        <GameTutorialOverlay
+          gameType="GAME_TWO"
+          levelNumber={levelNumber}
+          onExit={onExitRequest}
+          onStart={() => {
+            setTutorialView(null);
+            setShowTutorial(false);
+            const state = stateRef.current;
+            if (state) {
+              state.running = true;
+              state.last = performance.now();
+              state.lastSliceAt = performance.now();
+            }
+          }}
+        />
       )}
 
       {(isSubmitting || (resultData && !hideResultOverlay)) && (
@@ -1989,16 +1217,16 @@ const GameTwoCodeLabCanvas = ({
                 {resultData?.result === 'COMPLETED'
                   ? <CheckCircle2 className="h-5 w-5 text-emerald-700" />
                   : <AlertCircle className="h-5 w-5 text-rose-700" />}
-                <span>{resultData?.result === 'COMPLETED' ? 'Level Cleared' : 'Level Not Passed'}</span>
+                <span>{resultData?.result === 'COMPLETED' ? 'Level Cleared' : 'Game Over'}</span>
               </div>
               <div className="game-two-result-stats">
-                <span>Correct tasks: <strong>{correctCount}</strong> / {tasks.length}</span>
-                <span>Local stars: <strong>{earnedStars}</strong> / 3</span>
-                <span>Coins left: <strong>{coins}</strong></span>
-                <span>Stars earned: <strong>{resultData?.starsEarned ?? 0}</strong></span>
+                <span>Output: <strong>{outputs}</strong> / {config.target}</span>
+                <span>Score: <strong>{score}</strong></span>
+                <span>Lives: <strong>{lives}</strong> / 3</span>
+                <span>Stars earned: <strong>{resultData?.starsEarned ?? (localResult === 'COMPLETED' ? 3 : 0)}</strong></span>
               </div>
               <div className="game-two-result-actions">
-                <button type="button" className="btn btn-secondary" onClick={handleRetryGame}>
+                <button type="button" className="btn btn-secondary" onClick={handleLocalRetry}>
                   <RotateCcw className="h-4 w-4" />
                   Retry
                 </button>
@@ -2014,51 +1242,6 @@ const GameTwoCodeLabCanvas = ({
         </div>
       )}
     </div>
-  );
-};
-
-const GameCanvasGameTwo = (props) => {
-  const [showCongratulations, setShowCongratulations] = useState(false);
-  const isCompleted = props.resultData?.result === 'COMPLETED';
-
-  useEffect(() => {
-    setShowCongratulations(isCompleted);
-  }, [isCompleted, props.levelData?.levelNumber]);
-
-  const Canvas = Array.isArray(props.levelData?.tasks) && props.levelData.tasks.length > 0
-    ? GameTwoCodeLabCanvas
-    : GameTwoHardwareDragCanvas;
-
-  return (
-    <>
-      <Canvas
-        {...props}
-        hideResultOverlay={props.hideResultOverlay || showCongratulations}
-      />
-      <AnimatePresence>
-        {showCongratulations && isCompleted && (
-          <motion.div
-            className="student-story-intro-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-          >
-            <motion.div
-              initial={{ y: 18, scale: 0.98, opacity: 0 }}
-              animate={{ y: 0, scale: 1, opacity: 1 }}
-              exit={{ y: 12, scale: 0.98, opacity: 0 }}
-              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <CongratulatoryOverlay
-                message={`You completed ${props.levelData?.title || `Level ${props.levelData?.levelNumber || 1}`}. Great job!`}
-                onNext={() => setShowCongratulations(false)}
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
   );
 };
 

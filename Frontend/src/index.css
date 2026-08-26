@@ -2570,6 +2570,1359 @@
   }
 }
 
+/* Final mobile Guidelines button/content adjustment requested: buttons +7px more, content slightly higher. */
+@media (orientation: portrait), (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    top: 27.5% !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    bottom: 13.4% !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: calc(clamp(4.15rem, 24vw, 5.85rem) + 21px) !important;
+    height: calc(clamp(1.52rem, 7.8vw, 2.12rem) + 21px) !important;
+  }
+}
+
+/* Final mobile Guidelines correction for the updated 1206x1304 Guidelinesformobile.png. */
+@media (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10060 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    padding: max(0.08rem, env(safe-area-inset-top)) max(0.08rem, env(safe-area-inset-right)) max(0.08rem, env(safe-area-inset-bottom)) max(0.08rem, env(safe-area-inset-left)) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    position: relative !important;
+    display: block !important;
+    width: min(99vw, calc(99dvh * 0.9248)) !important;
+    height: min(99dvh, calc(99vw / 0.9248)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1206 / 1304 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-vine {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    position: absolute !important;
+    left: 16.5% !important;
+    top: 25.8% !important;
+    width: 67% !important;
+    height: 55% !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 92% !important;
+    margin: 0 0 clamp(0.2rem, 1vw, 0.4rem) !important;
+    padding: clamp(0.16rem, 0.72vw, 0.28rem) clamp(0.48rem, 2vw, 0.8rem) !important;
+    border-radius: 10px !important;
+    font-size: clamp(0.58rem, 2.75vw, 0.88rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.16rem, 0.8vw, 0.34rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.14rem, 0.7vw, 0.3rem) clamp(0.34rem, 1.35vw, 0.55rem) 0 !important;
+    color: #2b2116 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.42rem, 6.7vw, 2rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.28rem, 1.25vw, 0.5rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.08rem, 0.38vw, 0.16rem) 0 !important;
+    font-size: clamp(0.54rem, 2.72vw, 0.86rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.18 !important;
+    overflow: visible !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.28rem, 6vw, 1.86rem) !important;
+    height: clamp(1.28rem, 6vw, 1.86rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    position: absolute !important;
+    left: 17.5% !important;
+    bottom: 10.4% !important;
+    width: 65% !important;
+    height: 8.2% !important;
+    display: grid !important;
+    grid-template-columns: minmax(3.2rem, 1fr) minmax(3.4rem, auto) minmax(3.2rem, 1fr) !important;
+    align-items: center !important;
+    justify-items: center !important;
+    column-gap: clamp(0.24rem, 1.15vw, 0.5rem) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.35rem, 19.5vw, 4.7rem) !important;
+    height: clamp(1.22rem, 6.4vw, 1.72rem) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url('./assets/guidelines-icons/buttons.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    color: #f7ffe7 !important;
+    font-size: clamp(0.44rem, 2.28vw, 0.66rem) !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: center !important;
+    min-width: clamp(3rem, 15vw, 4.25rem) !important;
+    gap: clamp(0.1rem, 0.5vw, 0.2rem) !important;
+    font-size: clamp(0.44rem, 2.25vw, 0.64rem) !important;
+    line-height: 1 !important;
+    color: #2b2116 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.08rem, 0.44vw, 0.16rem) !important;
+    max-width: clamp(3rem, 15vw, 4.25rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.22rem, 1.18vw, 0.34rem) !important;
+    height: clamp(0.22rem, 1.18vw, 0.34rem) !important;
+  }
+}
+
+/* Mobile Guidelines final positioning polish: center board and enlarge bottom nav only. */
+@media (orientation: portrait), (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood {
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    left: 14% !important;
+    width: 72% !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: calc(clamp(4.15rem, 24vw, 5.85rem) + 7px) !important;
+    height: calc(clamp(1.52rem, 7.8vw, 2.12rem) + 7px) !important;
+    font-size: clamp(0.56rem, 2.75vw, 0.78rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    min-width: clamp(3.8rem, 18vw, 5.1rem) !important;
+    gap: clamp(0.14rem, 0.65vw, 0.26rem) !important;
+    font-size: clamp(0.56rem, 2.75vw, 0.78rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    gap: clamp(0.1rem, 0.55vw, 0.2rem) !important;
+    max-width: clamp(3.8rem, 18vw, 5.1rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.28rem, 1.45vw, 0.42rem) !important;
+    height: clamp(0.28rem, 1.45vw, 0.42rem) !important;
+  }
+}
+
+/* Final mobile Guidelines button/content adjustment requested: buttons +7px more, content slightly higher. */
+@media (orientation: portrait), (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    top: 27.5% !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: calc(clamp(4.15rem, 24vw, 5.85rem) + 14px) !important;
+    height: calc(clamp(1.52rem, 7.8vw, 2.12rem) + 14px) !important;
+  }
+}
+
+/* New 1206x1304 mobile Guidelines template alignment. UI only; content remains unchanged. */
+@media (max-width: 820px) {
+  .game-guide-backdrop.game-guide-wood {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: max(0.08rem, env(safe-area-inset-top)) max(0.08rem, env(safe-area-inset-right)) max(0.08rem, env(safe-area-inset-bottom)) max(0.08rem, env(safe-area-inset-left)) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    display: grid !important;
+    grid-template-rows: 22% 58% 15% !important;
+    width: min(99vw, calc(99dvh * 0.9248)) !important;
+    height: min(99dvh, calc(99vw / 0.9248)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1206 / 1304 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    display: none !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    grid-row: 2 !important;
+    width: 66% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    align-self: stretch !important;
+    justify-self: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 96% !important;
+    margin: 0 0 clamp(0.28rem, 1.15vw, 0.48rem) !important;
+    padding: clamp(0.22rem, 0.9vw, 0.36rem) clamp(0.58rem, 2.25vw, 0.9rem) !important;
+    font-size: clamp(0.66rem, 2.85vw, 0.95rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.2rem, 0.95vw, 0.44rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.18rem, 0.8vw, 0.36rem) clamp(0.36rem, 1.35vw, 0.58rem) 0 !important;
+    color: #2b2116 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.72rem, 7.6vw, 2.4rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.34rem, 1.55vw, 0.62rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.14rem, 0.6vw, 0.26rem) 0 !important;
+    font-size: clamp(0.68rem, 3.35vw, 1rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.22 !important;
+    overflow: visible !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.5rem, 6.9vw, 2.15rem) !important;
+    height: clamp(1.5rem, 6.9vw, 2.15rem) !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: minmax(3rem, 1fr) minmax(3.2rem, auto) minmax(3rem, 1fr) !important;
+    width: 66% !important;
+    height: 100% !important;
+    justify-self: center !important;
+    align-self: stretch !important;
+    align-items: start !important;
+    column-gap: clamp(0.22rem, 1vw, 0.42rem) !important;
+    padding: 3% 0 0 !important;
+    margin: 0 !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.75rem, 18.5vw, 5.1rem) !important;
+    height: clamp(1.3rem, 6.5vw, 1.78rem) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url('./assets/guidelines-icons/buttons.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    color: #f7ffe7 !important;
+    font-size: clamp(0.5rem, 2.35vw, 0.72rem) !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: start !important;
+    min-width: clamp(3.2rem, 16vw, 4.3rem) !important;
+    gap: clamp(0.1rem, 0.48vw, 0.2rem) !important;
+    font-size: clamp(0.5rem, 2.35vw, 0.72rem) !important;
+    line-height: 1 !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.08rem, 0.45vw, 0.18rem) !important;
+    max-width: clamp(3.2rem, 16vw, 4.3rem) !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.24rem, 1.18vw, 0.34rem) !important;
+    height: clamp(0.24rem, 1.18vw, 0.34rem) !important;
+  }
+}
+
+/* True final mobile Guidelines correction for updated 1206x1304 Guidelinesformobile.png. */
+@media (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10060 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    padding: max(0.08rem, env(safe-area-inset-top)) max(0.08rem, env(safe-area-inset-right)) max(0.08rem, env(safe-area-inset-bottom)) max(0.08rem, env(safe-area-inset-left)) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    position: relative !important;
+    display: block !important;
+    width: min(99vw, calc(99dvh * 0.9248)) !important;
+    height: min(99dvh, calc(99vw / 0.9248)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1206 / 1304 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-vine {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    position: absolute !important;
+    left: 16.5% !important;
+    top: 27.5% !important;
+    width: 67% !important;
+    height: 49.5% !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 92% !important;
+    margin: 0 0 clamp(0.2rem, 1vw, 0.4rem) !important;
+    padding: clamp(0.16rem, 0.72vw, 0.28rem) clamp(0.48rem, 2vw, 0.8rem) !important;
+    border-radius: 10px !important;
+    font-size: clamp(0.58rem, 2.75vw, 0.88rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.16rem, 0.8vw, 0.34rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.14rem, 0.7vw, 0.3rem) clamp(0.34rem, 1.35vw, 0.55rem) 0 !important;
+    color: #2b2116 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.42rem, 6.7vw, 2rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.28rem, 1.25vw, 0.5rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.08rem, 0.38vw, 0.16rem) 0 !important;
+    font-size: clamp(0.54rem, 2.72vw, 0.86rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.18 !important;
+    overflow: visible !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.28rem, 6vw, 1.86rem) !important;
+    height: clamp(1.28rem, 6vw, 1.86rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    position: absolute !important;
+    left: 17.5% !important;
+    bottom: 11.6% !important;
+    width: 65% !important;
+    height: 8.2% !important;
+    display: grid !important;
+    grid-template-columns: minmax(3.2rem, 1fr) minmax(3.4rem, auto) minmax(3.2rem, 1fr) !important;
+    align-items: center !important;
+    justify-items: center !important;
+    column-gap: clamp(0.24rem, 1.15vw, 0.5rem) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.35rem, 19.5vw, 4.7rem) !important;
+    height: clamp(1.22rem, 6.4vw, 1.72rem) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url('./assets/guidelines-icons/buttons.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    color: #f7ffe7 !important;
+    font-size: clamp(0.44rem, 2.28vw, 0.66rem) !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: center !important;
+    min-width: clamp(3rem, 15vw, 4.25rem) !important;
+    gap: clamp(0.1rem, 0.5vw, 0.2rem) !important;
+    font-size: clamp(0.44rem, 2.25vw, 0.64rem) !important;
+    line-height: 1 !important;
+    color: #2b2116 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.08rem, 0.44vw, 0.16rem) !important;
+    max-width: clamp(3rem, 15vw, 4.25rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.22rem, 1.18vw, 0.34rem) !important;
+    height: clamp(0.22rem, 1.18vw, 0.34rem) !important;
+  }
+}
+
+/* Phone Guidelines override: apply by mobile width, not orientation, so portrait phones cannot fall back to the web board. */
+@media (max-width: 820px) {
+  .game-guide-backdrop.game-guide-wood {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: max(0.08rem, env(safe-area-inset-top)) max(0.08rem, env(safe-area-inset-right)) max(0.08rem, env(safe-area-inset-bottom)) max(0.08rem, env(safe-area-inset-left)) !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    display: grid !important;
+    grid-template-rows: 18.6% 64.4% 13.4% !important;
+    width: min(99.5vw, calc(99.5dvh * 0.5628)) !important;
+    height: min(99.5dvh, calc(99.5vw / 0.5628)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 941 / 1672 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    display: none !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    grid-row: 2 !important;
+    width: 68% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    align-self: stretch !important;
+    justify-self: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 94% !important;
+    margin: 0 0 clamp(0.3rem, 1.55vw, 0.52rem) !important;
+    padding: clamp(0.2rem, 0.9vw, 0.34rem) clamp(0.56rem, 2.35vw, 0.84rem) !important;
+    font-size: clamp(0.66rem, 3.15vw, 0.98rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.24rem, 1.25vw, 0.48rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.18rem, 0.9vw, 0.34rem) clamp(0.42rem, 1.8vw, 0.7rem) 0 !important;
+    color: #2b2116 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.7rem, 8vw, 2.35rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.34rem, 1.65vw, 0.58rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.12rem, 0.65vw, 0.24rem) 0 !important;
+    font-size: clamp(0.66rem, 3.18vw, 0.98rem) !important;
+    line-height: 1.24 !important;
+    overflow: visible !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.5rem, 7.2vw, 2.1rem) !important;
+    height: clamp(1.5rem, 7.2vw, 2.1rem) !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: minmax(3.8rem, 1fr) minmax(4.2rem, auto) minmax(3.8rem, 1fr) !important;
+    width: 68% !important;
+    height: 100% !important;
+    justify-self: center !important;
+    align-self: stretch !important;
+    align-items: start !important;
+    column-gap: clamp(0.28rem, 1.4vw, 0.54rem) !important;
+    padding: 9.3% 0 0 !important;
+    margin: 0 !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.6rem, 22vw, 4.95rem) !important;
+    height: clamp(1.36rem, 7.4vw, 1.9rem) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    font-size: clamp(0.48rem, 2.6vw, 0.7rem) !important;
+    line-height: 1 !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: start !important;
+    min-width: clamp(3.4rem, 17.5vw, 4.75rem) !important;
+    gap: clamp(0.12rem, 0.72vw, 0.24rem) !important;
+    font-size: clamp(0.5rem, 2.65vw, 0.72rem) !important;
+    line-height: 1 !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.1rem, 0.72vw, 0.2rem) !important;
+    max-width: clamp(3.4rem, 17.5vw, 4.75rem) !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.28rem, 1.55vw, 0.42rem) !important;
+    height: clamp(0.28rem, 1.55vw, 0.42rem) !important;
+  }
+}
+
+/* Mobile Guidelines final portrait fit: larger readable board content, no duplicate overlay title. */
+@media (orientation: portrait) {
+  body > .game-guide-backdrop.game-guide-wood {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: max(0.18rem, env(safe-area-inset-top)) max(0.18rem, env(safe-area-inset-right)) max(0.18rem, env(safe-area-inset-bottom)) max(0.18rem, env(safe-area-inset-left)) !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    grid-template-rows: 18.2% 59.8% 17.4% !important;
+    width: min(99vw, calc(99dvh * 0.5628)) !important;
+    height: min(99dvh, calc(99vw / 0.5628)) !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    grid-row: 2 !important;
+    width: 70% !important;
+    height: 100% !important;
+    align-self: stretch !important;
+    justify-self: center !important;
+    padding: 0.4% 0 0.8% !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    width: fit-content !important;
+    max-width: 100% !important;
+    margin: 0 0 clamp(0.18rem, 0.9vw, 0.34rem) !important;
+    padding: clamp(0.15rem, 0.65vw, 0.28rem) clamp(0.42rem, 1.65vw, 0.68rem) !important;
+    font-size: clamp(0.58rem, 2.85vw, 0.9rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.1rem, 0.52vw, 0.24rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.12rem, 0.6vw, 0.26rem) clamp(0.2rem, 0.9vw, 0.42rem) 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.45rem, 7.2vw, 2.1rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.28rem, 1.35vw, 0.48rem) !important;
+    min-height: 0 !important;
+    padding: clamp(0.08rem, 0.44vw, 0.18rem) 0 !important;
+    font-size: clamp(0.62rem, 3.08vw, 0.9rem) !important;
+    line-height: 1.18 !important;
+    overflow: visible !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.25rem, 6.5vw, 1.9rem) !important;
+    height: clamp(1.25rem, 6.5vw, 1.9rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: minmax(3.6rem, 1fr) minmax(4.2rem, auto) minmax(3.6rem, 1fr) !important;
+    width: 72% !important;
+    height: 100% !important;
+    justify-self: center !important;
+    align-items: start !important;
+    column-gap: clamp(0.28rem, 1.5vw, 0.58rem) !important;
+    padding-top: 8.3% !important;
+    margin: 0 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.75rem, 23vw, 5rem) !important;
+    height: clamp(1.32rem, 7vw, 1.85rem) !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    font-size: clamp(0.48rem, 2.65vw, 0.72rem) !important;
+    line-height: 1 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: start !important;
+    gap: clamp(0.12rem, 0.75vw, 0.24rem) !important;
+    min-width: clamp(3.4rem, 18vw, 4.8rem) !important;
+    font-size: clamp(0.5rem, 2.7vw, 0.72rem) !important;
+    line-height: 1 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    gap: clamp(0.1rem, 0.75vw, 0.2rem) !important;
+    max-width: clamp(3.4rem, 18vw, 4.8rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.28rem, 1.55vw, 0.43rem) !important;
+    height: clamp(0.28rem, 1.55vw, 0.43rem) !important;
+  }
+}
+
+/* Mobile Game 2 / Game 4 landscape and guideline template alignment */
+.student-game-overlay-game-two-scroll .student-shell-overlay,
+.student-game-overlay-game-four .student-shell-overlay {
+  min-height: 100dvh;
+}
+
+@media (orientation: landscape) {
+  .student-game-overlay-game-two-scroll .student-shell-overlay,
+  .student-game-overlay-game-four .student-shell-overlay {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .student-game-overlay-game-two-scroll .student-shell-main,
+  .student-game-overlay-game-two-scroll .student-game-two-overlay-layout,
+  .student-game-overlay-game-two-scroll .student-game-three-frame-panel,
+  .student-game-overlay-game-two-scroll .student-game-frame-wrap,
+  .student-game-overlay-game-two-scroll .student-game-frame-shell {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-shell {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+}
+
+.game-guide-backdrop.game-guide-wood {
+  padding: max(0.35rem, env(safe-area-inset-top)) max(0.35rem, env(safe-area-inset-right)) max(0.35rem, env(safe-area-inset-bottom)) max(0.35rem, env(safe-area-inset-left));
+  background: rgba(12, 8, 5, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.game-guide-card--wood {
+  position: relative;
+  display: grid !important;
+  grid-template-rows: 19% 58% 18%;
+  width: min(96vw, calc(96dvh * 1.72));
+  height: min(96dvh, calc(96vw / 1.72));
+  max-width: none;
+  max-height: none;
+  padding: 0 !important;
+  gap: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-image: var(--game-guide-mobile-bg) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  font-family: 'Press Start 2P', 'Space Grotesk', 'Manrope', system-ui, sans-serif !important;
+}
+
+.game-guide-card--wood::before,
+.game-guide-card--wood::after,
+.game-guide-card--wood .game-guide-vine {
+  display: none !important;
+}
+
+.game-guide-card--wood .game-guide-main-title {
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+  color: #f8f1cf !important;
+  font-size: clamp(0.95rem, 3.2dvh, 1.55rem) !important;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow: 3px 3px 0 #2b170c;
+}
+
+.game-guide-card--wood .game-guide-grid {
+  grid-row: 2;
+  width: 68%;
+  height: 100%;
+  min-height: 0;
+  justify-self: center;
+  overflow: hidden;
+}
+
+.game-guide-card--wood .game-guide-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: clamp(0.45rem, 1.8dvh, 0.9rem) clamp(0.55rem, 2.2dvh, 1.1rem);
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.game-guide-card--wood .game-guide-section h4 {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  max-width: 100%;
+  margin: 0 0 clamp(0.3rem, 1.3dvh, 0.55rem);
+  padding: clamp(0.22rem, 0.9dvh, 0.42rem) clamp(0.4rem, 1.6dvh, 0.75rem);
+  border: 3px solid #24451b;
+  border-radius: 8px;
+  background: linear-gradient(#77c850, #34813a);
+  color: #f8ffe1;
+  font-size: clamp(0.55rem, 1.9dvh, 0.82rem);
+  line-height: 1.35;
+  text-shadow: 2px 2px 0 #163312;
+  overflow-wrap: anywhere;
+}
+
+.game-guide-card--wood .game-guide-section ul {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0 clamp(0.2rem, 1dvh, 0.45rem) clamp(0.4rem, 1.6dvh, 0.8rem) 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.2rem, 1dvh, 0.48rem);
+  color: #2b2116;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 2.35dvh, 1rem);
+  font-weight: 900;
+  line-height: 1.32;
+  list-style: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.game-guide-card--wood .game-guide-section ul li {
+  display: grid;
+  grid-template-columns: clamp(34px, 8dvh, 56px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.35rem, 1.5dvh, 0.8rem);
+  min-height: 0;
+  padding: clamp(0.15rem, 0.75dvh, 0.32rem) 0;
+  border-bottom: 2px dashed rgba(93, 58, 28, 0.24);
+  overflow: hidden;
+}
+
+.game-guide-card--wood .game-guide-section ul li:last-child {
+  border-bottom: 0;
+}
+
+.game-guide-card--wood .game-guide-section ul li > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.game-guide-card--wood .game-guide-item-icon {
+  width: clamp(30px, 7dvh, 50px);
+  height: clamp(30px, 7dvh, 50px);
+  justify-self: center;
+  align-self: center;
+  filter: drop-shadow(2px 2px 0 #2c2116);
+}
+
+.game-guide-card--wood .game-guide-item-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.game-guide-card--wood .game-guide-actions {
+  grid-row: 3;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(6rem, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.35rem, 1.5dvh, 0.75rem);
+  width: 74%;
+  height: 100%;
+  justify-self: center;
+  margin: 0 !important;
+  padding: 0 0 clamp(0.1rem, 0.8dvh, 0.4rem) !important;
+}
+
+.game-guide-card--wood .game-guide-nav-button {
+  width: clamp(5.8rem, 18dvh, 9rem);
+  min-width: 0;
+  min-height: clamp(2rem, 7.2dvh, 3.15rem);
+  padding: 0.35rem 0.5rem 0.48rem;
+  border: 4px solid #1d2717;
+  border-radius: 0;
+  background: linear-gradient(#86d957 0 47%, #4a9c31 48% 100%);
+  color: #f7ffe7;
+  font-size: clamp(0.48rem, 1.8dvh, 0.8rem);
+  font-weight: 900;
+  text-shadow: 2px 2px 0 #284315;
+  box-shadow: inset 0 -5px 0 rgba(29, 78, 20, 0.42), 4px 4px 0 #1d2717;
+}
+
+.game-guide-card--wood .game-guide-nav-back,
+.game-guide-card--wood .game-guide-nav-next,
+.game-guide-card--wood .game-guide-nav-spacer {
+  justify-self: center;
+}
+
+.game-guide-card--wood .game-guide-page-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  gap: clamp(0.15rem, 0.7dvh, 0.3rem);
+  min-width: clamp(5.5rem, 18dvh, 9rem);
+  color: #24160c;
+  font-size: clamp(0.48rem, 1.7dvh, 0.72rem);
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 1px 1px 0 rgba(255, 227, 154, 0.72);
+}
+
+.game-guide-card--wood .game-guide-page-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.16rem, 0.65dvh, 0.32rem);
+  max-width: clamp(5rem, 18dvh, 9rem);
+}
+
+.game-guide-card--wood .game-guide-page-dots span {
+  width: clamp(0.38rem, 1.7dvh, 0.72rem);
+  height: clamp(0.38rem, 1.7dvh, 0.72rem);
+  border: 2px solid #2a160a;
+  border-radius: 50%;
+  background: #3c2a1d;
+}
+
+.game-guide-card--wood .game-guide-page-dots span.is-active {
+  background: #55b843;
+}
+
+.game-four-mobile-controls {
+  display: none;
+}
+
+.game-four-sidebar-movement-card,
+.game-four-sidebar-gear-card,
+.game-four-sidebar-guide-card,
+.game-four-tutorial-side-card {
+  border: 3px solid #5AA9E6;
+  border-radius: 18px;
+  background: #F5FAFF;
+  color: #0f2744;
+  padding: 0.78rem;
+  box-shadow: 0 8px 18px rgba(23, 105, 170, 0.12);
+}
+
+.game-four-sidebar-movement-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 900;
+}
+
+.game-four-sidebar-keyboard-icon {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 2px solid #1769AA;
+  border-radius: 10px;
+  background: #EAF5FF;
+}
+
+.game-four-sidebar-movement-card span:not(.game-four-sidebar-keyboard-icon) {
+  font-weight: 1000;
+}
+
+.game-four-sidebar-gear-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #1769AA;
+  font-size: 1.05rem;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.game-four-sidebar-gear-slots {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+}
+
+.game-four-sidebar-gear-slot {
+  display: grid;
+  width: 2.45rem;
+  height: 2.45rem;
+  place-items: center;
+  border: 2px solid #5AA9E6;
+  border-radius: 8px;
+  background: #EAF5FF;
+}
+
+.game-four-sidebar-gear-slot img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+
+.game-four-sidebar-gear-slot.is-empty {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.game-four-sidebar-guide-heading {
+  margin: 0;
+  color: #1769AA;
+  font-size: 1rem;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.game-four-sidebar-guide-text {
+  margin: 0.45rem 0 0;
+  color: #0f2744;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.game-four-hud-tutorial-button {
+  border: 3px solid #5AA9E6;
+  border-radius: 16px;
+  background: #F5FAFF;
+  color: #0f2744;
+  box-shadow: 0 6px 14px rgba(23, 105, 170, 0.16);
+}
+
+.game-four-combo-feedback {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 112px;
+  z-index: 24;
+  display: grid;
+  place-items: center;
+  min-width: 220px;
+  color: #fff7c2;
+  filter: drop-shadow(0 8px 5px rgba(23, 10, 3, 0.42));
+  font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+  line-height: 1;
+  animation: gameFourComboMilestone 1.25s cubic-bezier(.16, .84, .24, 1) both;
+}
+
+.game-four-combo-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-shadow: 0 3px 0 #9a3412, 3px 0 0 #7c2d12, -3px 0 0 #7c2d12, 0 -3px 0 #7c2d12, 0 7px 8px rgba(0, 0, 0, 0.42);
+}
+
+.game-four-combo-number {
+  color: #fde047;
+  font-size: 1.85em;
+  font-style: italic;
+}
+
+.game-four-combo-word {
+  font-size: 1.05em;
+  font-style: italic;
+  letter-spacing: 0.06em;
+}
+
+.game-four-combo-multiplier {
+  margin-top: 8px;
+  color: #ffffff;
+  font-size: 1.35em;
+  font-style: italic;
+  text-shadow: 0 3px 0 #0f766e, 3px 0 0 #115e59, -3px 0 0 #115e59, 0 -3px 0 #115e59, 0 0 16px rgba(45, 212, 191, 0.95);
+}
+
+@keyframes gameFourComboMilestone {
+  0% { opacity: 0; transform: translate(-50%, 18px) scale(0.35) rotate(-7deg); filter: brightness(1.7) blur(5px); }
+  12% { opacity: 1; transform: translate(-50%, -5px) scale(1.42) rotate(3deg); filter: brightness(1.35) blur(0); }
+  23% { transform: translate(-50%, 2px) scale(0.9) rotate(-2deg); }
+  34%, 72% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(0); filter: brightness(1); }
+  100% { opacity: 0; transform: translate(-50%, -42px) scale(1.08); filter: blur(2px); }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .student-game-overlay-game-four .game-four-mobile-controls {
+    position: absolute;
+    inset: auto 0.55rem 0.45rem;
+    z-index: 25;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .student-game-overlay-game-four .game-four-mobile-control-button {
+    width: clamp(2.65rem, 12dvh, 3.5rem);
+    height: clamp(2.65rem, 12dvh, 3.5rem);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 999px;
+    background: rgba(23, 105, 170, 0.82);
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 0 3px 10px rgba(23, 105, 170, 0.38);
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .student-game-overlay-game-four .game-four-mobile-control-button:active {
+    background: rgba(15, 118, 110, 0.92);
+    transform: scale(0.94);
+  }
+}
+
 @media (max-width: 560px) {
   .game-three-toolbar {
     flex-direction: column;
@@ -9437,4 +10790,1986 @@ body > .game-guide-tour-game-two.game-guide-tour-no-spotlight {
 }
 body > .game-guide-tour-game-two.game-guide-tour-no-spotlight .game-guide-spotlight {
   display: none !important;
+}
+
+/* Final mobile-only overrides for Game 2/Game 4 landscape play and Guidelinesformobile.png alignment. */
+@media (orientation: landscape) {
+  .student-game-overlay-game-two-scroll .student-shell-overlay,
+  .student-game-overlay-game-four .student-shell-overlay {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .student-shell-main,
+  .student-game-overlay-game-two-scroll .student-game-two-overlay-layout,
+  .student-game-overlay-game-two-scroll .student-game-three-frame-panel,
+  .student-game-overlay-game-two-scroll .student-game-frame-wrap,
+  .student-game-overlay-game-two-scroll .student-game-frame-shell,
+  .student-game-overlay-game-two-scroll .game-two-fruit-shell {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+}
+
+body > .game-guide-backdrop.game-guide-wood {
+  padding: max(0.35rem, env(safe-area-inset-top)) max(0.35rem, env(safe-area-inset-right)) max(0.35rem, env(safe-area-inset-bottom)) max(0.35rem, env(safe-area-inset-left)) !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+  display: grid !important;
+  grid-template-rows: 19% 58% 18% !important;
+  width: min(96vw, calc(96dvh * 1.72)) !important;
+  height: min(96dvh, calc(96vw / 1.72)) !important;
+  max-width: none !important;
+  max-height: none !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-image: var(--game-guide-mobile-bg) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+  grid-row: 1 !important;
+  align-self: center !important;
+  justify-self: center !important;
+  margin: 0 !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+  grid-row: 2 !important;
+  width: 68% !important;
+  height: 100% !important;
+  max-height: none !important;
+  justify-self: center !important;
+  overflow: hidden !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section,
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+  height: 100% !important;
+  max-height: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+  overflow-y: auto !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+  grid-row: 3 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(6rem, auto) minmax(0, 1fr) !important;
+  width: 74% !important;
+  height: 100% !important;
+  justify-self: center !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back,
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer,
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+  justify-self: center !important;
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .student-game-overlay-game-four .game-four-mobile-controls {
+    display: flex !important;
+  }
+}
+
+/* Mobile final pass: landscape gameplay, portrait guidelines, proportional HUDs. */
+@media (orientation: landscape) and (max-height: 620px) {
+  .student-game-overlay-game-two-scroll .student-game-tutorial-test-button {
+    display: none !important;
+  }
+
+  .student-game-overlay-game-two-scroll .student-shell-overlay.student-shell {
+    padding: 0 !important;
+  }
+
+  .student-game-overlay-game-two-scroll .student-shell-main,
+  .student-game-overlay-game-two-scroll .student-game-two-overlay-layout,
+  .student-game-overlay-game-two-scroll .student-game-three-frame-panel,
+  .student-game-overlay-game-two-scroll .student-game-frame-wrap,
+  .student-game-overlay-game-two-scroll .student-game-frame-shell {
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-shell {
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-score {
+    left: clamp(0.55rem, 1.5vw, 1rem) !important;
+    top: clamp(0.5rem, 1.3vw, 0.9rem) !important;
+    transform: scale(0.78);
+    transform-origin: top left;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-mission {
+    top: clamp(0.4rem, 1.3vw, 0.85rem) !important;
+    width: clamp(8.5rem, 20vw, 13rem) !important;
+    padding: 0.35rem 0.65rem !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-mission strong {
+    font-size: clamp(0.9rem, 2.9dvh, 1.25rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-actions {
+    top: clamp(0.45rem, 1.4vw, 0.8rem) !important;
+    right: clamp(0.55rem, 1.5vw, 1rem) !important;
+    gap: clamp(0.35rem, 1vw, 0.65rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-action-button {
+    height: clamp(1.85rem, 7.4dvh, 2.35rem) !important;
+    min-height: 0 !important;
+    padding: 0.32rem 0.65rem !important;
+    font-size: clamp(0.58rem, 1.85dvh, 0.78rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-tutorial-button {
+    min-width: clamp(6.7rem, 16vw, 9rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-back-button {
+    min-width: clamp(3.4rem, 7.5vw, 4.8rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-lives {
+    top: clamp(3.15rem, 10.5dvh, 4.2rem) !important;
+    right: clamp(1.4rem, 3vw, 2.1rem) !important;
+    transform: scale(0.76);
+    transform-origin: top right;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-left {
+    left: clamp(0.7rem, 1.8vw, 1.25rem) !important;
+    top: clamp(4.85rem, 16dvh, 6.2rem) !important;
+    width: clamp(12rem, 23vw, 16rem) !important;
+    gap: clamp(0.45rem, 1.1dvh, 0.7rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-right {
+    right: clamp(0.7rem, 1.8vw, 1.25rem) !important;
+    top: clamp(7.1rem, 22dvh, 8.8rem) !important;
+    width: clamp(11.5rem, 22vw, 15.5rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-card {
+    padding: clamp(0.48rem, 1.5dvh, 0.7rem) clamp(0.55rem, 1.3vw, 0.85rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-combo {
+    min-height: clamp(4rem, 15dvh, 5.1rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-code {
+    max-height: clamp(8.8rem, 42dvh, 12.8rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-code code,
+  .student-game-overlay-game-two-scroll .game-two-fruit-output code {
+    font-size: clamp(0.66rem, 2.15dvh, 0.88rem) !important;
+    line-height: 1.34 !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output strong {
+    font-size: clamp(1.55rem, 6.5dvh, 2.35rem) !important;
+  }
+
+  .student-game-overlay-game-four .student-shell-overlay.student-shell {
+    padding: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-stage {
+    padding: clamp(0.2rem, 0.8dvh, 0.35rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-layout > div:first-child {
+    gap: clamp(0.28rem, 0.9dvh, 0.45rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header {
+    padding: clamp(0.22rem, 0.9dvh, 0.38rem) clamp(0.45rem, 1.2vw, 0.75rem) !important;
+    gap: clamp(0.35rem, 1vw, 0.7rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header h2 {
+    font-size: clamp(0.78rem, 3dvh, 1rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud {
+    flex: 0 1 58% !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: clamp(0.18rem, 0.65vw, 0.35rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-status {
+    min-height: clamp(1.9rem, 8dvh, 2.45rem) !important;
+    padding: 0.18rem 0.32rem !important;
+    font-size: clamp(0.48rem, 1.8dvh, 0.65rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-icon,
+  .student-game-overlay-game-four .game-four-hud-image-icon {
+    width: clamp(1rem, 4.5dvh, 1.35rem) !important;
+    height: clamp(1rem, 4.5dvh, 1.35rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-value {
+    font-size: clamp(0.68rem, 2.5dvh, 0.95rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-catch-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(9rem, 21%) !important;
+    gap: clamp(0.25rem, 0.8vw, 0.45rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar {
+    gap: clamp(0.22rem, 0.75dvh, 0.38rem) !important;
+    padding: clamp(0.22rem, 0.75dvh, 0.38rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar section {
+    padding: clamp(0.28rem, 0.9dvh, 0.48rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar h3 {
+    font-size: clamp(0.72rem, 2.55dvh, 0.92rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar p {
+    font-size: clamp(0.52rem, 1.8dvh, 0.68rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-movement-card {
+    gap: clamp(0.28rem, 0.8vw, 0.5rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-gear-slots {
+    gap: clamp(0.22rem, 0.7vw, 0.38rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-gear-slot {
+    width: clamp(1.55rem, 7dvh, 2.25rem) !important;
+    height: clamp(1.55rem, 7dvh, 2.25rem) !important;
+  }
+}
+
+body > .game-guide-backdrop.game-guide-wood {
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+  grid-template-rows: 16.5% 63.5% 14.5% !important;
+  width: min(96vw, calc(96dvh * 0.5628)) !important;
+  height: min(96dvh, calc(96vw / 0.5628)) !important;
+  background-size: 100% 100% !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+  padding-top: 1.8% !important;
+  font-size: clamp(1.45rem, 5.2vw, 2.55rem) !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+  width: 78% !important;
+  height: 100% !important;
+  padding: 2% 0 1% !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  padding: 0 !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+  margin: 0 0 clamp(0.35rem, 1.2vw, 0.65rem) !important;
+  padding: clamp(0.25rem, 0.9vw, 0.42rem) clamp(0.5rem, 1.8vw, 0.8rem) !important;
+  font-size: clamp(0.68rem, 2.5vw, 1.08rem) !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+  gap: clamp(0.25rem, 1.1vw, 0.55rem) !important;
+  padding: 0 0 clamp(0.3rem, 1vw, 0.55rem) !important;
+  overflow-y: auto !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+  grid-template-columns: clamp(2rem, 7vw, 3rem) minmax(0, 1fr) !important;
+  gap: clamp(0.35rem, 1.4vw, 0.7rem) !important;
+  min-height: clamp(2.35rem, 8.4vw, 3.5rem) !important;
+  padding: clamp(0.2rem, 0.8vw, 0.35rem) 0 !important;
+  font-size: clamp(0.62rem, 2.35vw, 0.95rem) !important;
+  line-height: 1.24 !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+  width: clamp(1.75rem, 6.3vw, 2.75rem) !important;
+  height: clamp(1.75rem, 6.3vw, 2.75rem) !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+  width: 82% !important;
+  grid-template-columns: minmax(5.1rem, 1fr) minmax(4.5rem, auto) minmax(5.1rem, 1fr) !important;
+  align-items: start !important;
+  padding-top: 2.6% !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+  width: clamp(4.9rem, 18vw, 7.3rem) !important;
+  height: clamp(2.05rem, 7.5vw, 3rem) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  font-size: clamp(0.68rem, 2.7vw, 1.05rem) !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+  gap: clamp(0.12rem, 0.55vw, 0.28rem) !important;
+  font-size: clamp(0.6rem, 2.1vw, 0.86rem) !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+  gap: clamp(0.16rem, 0.7vw, 0.34rem) !important;
+}
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+  width: clamp(0.38rem, 1.45vw, 0.58rem) !important;
+  height: clamp(0.38rem, 1.45vw, 0.58rem) !important;
+}
+
+/* Mobile UX correction: purpose-built landscape game layouts and portrait mechanics board. */
+@media (orientation: landscape) and (max-height: 640px) {
+  .student-game-overlay-game-two-scroll .student-game-tutorial-test-button,
+  .student-game-overlay-game-four .student-game-tutorial-test-button {
+    display: none !important;
+  }
+
+  .student-game-overlay-game-two-scroll,
+  .student-game-overlay-game-four {
+    width: 100vw !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .student-shell-overlay,
+  .student-game-overlay-game-four .student-shell-overlay,
+  .student-game-overlay-game-two-scroll .student-shell-main,
+  .student-game-overlay-game-four .student-shell-main {
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .student-game-two-overlay-layout,
+  .student-game-overlay-game-two-scroll .student-game-three-frame-panel,
+  .student-game-overlay-game-two-scroll .student-game-frame-wrap,
+  .student-game-overlay-game-two-scroll .student-game-frame-shell,
+  .student-game-overlay-game-two-scroll .game-two-fruit-shell {
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+    aspect-ratio: auto !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-shell {
+    border-radius: 0 !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-score {
+    top: 2.2dvh !important;
+    left: 1.2vw !important;
+    width: 12vw !important;
+    min-width: 5.8rem !important;
+    padding: 0.35rem 0.45rem !important;
+    transform: none !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-score span,
+  .student-game-overlay-game-two-scroll .game-two-fruit-lives span,
+  .student-game-overlay-game-two-scroll .game-two-fruit-card span {
+    font-size: clamp(0.45rem, 1.55dvh, 0.62rem) !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-score strong {
+    font-size: clamp(1.45rem, 6.2dvh, 2.25rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-mission {
+    top: 1.6dvh !important;
+    left: 50% !important;
+    width: clamp(7.2rem, 17vw, 10.5rem) !important;
+    min-height: clamp(1.8rem, 7dvh, 2.35rem) !important;
+    padding: 0.25rem 0.55rem !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-mission strong {
+    font-size: clamp(0.78rem, 2.8dvh, 1.05rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-actions {
+    top: 1.8dvh !important;
+    right: 1.2vw !important;
+    left: auto !important;
+    gap: 0.45rem !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-action-button {
+    height: clamp(1.65rem, 6.5dvh, 2.1rem) !important;
+    min-height: 0 !important;
+    padding: 0.25rem 0.55rem !important;
+    font-size: clamp(0.48rem, 1.7dvh, 0.68rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-tutorial-button {
+    min-width: clamp(5.9rem, 13.5vw, 8rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-back-button {
+    min-width: clamp(3.1rem, 6.5vw, 4.1rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-lives {
+    top: clamp(3.15rem, 11dvh, 4rem) !important;
+    right: 2vw !important;
+    padding: 0.32rem 0.45rem !important;
+    transform: none !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-lives strong {
+    font-size: clamp(1rem, 4.6dvh, 1.45rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-left {
+    top: clamp(4.5rem, 15dvh, 5.8rem) !important;
+    left: 1.3vw !important;
+    width: clamp(10.5rem, 21vw, 14.5rem) !important;
+    gap: clamp(0.35rem, 1dvh, 0.55rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-right {
+    top: clamp(6.4rem, 21dvh, 8rem) !important;
+    right: 1.3vw !important;
+    width: clamp(10rem, 20vw, 13.8rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-card {
+    padding: clamp(0.38rem, 1.15dvh, 0.58rem) clamp(0.42rem, 1vw, 0.68rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-combo {
+    min-height: clamp(3.1rem, 12dvh, 4.35rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-combo strong {
+    font-size: clamp(1.65rem, 7.2dvh, 2.65rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-code {
+    max-height: clamp(7.6rem, 38dvh, 11rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-challenge-title {
+    font-size: clamp(0.55rem, 1.9dvh, 0.78rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-code code,
+  .student-game-overlay-game-two-scroll .game-two-fruit-output code {
+    font-size: clamp(0.5rem, 1.72dvh, 0.7rem) !important;
+    line-height: 1.24 !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output {
+    min-height: clamp(5.8rem, 24dvh, 7.6rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output strong {
+    font-size: clamp(1.35rem, 5.4dvh, 2rem) !important;
+  }
+
+  .student-game-overlay-game-four .student-game-one-play-layout,
+  .student-game-overlay-game-four .student-game-four-panel,
+  .student-game-overlay-game-four .student-game-frame-wrap,
+  .student-game-overlay-game-four .student-game-frame-shell,
+  .student-game-overlay-game-four .game-four-stage,
+  .student-game-overlay-game-four .game-four-layout,
+  .student-game-overlay-game-four .game-four-layout > div:first-child {
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    aspect-ratio: auto !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .student-game-one-play-layout,
+  .student-game-overlay-game-four .student-game-four-panel,
+  .student-game-overlay-game-four .student-game-frame-wrap,
+  .student-game-overlay-game-four .student-game-frame-shell {
+    padding: 0 !important;
+    gap: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .student-game-overlay-game-four .game-four-stage {
+    padding: clamp(0.25rem, 0.8dvh, 0.42rem) !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-layout > div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.28rem, 0.85dvh, 0.44rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header {
+    flex: 0 0 clamp(2.4rem, 12dvh, 3.45rem) !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.22rem 0.48rem !important;
+    gap: 0.5rem !important;
+    border-width: 2px !important;
+    border-radius: 0.55rem !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header > div:first-child {
+    flex: 0 1 30% !important;
+    min-width: 8rem !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header p {
+    margin: 0 !important;
+    font-size: clamp(0.42rem, 1.5dvh, 0.58rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header h2 {
+    font-size: clamp(0.72rem, 2.8dvh, 0.98rem) !important;
+    line-height: 1.04 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud {
+    flex: 1 1 auto !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    gap: clamp(0.16rem, 0.55vw, 0.32rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-status {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.22rem !important;
+    padding: 0.12rem 0.25rem !important;
+    border-width: 2px !important;
+    box-shadow: none !important;
+    font-size: clamp(0.42rem, 1.55dvh, 0.58rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-label {
+    gap: 0.16rem !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-icon,
+  .student-game-overlay-game-four .game-four-hud-image-icon {
+    width: clamp(0.85rem, 3.8dvh, 1.18rem) !important;
+    height: clamp(0.85rem, 3.8dvh, 1.18rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-value {
+    font-size: clamp(0.52rem, 2dvh, 0.75rem) !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-tutorial-button {
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-catch-layout {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(8rem, 22%) minmax(0, 1fr) !important;
+    gap: clamp(0.28rem, 0.8vw, 0.48rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    gap: clamp(0.2rem, 0.62dvh, 0.34rem) !important;
+    padding: clamp(0.22rem, 0.68dvh, 0.36rem) !important;
+    overflow-y: auto !important;
+  }
+
+  .student-game-overlay-game-four .game-four-play-card {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: clamp(0.14rem, 0.42dvh, 0.24rem) !important;
+    border-width: 2px !important;
+    box-shadow: none !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar section {
+    padding: clamp(0.24rem, 0.78dvh, 0.42rem) !important;
+    border-width: 2px !important;
+  }
+
+  .student-game-overlay-game-four .game-four-objective-card h3 {
+    font-size: clamp(0.68rem, 2.35dvh, 0.88rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar p,
+  .student-game-overlay-game-four .game-four-sidebar-guide-text {
+    font-size: clamp(0.46rem, 1.62dvh, 0.62rem) !important;
+    line-height: 1.14 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-guide-heading,
+  .student-game-overlay-game-four .game-four-sidebar-gear-title {
+    font-size: clamp(0.52rem, 1.85dvh, 0.7rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-movement-card {
+    gap: clamp(0.22rem, 0.7vw, 0.42rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-keyboard-icon {
+    width: clamp(1.15rem, 5dvh, 1.65rem) !important;
+    height: clamp(1.15rem, 5dvh, 1.65rem) !important;
+    font-size: clamp(0.72rem, 3.2dvh, 1rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-gear-slot {
+    width: clamp(1.25rem, 5.8dvh, 1.8rem) !important;
+    height: clamp(1.25rem, 5.8dvh, 1.8rem) !important;
+  }
+}
+
+@media (orientation: portrait) {
+  body > .game-guide-backdrop.game-guide-wood {
+    padding: 0 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    grid-template-rows: 15.2% 66.2% 13.2% !important;
+    width: min(100vw, calc(100dvh * 0.5628)) !important;
+    height: min(100dvh, calc(100vw / 0.5628)) !important;
+    background-size: contain !important;
+    background-position: center !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    padding-top: 3.6% !important;
+    font-size: clamp(1.65rem, 7.1vw, 2.85rem) !important;
+    line-height: 1 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    width: 82% !important;
+    padding: 1.2% 0 0 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    margin-bottom: clamp(0.35rem, 1.8vw, 0.75rem) !important;
+    font-size: clamp(0.78rem, 3.4vw, 1.18rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    gap: clamp(0.34rem, 1.8vw, 0.8rem) !important;
+    padding-bottom: 0.6rem !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    grid-template-columns: clamp(2.35rem, 10vw, 3.35rem) minmax(0, 1fr) !important;
+    min-height: clamp(2.8rem, 11.8vw, 4.1rem) !important;
+    gap: clamp(0.48rem, 2vw, 0.85rem) !important;
+    font-size: clamp(0.74rem, 3.25vw, 1.05rem) !important;
+    line-height: 1.27 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(2.1rem, 9vw, 3.05rem) !important;
+    height: clamp(2.1rem, 9vw, 3.05rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    width: 84% !important;
+    padding-top: 2.2% !important;
+    align-items: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(5.65rem, 25vw, 7.7rem) !important;
+    height: clamp(2.35rem, 10vw, 3.15rem) !important;
+    font-size: clamp(0.76rem, 3.35vw, 1.05rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    font-size: clamp(0.68rem, 2.9vw, 0.92rem) !important;
+  }
+
+body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+  width: clamp(0.45rem, 1.9vw, 0.62rem) !important;
+  height: clamp(0.45rem, 1.9vw, 0.62rem) !important;
+}
+
+/* Game 2 mobile-only output and object-space tuning. */
+@media (orientation: landscape) and (max-height: 640px) {
+  .student-game-overlay-game-two-scroll .game-two-fruit-right {
+    width: clamp(6.25rem, 10.5vw, 7.85rem) !important;
+    max-width: clamp(6.25rem, 10.5vw, 7.85rem) !important;
+    top: clamp(5.85rem, 18.5dvh, 6.9rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output {
+    width: 100% !important;
+    height: clamp(5rem, 18dvh, 6.15rem) !important;
+    min-height: 0 !important;
+    max-height: clamp(5rem, 18dvh, 6.15rem) !important;
+    grid-template-rows: auto minmax(1.2rem, 1fr) minmax(1.35rem, auto) !important;
+    gap: clamp(0.14rem, 0.45dvh, 0.24rem) !important;
+    padding: clamp(0.18rem, 0.55dvh, 0.28rem) clamp(0.22rem, 0.48vw, 0.34rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output > span {
+    font-size: clamp(0.45rem, 1.45dvh, 0.58rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output code {
+    min-height: 0 !important;
+    max-height: none !important;
+    font-size: clamp(0.45rem, 1.5dvh, 0.6rem) !important;
+    line-height: 1.14 !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output strong {
+    min-height: 0 !important;
+    font-size: clamp(0.92rem, 3.65dvh, 1.32rem) !important;
+    line-height: 1 !important;
+  }
+}
+}
+
+/* Mobile Guidelines portrait correction: use the PNG title, keep readable content inside the parchment. */
+@media (orientation: portrait) {
+  body > .game-guide-backdrop.game-guide-wood {
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    grid-template-rows: 18.5% 64.5% 13% !important;
+    width: min(100vw, calc(100dvh * 0.5628)) !important;
+    height: min(100dvh, calc(100vw / 0.5628)) !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    grid-row: 2 !important;
+    width: 76% !important;
+    height: 100% !important;
+    align-self: stretch !important;
+    justify-self: center !important;
+    padding: 1.5% 0 2.5% !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    width: fit-content !important;
+    max-width: 100% !important;
+    margin: 0 0 clamp(0.24rem, 1.1vw, 0.46rem) !important;
+    padding: clamp(0.18rem, 0.72vw, 0.32rem) clamp(0.42rem, 1.45vw, 0.64rem) !important;
+    font-size: clamp(0.62rem, 2.55vw, 0.95rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    gap: clamp(0.18rem, 0.9vw, 0.42rem) !important;
+    padding: 0 0 clamp(0.28rem, 1vw, 0.55rem) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    grid-template-columns: clamp(1.85rem, 7.8vw, 2.55rem) minmax(0, 1fr) !important;
+    min-height: auto !important;
+    gap: clamp(0.34rem, 1.45vw, 0.58rem) !important;
+    padding: clamp(0.16rem, 0.72vw, 0.28rem) 0 !important;
+    font-size: clamp(0.68rem, 2.9vw, 0.98rem) !important;
+    line-height: 1.22 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.65rem, 7vw, 2.35rem) !important;
+    height: clamp(1.65rem, 7vw, 2.35rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: minmax(4.3rem, 1fr) minmax(4.3rem, auto) minmax(4.3rem, 1fr) !important;
+    width: 76% !important;
+    height: 100% !important;
+    justify-self: center !important;
+    align-items: start !important;
+    column-gap: clamp(0.34rem, 1.6vw, 0.72rem) !important;
+    padding-top: 5.2% !important;
+    margin: 0 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(4.25rem, 18vw, 5.85rem) !important;
+    height: clamp(1.8rem, 7.4vw, 2.4rem) !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    font-size: clamp(0.58rem, 2.45vw, 0.82rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    gap: clamp(0.12rem, 0.65vw, 0.24rem) !important;
+    font-size: clamp(0.58rem, 2.35vw, 0.82rem) !important;
+    line-height: 1 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    gap: clamp(0.12rem, 0.62vw, 0.25rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.34rem, 1.42vw, 0.5rem) !important;
+    height: clamp(0.34rem, 1.42vw, 0.5rem) !important;
+  }
+}
+
+/* Final mobile Guidelines layout override: portrait template placement only. */
+@media (orientation: portrait) and (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: max(0.12rem, env(safe-area-inset-top)) max(0.12rem, env(safe-area-inset-right)) max(0.12rem, env(safe-area-inset-bottom)) max(0.12rem, env(safe-area-inset-left)) !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    display: grid !important;
+    grid-template-rows: 18.4% 65.2% 12.2% !important;
+    width: min(99.5vw, calc(99.5dvh * 0.5628)) !important;
+    height: min(99.5dvh, calc(99.5vw / 0.5628)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    padding: 0 !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    grid-row: 2 !important;
+    width: 68.5% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    align-self: stretch !important;
+    justify-self: center !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 92% !important;
+    margin: 0 0 clamp(0.24rem, 1.2vw, 0.42rem) !important;
+    padding: clamp(0.18rem, 0.78vw, 0.28rem) clamp(0.5rem, 2.05vw, 0.74rem) !important;
+    border-radius: 10px !important;
+    font-size: clamp(0.62rem, 2.95vw, 0.92rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.2rem, 1.05vw, 0.38rem) !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.16rem, 0.75vw, 0.32rem) clamp(0.36rem, 1.5vw, 0.58rem) 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.65rem, 7.7vw, 2.25rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.32rem, 1.45vw, 0.5rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.1rem, 0.48vw, 0.18rem) 0 !important;
+    font-size: clamp(0.64rem, 3.08vw, 0.94rem) !important;
+    line-height: 1.22 !important;
+    overflow: visible !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.45rem, 6.9vw, 2rem) !important;
+    height: clamp(1.45rem, 6.9vw, 2rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: minmax(3.8rem, 1fr) minmax(4rem, auto) minmax(3.8rem, 1fr) !important;
+    width: 68.5% !important;
+    height: 100% !important;
+    justify-self: center !important;
+    align-self: stretch !important;
+    align-items: start !important;
+    column-gap: clamp(0.24rem, 1.25vw, 0.48rem) !important;
+    margin: 0 !important;
+    padding: 8.8% 0 0 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.55rem, 21.5vw, 4.85rem) !important;
+    height: clamp(1.34rem, 7.25vw, 1.82rem) !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    font-size: clamp(0.48rem, 2.55vw, 0.68rem) !important;
+    line-height: 1 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: start !important;
+    min-width: clamp(3.4rem, 17vw, 4.6rem) !important;
+    gap: clamp(0.12rem, 0.7vw, 0.22rem) !important;
+    font-size: clamp(0.5rem, 2.55vw, 0.68rem) !important;
+    line-height: 1 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.1rem, 0.7vw, 0.18rem) !important;
+    max-width: clamp(3.4rem, 17vw, 4.6rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.28rem, 1.5vw, 0.4rem) !important;
+    height: clamp(0.28rem, 1.5vw, 0.4rem) !important;
+  }
+}
+
+/* Absolute last mobile phone Guidelines override: 1206x1304 template alignment. */
+@media (max-width: 820px) {
+  .game-guide-backdrop.game-guide-wood {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: max(0.08rem, env(safe-area-inset-top)) max(0.08rem, env(safe-area-inset-right)) max(0.08rem, env(safe-area-inset-bottom)) max(0.08rem, env(safe-area-inset-left)) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    display: grid !important;
+    grid-template-rows: 22% 58% 15% !important;
+    width: min(99vw, calc(99dvh * 0.9248)) !important;
+    height: min(99dvh, calc(99vw / 0.9248)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1206 / 1304 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    gap: 0 !important;
+    background-color: transparent !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    display: none !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    grid-row: 2 !important;
+    width: 66% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    align-self: stretch !important;
+    justify-self: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 96% !important;
+    margin: 0 0 clamp(0.22rem, 0.9vw, 0.42rem) !important;
+    padding: clamp(0.18rem, 0.72vw, 0.3rem) clamp(0.54rem, 2.2vw, 0.86rem) !important;
+    font-size: clamp(0.66rem, 2.9vw, 0.95rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.2rem, 0.82vw, 0.44rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.18rem, 0.76vw, 0.34rem) clamp(0.26rem, 1vw, 0.46rem) 0 !important;
+    color: #2b2116 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.72rem, 7vw, 2.25rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.34rem, 1.35vw, 0.56rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.1rem, 0.42vw, 0.18rem) 0 !important;
+    font-size: clamp(0.68rem, 2.9vw, 1rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.22 !important;
+    overflow: visible !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.5rem, 6.3vw, 2.15rem) !important;
+    height: clamp(1.5rem, 6.3vw, 2.15rem) !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    grid-row: 3 !important;
+    display: grid !important;
+    grid-template-columns: minmax(3rem, 1fr) minmax(3.2rem, auto) minmax(3rem, 1fr) !important;
+    width: 66% !important;
+    height: 100% !important;
+    justify-self: center !important;
+    align-self: stretch !important;
+    align-items: start !important;
+    column-gap: clamp(0.28rem, 1.2vw, 0.5rem) !important;
+    padding: 3% 0 0 !important;
+    margin: 0 !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.75rem, 20vw, 5.1rem) !important;
+    height: clamp(1.3rem, 6.5vw, 1.78rem) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url('./assets/guidelines-icons/buttons.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    font-size: clamp(0.5rem, 2.35vw, 0.72rem) !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: start !important;
+    min-width: clamp(3.35rem, 17vw, 4.55rem) !important;
+    gap: clamp(0.12rem, 0.55vw, 0.22rem) !important;
+    font-size: clamp(0.5rem, 2.35vw, 0.72rem) !important;
+    line-height: 1 !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.08rem, 0.45vw, 0.18rem) !important;
+    max-width: clamp(3.35rem, 17vw, 4.55rem) !important;
+  }
+
+  .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.24rem, 1.18vw, 0.34rem) !important;
+    height: clamp(0.24rem, 1.18vw, 0.34rem) !important;
+  }
+}
+
+/* True final mobile Guidelines correction for updated 1206x1304 Guidelinesformobile.png. */
+@media (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10060 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    padding: max(0.08rem, env(safe-area-inset-top)) max(0.08rem, env(safe-area-inset-right)) max(0.08rem, env(safe-area-inset-bottom)) max(0.08rem, env(safe-area-inset-left)) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    position: relative !important;
+    display: block !important;
+    width: min(99vw, calc(99dvh * 0.9248)) !important;
+    height: min(99dvh, calc(99vw / 0.9248)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1206 / 1304 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-vine {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    position: absolute !important;
+    left: 16.5% !important;
+    top: 27.5% !important;
+    width: 67% !important;
+    height: 49.5% !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 92% !important;
+    margin: 0 0 clamp(0.2rem, 1vw, 0.4rem) !important;
+    padding: clamp(0.16rem, 0.72vw, 0.28rem) clamp(0.48rem, 2vw, 0.8rem) !important;
+    border-radius: 10px !important;
+    font-size: clamp(0.58rem, 2.75vw, 0.88rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.16rem, 0.8vw, 0.34rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.14rem, 0.7vw, 0.3rem) clamp(0.34rem, 1.35vw, 0.55rem) 0 !important;
+    color: #2b2116 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.42rem, 6.7vw, 2rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.28rem, 1.25vw, 0.5rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.08rem, 0.38vw, 0.16rem) 0 !important;
+    font-size: clamp(0.54rem, 2.72vw, 0.86rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.18 !important;
+    overflow: visible !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.28rem, 6vw, 1.86rem) !important;
+    height: clamp(1.28rem, 6vw, 1.86rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    position: absolute !important;
+    left: 17.5% !important;
+    bottom: 11.6% !important;
+    width: 65% !important;
+    height: 8.2% !important;
+    display: grid !important;
+    grid-template-columns: minmax(3.2rem, 1fr) minmax(3.4rem, auto) minmax(3.2rem, 1fr) !important;
+    align-items: center !important;
+    justify-items: center !important;
+    column-gap: clamp(0.24rem, 1.15vw, 0.5rem) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(3.35rem, 19.5vw, 4.7rem) !important;
+    height: clamp(1.22rem, 6.4vw, 1.72rem) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url('./assets/guidelines-icons/buttons.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    color: #f7ffe7 !important;
+    font-size: clamp(0.44rem, 2.28vw, 0.66rem) !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: center !important;
+    min-width: clamp(3rem, 15vw, 4.25rem) !important;
+    gap: clamp(0.1rem, 0.5vw, 0.2rem) !important;
+    font-size: clamp(0.44rem, 2.25vw, 0.64rem) !important;
+    line-height: 1 !important;
+    color: #2b2116 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.08rem, 0.44vw, 0.16rem) !important;
+    max-width: clamp(3rem, 15vw, 4.25rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.22rem, 1.18vw, 0.34rem) !important;
+    height: clamp(0.22rem, 1.18vw, 0.34rem) !important;
+  }
+}
+
+/* Phone portrait Guidelines layout for the updated Guidelinesformobile.png. */
+@media (orientation: portrait), (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10060 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    padding: max(0.08rem, env(safe-area-inset-top)) max(0.08rem, env(safe-area-inset-right)) max(0.08rem, env(safe-area-inset-bottom)) max(0.08rem, env(safe-area-inset-left)) !important;
+    background: rgba(0, 0, 0, 0.72) !important;
+    background-color: rgba(0, 0, 0, 0.72) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    position: relative !important;
+    display: block !important;
+    width: min(100vw, calc(100dvh * 0.9248)) !important;
+    height: min(100dvh, calc(100vw / 0.9248)) !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1206 / 1304 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: var(--game-guide-mobile-bg) !important;
+    background-position: top center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-vine {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    position: absolute !important;
+    left: 16.5% !important;
+    top: 29.5% !important;
+    width: 67% !important;
+    height: 49% !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    justify-self: center !important;
+    width: fit-content !important;
+    max-width: 92% !important;
+    margin: 0 0 clamp(0.2rem, 1vw, 0.4rem) !important;
+    padding: clamp(0.16rem, 0.72vw, 0.28rem) clamp(0.48rem, 2vw, 0.8rem) !important;
+    border-radius: 10px !important;
+    font-size: clamp(0.58rem, 2.75vw, 0.88rem) !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(0.16rem, 0.8vw, 0.34rem) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 clamp(0.14rem, 0.7vw, 0.3rem) clamp(0.34rem, 1.35vw, 0.55rem) 0 !important;
+    color: #2b2116 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    display: grid !important;
+    grid-template-columns: clamp(1.42rem, 6.7vw, 2rem) minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: clamp(0.28rem, 1.25vw, 0.5rem) !important;
+    min-height: auto !important;
+    padding: clamp(0.08rem, 0.38vw, 0.16rem) 0 !important;
+    font-size: clamp(0.54rem, 2.72vw, 0.86rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.18 !important;
+    overflow: visible !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li > span:last-child {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.28rem, 6vw, 1.86rem) !important;
+    height: clamp(1.28rem, 6vw, 1.86rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    position: absolute !important;
+    left: 14% !important;
+    bottom: 11.6% !important;
+    width: 72% !important;
+    height: 8.2% !important;
+    display: grid !important;
+    grid-template-columns: minmax(3.2rem, 1fr) minmax(3.4rem, auto) minmax(3.2rem, 1fr) !important;
+    align-items: center !important;
+    justify-items: center !important;
+    column-gap: clamp(0.24rem, 1.15vw, 0.5rem) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: calc(clamp(4.15rem, 24vw, 5.85rem) + 14px) !important;
+    height: calc(clamp(1.52rem, 7.8vw, 2.12rem) + 14px) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url('./assets/guidelines-icons/buttons.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    box-shadow: none !important;
+    color: #f7ffe7 !important;
+    font-size: clamp(0.56rem, 2.75vw, 0.78rem) !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: center !important;
+    min-width: clamp(3.8rem, 18vw, 5.1rem) !important;
+    gap: clamp(0.14rem, 0.65vw, 0.26rem) !important;
+    font-size: clamp(0.56rem, 2.75vw, 0.78rem) !important;
+    line-height: 1 !important;
+    color: #2b2116 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.1rem, 0.55vw, 0.2rem) !important;
+    max-width: clamp(3.8rem, 18vw, 5.1rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots span {
+    width: clamp(0.28rem, 1.45vw, 0.42rem) !important;
+    height: clamp(0.28rem, 1.45vw, 0.42rem) !important;
+  }
+}
+
+/* Final mobile Guidelines button/content adjustment requested: buttons +7px more, content slightly higher. */
+@media (orientation: portrait), (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    top: 27.5% !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: calc(clamp(4.15rem, 24vw, 5.85rem) + 14px) !important;
+    height: calc(clamp(1.52rem, 7.8vw, 2.12rem) + 14px) !important;
+  }
+}
+
+/* Final active mobile Guidelines nav adjustment: larger buttons and slightly higher nav row. */
+@media (orientation: portrait), (max-width: 820px) {
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    bottom: 13.4% !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: calc(clamp(4.15rem, 24vw, 5.85rem) + 21px) !important;
+    height: calc(clamp(1.52rem, 7.8vw, 2.12rem) + 21px) !important;
+  }
+}
+
+/* Game 4 MOBILE only: blue tech theme/readability polish without changing gameplay layout or logic. */
+@media (orientation: landscape) and (max-height: 640px) {
+  .student-game-overlay-game-four .game-four-stage,
+  .student-game-overlay-game-four .game-four-layout,
+  .student-game-overlay-game-four .game-four-layout > div:first-child {
+    background: #EAF5FF !important;
+    color: #0d2f50 !important;
+    border-color: #5AA9E6 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header {
+    background: #EAF5FF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-status,
+  .student-game-overlay-game-four .game-four-sidebar,
+  .student-game-overlay-game-four .game-four-sidebar section,
+  .student-game-overlay-game-four .game-four-side-actions {
+    background: #F5FAFF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+    box-shadow: 0 0 0 1px rgba(90, 169, 230, 0.22) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-objective-card {
+    background: #EAF5FF !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar h3,
+  .student-game-overlay-game-four .game-four-sidebar-guide-heading,
+  .student-game-overlay-game-four .game-four-sidebar-gear-title,
+  .student-game-overlay-game-four .game-four-hud-label,
+  .student-game-overlay-game-four .game-four-hud-text {
+    color: #1769AA !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar h3 {
+    font-size: clamp(0.82rem, 3dvh, 1.08rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar p,
+  .student-game-overlay-game-four .game-four-sidebar-guide-text,
+  .student-game-overlay-game-four .game-four-sidebar-movement-card span:not(.game-four-sidebar-keyboard-icon) {
+    font-size: clamp(0.62rem, 2.15dvh, 0.82rem) !important;
+    line-height: 1.22 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-guide-heading,
+  .student-game-overlay-game-four .game-four-sidebar-gear-title {
+    font-size: clamp(0.68rem, 2.35dvh, 0.9rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-keyboard-icon {
+    border-color: #5AA9E6 !important;
+    background: #EAF5FF !important;
+    color: #1769AA !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-gear-slot {
+    background: #F5FAFF !important;
+    border-color: #5AA9E6 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-play-card {
+    border-color: #1769AA !important;
+    background: #F5FAFF !important;
+  }
+
+  .student-game-overlay-game-four .game-four-side-actions button {
+    width: auto !important;
+    min-width: clamp(3.9rem, 9vw, 5.2rem) !important;
+    min-height: clamp(1.65rem, 6dvh, 2.15rem) !important;
+    padding: 0.28rem 0.75rem !important;
+    font-size: clamp(0.72rem, 2.45dvh, 0.9rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-header,
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-shell {
+    background: #EAF5FF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-shell {
+    padding: clamp(0.28rem, 0.9dvh, 0.45rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-card {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: clamp(0.45rem, 1.5dvh, 0.75rem) !important;
+    background: #F5FAFF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+    box-shadow: 0 8px 20px rgba(23, 105, 170, 0.14) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-card > p:first-child,
+  .student-game-overlay-game-four .game-four-token-label {
+    color: #1769AA !important;
+    font-size: clamp(0.48rem, 1.7dvh, 0.62rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-card h3 {
+    color: #1769AA !important;
+    font-size: clamp(1rem, 4dvh, 1.45rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-card > h3 + p {
+    color: #0d2f50 !important;
+    font-size: clamp(0.62rem, 2.15dvh, 0.8rem) !important;
+    line-height: 1.16 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-coins {
+    background: #D7F0FF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-assembly-output {
+    min-height: clamp(2.65rem, 11dvh, 4.1rem) !important;
+    margin-top: clamp(0.28rem, 0.9dvh, 0.42rem) !important;
+    padding: clamp(0.28rem, 0.9dvh, 0.45rem) !important;
+    background: #EAF5FF !important;
+    border-color: #5AA9E6 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-token-bank {
+    gap: clamp(0.24rem, 0.75dvh, 0.4rem) !important;
+    margin-top: clamp(0.2rem, 0.7dvh, 0.35rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-assembled-token,
+  .student-game-overlay-game-four .game-four-token-bank button {
+    padding: clamp(0.28rem, 0.85dvh, 0.42rem) clamp(0.45rem, 1.2vw, 0.7rem) !important;
+    border-color: #5AA9E6 !important;
+    background: #EAF5FF !important;
+    color: #0d2f50 !important;
+    font-size: clamp(0.66rem, 2.35dvh, 0.86rem) !important;
+    box-shadow: 0 3px 0 rgba(23, 105, 170, 0.28) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions {
+    position: static !important;
+    margin-top: clamp(0.28rem, 0.9dvh, 0.42rem) !important;
+    padding: clamp(0.22rem, 0.7dvh, 0.35rem) !important;
+    background: transparent !important;
+    gap: clamp(0.26rem, 0.9vw, 0.45rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions button {
+    min-height: clamp(1.75rem, 6.5dvh, 2.3rem) !important;
+    padding: 0.24rem 0.65rem !important;
+    border-color: #5AA9E6 !important;
+    font-size: clamp(0.62rem, 2.15dvh, 0.8rem) !important;
+    box-shadow: 0 3px 0 rgba(23, 105, 170, 0.28) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-check-answer-button {
+    background: #1769AA !important;
+    color: #ffffff !important;
+  }
+
+  .student-game-overlay-game-four .game-four-reset-answer-button,
+  .student-game-overlay-game-four .game-four-arrange-actions button:not(.game-four-check-answer-button) {
+    background: #F5FAFF !important;
+    color: #0d2f50 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-feedback {
+    min-height: clamp(1.8rem, 7dvh, 2.55rem) !important;
+    margin-top: clamp(0.28rem, 0.9dvh, 0.42rem) !important;
+    padding: clamp(0.24rem, 0.75dvh, 0.36rem) !important;
+    background: #EAF5FF !important;
+    border-color: #5AA9E6 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-feedback p {
+    font-size: clamp(0.56rem, 1.95dvh, 0.72rem) !important;
+    color: #0d2f50 !important;
+  }
+}
+
+/* Game 4 MOBILE PORTRAIT only: match landscape blue theme and keep arrangement HUD icons in one row. */
+@media (orientation: portrait) and (max-width: 820px) {
+  .student-game-overlay-game-four .game-four-stage,
+  .student-game-overlay-game-four .game-four-layout,
+  .student-game-overlay-game-four .game-four-layout > div:first-child {
+    background: #EAF5FF !important;
+    color: #0d2f50 !important;
+    border-color: #5AA9E6 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header {
+    background: #EAF5FF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-status,
+  .student-game-overlay-game-four .game-four-sidebar,
+  .student-game-overlay-game-four .game-four-sidebar section,
+  .student-game-overlay-game-four .game-four-side-actions,
+  .student-game-overlay-game-four .game-four-arrange-shell,
+  .student-game-overlay-game-four .game-four-arrange-card,
+  .student-game-overlay-game-four .game-four-assembly-output,
+  .student-game-overlay-game-four .game-four-arrange-feedback {
+    background: #F5FAFF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+    box-shadow: 0 0 0 1px rgba(90, 169, 230, 0.22) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-objective-card,
+  .student-game-overlay-game-four .game-four-assembly-output,
+  .student-game-overlay-game-four .game-four-arrange-feedback {
+    background: #EAF5FF !important;
+  }
+
+  .student-game-overlay-game-four .game-four-play-card {
+    background: #F5FAFF !important;
+    border-color: #1769AA !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar h3,
+  .student-game-overlay-game-four .game-four-sidebar-guide-heading,
+  .student-game-overlay-game-four .game-four-sidebar-gear-title,
+  .student-game-overlay-game-four .game-four-hud-label,
+  .student-game-overlay-game-four .game-four-hud-text,
+  .student-game-overlay-game-four .game-four-arrange-card > p:first-child,
+  .student-game-overlay-game-four .game-four-token-label,
+  .student-game-overlay-game-four .game-four-arrange-card h3 {
+    color: #1769AA !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar-keyboard-icon,
+  .student-game-overlay-game-four .game-four-sidebar-gear-slot,
+  .student-game-overlay-game-four .game-four-arrange-coins,
+  .student-game-overlay-game-four .game-four-assembled-token,
+  .student-game-overlay-game-four .game-four-token-bank button {
+    background: #EAF5FF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-check-answer-button {
+    background: #1769AA !important;
+    border-color: #5AA9E6 !important;
+    color: #ffffff !important;
+  }
+
+  .student-game-overlay-game-four .game-four-reset-answer-button,
+  .student-game-overlay-game-four .game-four-arrange-actions button:not(.game-four-check-answer-button) {
+    background: #F5FAFF !important;
+    border-color: #5AA9E6 !important;
+    color: #0d2f50 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: clamp(0.28rem, 1.2vw, 0.5rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-status {
+    display: flex !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(0.18rem, 0.7vw, 0.35rem) !important;
+    padding: clamp(0.22rem, 0.8vw, 0.4rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-icon,
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-image-icon {
+    width: clamp(1.7rem, 10vw, 2.45rem) !important;
+    height: clamp(1.7rem, 10vw, 2.45rem) !important;
+    flex: 0 0 auto !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-value {
+    font-size: clamp(0.78rem, 3.2vw, 1.05rem) !important;
+  }
 }

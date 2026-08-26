@@ -18,7 +18,7 @@ const StudentGamePlayPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform() || gameType !== 'GAME_ONE') {
+    if (!Capacitor.isNativePlatform() || !['GAME_ONE', 'GAME_TWO', 'GAME_FOUR'].includes(gameType)) {
       return undefined;
     }
 
