@@ -26,9 +26,7 @@ const StudentStoryFrame = ({
   const isFirstPage = pageIndex <= 0;
   const isLastPage = pageIndex >= pageTotal - 1;
   const isImageOnly = Boolean(activePage.imageOnly);
-  const storyWorldClass = activePage.world
-    ? ` student-story-${String(activePage.world).toLowerCase()}`
-    : '';
+  const worldClass = activePage.world ? ` student-story-world-${activePage.world}` : '';
 
   const fullText = activePage.text || activePage.body || '';
   const [typedText, setTypedText] = useState('');
@@ -58,7 +56,7 @@ const StudentStoryFrame = ({
 
   return (
     <main
-      className={`student-story-preview-stage student-story-rpg-stage${storyWorldClass}${isImageOnly ? ' student-story-image-only' : ''}${activePage.useLegacyStoryAsset ? ' student-story-image-legacy' : ''}`}
+      className={`student-story-preview-stage student-story-rpg-stage${worldClass}${isImageOnly ? ' student-story-image-only' : ''}${activePage.useLegacyStoryAsset ? ' student-story-image-legacy' : ''}`}
       aria-label="Storyline animation frame"
       style={{
         '--story-bg': activePage.suppressStageBackground || !activePage.background

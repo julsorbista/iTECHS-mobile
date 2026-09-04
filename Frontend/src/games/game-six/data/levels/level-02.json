@@ -3,9 +3,9 @@
   "gameType": "GAME_SIX",
   "levelNumber": 2,
   "seedVersion": 2,
-  "title": "Syntax Rain Typing: Drizzle",
-  "subtitle": "Type ten falling terms in five minutes.",
-  "objective": "Type ten falling terms in five minutes.",
+  "title": "Incomplete Letters",
+  "subtitle": "Recognize Java terms from their visible letters.",
+  "objective": "Complete ten falling Java terms with missing letters.",
   "settings": {
     "targetWords": 10,
     "seconds": 300,

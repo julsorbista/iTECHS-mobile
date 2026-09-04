@@ -38,13 +38,13 @@ const WORLD_META = Object.freeze({
   },
   GAME_FOUR: {
     world: 'world4',
-    title: 'The Snowcode Temple',
+    title: 'Code Catcher',
     gameName: 'Catch and Arrange Syntax',
     oldImage: coreCompilerImage,
   },
   GAME_FIVE: {
     world: 'world5',
-    title: 'The Lost Snowman',
+    title: 'Code Robot',
     gameName: 'Guess the Word',
     oldImage: coreCompilerImage,
   },
@@ -663,7 +663,7 @@ const buildPages = (gameType, mode) => {
   }
 
   if (key === 'GAME_FOUR' && mode === 'intro') {
-    sources = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png'].map((imageFile) => ({
+    sources = Array.from({ length: 8 }, (_, index) => `${index + 1}.png`).map((imageFile) => ({
       imageFile,
       imageOnly: true,
     }));
@@ -686,7 +686,7 @@ const buildPages = (gameType, mode) => {
       ? `bg${(index % 4) + 1}.png`
       : 'bg2.png');
     const imageUrl = source?.useLegacyStoryAsset
-      ? (key === 'GAME_ONE' ? legacySrcStoryAsset(backgroundFile) : legacyStoryAsset(backgroundFile))
+      ? ((key === 'GAME_ONE' || key === 'GAME_FIVE') ? legacySrcStoryAsset(backgroundFile) : legacyStoryAsset(backgroundFile))
       : storyAsset(meta.world, backgroundFile);
     const text = source?.text || '';
 
@@ -710,9 +710,7 @@ const buildPages = (gameType, mode) => {
       image: imageUrl,
       imageOnly: Boolean(source?.imageOnly),
       useLegacyStoryAsset: Boolean(source?.useLegacyStoryAsset),
-      // All comic/image story pages use the same contained card presentation.
-      // Never repeat the story artwork as a full-stage background.
-      suppressStageBackground: Boolean(source?.imageOnly),
+      suppressStageBackground: Boolean(source?.useLegacyStoryAsset),
       showPortal: false,
       chip: String(index + 1),
     };

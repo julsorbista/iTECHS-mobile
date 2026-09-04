@@ -862,6 +862,8 @@ const StudentGameOverlay = ({
                     style={{
                       width: isGameThree
                         ? '100%'
+                        : isGameSix && viewportSize.width <= 760
+                          ? '100%'
                         : isArcadeCanvas
                           ? `${Math.round(Math.max(920, Math.min(viewportSize.width - 32, frameSize.width + 88)))}px`
                           : `${frameSize.width}px`,
@@ -919,6 +921,7 @@ const StudentGameOverlay = ({
                     ) : isGameSix ? (
                       <GameCanvasGameSix
                         key={sessionInfo.sessionId}
+                        sessionInfo={sessionInfo}
                         levelData={levelData}
                         onLevelComplete={submitOutcome}
                         onLevelFail={submitOutcome}

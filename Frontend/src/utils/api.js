@@ -538,6 +538,11 @@ export const levelAPI = {
     return response.data;
   },
 
+  resolveGameSixTerm: async (levelNumber, sessionId, payload) => {
+    const response = await api.post(`/levels/GAME_SIX/${levelNumber}/sessions/${sessionId}/terms/resolve`, payload);
+    return response.data;
+  },
+
   getLevelHistory: async (gameType, levelNumber, params = {}) => {
     const response = await api.get(`/levels/${gameType}/${levelNumber}/history`, { params });
     return response.data;

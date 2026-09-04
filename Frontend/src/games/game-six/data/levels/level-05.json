@@ -3,9 +3,9 @@
   "gameType": "GAME_SIX",
   "levelNumber": 5,
   "seedVersion": 2,
-  "title": "Syntax Rain Typing: Compiler Tempest",
-  "subtitle": "Type twenty-five falling terms in the hardest storm.",
-  "objective": "Type twenty-five falling terms in the hardest storm.",
+  "title": "Odd Pair",
+  "subtitle": "Find the hidden relationship between falling Java terms and type both members of each pair.",
+  "objective": "Complete twenty-five hidden Java pairs before time or health runs out.",
   "settings": {
     "targetWords": 25,
     "seconds": 480,
