@@ -1953,12 +1953,12 @@ const mapLevelContentResponse = (level, content) => ({
     publishedJson: cloneJson(content.publishedJson),
     publishedAt: content.publishedAt,
     updatedAt: content.updatedAt,
-    updatedBy: content.updatedBy
+    updatedBy: content.updatedByUser
       ? {
-          id: content.updatedBy.id,
-          username: content.updatedBy.username,
-          firstName: content.updatedBy.firstName,
-          lastName: content.updatedBy.lastName,
+          id: content.updatedByUser.id,
+          username: content.updatedByUser.username,
+          firstName: content.updatedByUser.firstName,
+          lastName: content.updatedByUser.lastName,
         }
       : null,
   },
@@ -1976,7 +1976,7 @@ const getLevelContentRecord = async (gameType, gameLevelNumber) => {
   const content = await prisma.levelContent.findUnique({
     where: { levelId: level.id },
     include: {
-      updatedBy: {
+      updatedByUser: {
         select: {
           id: true,
           username: true,

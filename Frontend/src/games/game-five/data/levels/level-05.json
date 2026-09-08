@@ -3,9 +3,9 @@
   "gameType": "GAME_FIVE",
   "levelNumber": 5,
   "seedVersion": 2,
-  "title": "Code Snowman: Compiler Freeze",
-  "subtitle": "Guess ten harder programming terms before the final melt.",
-  "objective": "Guess ten harder programming terms before the final melt.",
+  "title": "Code Robot: Compiler Core",
+  "subtitle": "Guess ten harder programming terms before the final shutdown.",
+  "objective": "Guess ten harder programming terms before the final shutdown.",
   "settings": {
     "targetWords": 10,
     "seconds": 120,

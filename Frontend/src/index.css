@@ -6083,8 +6083,12 @@
 }
 
 .student-shell-overlay .student-shell-main-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 100dvh;
   max-width: none;
+  padding: 1rem;
 }
 
 .student-shell-overlay .student-level-loading-panel {
@@ -6650,10 +6654,10 @@
     border-width: 3px;
     border-radius: 14px;
     overflow: visible;
-    box-shadow: 4px 4px 0 #43204f;
+    box-shadow: 4px 4px 0 #082f49;
   }
 
-  .student-game-four-panel .game-five-shell > div:first-child {
+  .student-game-four-panel .game-five-header {
     align-items: stretch;
     flex-direction: column;
     gap: 0.5rem;
@@ -6662,38 +6666,44 @@
     border-width: 3px;
   }
 
-  .student-game-four-panel .game-five-shell > div:first-child h2 {
-    font-size: 1.35rem;
+  .student-game-four-panel .game-five-header h2 {
+    font-size: 1.55rem;
     line-height: 1.15;
   }
 
-  .student-game-four-panel .game-five-shell > div:first-child > div:last-child {
+  .student-game-four-panel .game-five-status-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.4rem;
-    font-size: 0.78rem;
+    font-size: 0.95rem;
   }
 
-  .student-game-four-panel .game-five-shell > div:first-child > div:last-child > div {
+  .student-game-four-panel .game-five-status-row > div {
     min-width: 0;
     padding: 0.5rem;
     border-width: 2px;
-    box-shadow: 2px 2px 0 #43204f;
+    box-shadow: 2px 2px 0 #082f49;
   }
 
-  .student-game-four-panel .game-five-shell > .grid {
+  .student-game-four-panel .game-five-combo-status {
+    grid-column: span 2;
+  }
+
+  .student-game-four-panel .game-five-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 0.6rem;
   }
 
-  .student-game-four-panel .game-five-shell > .grid > main {
+  .student-game-four-panel .game-five-play-area {
     order: -3;
     display: grid;
+    min-height: 0;
     gap: 0.55rem;
   }
 
   .student-game-four-panel .game-five-clue-panel {
+    min-height: 0;
     padding: 0.75rem;
   }
 
@@ -6702,27 +6712,44 @@
     margin-bottom: 0.55rem;
     padding: 0.55rem 0.8rem;
     border-width: 3px;
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
 
   .student-game-four-panel .game-five-clue-panel p {
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: 1.08rem;
+    line-height: 1.45;
   }
 
-  .student-game-four-panel .game-five-clue-panel > div:last-child,
-  .student-game-four-panel .game-five-shell > .grid > main > div:last-child {
+  .student-game-four-panel .game-five-clue-bubble {
+    min-height: 0;
+    margin-top: 0.4rem;
+    gap: 0.55rem;
+    padding: 0.55rem;
+    border-width: 2px;
+    box-shadow: 2px 2px 0 #082f49;
+  }
+
+  .student-game-four-panel .game-five-clue-avatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-width: 2px;
+  }
+
+  .student-game-four-panel .game-five-sidebar > div:nth-of-type(2),
+  .student-game-four-panel .game-five-stage-tip {
     display: none;
   }
 
   .student-game-four-panel .game-five-answer-panel {
     gap: 0.3rem;
+    min-height: 0;
+    margin-top: 0;
     padding: 0.65rem;
-    font-size: 1.5rem;
+    font-size: 1.85rem;
   }
 
   .student-game-four-panel .game-five-word-tile {
-    min-width: 1.5rem;
+    min-width: 1.75rem;
   }
 
   .student-game-four-panel .game-five-keyboard {
@@ -6735,30 +6762,142 @@
     min-height: 2.75rem;
     padding: 0.35rem 0;
     border-width: 2px;
-    font-size: 0.9rem;
-    box-shadow: 2px 2px 0 #43204f;
+    font-size: 1.15rem;
+    box-shadow: 2px 2px 0 #082f49;
     touch-action: manipulation;
   }
 
-  .student-game-four-panel .game-five-shell > .grid > section {
-    order: -2;
+  .student-game-four-panel .game-five-combo-feedback {
+    width: min(16rem, calc(100vw - 2rem));
+    padding: 0.85rem 1rem;
+    font-size: 1.35rem;
+  }
+
+  .student-game-four-panel .game-five-combo-feedback span:last-child {
+    font-size: 0.95rem;
+  }
+
+  .student-game-four-panel .game-five-robot-stage {
+    order: 1;
     width: 100%;
     min-width: 0;
-    min-height: 42dvh;
+    min-height: clamp(15rem, 34dvh, 20rem);
     border-width: 3px;
   }
 
-  .student-game-four-panel .game-five-shell > .grid > section img {
-    height: min(36dvh, 20rem);
+  .student-game-four-panel .game-five-robot-sprite {
+    bottom: 0.8rem;
+    width: min(92vw, 22rem);
+    height: min(33dvh, 19rem);
   }
 
-  .student-game-four-panel .game-five-shell > .grid > aside {
+  .student-game-four-panel .game-five-sidebar {
+    order: 2;
     display: grid;
     gap: 0.6rem;
+    min-height: 0;
   }
 
-  .student-game-four-panel .game-five-shell > .grid > aside > * {
+  .student-game-four-panel .game-five-sidebar > * {
     margin: 0;
+  }
+
+  .student-game-four-panel .game-five-mission-panel {
+    padding: 0.7rem;
+  }
+
+  .student-game-four-panel .game-five-mission-panel h3 {
+    margin-bottom: 0.4rem;
+    font-size: 1.3rem;
+    line-height: 1.15;
+  }
+
+  .student-game-four-panel .game-five-mission-panel p {
+    font-size: 1.05rem;
+    line-height: 1.35;
+  }
+
+  .student-game-four-panel .game-five-mission-panel > div {
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+  }
+
+  .student-game-four-panel .game-five-mission-panel > div > div {
+    padding: 0.45rem;
+    border-width: 2px;
+    box-shadow: 2px 2px 0 #082f49;
+  }
+
+  .student-game-four-panel .game-five-mission-panel svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .student-game-four-panel .game-five-mission-panel strong {
+    font-size: 1.4rem;
+    line-height: 1.2;
+  }
+
+  .student-game-four-panel .game-five-mission-panel span {
+    font-size: 0.9rem;
+  }
+}
+
+.game-five-combo-feedback {
+  animation: game-five-combo-pop 900ms ease-out both;
+}
+
+.student-game-five-panel .game-five-header h2 {
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+}
+
+.student-game-five-panel .game-five-status-row {
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
+}
+
+.student-game-five-panel .game-five-mission-panel h3,
+.student-game-five-panel .game-five-clue-panel h3 {
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+}
+
+.student-game-five-panel .game-five-mission-panel p,
+.student-game-five-panel .game-five-clue-panel p {
+  font-size: clamp(1.12rem, 1.65vw, 1.35rem);
+  line-height: 1.45;
+}
+
+.student-game-five-panel .game-five-mission-panel strong {
+  font-size: clamp(1.45rem, 2.2vw, 1.85rem);
+}
+
+.student-game-five-panel .game-five-mission-panel span {
+  font-size: clamp(0.95rem, 1.35vw, 1.12rem);
+}
+
+.student-game-five-panel .game-five-answer-panel {
+  font-size: clamp(2rem, 5vw, 4.75rem);
+}
+
+.student-game-five-panel .game-five-keyboard button {
+  font-size: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+@keyframes game-five-combo-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.76);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(0.92);
   }
 }
 
@@ -9177,8 +9316,67 @@ textarea {
     width: 100% !important;
     min-height: 3rem !important;
   }
+
+  .student-shell-warm .student-game-five-levels > .student-panel:first-child {
+    padding: 0.8rem !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-inline-summary-value {
+    font-size: 0.95rem !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-inline-summary-label {
+    font-size: 0.52rem !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-eyebrow {
+    font-size: 0.7rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-level-card {
+    min-height: 7.6rem !important;
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-level-card .student-pill {
+    min-height: 2.35rem !important;
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.68rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-level-card-number {
+    font-size: 1.55rem !important;
+    line-height: 1 !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-level-card-title {
+    font-size: 0.72rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-level-card-stars svg {
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-section-title {
+    font-size: 1.08rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-body-copy {
+    font-size: 0.74rem !important;
+    line-height: 1.65 !important;
+  }
+
+  .student-shell-warm .student-game-five-levels .student-insight-label,
+  .student-shell-warm .student-game-five-levels .student-insight-value {
+    font-size: 0.72rem !important;
+  }
 }
-+
 
 /* Authoritative web tutorial presentation for Capacitor/mobile.
    Kept last intentionally so generic mobile guide rules cannot replace it. */

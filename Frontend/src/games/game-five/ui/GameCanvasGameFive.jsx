@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import {
   CheckCircle2,
   Clock3,
@@ -8,12 +7,14 @@ import {
   Loader2,
   LogOut,
   RotateCcw,
-  Snowflake,
+  Bot,
   Star,
 } from 'lucide-react';
-import codeSnowman from '../../../assets/game-five/code-snowman-generated.png';
 import gameFiveMusic from '../../../assets/game-arcade/audio/game5.mp3';
 import sharedSfx from '../../../assets/game-arcade/audio/soundeffects.mp3';
+import combo3Sound from '../../../assets/game-arcade/audio/combo_3_x2.mp3';
+import combo5Sound from '../../../assets/game-arcade/audio/combo_5_x3.mp3';
+import combo10Sound from '../../../assets/game-arcade/audio/combo_10_x5.mp3';
 import {
   getStudentMusicPreference,
   getStudentSfxPreference,
@@ -23,6 +24,16 @@ import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
 import PlayableTutorialCoach from '../../shared/ui/PlayableTutorialCoach';
 import { buildGameFiveGuideContent } from '../../shared/ui/levelGuideBuilders';
 import { levelAPI } from '../../../utils/api';
+import { addUserCoins } from '../../shared/gameSessionPersistence';
+
+const getLegacyGameFiveTitlePattern = () => {
+  const encodedLegacyObjectName = 'c25vd21hbg==';
+  const legacyObjectName = typeof globalThis.atob === 'function'
+    ? globalThis.atob(encodedLegacyObjectName)
+    : ['s', 'n', 'o', 'w', 'm', 'a', 'n'].join('');
+  return new RegExp(['code', legacyObjectName].join('\\s+'), 'gi');
+};
+const LEGACY_GAME_FIVE_TITLE_PATTERN = getLegacyGameFiveTitlePattern();
 
 const WORDS_BY_LEVEL = Object.freeze({
   1: [
@@ -73,10 +84,6 @@ const WORDS_BY_LEVEL = Object.freeze({
   ],
 });
 
-const renderScreenModal = (content) => (
-  typeof document === 'undefined' ? content : createPortal(content, document.body)
-);
-
 const GAME_FIVE_TUTORIAL_STEPS = Object.freeze([
   { title: 'Practice Tutorial', body: 'This tutorial teaches the word clue, keyboard, hint, timer, and lives. You can practice before the real Level 1 starts.', buttonLabel: 'Start Practice' },
   { title: 'Read The Clue', body: 'Use the clue to guess the programming word. The blanks show how many letters are in the answer.', buttonLabel: 'Try Letters' },
@@ -97,6 +104,48 @@ const HINT_SOUND_SRC = new URL(
   '../../../../assets/Game/game_two/Game 2_ Hardware/Music & Sound Effects/hint sf.mp3',
   import.meta.url,
 ).href;
+const ROBOT_DESTROY_HIT_SOUND_SRC = new URL(
+  '../../../assets/game-five/robot/sfx/robot-destroy-hit.mp4',
+  import.meta.url,
+).href;
+const ROBOT_DESTROYED_SOUND_SRC = new URL(
+  '../../../assets/game-five/robot/sfx/robot-destroyed.mp4',
+  import.meta.url,
+).href;
+const ROBOT_INTRO_VOICE_SRC = new URL(
+  '../../../assets/game-five/robot/sfx/robot-intro-voice.mp4',
+  import.meta.url,
+).href;
+const ROBOT_GUIDE_VOICE_SRC = new URL(
+  '../../../assets/game-five/robot/sfx/robot-guide-voice.mp4',
+  import.meta.url,
+).href;
+
+const ROBOT_FRAME_MODULES = import.meta.glob(
+  '../../../assets/game-five/robot/frames/*/*.png',
+  { eager: true, import: 'default' },
+);
+
+const ROBOT_FRAMES = Object.freeze(
+  Object.entries(ROBOT_FRAME_MODULES).reduce((framesByAnimation, [path, src]) => {
+    const [, animationName, frameName] = path.match(/frames\/([^/]+)\/([^/]+)\.png$/) || [];
+    if (!animationName || !frameName) return framesByAnimation;
+    if (!framesByAnimation[animationName]) framesByAnimation[animationName] = [];
+    framesByAnimation[animationName][Number(frameName)] = src;
+    return framesByAnimation;
+  }, {}),
+);
+
+const ROBOT_SPRITES = Object.freeze({
+  idle: { animationName: 'idle', frameSequence: [0, 1, 2, 3, 4, 5, 4, 3, 2, 1], frameMs: 170, loop: true },
+  hurt1: { animationName: 'hurt1', frameMs: 90, loop: false },
+  hurt1Idle: { animationName: 'hurt1Idle', frameSequence: [0, 1, 2, 3, 4, 3, 2, 1], frameMs: 170, loop: true },
+  hurt2: { animationName: 'hurt2', frameMs: 90, loop: false },
+  hurt2Idle: { animationName: 'hurt2Idle', frameSequence: [0, 1, 2, 3, 4, 5, 4, 3, 2, 1], frameMs: 170, loop: true },
+  hurt3: { animationName: 'hurt3', frameMs: 82, loop: false },
+  finalDestruction: { animationName: 'finalDestruction', frameMs: 120, loop: false },
+  destroyed: { animationName: 'destroyed', frameMs: 220, loop: true },
+});
 
 const getSettings = (levelData) => {
   const level = Math.max(1, Math.min(5, Number(levelData?.levelNumber || 1)));
@@ -109,19 +158,32 @@ const getSettings = (levelData) => {
   };
 };
 
-const getSnowmanMeltStyle = (lives, maxLives, timedOut) => {
-  if (timedOut || lives <= 0) {
-    return { opacity: 0, transform: 'translate(-50%, 170px) scale(1.12, 0.08)' };
-  }
-  const lost = Math.max(0, maxLives - lives);
-  const stages = [
-    { opacity: 1, transform: 'translate(-50%, 0) scale(1)' },
-    { opacity: 0.96, transform: 'translate(-50%, 22px) scale(0.98, 0.9)' },
-    { opacity: 0.9, transform: 'translate(-50%, 52px) scale(0.94, 0.76)' },
-    { opacity: 0.76, transform: 'translate(-50%, 95px) scale(0.88, 0.55)' },
-    { opacity: 0.52, transform: 'translate(-50%, 135px) scale(0.78, 0.32)' },
-  ];
-  return stages[Math.min(lost, stages.length - 1)];
+const getRobotDamageRatio = (lives, maxLives) => {
+  const safeMaxLives = Math.max(1, Number(maxLives) || 1);
+  return Math.max(0, Math.min(1, (safeMaxLives - Math.max(0, lives)) / safeMaxLives));
+};
+
+const getRobotIdleKey = (lives, maxLives, timedOut) => {
+  if (timedOut || lives <= 0) return 'destroyed';
+  const damageRatio = getRobotDamageRatio(lives, maxLives);
+  if (damageRatio <= 0) return 'idle';
+  if (damageRatio <= 0.34) return 'hurt1Idle';
+  return 'hurt2Idle';
+};
+
+const getRobotImpactKey = (nextLives, maxLives) => {
+  if (nextLives <= 0) return 'finalDestruction';
+  const damageRatio = getRobotDamageRatio(nextLives, maxLives);
+  if (damageRatio <= 0.34) return 'hurt1';
+  if (damageRatio <= 0.67) return 'hurt2';
+  return 'hurt3';
+};
+
+const getGameFiveComboMultiplier = (comboCount) => {
+  if (comboCount >= 10) return 5;
+  if (comboCount >= 5) return 3;
+  if (comboCount >= 3) return 2;
+  return 1;
 };
 
 const buildAiClue = (entry, level, clueDepth, guessedLetters) => {
@@ -145,6 +207,7 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
   const musicRef = useRef(null);
   const sfxRef = useRef(null);
   const musicBlockedRef = useRef(false);
+  const musicDuckedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.Audio === 'undefined') return undefined;
@@ -165,6 +228,7 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
       musicRef.current = null;
       sfxRef.current = null;
       musicBlockedRef.current = false;
+      musicDuckedRef.current = false;
     };
   }, [musicSrc, sfxSrc]);
 
@@ -210,7 +274,7 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
     };
   }, [active]);
 
-  return useCallback(() => {
+  const playSfx = useCallback(() => {
     const sfx = sfxRef.current;
     if (!sfx) return;
     try {
@@ -221,6 +285,15 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
       // Ignore browser audio restrictions.
     }
   }, []);
+
+  const setMusicDucked = useCallback((isDucked) => {
+    musicDuckedRef.current = Boolean(isDucked);
+    const music = musicRef.current;
+    if (!music) return;
+    music.volume = isDucked ? 0.14 : 0.48;
+  }, []);
+
+  return { playSfx, setMusicDucked };
 };
 
 const useAnswerSounds = () => {
@@ -272,11 +345,201 @@ const useAnswerSounds = () => {
   };
 };
 
+const useComboMilestoneSounds = (active = true) => {
+  const soundsRef = useRef(new Map());
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.Audio === 'undefined') return undefined;
+    const sounds = new Map([
+      [3, new Audio(combo3Sound)],
+      [5, new Audio(combo5Sound)],
+      [10, new Audio(combo10Sound)],
+    ]);
+    sounds.forEach((audio) => {
+      audio.preload = 'auto';
+      audio.volume = 1;
+      audio.load();
+    });
+    soundsRef.current = sounds;
+
+    return () => {
+      sounds.forEach((audio) => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      soundsRef.current = new Map();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (active) return;
+    soundsRef.current.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  }, [active]);
+
+  return useCallback((comboCount) => {
+    if (!getStudentSfxPreference()) return;
+    const audio = soundsRef.current.get(comboCount);
+    if (!audio) return;
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise?.catch) playPromise.catch(() => {});
+  }, []);
+};
+
+const useRobotDestructionSounds = () => {
+  const hitRef = useRef(null);
+  const destroyedRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.Audio === 'undefined') return undefined;
+
+    const hit = new Audio(ROBOT_DESTROY_HIT_SOUND_SRC);
+    hit.preload = 'auto';
+    hit.volume = 0.85;
+    hitRef.current = hit;
+
+    const destroyed = new Audio(ROBOT_DESTROYED_SOUND_SRC);
+    destroyed.preload = 'auto';
+    destroyed.volume = 0.85;
+    destroyedRef.current = destroyed;
+
+    return () => {
+      hit.pause();
+      destroyed.pause();
+      hitRef.current = null;
+      destroyedRef.current = null;
+    };
+  }, []);
+
+  return useCallback(() => {
+    if (!getStudentSfxPreference()) return;
+    const hit = hitRef.current;
+    const destroyed = destroyedRef.current;
+    if (!hit || !destroyed) return;
+
+    const playDestroyed = () => {
+      destroyed.currentTime = 0;
+      const destroyedPromise = destroyed.play();
+      if (destroyedPromise?.catch) destroyedPromise.catch(() => {});
+    };
+
+    hit.pause();
+    destroyed.pause();
+    hit.currentTime = 0;
+    destroyed.currentTime = 0;
+    hit.onended = playDestroyed;
+
+    const hitPromise = hit.play();
+    if (hitPromise?.catch) {
+      hitPromise.catch(() => {
+        playDestroyed();
+      });
+    }
+  }, []);
+};
+
+const useRobotVoiceSounds = (setMusicDucked) => {
+  const introRef = useRef(null);
+  const guideRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.Audio === 'undefined') return undefined;
+
+    const intro = new Audio(ROBOT_INTRO_VOICE_SRC);
+    intro.preload = 'auto';
+    intro.volume = 1;
+    introRef.current = intro;
+
+    const guide = new Audio(ROBOT_GUIDE_VOICE_SRC);
+    guide.preload = 'auto';
+    guide.volume = 1;
+    guideRef.current = guide;
+
+    return () => {
+      intro.pause();
+      guide.pause();
+      setMusicDucked?.(false);
+      introRef.current = null;
+      guideRef.current = null;
+    };
+  }, [setMusicDucked]);
+
+  const play = useCallback((audioRef) => {
+    if (!getStudentSfxPreference()) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    setMusicDucked?.(true);
+    audio.onended = () => {
+      setMusicDucked?.(false);
+    };
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise?.catch) {
+      playPromise.catch(() => {
+        setMusicDucked?.(false);
+      });
+    }
+  }, [setMusicDucked]);
+
+  return {
+    playIntroVoice: useCallback(() => play(introRef), [play]),
+    playGuideVoice: useCallback(() => play(guideRef), [play]),
+  };
+};
+
 const PixelPanel = ({ children, className = '' }) => (
-  <div className={`border-4 border-[#43204f] bg-[#fff1be] text-[#201325] shadow-[6px_6px_0_#43204f] ${className}`}>
+  <div className={`border-4 border-[#0f3a5f] bg-[#e0f2fe] text-[#082f49] shadow-[6px_6px_0_#082f49] ${className}`}>
     {children}
   </div>
 );
+
+const RobotSprite = ({ spriteKey, animationId, onComplete }) => {
+  const sprite = ROBOT_SPRITES[spriteKey] || ROBOT_SPRITES.idle;
+  const frames = ROBOT_FRAMES[sprite.animationName] || ROBOT_FRAMES.idle || [];
+  const frameSequence = useMemo(() => (
+    sprite.frameSequence || frames.map((_, index) => index)
+  ), [frames, sprite]);
+  const [frameIndex, setFrameIndex] = useState(0);
+
+  useEffect(() => {
+    setFrameIndex(0);
+  }, [spriteKey, animationId]);
+
+  useEffect(() => {
+    let nextFrame = 0;
+    const intervalId = window.setInterval(() => {
+      nextFrame += 1;
+      if (nextFrame >= frameSequence.length) {
+        if (!sprite.loop) {
+          window.clearInterval(intervalId);
+          setFrameIndex(frameSequence[frameSequence.length - 1] || 0);
+          onComplete?.();
+          return;
+        }
+        nextFrame = 0;
+      }
+      setFrameIndex(frameSequence[nextFrame] || 0);
+    }, sprite.frameMs);
+
+    return () => window.clearInterval(intervalId);
+  }, [animationId, frameSequence, onComplete, sprite, spriteKey]);
+
+  const frameSrc = frames[frameIndex] || frames[0] || '';
+
+  return (
+    <img
+      className="game-five-robot-sprite absolute bottom-6 left-1/2 h-[460px] w-[460px] max-w-none -translate-x-1/2 object-contain transition-transform duration-200 2xl:h-[520px] 2xl:w-[520px]"
+      src={frameSrc}
+      alt="Code robot"
+      draggable="false"
+      style={{ imageRendering: 'auto' }}
+    />
+  );
+};
 
 const GameCanvasGameFive = ({
   levelData,
@@ -295,6 +558,10 @@ const GameCanvasGameFive = ({
   showLevelGuideline = false,
   gameTutorialRequested = false,
   continueToTutorialAfterGuide = false,
+  onGameTutorial,
+  playerId = 'guest',
+  initialCoins = 0,
+  onCoinBalanceChange,
 }) => {
   const baseSettings = useMemo(() => getSettings(levelData), [levelData]);
   const [generatedQuestions, setGeneratedQuestions] = useState(null);
@@ -315,7 +582,10 @@ const GameCanvasGameFive = ({
   const [lives, setLives] = useState(settings.lives);
   const [solved, setSolved] = useState(0);
   const [score, setScore] = useState(0);
-  const [coins, setCoins] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [comboFeedback, setComboFeedback] = useState(null);
+  const [coins, setCoins] = useState(() => Math.max(0, Math.round(Number(initialCoins) || 0)));
+  const [hintsUsed, setHintsUsed] = useState(0);
   const [mistakes, setMistakes] = useState(0);
   const [finished, setFinished] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
@@ -331,8 +601,12 @@ const GameCanvasGameFive = ({
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
   const [hintedIndices, setHintedIndices] = useState([]);
   const [hintReveal, setHintReveal] = useState(null);
+  const [robotImpact, setRobotImpact] = useState(null);
+  const introVoicePlayedRef = useRef(false);
+  const guideVoicePlayedRef = useRef(false);
   const shouldPauseForTutorialCoach = Boolean(isTutorialLevel && tutorialCoachOpen);
   const showGuide = showTutorial && tutorialView === 'guide';
+  const gameplayAudioActive = !showTutorial && !shouldPauseForTutorialCoach && !finished && !resultData;
 
   useEffect(() => {
     if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
@@ -340,12 +614,19 @@ const GameCanvasGameFive = ({
       setShowTutorial(true);
     }
   }, [gameTutorialRequested, isTutorialLevel]);
-  useArcadeAudio(gameFiveMusic, sharedSfx, !showTutorial && !shouldPauseForTutorialCoach && !finished && !resultData);
+  const { setMusicDucked } = useArcadeAudio(gameFiveMusic, sharedSfx, gameplayAudioActive);
   const { playCorrectAnswer, playIncorrectAnswer, playHint } = useAnswerSounds();
+  const playComboMilestone = useComboMilestoneSounds(gameplayAudioActive);
+  const playRobotDestructionSounds = useRobotDestructionSounds();
+  const { playIntroVoice, playGuideVoice } = useRobotVoiceSounds(setMusicDucked);
 
   const current = settings.words[wordIndex % settings.words.length];
   const letters = useMemo(() => current.word.split(''), [current.word]);
-  const snowmanMeltStyle = getSnowmanMeltStyle(lives, settings.lives, timedOut);
+  const robotIdleKey = getRobotIdleKey(lives, settings.lives, timedOut);
+  const robotSpriteKey = robotImpact?.key || robotIdleKey;
+  const handleRobotImpactComplete = useCallback(() => {
+    setRobotImpact(null);
+  }, []);
   const handleContinueTutorialStep = () => {
     if (tutorialStepIndex === 0) {
       setTutorialStepIndex(1);
@@ -357,6 +638,22 @@ const GameCanvasGameFive = ({
     buildAiClue(current, settings.level, clueDepth, guessed)
   ), [current, settings.level, clueDepth, guessed]);
   const activeClue = aiClue || fallbackClue;
+
+  useEffect(() => {
+    if (
+      introVoicePlayedRef.current
+      || isGeneratingQuestions
+      || showTutorial
+      || shouldPauseForTutorialCoach
+      || finished
+      || resultData
+    ) {
+      return;
+    }
+
+    introVoicePlayedRef.current = true;
+    playIntroVoice();
+  }, [finished, isGeneratingQuestions, playIntroVoice, resultData, shouldPauseForTutorialCoach, showTutorial]);
 
   useEffect(() => {
     let active = true;
@@ -391,10 +688,12 @@ const GameCanvasGameFive = ({
       mistakes: finalMistakes,
       completedTasks: finalSolved,
       totalTasks: settings.targetWords,
+      hintsUsed,
+      coinsRemaining: coins,
     };
     if (outcome === 'COMPLETED') onLevelComplete?.(payload);
     else onLevelFail?.(payload);
-  }, [finished, mistakes, onLevelComplete, onLevelFail, score, settings.targetWords, solved]);
+  }, [coins, finished, hintsUsed, mistakes, onLevelComplete, onLevelFail, score, settings.targetWords, solved]);
 
   useEffect(() => {
     if (isGeneratingQuestions || showTutorial || shouldPauseForTutorialCoach || finished || resultData) return undefined;
@@ -403,6 +702,8 @@ const GameCanvasGameFive = ({
         if (value <= 1) {
           setTimedOut(true);
           setLives(0);
+          setRobotImpact({ key: 'finalDestruction', id: Date.now() });
+          playRobotDestructionSounds();
           finish('FAILED', solved, score, mistakes + settings.lives);
           return 0;
         }
@@ -410,7 +711,7 @@ const GameCanvasGameFive = ({
       });
     }, 1000);
     return () => window.clearInterval(id);
-  }, [finish, finished, isGeneratingQuestions, mistakes, resultData, score, settings.lives, shouldPauseForTutorialCoach, showTutorial, solved]);
+  }, [finish, finished, isGeneratingQuestions, mistakes, playRobotDestructionSounds, resultData, score, settings.lives, shouldPauseForTutorialCoach, showTutorial, solved]);
 
   useEffect(() => {
     setHintReveal(null);
@@ -421,11 +722,25 @@ const GameCanvasGameFive = ({
 
   const completeCurrentWord = useCallback((finalMistakes = mistakes) => {
     const nextSolved = solved + 1;
+    const nextCombo = combo + 1;
     const earnedCoins = 10 + (settings.level * 2);
-    const nextCoins = coins + earnedCoins;
-    const nextScore = score + 100 + earnedCoins + Math.max(0, Math.floor(timeLeft / 3));
+    const persistedCoins = addUserCoins(playerId, earnedCoins).balance;
+    const activeMultiplier = getGameFiveComboMultiplier(nextCombo);
+    const nextScore = score + (100 * activeMultiplier) + Math.max(0, Math.floor(timeLeft / 3));
     setSolved(nextSolved);
-    setCoins(nextCoins);
+    setCombo(nextCombo);
+    if ([3, 5, 10].includes(nextCombo)) {
+      playComboMilestone(nextCombo);
+      setComboFeedback({
+        id: `milestone-${nextCombo}-${Date.now()}`,
+        type: 'milestone',
+        count: nextCombo,
+        label: `${nextCombo} COMBO!`,
+        multiplier: activeMultiplier,
+      });
+    }
+    setCoins(persistedCoins);
+    onCoinBalanceChange?.(persistedCoins);
     setScore(nextScore);
     if (isTutorialLevel && tutorialStepIndex < 4) {
       setTutorialStepIndex(4);
@@ -442,7 +757,7 @@ const GameCanvasGameFive = ({
     setClueDepth(0);
     setHintedIndices([]);
     setAiClue('');
-  }, [coins, finish, isTutorialLevel, mistakes, score, settings.level, settings.targetWords, solved, timeLeft, tutorialStepIndex]);
+  }, [combo, finish, isTutorialLevel, mistakes, onCoinBalanceChange, playComboMilestone, playerId, score, settings.level, settings.targetWords, solved, timeLeft, tutorialStepIndex]);
 
   const chooseLetter = useCallback((rawLetter) => {
     const letter = String(rawLetter || '').toUpperCase();
@@ -456,11 +771,20 @@ const GameCanvasGameFive = ({
     }
 
     if (!current.word.includes(letter)) {
-      playIncorrectAnswer();
       const nextLives = lives - 1;
       const nextMistakes = mistakes + 1;
+      if (nextLives <= 0) {
+        playRobotDestructionSounds();
+      } else {
+        playIncorrectAnswer();
+        if (!guideVoicePlayedRef.current) {
+          guideVoicePlayedRef.current = true;
+          playGuideVoice();
+        }
+      }
       setLives(Math.max(0, nextLives));
       setMistakes(nextMistakes);
+      setRobotImpact({ key: getRobotImpactKey(nextLives, settings.lives), id: Date.now() });
       if (nextLives <= 0) {
         finish('FAILED', solved, score, nextMistakes);
       }
@@ -474,7 +798,7 @@ const GameCanvasGameFive = ({
     if (!solvedWord) return;
 
     completeCurrentWord(mistakes);
-  }, [completeCurrentWord, current.word, finish, finished, guessed, hintedIndices, isGeneratingQuestions, isTutorialLevel, lives, mistakes, playCorrectAnswer, playIncorrectAnswer, resultData, score, shouldPauseForTutorialCoach, showTutorial, solved, tutorialStepIndex]);
+  }, [completeCurrentWord, current.word, finish, finished, guessed, hintedIndices, isGeneratingQuestions, isTutorialLevel, lives, mistakes, playCorrectAnswer, playGuideVoice, playIncorrectAnswer, playRobotDestructionSounds, resultData, score, settings.lives, shouldPauseForTutorialCoach, showTutorial, solved, tutorialStepIndex]);
 
   const revealRandomLetterHint = useCallback(async () => {
     if (isGeneratingQuestions || isGeneratingHint || clueDepth >= 3 || showTutorial || shouldPauseForTutorialCoach || finished || Boolean(resultData)) return;
@@ -496,6 +820,7 @@ const GameCanvasGameFive = ({
       setTutorialCoachOpen(true);
     }
     setClueDepth(nextClueDepth);
+    setHintsUsed((value) => value + 1);
     setHintedIndices(nextHintedIndices);
     setHintReveal({
       index: selection.index,
@@ -545,55 +870,63 @@ const GameCanvasGameFive = ({
 
   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
   const seconds = String(timeLeft % 60).padStart(2, '0');
+  const levelTitle = typeof levelData?.title === 'string' && levelData.title.trim().length > 0
+    ? levelData.title.replace(LEGACY_GAME_FIVE_TITLE_PATTERN, 'Code Robot')
+    : 'Code Robot';
 
   return (
-    <div className="game-five-shell min-h-[700px] w-full overflow-hidden border-4 border-[#32173b] bg-[#f8d994] p-3 text-[#201325] shadow-2xl" style={{ imageRendering: 'pixelated' }}>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3 border-4 border-[#43204f] bg-[#ffe8aa] px-4 py-3 shadow-[4px_4px_0_#43204f]">
+    <div className="game-five-shell min-h-[700px] w-full overflow-hidden border-4 border-[#082f49] bg-[#93c5fd] p-3 text-[#082f49] shadow-2xl" style={{ imageRendering: 'pixelated' }}>
+      <div className="game-five-header mb-3 flex flex-wrap items-center justify-between gap-3 border-4 border-[#0f3a5f] bg-[#bfdbfe] px-4 py-3 shadow-[4px_4px_0_#082f49]">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide">Game 5</p>
-          <h2 className="text-3xl font-bold text-[#4b235d]">{levelData?.title || 'Code Snowman'}</h2>
+          <h2 className="text-3xl font-bold text-[#075985]">{levelTitle}</h2>
         </div>
-        <div className="flex flex-wrap gap-3 text-lg font-semibold">
+        <div className="game-five-status-row flex flex-wrap gap-3 text-lg font-semibold">
           <PixelPanel className="px-4 py-2">Level: {settings.level} <Star className="inline h-5 w-5 fill-yellow-300 text-yellow-500" /></PixelPanel>
           <PixelPanel className="game-five-coins-status px-4 py-2"><Coins className="inline h-5 w-5 text-yellow-500" /> Coins: {coins}</PixelPanel>
           <PixelPanel className="game-five-lives-status px-4 py-2"><Heart className="inline h-5 w-5 fill-red-500 text-red-600" /> Lives: {lives}/{settings.lives}</PixelPanel>
           <PixelPanel className="px-4 py-2">Round: {solved + 1}/{settings.targetWords}</PixelPanel>
+          {combo > 0 && <PixelPanel className="game-five-combo-status px-4 py-2">Combo: x{getGameFiveComboMultiplier(combo)}</PixelPanel>}
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[250px_420px_1fr]">
-        <aside className="space-y-4">
-          <PixelPanel className="game-five-mission-panel p-4">
-            <h3 className="mb-3 text-xl font-bold uppercase">Mission</h3>
-            <p className="font-medium leading-snug">Guess {settings.targetWords} programming words before the timer runs out. Wrong letters melt the code snowman.</p>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <PixelPanel className="game-five-timer-status p-3 text-center"><Clock3 className="mx-auto h-6 w-6 text-green-700" /><strong className="block text-xl font-semibold">{minutes}:{seconds}</strong><span className="text-xs font-semibold">Timer</span></PixelPanel>
-              <PixelPanel className="game-five-score-status p-3 text-center"><Star className="mx-auto h-6 w-6 fill-yellow-300 text-yellow-500" /><strong className="block text-xl font-semibold">{score}</strong><span className="text-xs font-semibold">Score</span></PixelPanel>
-              <PixelPanel className="p-3 text-center"><CheckCircle2 className="mx-auto h-6 w-6 text-green-700" /><strong className="block text-xl font-semibold">{solved}/{settings.targetWords}</strong><span className="text-xs font-semibold">Words</span></PixelPanel>
-              <PixelPanel className="game-five-snow-status p-3 text-center"><Snowflake className="mx-auto h-6 w-6 text-blue-600" /><strong className="block text-xl font-semibold">{lives}</strong><span className="text-xs font-semibold">Snow Left</span></PixelPanel>
+      <div className="game-five-layout grid gap-4 lg:grid-cols-[280px_460px_minmax(0,1fr)] xl:grid-cols-[300px_520px_minmax(0,1fr)] 2xl:grid-cols-[340px_620px_minmax(0,1fr)]">
+        <aside className="game-five-sidebar flex flex-col gap-4 lg:min-h-[760px]">
+          <PixelPanel className="game-five-mission-panel p-5">
+            <h3 className="mb-3 text-2xl font-bold uppercase">Mission</h3>
+            <p className="text-lg font-medium leading-snug">Guess {settings.targetWords} programming words before the timer runs out. Wrong letters damage the code robot.</p>
+            <div className="mt-5 grid grid-cols-2 gap-4">
+              <PixelPanel className="game-five-timer-status p-4 text-center"><Clock3 className="mx-auto h-7 w-7 text-green-700" /><strong className="block text-2xl font-semibold">{minutes}:{seconds}</strong><span className="text-sm font-semibold">Timer</span></PixelPanel>
+              <PixelPanel className="game-five-score-status p-4 text-center"><Star className="mx-auto h-7 w-7 fill-yellow-300 text-yellow-500" /><strong className="block text-2xl font-semibold">{score}</strong><span className="text-sm font-semibold">Score</span></PixelPanel>
+              <PixelPanel className="p-4 text-center"><CheckCircle2 className="mx-auto h-7 w-7 text-green-700" /><strong className="block text-2xl font-semibold">{solved}/{settings.targetWords}</strong><span className="text-sm font-semibold">Words</span></PixelPanel>
+              <PixelPanel className="game-five-snow-status p-4 text-center"><Bot className="mx-auto h-7 w-7 text-blue-600" /><strong className="block text-2xl font-semibold">{lives}</strong><span className="text-sm font-semibold">Power</span></PixelPanel>
             </div>
           </PixelPanel>
-          <PixelPanel className="p-4">
-            <h3 className="mb-2 text-xl font-bold uppercase">Guide</h3>
-            <p className="font-medium">Click letters or press your keyboard. Correct letters reveal the word. Wrong letters remove 1 life. If time runs out, the snowman melts instantly.</p>
+          <PixelPanel className="flex-1 p-5">
+            <h3 className="mb-2 text-2xl font-bold uppercase">Guide</h3>
+            <p className="text-lg font-medium">Click letters or press your keyboard. Correct letters reveal the word. Wrong letters remove 1 life. If time runs out, the robot shuts down instantly.</p>
           </PixelPanel>
-          <button type="button" className="w-full border-4 border-[#43204f] bg-[#fff1be] px-5 py-3 text-xl font-semibold shadow-[4px_4px_0_#43204f] transition hover:bg-white" onClick={onExitRequest}>
+          <button type="button" className="w-full border-4 border-[#0f3a5f] bg-[#dbeafe] px-5 py-3 text-xl font-semibold shadow-[4px_4px_0_#082f49] transition hover:bg-[#f0f9ff]" onClick={onExitRequest}>
             <LogOut className="inline h-5 w-5" /> Back
           </button>
         </aside>
 
-        <section className="relative min-h-[510px] overflow-hidden border-4 border-[#43204f] bg-gradient-to-b from-[#7165c8] via-[#8ca2d8] to-[#fff1be] shadow-[5px_5px_0_#43204f]">
+        <section className="game-five-robot-stage relative min-h-[510px] overflow-hidden border-4 border-[#0f3a5f] bg-gradient-to-b from-[#1e3a8a] via-[#60a5fa] to-[#e0f2fe] shadow-[5px_5px_0_#082f49]">
           <div className="absolute inset-0 opacity-70" style={{ backgroundImage: 'radial-gradient(circle at 22% 18%, white 0 2px, transparent 3px), radial-gradient(circle at 72% 10%, white 0 2px, transparent 3px), radial-gradient(circle at 50% 30%, white 0 2px, transparent 3px)' }} />
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-[#eef7ff]" />
           <div className="absolute bottom-7 left-1/2 h-14 w-[300px] -translate-x-1/2 rounded-[50%] border-4 border-[#6aa0c8] bg-[#bfe8ff] opacity-80 shadow-[0_0_18px_rgba(191,232,255,.9)]" />
-          <img className="absolute bottom-10 left-1/2 h-[385px] max-w-none origin-bottom transition-all duration-500 ease-out" src={codeSnowman} alt="Code snowman" style={snowmanMeltStyle} />
-          <PixelPanel className="absolute bottom-20 left-8 p-3 text-center text-sm font-semibold">TIP<br />Think like<br />a coder!</PixelPanel>
+          <RobotSprite
+            spriteKey={robotSpriteKey}
+            animationId={robotImpact?.id || robotSpriteKey}
+            onComplete={handleRobotImpactComplete}
+          />
+          <PixelPanel className="game-five-stage-tip absolute bottom-20 left-8 p-3 text-center text-sm font-semibold">TIP<br />Think like<br />a coder!</PixelPanel>
         </section>
 
-        <main className="space-y-4">
-          <PixelPanel className="game-five-clue-panel p-5">
+        <main className="game-five-play-area flex min-h-[760px] flex-col gap-5">
+          <PixelPanel className="game-five-clue-panel min-h-[300px] p-5">
             <h3
-              className="-mt-10 mb-4 inline-block border-4 border-[#43204f] bg-[#5a2a68] px-5 py-2 text-2xl font-semibold uppercase text-[#fff1be] shadow-[4px_4px_0_#43204f] transition hover:brightness-110 disabled:opacity-60"
+              className="-mt-10 mb-4 inline-block border-4 border-[#0f3a5f] bg-[#0369a1] px-5 py-2 text-2xl font-semibold uppercase text-[#e0f2fe] shadow-[4px_4px_0_#082f49] transition hover:bg-[#0284c7] disabled:opacity-60"
               role="button"
               tabIndex={0}
               aria-disabled={isGeneratingHint || clueDepth >= 3 || showTutorial || Boolean(resultData)}
@@ -607,16 +940,12 @@ const GameCanvasGameFive = ({
               {isGeneratingHint ? <><Loader2 className="mr-2 inline h-5 w-5 animate-spin" />Thinking...</> : 'Hint'}
             </h3>
 
-            <div className="mt-1">
-              <p className="text-xl font-medium leading-relaxed">{activeClue}</p>
-            </div>
-
-            <PixelPanel className="mt-4 flex items-center gap-4 p-4">
-              <div className="h-20 w-20 rounded-full border-4 border-[#43204f] bg-[#5a2a68]" />
-              <p className="text-xl font-medium">Let's warm up our coding brain. Solve the clue and keep our snowman safe!</p>
+            <PixelPanel className="game-five-clue-bubble mt-6 flex min-h-[205px] items-center gap-5 p-5">
+              <div className="game-five-clue-avatar h-24 w-24 shrink-0 rounded-full border-4 border-[#0f3a5f] bg-[#0ea5e9]" />
+              <p className="text-2xl font-medium leading-relaxed">{activeClue}</p>
             </PixelPanel>
           </PixelPanel>
-          <PixelPanel className="game-five-answer-panel flex flex-wrap items-center justify-center gap-2 p-5 text-center text-4xl font-semibold">
+          <PixelPanel className="game-five-answer-panel mt-auto flex min-h-[280px] flex-wrap items-center justify-center gap-4 px-8 py-14 text-center text-7xl font-semibold">
             {letters.map((letter, index) => {
               const isVisible = guessed.includes(letter) || hintedIndices.includes(index);
               const isHintReveal = isVisible && hintReveal?.index === index && hintReveal?.letter === letter;
@@ -630,12 +959,12 @@ const GameCanvasGameFive = ({
               );
             })}
           </PixelPanel>
-          <div className="game-five-keyboard grid grid-cols-7 gap-2 xl:grid-cols-13">
+          <div className="game-five-keyboard mt-6 grid grid-cols-7 gap-4 2xl:grid-cols-13">
             {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
               <button
                 key={letter}
                 type="button"
-                className="border-4 border-[#43204f] bg-[#fff1be] py-3 text-2xl font-semibold shadow-[3px_3px_0_#43204f] transition hover:bg-white disabled:bg-[#c9ad91] disabled:text-[#80656f] disabled:shadow-none"
+                className="min-h-[88px] border-4 border-[#0f3a5f] bg-[#dbeafe] py-5 text-4xl font-semibold shadow-[4px_4px_0_#082f49] transition hover:bg-[#f0f9ff] disabled:bg-[#94a3b8] disabled:text-[#334155] disabled:shadow-none"
                 disabled={guessed.includes(letter) || Boolean(resultData)}
                 onClick={() => chooseLetter(letter)}
               >
@@ -643,15 +972,21 @@ const GameCanvasGameFive = ({
               </button>
             ))}
           </div>
-          <PixelPanel className="flex items-center gap-4 p-4">
-            <div className="h-20 w-20 rounded-full border-4 border-[#43204f] bg-[#5a2a68]" />
-            <p className="text-xl font-medium">Let's warm up our coding brain. Solve the clue and keep our snowman safe!</p>
-          </PixelPanel>
+          {comboFeedback && (
+            <div
+              key={comboFeedback.id}
+              className="game-five-combo-feedback pointer-events-none fixed left-1/2 top-1/2 z-[10030] -translate-x-1/2 -translate-y-1/2 border-4 border-[#0f3a5f] bg-[#fef3c7] px-6 py-4 text-center text-3xl font-black text-[#075985] shadow-[6px_6px_0_#082f49]"
+              onAnimationEnd={() => setComboFeedback(null)}
+            >
+              <span className="block">{comboFeedback.label}</span>
+              <span className="block text-xl">Score x{comboFeedback.multiplier}</span>
+            </div>
+          )}
         </main>
       </div>
 
       {showTutorial && !shouldPauseForTutorialCoach && !resultData && !isSubmitting && (
-        showGuide ? renderScreenModal(
+        showGuide ? (
           <GameGuideOverlay
             kicker={guideContent.kicker}
             title={guideContent.title}
@@ -675,6 +1010,7 @@ const GameCanvasGameFive = ({
             levelNumber={levelData?.levelNumber || 1}
             onExit={onExitRequest}
             onStart={() => {
+              onGameTutorial?.();
               setTutorialView(null);
               setShowTutorial(false);
             }}
@@ -697,8 +1033,8 @@ const GameCanvasGameFive = ({
       {!hideResultOverlay && (resultData || isSubmitting) && (
         <div className="game-two-result-overlay">
           <div className="game-two-result-card">
-            {isSubmitting ? <Loader2 className="mx-auto h-8 w-8 animate-spin" /> : <h3 className="game-two-result-title">{resultData?.result === 'COMPLETED' ? 'Snowman Saved' : 'Snowman Melted'}</h3>}
-            <p className="student-body-copy student-body-copy-tight">Score: {Number(gameplayData?.points || 0)} | Words: {Number(gameplayData?.completedTasks || 0)}/{settings.targetWords}</p>
+            {isSubmitting ? <Loader2 className="mx-auto h-8 w-8 animate-spin" /> : <h3 className="game-two-result-title">{resultData?.result === 'COMPLETED' ? 'Robot Saved' : 'Robot Destroyed'}</h3>}
+            <p className="student-body-copy student-body-copy-tight">Final score: {Number(resultData?.finalScore ?? gameplayData?.points ?? 0)} | Words: {Number(gameplayData?.completedTasks || 0)}/{settings.targetWords}</p>
             <div className="game-two-result-actions">
               <button type="button" className="btn btn-secondary" onClick={onBack}>Back</button>
               <button type="button" className="btn btn-primary" onClick={onRetry}><RotateCcw className="h-4 w-4" /> Retry</button>

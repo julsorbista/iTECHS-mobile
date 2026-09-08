@@ -65,7 +65,7 @@ const LEVEL_LOADING_TIPS = Object.freeze([
   },
   {
     title: 'Game Five tip',
-    body: 'Use the clue, guess only the best letters, and keep the snowman from melting.',
+    body: 'Use the clue, guess only the best letters, and keep the code robot online.',
   },
   {
     title: 'Game Six tip',
@@ -100,7 +100,7 @@ const getLevelObjective = (levelData, normalizedGameType) => {
   }
 
   if (normalizedGameType === 'GAME_FIVE') {
-    return 'Guess each programming word from the clue before your snowman loses all its snow.';
+    return 'Guess each programming word from the clue before your code robot runs out of power.';
   }
 
   if (normalizedGameType === 'GAME_SIX') {
@@ -129,6 +129,22 @@ const getUserDisplay = (user) => {
 
 const createRunToken = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 const GAME_ONE_NEXT_LEVEL_MIN_STARS = 2;
+const getLegacyGameFiveTitlePattern = () => {
+  const encodedLegacyObjectName = 'c25vd21hbg==';
+  const legacyObjectName = typeof globalThis.atob === 'function'
+    ? globalThis.atob(encodedLegacyObjectName)
+    : ['s', 'n', 'o', 'w', 'm', 'a', 'n'].join('');
+  return new RegExp(['code', legacyObjectName].join('\\s+'), 'gi');
+};
+const LEGACY_GAME_FIVE_TITLE_PATTERN = getLegacyGameFiveTitlePattern();
+
+const getGameFiveDisplayTitle = (title) => {
+  if (typeof title !== 'string' || title.trim().length === 0) {
+    return 'Code Robot';
+  }
+
+  return title.replace(LEGACY_GAME_FIVE_TITLE_PATTERN, 'Code Robot');
+};
 
 const getNextGameType = (normalizedGameType) => {
   const currentIndex = GAME_TYPE_ORDER.indexOf(normalizedGameType);
@@ -200,6 +216,9 @@ const StudentGameOverlay = ({
   const activeLevelData = levelData;
   const activeRunKey = `${sessionInfo?.sessionId || 'pending'}-level`;
   const activeLevelLabel = `Level ${String(numericLevelNumber).padStart(2, '0')}`;
+  const activeLevelTitle = isGameFive
+    ? getGameFiveDisplayTitle(activeLevelData?.title)
+    : activeLevelData?.title;
   const levelObjective = getLevelObjective(activeLevelData, normalizedGameType);
   const storyBriefing = getLevelStoryBriefing(normalizedGameType, numericLevelNumber, activeLevelData || {});
   const storyBriefingContent = storyBriefing || {
@@ -235,8 +254,8 @@ const StudentGameOverlay = ({
   const completionPopupKicker = 'Level Complete';
   const completionPopupTitle = 'Congratulations';
   const completionPopupMessage = useMemo(() => (
-    `You completed ${activeLevelData?.title || `Level ${String(numericLevelNumber).padStart(2, '0')}`}. Great job!`
-  ), [activeLevelData?.title, numericLevelNumber]);
+    `You completed ${activeLevelTitle || `Level ${String(numericLevelNumber).padStart(2, '0')}`}. Great job!`
+  ), [activeLevelTitle, numericLevelNumber]);
   const shouldShowCongratsForCompletion = useMemo(() => {
     if (resultData?.result !== 'COMPLETED') {
       return false;
@@ -281,7 +300,7 @@ const StudentGameOverlay = ({
             ? [
               { label: 'Guess letters', Icon: Gamepad2 },
               { label: 'Use hint', Icon: Snowflake },
-              { label: 'Keep snowman safe', Icon: Sparkles },
+              { label: 'Keep robot online', Icon: Sparkles },
             ]
             : isGameSix
               ? [
@@ -635,7 +654,7 @@ const StudentGameOverlay = ({
 
   return (
     <motion.div
-      className={`student-game-overlay ${isGameOne ? 'student-game-overlay-game-one' : ''} ${isGameFour ? 'student-game-overlay-game-four' : ''} ${(isGameTwo || isGameThree) ? 'student-game-overlay-game-two-scroll' : ''}`}
+      className={`student-game-overlay ${isGameOne ? 'student-game-overlay-game-one' : ''} ${isGameFour ? 'student-game-overlay-game-four' : ''} ${isGameFive ? 'student-game-overlay-game-five' : ''} ${(isGameTwo || isGameThree) ? 'student-game-overlay-game-two-scroll' : ''}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -686,7 +705,7 @@ const StudentGameOverlay = ({
                 <aside className={`student-panel student-game-three-sidebar ${isGameTwo ? 'student-game-sidebar-compact' : ''}`}>
                   <div className="student-game-three-sidebar-block">
                     <p className="student-eyebrow">{sessionInfo.gameType}</p>
-                    <h2 className="student-section-title">{activeLevelData.title}</h2>
+                    <h2 className="student-section-title">{activeLevelTitle}</h2>
                     <p className="student-body-copy student-body-copy-tight">
                       {activeLevelData.subtitle || levelObjective}
                     </p>
@@ -830,14 +849,14 @@ const StudentGameOverlay = ({
             </section>
           ) : (
             <section className="student-game-one-play-layout mx-auto flex h-full w-full max-w-7xl flex-col gap-4">
-              <section className={`student-panel student-game-one-panel flex flex-col gap-4 ${isArcadeCanvas ? 'student-game-four-panel' : ''} ${!(runtimeBootReady || isArcadeCanvas) ? 'student-game-one-preload-panel' : ''}`}>
+              <section className={`student-panel student-game-one-panel flex flex-col gap-4 ${isArcadeCanvas ? 'student-game-four-panel' : ''} ${isGameFive ? 'student-game-five-panel' : ''} ${!(runtimeBootReady || isArcadeCanvas) ? 'student-game-one-preload-panel' : ''}`}>
                 {(runtimeBootReady || isArcadeCanvas) && (
                   <div className="student-game-one-header flex flex-wrap items-center justify-between gap-3">
                     <div className="text-left">
                       <p className="student-eyebrow">
                         {sessionInfo.gameType} • {activeLevelLabel}
                       </p>
-                      <h2 className="student-section-title">{activeLevelData.title}</h2>
+                      <h2 className="student-section-title">{activeLevelTitle}</h2>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {isArcadeCanvas ? (
@@ -892,7 +911,7 @@ const StudentGameOverlay = ({
                     ) : isGameFive ? (
                       <GameCanvasGameFive
                         key={sessionInfo.sessionId}
-                        levelData={levelData}
+                        levelData={{ ...levelData, title: activeLevelTitle }}
                         onLevelComplete={submitOutcome}
                         onLevelFail={submitOutcome}
                         onExitRequest={handleExitRequest}

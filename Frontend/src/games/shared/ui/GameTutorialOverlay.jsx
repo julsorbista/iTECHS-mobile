@@ -56,9 +56,9 @@ const GAME_TUTORIALS = {
     kicker: 'Game 5',
     root: '.game-five-shell',
     steps: [
-      { title: 'Welcome to Code Snowman', body: 'Guess each programming word before the snowman melts.', items: ['Read the clue and answer length.', 'Choose letters using the keyboard.', 'Solve all required words before time runs out.'], target: '.game-five-shell > div:nth-child(2)' },
-      { title: 'Mechanics', items: ['Use the clue and blanks to determine the word.', 'Correct letters reveal matching positions.', 'Wrong letters melt the snowman.'], target: '.game-five-answer-panel' },
-      { title: 'Lives', items: ['Lives and Snow Left show remaining health.', 'Incorrect letters remove one life.', 'Losing all lives ends the attempt.'], target: '.game-five-lives-status' },
+      { title: 'Welcome to Code Robot', body: 'Guess each programming word before the robot shuts down.', items: ['Read the clue and answer length.', 'Choose letters using the keyboard.', 'Solve all required words before time runs out.'], target: '.game-five-layout' },
+      { title: 'Mechanics', items: ['Use the clue and blanks to determine the word.', 'Correct letters reveal matching positions.', 'Wrong letters damage the robot.'], target: '.game-five-answer-panel' },
+      { title: 'Lives', items: ['Lives and Power show remaining robot health.', 'Incorrect letters remove one life.', 'Losing all lives ends the attempt.'], target: '.game-five-lives-status' },
       { title: 'Controls', items: ['Click an on-screen letter or use the keyboard.', 'A selected letter cannot be used again.', 'Hint reveals additional help.'], target: '.game-five-keyboard' },
       { title: 'Score System', items: ['Solved words add points.', 'Remaining time can add a bonus.', 'Mistakes reduce the submitted result.'], target: '.game-five-score-status' },
       { title: 'Condition', items: ['Solve the required number of words.', 'Finish before time or lives run out.', 'A passing result unlocks the next level.'], target: '.game-five-mission-panel' },

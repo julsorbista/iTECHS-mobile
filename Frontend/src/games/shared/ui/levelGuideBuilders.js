@@ -237,7 +237,7 @@ export const buildGameFourGuideContent = (levelData = {}, policy = {}) => {
 };
 
 export const buildGameFiveGuideContent = (levelData = {}) => {
-  const identity = levelIdentity(5, levelData, 'Code Snowman');
+  const identity = levelIdentity(5, levelData, 'Code Robot');
   const settings = levelData?.settings || {};
   const targetWords = Math.max(1, numberOr(settings.targetWords, 5));
   const seconds = Math.max(1, numberOr(settings.seconds, 180));
@@ -252,7 +252,7 @@ export const buildGameFiveGuideContent = (levelData = {}) => {
     summary: [
       levelData?.objective || `Guess ${targetWords} programming words from their clues.`,
       `Solve ${targetWords} words within ${seconds} seconds.`,
-      `Protect ${lives} lives by avoiding incorrect letters.`,
+      `Preserve all ${lives} robot power units by avoiding incorrect letters.`,
     ],
     sections: [
       {

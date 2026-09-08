@@ -235,6 +235,7 @@ const StudentGameLevelsPage = () => {
   };
 
   const theme = getStudentGameTheme(gameState?.gameType || gameType);
+  const isGameFive = gameType === 'GAME_FIVE';
   const pendingStoryLevel = useMemo(() => (
     displayLevels.find((level) => level.levelNumber === pendingStoryLevelNumber) || selectedLevel
   ), [displayLevels, pendingStoryLevelNumber, selectedLevel]);
@@ -338,7 +339,10 @@ const StudentGameLevelsPage = () => {
             <p className="student-body-copy">This track is not available right now.</p>
           </section>
         ) : (
-          <motion.section className="student-levels-page-stack mx-auto flex w-full flex-col gap-4 sm:h-full sm:min-h-0" {...PANEL_TRANSITION}>
+          <motion.section className={clsx(
+            'student-levels-page-stack mx-auto flex w-full flex-col gap-4 sm:h-full sm:min-h-0',
+            isGameFive && 'student-game-five-levels',
+          )} {...PANEL_TRANSITION}>
             <section className={clsx('student-panel text-left flex flex-col sm:flex-row items-center justify-between gap-4', `student-surface-${theme.tone}`)}>
               <div>
                 <p className="student-eyebrow">{gameState?.label || 'Track'}</p>

@@ -44,7 +44,7 @@ const WORLD_META = Object.freeze({
   },
   GAME_FIVE: {
     world: 'world5',
-    title: 'The Lost Snowman',
+    title: 'The Lost Code Robot',
     gameName: 'Guess the Word',
     oldImage: coreCompilerImage,
   },
@@ -298,11 +298,11 @@ No voices. No laughter. Only cold wind.`,
     },
     {
       speaker: 'Byte',
-      text: `At the center of the village sat a small snowman wearing a cracked scarf.
+      text: `At the center of the village sat a small code robot with a cracked visor.
 
 Unlike the others, it was still alive.
 
-The snowman looked weakly at Aeris.
+The robot looked weakly at Aeris.
 
 "My name… I can't remember it anymore…"`,
     },
@@ -312,13 +312,13 @@ The snowman looked weakly at Aeris.
 
 "The blizzard is stealing words now."
 
-The snowman's body slowly began crumbling.
+The robot's power core flickered and its metal body shook.
 
-"If forgotten completely," Byte whispered, "he may disappear forever."`,
+"If its memory is erased completely," Byte whispered, "it may shut down forever."`,
     },
     {
       speaker: 'Sol',
-      text: `The snowman looked up at Aeris with fading hope.
+      text: `The code robot looked up at Aeris with fading hope.
 
 "Please… help me remember who I am…"
 
@@ -544,19 +544,19 @@ And the core began breaking apart.`,
 
 The storm had consumed almost everything.
 
-Only the snowman remained.
+Only the code robot remained.
 
-But now half of his body had become corrupted ice.
+But now half of its body had become corrupted ice and broken circuitry.
 
 Aeris ran toward him.
 
 "We found the final memory word!"
 
-The snowman smiled weakly.
+The robot's visor glowed softly.
 
 "I remember now…"
 
-Snow began glowing around the village.
+Blue light began glowing around the village.
 
 "My name is Sol…"
 
@@ -574,7 +574,7 @@ A deep voice echoed through the storm.
 
 Null appeared from the blizzard itself.
 
-The snowman protected Aeris despite barely standing.
+The code robot protected Aeris despite barely standing.
 
 "You… will not erase them again…"
 

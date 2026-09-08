@@ -383,7 +383,7 @@ export const GAME_FOUR_GUIDE_CONTENT = Object.freeze({
 
 export const GAME_FIVE_GUIDE_CONTENT = Object.freeze({
   kicker: 'Game 5',
-  title: 'Code Snowman Game Guide',
+  title: 'Code Robot Game Guide',
   lead: 'Review the guessing rules, scoring, lives, bonuses, and star requirements before the level starts.',
   summary: [
     'Guess programming-related words from the AI clue before the timer runs out.',
