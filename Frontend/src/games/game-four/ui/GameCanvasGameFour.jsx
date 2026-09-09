@@ -2142,6 +2142,19 @@ const GameCanvasGameFour = ({
   const shouldPauseForTutorialCoach = Boolean(isTutorialLevel && tutorialCoachOpen && currentTutorialStep);
   const showGuide = showTutorial && tutorialView === 'guide';
   const showPracticeIntro = showTutorial && tutorialView === 'practice';
+  const canInitializeGameplay = Boolean(
+    activeRound
+    && !showStoryline
+    && !showTutorial
+    && !shouldPauseForTutorialCoach
+  );
+  const isGameplayActive = Boolean(
+    canInitializeGameplay
+    && mode === 'catch'
+    && !localOutcome
+    && !resultData
+    && !isSubmitting
+  );
 
   useEffect(() => {
     if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
@@ -2391,6 +2404,17 @@ const GameCanvasGameFour = ({
     coinsSpawnedThisRoundRef.current = 0;
     spawnAccumulatorRef.current = 0;
     previousTsRef.current = null;
+    setMode('catch');
+    setCatchEffects([]);
+    setRevealedHintCount(0);
+    setHintMessage('');
+    setFeedbackMessage('');
+    setRoundFeedback('');
+    if (!canInitializeGameplay) {
+      setFallingItems([]);
+      return;
+    }
+
     setFallingItems(() => (
       activeRound
         ? Array.from({ length: concurrentFallingCount }, (_, index) => (
@@ -2418,16 +2442,10 @@ const GameCanvasGameFour = ({
           })
         : []
     ));
-    setMode('catch');
-    setCatchEffects([]);
-    setRevealedHintCount(0);
-    setHintMessage('');
-    setFeedbackMessage('');
-    setRoundFeedback('');
-  }, [activeRound, concurrentFallingCount, fallSpeed, roundIndex]);
+  }, [activeRound, canInitializeGameplay, concurrentFallingCount, fallSpeed, roundIndex]);
 
   useEffect(() => {
-    if (!isTutorialLevel || tutorialCoachOpen || mode !== 'catch' || !activeRound || !currentTutorialStep?.targetKind) {
+    if (!isGameplayActive || !isTutorialLevel || tutorialCoachOpen || !currentTutorialStep?.targetKind) {
       return;
     }
 
@@ -2466,9 +2484,9 @@ const GameCanvasGameFour = ({
     concurrentFallingCount,
     currentTutorialStep,
     fallSpeed,
+    isGameplayActive,
     inventory,
     isTutorialLevel,
-    mode,
     tutorialCoachOpen,
   ]);
 
@@ -2501,11 +2519,12 @@ const GameCanvasGameFour = ({
   }, []);
 
   useEffect(() => {
-    if (!activeRound || showStoryline || showTutorial || shouldPauseForTutorialCoach || localOutcome || resultData || isSubmitting || mode !== 'catch') {
+    if (!isGameplayActive) {
       if (requestRef.current) {
         cancelAnimationFrame(requestRef.current);
         requestRef.current = null;
       }
+      previousTsRef.current = null;
       return undefined;
     }
 
@@ -2782,8 +2801,34 @@ const GameCanvasGameFour = ({
                 }
                 nextItems.push(spawnedItem);
               } else {
-                window.playGameOverSound?.();
-                immediateFailure = `Game over: you missed ${item.value}.`;
+                comboStreakRef.current = 0;
+                comboCatchIdRef.current = null;
+                damageTaken += 1;
+                simulatedLives = Math.max(0, simulatedLives - 1);
+                if (simulatedLives <= 0) {
+                  window.playGameOverSound?.();
+                  immediateFailure = 'Game over: no lives remaining.';
+                } else {
+                  nextFeedbackMessage = `Missed ${item.value}! ${simulatedLives}/${startingLives} lives remaining.`;
+                  itemIdRef.current += 1;
+                  const respawnY = resolveRespawnY(nextItems, levelNumber);
+                  const spawnedItem = makeFallingItem(
+                    activeRound,
+                    nextInventory,
+                    ZIP_GAME_AREA_WIDTH,
+                    fallSpeed,
+                    itemIdRef.current,
+                    respawnY,
+                    {
+                      itemsOnScreen: nextItems,
+                      coinsSpawned: coinsSpawnedThisRoundRef.current,
+                    },
+                  );
+                  if (spawnedItem.kind === 'coin') {
+                    coinsSpawnedThisRoundRef.current += 1;
+                  }
+                  nextItems.push(spawnedItem);
+                }
               }
             } else if (item.kind === 'bonus') {
               comboStreakRef.current = 0;
@@ -2915,6 +2960,7 @@ const GameCanvasGameFour = ({
     bonusPoints,
     mistakes,
     hintsUsed,
+    isGameplayActive,
     coins,
     fruitCatchCount,
     lives,
@@ -2927,7 +2973,7 @@ const GameCanvasGameFour = ({
       return;
     }
 
-    if (!isTutorialLevel && lives <= 0) {
+    if (isGameplayActive && !isTutorialLevel && lives <= 0) {
       setLocalOutcome(buildRoundCompleteState({
         roundsCleared,
         totalRounds,
@@ -2938,7 +2984,7 @@ const GameCanvasGameFour = ({
         coinsRemaining: coins,
       }));
     }
-  }, [bonusPoints, coins, hintsUsed, isSubmitting, isTutorialLevel, lives, localOutcome, mistakes, points, resultData, roundsCleared, totalRounds]);
+  }, [bonusPoints, coins, hintsUsed, isGameplayActive, isSubmitting, isTutorialLevel, lives, localOutcome, mistakes, points, resultData, roundsCleared, totalRounds]);
 
   useEffect(() => {
     if (!isTutorialLevel || mode !== 'assemble' || localOutcome || resultData || isSubmitting) {
@@ -3262,7 +3308,7 @@ const GameCanvasGameFour = ({
                 <section className="game-four-sidebar-guide-card">
                   <p className="game-four-sidebar-guide-heading">Guide</p>
                   <p className="game-four-sidebar-guide-text">
-                    Catch the correct Java code pieces, then arrange them in the proper order to form a valid variable declaration. Avoid wrong pieces and hazards to complete each round.
+                    Catch the correct code, avoid the bombs, and catch gears for extra lives!
                   </p>
                 </section>
 
@@ -3730,6 +3776,7 @@ const GameCanvasGameFour = ({
                       }
                     }}
                     startLabel="Next"
+                    lockLandscapeOnStart
                   />
                 ) : null}
                 {showPracticeIntro ? (

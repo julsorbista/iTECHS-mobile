@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import iconCards from '../../../assets/guidelines-icons/icon-cards.png';
 import iconCheck from '../../../assets/guidelines-icons/icon-check.png';
@@ -96,6 +96,7 @@ const GameGuideOverlay = ({
   onStart,
   exitLabel = 'Exit Level',
   startLabel = 'Start Level',
+  lockLandscapeOnStart = false,
 }) => {
   const pagedSections = [
     ...(summary.length ? [{ title: title || 'Overview', items: summary }] : []),
@@ -108,6 +109,8 @@ const GameGuideOverlay = ({
   const themeClass = useMemo(() => getGuideThemeClass(kicker, title), [kicker, title]);
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage >= safeSections.length - 1;
+  const [isStarting, setIsStarting] = useState(false);
+  const startedRef = useRef(false);
 
   useEffect(() => {
     setPage(0);
@@ -116,17 +119,22 @@ const GameGuideOverlay = ({
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return undefined;
 
-    const locationText = `${window.location.pathname} ${window.location.hash}`.toUpperCase();
+    const locationText = `${window.location.pathname} ${window.location.hash}`
+      .trim()
+      .replace(/[-/]/g, '_')
+      .toUpperCase();
     const shouldRestoreLandscape = locationText.includes('GAME_TWO') || locationText.includes('GAME_FOUR');
 
     ScreenOrientation.lock({ orientation: 'portrait-primary' }).catch(() => undefined);
 
     return () => {
       ScreenOrientation.lock({
-        orientation: shouldRestoreLandscape ? 'landscape-primary' : 'portrait-primary',
+        orientation: startedRef.current && (lockLandscapeOnStart || shouldRestoreLandscape)
+          ? 'landscape-primary'
+          : 'portrait-primary',
       }).catch(() => undefined);
     };
-  }, []);
+  }, [lockLandscapeOnStart]);
 
   const handleBack = () => {
     if (!isFirstPage) {
@@ -136,11 +144,62 @@ const GameGuideOverlay = ({
     onExit?.();
   };
 
-  const handleNext = () => {
+  const waitForLandscapeViewport = () => new Promise((resolve) => {
+    if (typeof window === 'undefined' || window.innerWidth > window.innerHeight) {
+      resolve();
+      return;
+    }
+
+    let settled = false;
+    let orientationListener;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener('resize', check);
+      window.removeEventListener('orientationchange', check);
+      orientationListener?.remove?.();
+      resolve();
+    };
+    const check = () => {
+      if (window.innerWidth > window.innerHeight) finish();
+    };
+    const checkNativeOrientation = (orientation) => {
+      if (String(orientation?.type || '').includes('landscape')) finish();
+    };
+
+    window.addEventListener('resize', check);
+    window.addEventListener('orientationchange', check);
+    ScreenOrientation.orientation()
+      .then(checkNativeOrientation)
+      .catch(() => undefined);
+    ScreenOrientation.addListener('screenOrientationChange', checkNativeOrientation)
+      .then((listener) => {
+        if (settled) {
+          listener?.remove?.();
+          return;
+        }
+        orientationListener = listener;
+      })
+      .catch(() => undefined);
+    if (window.innerWidth > window.innerHeight) {
+      finish();
+    }
+    window.setTimeout(finish, 1200);
+  });
+
+  const handleNext = async () => {
     if (!isLastPage) {
       setPage((value) => Math.min(safeSections.length - 1, value + 1));
       return;
     }
+
+    if (isStarting) return;
+    setIsStarting(true);
+    if (lockLandscapeOnStart && Capacitor.isNativePlatform()) {
+      await ScreenOrientation.lock({ orientation: 'landscape-primary' }).catch(() => undefined);
+      await waitForLandscapeViewport();
+    }
+    startedRef.current = true;
     onStart?.();
   };
 
@@ -185,7 +244,7 @@ const GameGuideOverlay = ({
             <span>{currentPage + 1} / {safeSections.length}</span>
           </div>
           {(!isLastPage || onStart) ? (
-            <button type="button" className="game-guide-nav-button game-guide-nav-next" onClick={handleNext}>
+            <button type="button" className="game-guide-nav-button game-guide-nav-next" onClick={handleNext} disabled={isStarting}>
               {isLastPage ? 'START →' : 'NEXT →'}
             </button>
           ) : <span className="game-guide-nav-spacer" aria-hidden="true" />}

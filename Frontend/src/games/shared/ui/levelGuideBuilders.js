@@ -18,14 +18,14 @@ const progressionSection = (minimumStars = 1, policyAffectsStars = true) => ({
     `Finish the level with at least ${minimumStars} ${minimumStars === 1 ? 'Star' : 'Stars'} to pass.`,
     'A passed result unlocks the next available level.',
     policyAffectsStars
-      ? 'Mistakes and used hints can reduce the platform star reward.'
+      ? 'Avoid extra mistakes because they can reduce your final Stars; hints are paid for with coins.'
       : 'This game reports its completion Stars directly from completed level tasks.',
   ],
 });
 
-const policyItems = ({ freeMistakes = 3, hintStarCost = 1 } = {}) => [
+const policyItems = ({ freeMistakes = 3 } = {}) => [
   `You begin with 3 platform Stars; the first ${freeMistakes} mistake${freeMistakes === 1 ? '' : 's'} do not reduce them.`,
-  `Each additional mistake removes 1 Star; each used hint removes ${hintStarCost} Star${hintStarCost === 1 ? '' : 's'}.`,
+  'Each additional mistake removes 1 Star; hints cost 1 coin and do not remove Stars.',
   'The final platform score is multiplied by the retry multiplier and by earned Stars ÷ 3.',
 ];
 

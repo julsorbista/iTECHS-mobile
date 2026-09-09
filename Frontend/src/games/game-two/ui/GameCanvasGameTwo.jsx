@@ -1,9 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import '../gameTwoCodeLab.css';
 import { AlertCircle, CheckCircle2, Loader2, RotateCcw } from 'lucide-react';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
 import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import announcementBoard from '../../../assets/announcement-board.png';
 import industrialFrameBackground from '../../../assets/game-two/industrial-frame-background.png';
+import beepOne from '../../game-six/assets/beep-1.mp3';
+import beepTwo from '../../game-six/assets/beep-2.mp3';
+import beepThree from '../../game-six/assets/beep-3.mp3';
 import { getStudentMusicPreference } from '../../../utils/studentMenuAudio';
 
 const SWORD_SLICE_SOUND_SRC = new URL('../assets/processed/swordslice.mp3', import.meta.url).href;
@@ -14,13 +19,16 @@ const BACKGROUND_MUSIC_SRC = new URL('../assets/processed/game2background.mp3', 
 
 const LEVEL_CONFIG = Object.freeze({
   1: { target: 2, spawnRate: 1750, speed: 90, bombChance: 0.12, decoyChance: 0.22, correctChance: 0.42, correctGap: 1, maxObjects: 4 },
-  2: { target: 4, spawnRate: 1220, speed: 128, bombChance: 0.16, decoyChance: 0.28, correctChance: 0.36, correctGap: 1, maxObjects: 6 },
-  3: { target: 6, spawnRate: 980, speed: 155, bombChance: 0.21, decoyChance: 0.35, correctChance: 0.33, correctGap: 1, maxObjects: 7 },
-  4: { target: 8, spawnRate: 780, speed: 180, bombChance: 0.25, decoyChance: 0.43, correctChance: 0.3, correctGap: 2, maxObjects: 8 },
-  5: { target: 10, spawnRate: 640, speed: 205, bombChance: 0.29, decoyChance: 0.5, correctChance: 0.28, correctGap: 2, maxObjects: 9 },
+  2: { target: 3, spawnRate: 1220, speed: 128, bombChance: 0.16, decoyChance: 0.28, correctChance: 0.36, correctGap: 1, maxObjects: 6 },
+  3: { target: 4, spawnRate: 980, speed: 155, bombChance: 0.21, decoyChance: 0.35, correctChance: 0.33, correctGap: 1, maxObjects: 7 },
+  4: { target: 5, spawnRate: 780, speed: 180, bombChance: 0.25, decoyChance: 0.43, correctChance: 0.3, correctGap: 2, maxObjects: 8 },
+  5: { target: 6, spawnRate: 640, speed: 205, bombChance: 0.29, decoyChance: 0.5, correctChance: 0.28, correctGap: 2, maxObjects: 9 },
 });
 
 const AFK_TIMEOUT_MS = 20000;
+const ANNOUNCEMENT_MS = 5500;
+const COUNTDOWN_SECONDS = 3;
+const FADE_MS = 350;
 
 const FALLBACK_DECOYS = Object.freeze([
   'System.out.printline',
@@ -33,6 +41,106 @@ const FALLBACK_DECOYS = Object.freeze([
   'whlie (isRunning)',
   'new Scaner(System.in)',
 ]);
+
+const GameTwoAnnouncementBoard = ({ levelNumber = 1, targetCodes = [], onStart }) => {
+  const level = clamp(Math.round(Number(levelNumber) || 1), 1, 5);
+  const displayTargetCodes = Array.isArray(targetCodes) ? targetCodes.filter(Boolean).join(' & ') : '';
+  const [countdown, setCountdown] = useState(null);
+  const [leaving, setLeaving] = useState(false);
+  const onStartRef = useRef(onStart);
+  const countdownAudioRef = useRef({});
+  onStartRef.current = onStart;
+
+  useEffect(() => {
+    const sounds = {
+      1: new Audio(beepOne),
+      2: new Audio(beepTwo),
+      3: new Audio(beepThree),
+    };
+    Object.values(sounds).forEach((sound) => {
+      sound.preload = 'auto';
+      sound.load();
+    });
+    countdownAudioRef.current = sounds;
+    return () => {
+      Object.values(sounds).forEach((sound) => {
+        sound.pause();
+        sound.currentTime = 0;
+      });
+      countdownAudioRef.current = {};
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!countdown) return undefined;
+    const sourceSound = countdownAudioRef.current[countdown];
+    if (!sourceSound) return undefined;
+
+    const sound = sourceSound.cloneNode();
+    sound.muted = false;
+    sound.volume = 1;
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+
+    return () => {
+      if (countdown !== 1) {
+        sound.pause();
+        sound.currentTime = 0;
+      }
+    };
+  }, [countdown]);
+
+  useEffect(() => {
+    setCountdown(null);
+    setLeaving(false);
+    const timers = [
+      window.setTimeout(() => setCountdown(3), ANNOUNCEMENT_MS),
+      window.setTimeout(() => setCountdown(2), ANNOUNCEMENT_MS + 1000),
+      window.setTimeout(() => setCountdown(1), ANNOUNCEMENT_MS + 2000),
+      window.setTimeout(() => setLeaving(true), ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000) - FADE_MS),
+      window.setTimeout(() => onStartRef.current?.(), ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000)),
+    ];
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [level]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    document.body.classList.add('game-six-announcement-open');
+
+    return () => {
+      document.body.classList.remove('game-six-announcement-open');
+    };
+  }, []);
+
+  const isCountingDown = countdown !== null;
+  const announcement = (
+    <div className={`announcement-guide-backdrop game-two-announcement-backdrop${leaving ? ' is-leaving' : ''}`} role="dialog" aria-modal="true" aria-labelledby="game-two-announcement-title">
+      <section className="announcement-guide-board" style={{ backgroundImage: `url(${announcementBoard})` }}>
+        <div className="announcement-guide-paper">
+          {isCountingDown ? (
+            <div className="announcement-guide-countdown" role="timer" aria-live="assertive">
+              <p>GET READY!</p>
+              <strong key={countdown}>{countdown}</strong>
+            </div>
+          ) : (
+            <>
+              <p className="announcement-guide-level">CHALLENGE ANNOUNCEMENT</p>
+              <h2 id="game-two-announcement-title">READY?</h2>
+              <div className="announcement-guide-divider" aria-hidden="true" />
+              <h3 className="announcement-guide-challenge-title">LEVEL {level}: SLASH THE CORRECT CODE</h3>
+              <p className="announcement-guide-instruction">TARGET CODE</p>
+              <p className="announcement-guide-instruction">{displayTargetCodes}</p>
+            </>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+
+  return typeof document !== 'undefined'
+    ? createPortal(announcement, document.body)
+    : announcement;
+};
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const rand = (min, max) => min + Math.random() * (max - min);
@@ -147,9 +255,29 @@ const makeDecoy = (piece) => {
     .replace(/;/g, '');
 };
 
+const normalizeChallengePieces = (task, targetCode, pieces) => {
+  let normalizedPieces = Array.isArray(pieces) ? pieces.filter(Boolean) : [];
+
+  if (normalizedPieces.length < 3 && String(task?.snippet || '').includes('____')) {
+    const expandedCode = String(task.snippet).replace('____', targetCode);
+    const expandedPieces = splitCodePieces(expandedCode);
+    if (expandedPieces.length >= 3) normalizedPieces = expandedPieces;
+  }
+
+  if (normalizedPieces.length > 5) {
+    const groupSize = Math.ceil(normalizedPieces.length / 5);
+    normalizedPieces = Array.from(
+      { length: Math.ceil(normalizedPieces.length / groupSize) },
+      (_, index) => normalizedPieces.slice(index * groupSize, (index + 1) * groupSize).join(' '),
+    );
+  }
+
+  return normalizedPieces;
+};
+
 const taskToChallenge = (task, index) => {
   const targetCode = getTaskTargetCode(task);
-  const pieces = splitCodePieces(targetCode);
+  const pieces = normalizeChallengePieces(task, targetCode, splitCodePieces(targetCode));
   const optionDecoys = (Array.isArray(task?.options) ? task.options : [])
     .map((option) => option.label)
     .filter((label) => normalize(label) !== normalize(targetCode));
@@ -309,10 +437,12 @@ const GameCanvasGameTwo = ({
   const config = useMemo(() => getLevelConfig(levelNumber), [levelNumber]);
   const challenges = useMemo(() => buildChallenges(levelData, config.target), [config.target, levelData]);
   const guideContent = useMemo(() => buildGuideContent(levelData, config), [config, levelData]);
-  const [showTutorial, setShowTutorial] = useState(Boolean(showLevelGuideline));
-  const [tutorialView, setTutorialView] = useState(showLevelGuideline ? 'guide' : null);
+  const [showTutorial, setShowTutorial] = useState(true);
+  const [tutorialView, setTutorialView] = useState(showLevelGuideline ? 'guide' : 'announcement');
+  const [tutorialLaunchedFromIntro, setTutorialLaunchedFromIntro] = useState(false);
   const showGuide = showTutorial && tutorialView === 'guide';
   const showFirstHandGuide = showTutorial && tutorialView === 'tutorial';
+  const showAnnouncement = showTutorial && tutorialView === 'announcement';
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [lives, setLives] = useState(3);
@@ -323,6 +453,26 @@ const GameCanvasGameTwo = ({
   const [flash, setFlash] = useState(null);
   const [sliceFeedback, setSliceFeedback] = useState(null);
   const [localResult, setLocalResult] = useState(null);
+  const javaCodePreview = useMemo(() => {
+    const match = String(codePreview || '').match(/^CORRECT CODE:\n([\s\S]*?)\n\nSLICED CODE:\n([\s\S]*)$/);
+    if (!match) {
+      return {
+        correct: codePreview,
+        sliced: '',
+      };
+    }
+    return {
+      correct: match[1],
+      sliced: match[2],
+    };
+  }, [codePreview]);
+  const announcementTargetCodes = useMemo(() => {
+    const nextChallenge = challenges[Math.min(outputs, challenges.length - 1)] || challenges[0];
+    const targetCode = nextChallenge
+      ? formatCodePieces(nextChallenge.pieces || [], nextChallenge.type)
+      : '';
+    return targetCode ? [targetCode] : [];
+  }, [challenges, outputs]);
   const swordSliceSoundRef = useRef(null);
   const syntaxSliceSoundRef = useRef(null);
   const bombErrorSoundRef = useRef(null);
@@ -356,6 +506,17 @@ const GameCanvasGameTwo = ({
     window.setTimeout(() => {
       setSliceFeedback((current) => (current?.id === id ? null : current));
     }, 900);
+  }, []);
+
+  const beginIntroSequence = useCallback(() => {
+    setTutorialView('announcement');
+    setShowTutorial(true);
+    const state = stateRef.current;
+    if (state) {
+      state.running = false;
+      state.last = performance.now();
+      state.lastSliceAt = performance.now();
+    }
   }, []);
 
   useEffect(() => () => {
@@ -460,7 +621,7 @@ const GameCanvasGameTwo = ({
       lastSpawnKind: null,
       correctGapRemaining: 0,
       hazardsSinceCorrect: 0,
-      running: !showTutorial,
+      running: false,
       finished: false,
     };
     setScore(0);
@@ -470,13 +631,9 @@ const GameCanvasGameTwo = ({
     setChallengeTitle(firstChallenge?.title || 'Code Challenge');
     setCodePreview(firstChallenge ? renderCodePreview(firstChallenge, 0) : '');
     setOutputText(firstChallenge?.output || '');
-    setFlash({ title: 'READY', tone: 'good' });
+    setFlash(null);
     setLocalResult(null);
-    window.setTimeout(() => {
-      setFlash({ title: 'GO!', tone: 'good' });
-      window.setTimeout(() => setFlash(null), 560);
-    }, 520);
-  }, [challenges, config.spawnRate, showTutorial]);
+  }, [challenges, config.spawnRate]);
 
   useEffect(() => {
     resetRun();
@@ -489,12 +646,14 @@ const GameCanvasGameTwo = ({
   }, []);
 
   useEffect(() => {
-    setShowTutorial(Boolean(showLevelGuideline));
-    setTutorialView(showLevelGuideline ? 'guide' : null);
+    setShowTutorial(true);
+    setTutorialView(showLevelGuideline ? 'guide' : 'announcement');
+    setTutorialLaunchedFromIntro(false);
   }, [levelNumber, shouldAutoOpenFirstHandGuide, showLevelGuideline]);
 
   useEffect(() => {
     if (Number(gameTutorialRequested) > 0) {
+      setTutorialLaunchedFromIntro(false);
       setTutorialView('tutorial');
       setShowTutorial(true);
     }
@@ -673,8 +832,17 @@ const GameCanvasGameTwo = ({
     burst(ctx, state.width / 2, state.height * 0.42, '#ffd15d', 34);
     setFlash({ title: 'OUTPUT DONE', tone: 'good' });
     window.setTimeout(() => setFlash(null), 820);
-    if (state.outputs >= config.target) finishRun('COMPLETED');
-  }, [challenges.length, config.target, finishRun]);
+    if (state.outputs >= config.target) {
+      finishRun('COMPLETED');
+      return;
+    }
+
+    state.running = false;
+    state.last = performance.now();
+    state.lastSliceAt = performance.now();
+    setTutorialView('announcement');
+    setShowTutorial(true);
+  }, [challenges, config.target, finishRun]);
 
   const cutItem = useCallback((item, sliceStart, sliceEnd) => {
     const canvas = canvasRef.current;
@@ -1130,8 +1298,12 @@ const GameCanvasGameTwo = ({
         </section>
         <section className="game-two-fruit-card game-two-fruit-code">
           <span>Java Code</span>
-          <strong className="game-two-fruit-challenge-title">{challengeTitle}</strong>
-          <code>{codePreview}</code>
+          <div className="game-two-fruit-code-preview">
+            <strong>Correct Code:</strong>
+            <code>{javaCodePreview.correct}</code>
+            <strong>Sliced Code:</strong>
+            <code>{javaCodePreview.sliced || '____'}</code>
+          </div>
         </section>
       </aside>
 
@@ -1170,7 +1342,26 @@ const GameCanvasGameTwo = ({
           onExit={onExitRequest}
           onStart={() => {
             if (shouldAutoOpenFirstHandGuide) {
+              setTutorialLaunchedFromIntro(true);
               setTutorialView('tutorial');
+              return;
+            }
+            beginIntroSequence();
+          }}
+          startLabel="Next"
+          lockLandscapeOnStart
+        />
+      )}
+
+      {showFirstHandGuide && (
+        <GameTutorialOverlay
+          gameType="GAME_TWO"
+          levelNumber={levelNumber}
+          onExit={onExitRequest}
+          onStart={() => {
+            if (tutorialLaunchedFromIntro) {
+              setTutorialLaunchedFromIntro(false);
+              beginIntroSequence();
               return;
             }
             setTutorialView(null);
@@ -1186,11 +1377,10 @@ const GameCanvasGameTwo = ({
         />
       )}
 
-      {showFirstHandGuide && (
-        <GameTutorialOverlay
-          gameType="GAME_TWO"
+      {showAnnouncement && (
+        <GameTwoAnnouncementBoard
           levelNumber={levelNumber}
-          onExit={onExitRequest}
+          targetCodes={announcementTargetCodes}
           onStart={() => {
             setTutorialView(null);
             setShowTutorial(false);

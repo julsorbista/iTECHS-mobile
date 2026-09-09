@@ -7,7 +7,7 @@ export const buildSubmissionPayload = (gameplay) => {
     safeRoundsCleared,
     clamp(Math.round(Number(gameplay?.totalRounds || 0)), 0, 9999),
   );
-  const safeHintsUsed = clamp(Math.round(Number(gameplay?.hintsUsed || 0)), 0, 9999);
+  const safeHintsUsed = 0;
   const safeBonusPoints = clamp(Math.round(Number(gameplay?.bonusPoints || 0)), 0, 9999);
   const completed = gameplay?.outcome === 'COMPLETED'
     || (safeTotalRounds > 0 && safeRoundsCleared >= safeTotalRounds);

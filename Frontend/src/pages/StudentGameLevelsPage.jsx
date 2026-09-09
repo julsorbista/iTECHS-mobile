@@ -152,7 +152,7 @@ const StudentGameLevelsPage = () => {
   }, [activeLevelNumber]);
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform() || !['GAME_ONE', 'GAME_TWO', 'GAME_FOUR'].includes(gameType)) {
+    if (!Capacitor.isNativePlatform() || gameType !== 'GAME_ONE') {
       return undefined;
     }
 

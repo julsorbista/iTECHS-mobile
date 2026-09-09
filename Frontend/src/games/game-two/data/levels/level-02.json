@@ -21,28 +21,28 @@
       "id": "g2l2-t1",
       "type": "complete",
       "title": "Boolean Flag",
-      "prompt": "Complete the statement so passed stores true.",
-      "snippet": "boolean passed = ____;",
-      "answer": "true",
+      "prompt": "Complete the Java statement so passed stores true.",
+      "snippet": "____",
+      "answer": "boolean passed = true;",
       "acceptedAnswers": [
-        "true"
+        "boolean passed = true;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "\"true\""
+          "label": "boolean passed == true;"
         },
         {
           "id": "b",
-          "label": "true"
+          "label": "boolean passed = true;"
         },
         {
           "id": "c",
-          "label": "yes"
+          "label": "bool passed = yes;"
         },
         {
           "id": "d",
-          "label": "1"
+          "label": "boolean = passed true;"
         }
       ],
       "points": 120,
@@ -56,29 +56,29 @@
     {
       "id": "g2l2-t2",
       "type": "debug",
-      "title": "Fix Equality",
-      "prompt": "The if statement uses assignment by mistake. Drag the repaired header into the blank.",
-      "snippet": "____\n  System.out.println(\"Level 2\");\n}",
-      "answer": "if (level == 2) {",
+      "title": "Store A Level",
+      "prompt": "Complete the Java statement that stores the current level.",
+      "snippet": "____",
+      "answer": "int level = 2;",
       "acceptedAnswers": [
-        "if (level == 2) {"
+        "int level = 2;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "if (level = 2) {"
+          "label": "int level == 2;"
         },
         {
           "id": "b",
-          "label": "if (level == 2) {"
+          "label": "int level = 2;"
         },
         {
           "id": "c",
-          "label": "if level == 2) {"
+          "label": "level int = 2;"
         },
         {
           "id": "d",
-          "label": "if (level equals 2) {"
+          "label": "int level: 2;"
         }
       ],
       "points": 150,
@@ -92,8 +92,8 @@
     {
       "id": "g2l2-t3",
       "type": "choice",
-      "title": "Choose The Else",
-      "prompt": "Which Java block correctly handles the false branch?",
+      "title": "Store A Count",
+      "prompt": "Complete the Java statement that stores a count.",
       "correctOptionId": "c",
       "points": 130,
       "coinReward": 1,
@@ -101,19 +101,19 @@
       "options": [
         {
           "id": "a",
-          "label": "else (score < 50) {"
+          "label": "int count == 3;"
         },
         {
           "id": "b",
-          "label": "if else {"
+          "label": "count int = 3;"
         },
         {
           "id": "c",
-          "label": "} else {"
+          "label": "int count = 3;"
         },
         {
           "id": "d",
-          "label": "otherwise {"
+          "label": "int count: 3;"
         }
       ],
       "hints": [
