@@ -16,9 +16,13 @@ describe('isCodingAnswerCorrect', () => {
   });
 
   it('checks reorder answers', () => {
-    expect(isCodingAnswerCorrect({
+    const task = {
       type: 'reorder',
       correctOrder: ['a', 'b', 'c'],
-    }, ['a', 'b', 'c'])).toBe(true);
+    };
+
+    expect(isCodingAnswerCorrect(task, ['a', 'b', 'c'])).toBe(true);
+    expect(isCodingAnswerCorrect(task, ['a', 'c', 'b'])).toBe(false);
+    expect(isCodingAnswerCorrect(task, ['a', 'b'])).toBe(false);
   });
 });

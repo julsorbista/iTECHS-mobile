@@ -1,0 +1,59 @@
+/* Game 1's floating coach, inside a safe copy of Game 4's current room. */
+.g4-practice-backdrop { position: fixed; inset: 0; z-index: 2147483000; }
+.g4-practice { --g4-coach-width: 310px; --g4-drop-end: 190px; outline: none; font-size: 14px; line-height: 1.5; }
+.g4-practice-layout { position: absolute; inset: var(--g4-hud-height, 12px) 0 0; }
+.g4-practice-room { position: absolute; inset: 0; border-radius: 12px; background-size: cover; background-position: center; overflow: hidden; }
+.g4-practice-playfield { position: absolute; inset: 40px calc(var(--g4-coach-width) + 48px) 12px 12px; pointer-events: auto; }
+.g4-practice .g1-coach__bubble { top: 12px; right: 12px; width: var(--g4-coach-width); max-height: calc(100% - 24px); }
+.g4-practice-badge { position: absolute; top: 12px; left: 12px; padding: 4px 8px; border: 1px solid #c7b3f066; border-radius: 6px; background: #202038ed; color: #eee7ff; font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+.g4-practice-robot { position: absolute; width: 156px; height: 150px; object-fit: contain; bottom: 25px; transform: translateX(-50%); transition: left 420ms ease; z-index: 2; }
+.g4-practice-player-label { position: absolute; bottom: 185px; transform: translateX(-50%); transition: left 420ms ease; padding: 4px 8px; border: 1px solid #c7b3f088; border-radius: 6px; color: #eee7ff; background: #202038ed; white-space: nowrap; font-size: 10px; font-weight: 700; }
+.g4-practice.g1-coach--success .g4-practice-player-label { color: var(--accent); border-color: var(--accent); }
+.g4-practice-falling { position: absolute; left: 25%; top: 18%; transform: translateX(-50%); z-index: 3; max-width: 48%; overflow-wrap: anywhere; border: 1px solid #000; background: #222; border-radius: 6px; padding: 8px 12px; color: white; font-weight: 800; }
+.g4-practice-bomb { width: 56px; height: 56px; padding: 0; border: 0; background: none; object-fit: contain; }
+.g4-practice-falling.is-dropping { animation: g4-practice-drop 1s ease-in forwards; }
+.g4-practice-falling.is-hidden { display: none; }
+.g4-practice-path { position: absolute; left: 25%; top: 29%; bottom: 175px; border-left: 2px dashed #fff8dfb3; }
+.g4-practice-success { position: absolute; top: 34%; left: 50%; transform: translateX(-50%); max-width: 100%; text-align: center; padding: 8px 13px; border: 1px solid #b0f0bb88; border-radius: 8px; background: #20382fef; color: #d8ffe0; font-size: 13px; font-weight: 800; }
+.g4-practice-controls { display: grid; grid-template-columns: 56px 56px; column-gap: 48px; row-gap: 8px; }
+.g4-practice-controls small { grid-column: 1 / -1; margin-top: 34px; color: var(--muted); font-size: 10px; white-space: nowrap; }
+.g4-practice-controls .g1-coach__meter { grid-column: 1 / -1; }
+.g4-practice button:disabled { opacity: .5; }
+.g4-practice nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 34px 30px 0; }
+.g4-practice .g4-practice-back { border: 0; padding: 6px 0; background: transparent; color: var(--muted); font-size: 11px; white-space: nowrap; }
+.g4-practice .g4-practice-next { margin-top: 0; padding: 8px 10px; white-space: nowrap; }
+.g4-practice-playfield [data-guide="true"] { outline: 2px solid #ffe5a0; outline-offset: 5px; box-shadow: 0 0 0 7px #ffd47833; }
+.g4-practice-playfield .g4-practice-bomb[data-guide="true"] { outline-color: #ffa58e; box-shadow: 0 0 0 7px #ff977733; }
+.g4-practice-pickups { display: grid; gap: 22px; width: min(320px, calc(100% - 48px)); margin: 24px auto; color: #eee7ff; }
+.g4-practice-pickups > div { padding: 12px; border: 1px solid #c7b3f088; border-radius: 10px; text-align: center; background: #202038ed; }
+.g4-practice-pickups img { display: inline-block; width: 52px; height: 52px; object-fit: contain; margin: 6px; }
+.g4-practice-pickups p { margin: 3px; font-size: 12px; }
+.g4-practice-assembly { width: min(640px, 100%); max-height: calc(100% - 12px); overflow: auto; margin: 6px auto; padding: 22px 46px 18px 22px; border: 1px solid #c7b3f088; border-radius: 14px; background: #202038f2; color: #eee7ff; box-shadow: 0 6px 18px #11152233; }
+.g4-practice-assembly > p { margin: 0 0 8px; font-size: 10px; letter-spacing: .1em; color: var(--accent); font-weight: 800; }
+.g4-practice-assembly > p > span { float: right; color: #c5c3d9; letter-spacing: 0; }
+.g4-practice-assembly code { display: block; padding: 10px 0; font-size: 16px; overflow-wrap: anywhere; }
+.g4-practice-answer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 64px; margin: 14px 0 22px; padding: 12px; background: #0b112766; border: 1px dashed #c7b3f0; border-radius: 8px; overflow-wrap: anywhere; font: 14px/1.5 monospace; }
+.g4-practice-answer > span { max-width: 100%; padding: 3px 6px; border-radius: 4px; background: #8071b433; }
+.g4-practice-answer.is-complete { border-style: solid; border-color: #b0f0bb; color: #d8ffe0; background: #20382f; }
+.g4-practice-pieces { display: flex; flex-wrap: wrap; gap: 44px 48px; padding-bottom: 44px; }
+.g4-practice-assembly button { max-width: 100%; overflow-wrap: anywhere; padding: 8px 12px; border: 1px solid #ddd3ff; border-radius: 7px; background: #eee7ff; color: #28213e; font: 700 13px/1.4 monospace; box-shadow: 0 3px 0 #897fa6; }
+.g4-practice-submit { margin-bottom: 28px; }
+.g4-practice-playfield--ready { display: flex; align-items: center; justify-content: center; gap: 18px; }
+.g4-practice-playfield--ready .g4-practice-robot { position: static; flex-shrink: 0; transform: none; width: 176px; height: 190px; }
+.g4-practice-recap { width: min(370px, 100%); max-height: 100%; overflow: auto; padding: 20px; border: 1px solid #b0f0bb88; border-radius: 14px; background: #202038f2; color: #eee7ff; }
+.g4-practice-recap-icon { display: inline-flex; padding: 8px; border-radius: 50%; color: #b0f0bb; background: #b0f0bb22; }
+.g4-practice-recap h3 { margin: 10px 0 3px; font-size: 24px; font-weight: 800; }
+.g4-practice-recap > p { margin: 0; font-size: 12px; color: #c5c3d9; }
+.g4-practice-recap ol { display: grid; gap: 14px; padding: 0; margin: 20px 0; list-style: none; }
+.g4-practice-recap li { display: flex; align-items: start; gap: 10px; font-size: 12px; color: #c5c3d9; }
+.g4-practice-recap li b { display: grid; place-items: center; flex-shrink: 0; width: 24px; height: 24px; border-radius: 6px; background: #8071b433; color: #e3d8ff; }
+.g4-practice-recap strong { display: block; margin-bottom: 3px; font-size: 13px; color: #eee7ff; }
+.g4-practice-recap small { display: flex; align-items: center; gap: 5px; color: #b0f0bb; font-size: 10px; }
+@media (max-width: 900px) { .g4-practice-playfield--ready { gap: 8px; } .g4-practice-playfield--ready .g4-practice-robot { width: 120px; height: 155px; } .g4-practice-recap { padding: 14px; } }
+.g4-practice .g1-coach__hand.is-tracking { transition: left 320ms ease, top 80ms linear; }
+.g4-practice.g1-coach--success .g1-coach__hand { opacity: 1; }
+.g4-practice.g1-coach--success .g1-coach__hand img, .g4-practice.g1-coach--success .g1-coach__touch { animation-play-state: running; }
+@keyframes g4-practice-drop { from { top: 18%; } to { top: calc(100% - var(--g4-drop-end)); } }
+@media (max-width: 900px) { .g4-practice { --g4-coach-width: 282px; } .g4-practice .g1-coach__bubble { padding: 10px 12px; } .g4-practice-pickups img { width: 42px; height: 42px; margin: 3px; } }
+@media (max-width: 580px) { .g4-practice { --g4-coach-width: 250px; --g4-drop-end: 100px; } .g4-practice-playfield { right: 12px; bottom: 48%; } .g4-practice .g1-coach__bubble { top: auto; bottom: 8px; right: 8px; max-height: 47%; width: calc(100% - 16px); } .g4-practice-robot { width: 80px; height: 78px; bottom: 5px; } .g4-practice-player-label { bottom: 86px; } .g4-practice-path { bottom: 83px; } .g4-practice-pickups { display: flex; gap: 10px; width: calc(100% - 44px); margin: 0; } .g4-practice-pickups > div { padding: 6px; } }
+@media (prefers-reduced-motion: reduce) { .g4-practice-falling.is-dropping { top: calc(100% - var(--g4-drop-end)); } }

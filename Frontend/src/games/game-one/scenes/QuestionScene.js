@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
+import { getStudentSfxVolume } from '../../../utils/studentMenuAudio';
 
 const CHOICE_LABEL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
 const PALETTE = Object.freeze({
   overlay: 0x110912,
   modalOverlay: 0x0f172a,
@@ -72,21 +72,24 @@ function buildQuestionHints(question, choices = []) {
       .filter(Boolean)
     : [];
 
-  if (authoredHints.length > 0) {
-    return authoredHints.slice(0, 3);
-  }
-
   const topic = typeof question?.topic === 'string' && question.topic.trim()
     ? question.topic.trim()
     : '';
   const choiceCount = Array.isArray(choices) && choices.length ? choices.length : 4;
-
-  return [
+  const fallbackHints = [
     topic
       ? `Focus on the main idea connected to ${topic}.`
       : 'Read the question again and remove choices that do not fit the prompt.',
     `Compare all ${choiceCount} choices before selecting one.`,
+    topic
+      ? `Recall how ${topic} behaves when Java runs the code.`
+      : 'Connect the question to the lesson clues you collected before answering.',
   ];
+  const hints = [...authoredHints];
+  fallbackHints.forEach((hint) => {
+    if (hints.length < 3 && !hints.includes(hint)) hints.push(hint);
+  });
+  return hints.slice(0, 3);
 }
 
 function fitTextHeight(textObject, maxHeight, minFontSize = 12) {
@@ -125,7 +128,10 @@ function fitDomTextGroup(container, entries = [], minGap = 4) {
     return;
   }
 
-  while (container.scrollHeight > container.clientHeight) {
+  while (
+    container.scrollHeight > container.clientHeight
+    || container.scrollWidth > container.clientWidth
+  ) {
     let changed = false;
 
     validEntries.forEach(({ element, minSize, step = 1 }) => {
@@ -183,6 +189,17 @@ function addDiamond(scene, x, y, size, color, strokeColor = null) {
   return diamond;
 }
 
+function addRoundedPanel(scene, x, y, width, height, radius, fillColor, fillAlpha = 1, strokeColor = null, strokeWidth = 0) {
+  const graphics = scene.add.graphics();
+  graphics.fillStyle(fillColor, fillAlpha);
+  graphics.fillRoundedRect(x - (width / 2), y - (height / 2), width, height, radius);
+  if (strokeColor !== null && strokeWidth > 0) {
+    graphics.lineStyle(strokeWidth, strokeColor, 1);
+    graphics.strokeRoundedRect(x - (width / 2), y - (height / 2), width, height, radius);
+  }
+  return graphics;
+}
+
 export default class QuestionScene extends Phaser.Scene {
   constructor() {
     super('QuestionScene');
@@ -205,6 +222,13 @@ export default class QuestionScene extends Phaser.Scene {
     const cleanupHandlers = [];
 
     const rawChoices = Array.isArray(this.question?.choices) ? this.question.choices : [];
+    const questionModeText = [this.question?.formattedQuestion, this.question?.prompt]
+      .filter((value) => typeof value === 'string')
+      .join('\n');
+    const legacyJumbledWordMatch = questionModeText.match(/jumbled\s+word\s*:\s*([a-z]+)/i);
+    const isWordScramble = this.question?.challengeType === 'WORD_SCRAMBLE'
+      || Boolean(this.question?.jumbledWord)
+      || Boolean(legacyJumbledWordMatch);
     const normalizedChoices = rawChoices.length >= 2 ? rawChoices : ['Option A', 'Option B', 'Option C', 'Option D'];
     const preparedChoices = normalizedChoices.map((choice, index) => {
       const label = getChoiceLabelByIndex(index);
@@ -216,47 +240,61 @@ export default class QuestionScene extends Phaser.Scene {
       };
     });
 
-    const hints = buildQuestionHints(this.question, preparedChoices).slice(0, 2);
-    const choiceCount = preparedChoices.length;
+    const hints = buildQuestionHints(this.question, preparedChoices).slice(0, 3);
+    const choiceCount = isWordScramble ? 2 : preparedChoices.length;
     const displayScale = getCanvasDisplayScale(sceneWidth, sceneHeight, this.game.canvas);
     const uiScale = Phaser.Math.Clamp(0.92 / Math.max(displayScale, 0.6), 0.96, 1.18);
-    const renderResolution = 1;
     const rawPromptSource = typeof this.question?.formattedQuestion === 'string' && this.question.formattedQuestion.trim()
       ? this.question.formattedQuestion.trim()
       : (typeof this.question?.prompt === 'string' && this.question.prompt.trim()
         ? this.question.prompt.trim()
         : 'Solve the challenge.');
-    const promptSource = rawPromptSource.replace(/\n\s*\n/g, '\n').trim();
+    const promptSource = rawPromptSource
+      .replace(/\n?\s*jumbled\s+word\s*:\s*[a-z]+\s*/ig, '')
+      .replace(/\n\s*\n/g, '\n')
+      .trim();
     const { title: promptTitle, body: promptBody } = parsePromptContent(promptSource);
+    const displayPromptTitle = isWordScramble ? 'FINAL TREASURE RIDDLE' : promptTitle;
 
-    const panelWidth = Math.min(sceneWidth - 64, 1010);
-    const panelHeight = Math.min(sceneHeight - 44, 600);
+    const wordScrambleAspect = 608 / 391;
+    const panelWidth = isWordScramble
+      ? Math.min(sceneWidth - 28, (sceneHeight - 20) * wordScrambleAspect, 1100)
+      : Math.min(sceneWidth - 28, 1100);
+    const panelHeight = isWordScramble
+      ? panelWidth / wordScrambleAspect
+      : Math.min(sceneHeight - 20, 660);
     const panelLeft = centerX - (panelWidth / 2);
     const panelRight = centerX + (panelWidth / 2);
     const panelTop = centerY - (panelHeight / 2);
     const panelBottom = centerY + (panelHeight / 2);
-    const innerInset = Math.round(34 * uiScale);
+    // The treasure artwork is authored at 608x391. Position its overlay
+    // content in that coordinate system so scaling cannot cause text drift.
+    const treasureFrameScale = panelWidth / 608;
+    const treasureY = (sourceY) => panelTop + (sourceY * treasureFrameScale);
+    const innerInset = Math.round((isWordScramble ? 72 : 34) * uiScale);
     const innerLeft = panelLeft + innerInset;
     const innerRight = panelRight - innerInset;
     const innerWidth = innerRight - innerLeft;
     const optionHeight = Math.round((choiceCount >= 6 ? 42 : (choiceCount >= 5 ? 48 : 54)) * uiScale);
     const optionGap = Math.round((choiceCount >= 6 ? 8 : 12) * uiScale);
     const optionsTotalHeight = (choiceCount * optionHeight) + ((choiceCount - 1) * optionGap);
-    const topControlsY = panelTop + Math.round(28 * uiScale);
+    const topControlsY = panelTop + Math.round((isWordScramble ? 42 : 28) * uiScale);
     const headerY = panelTop + Math.round(82 * uiScale);
     const headerHeight = Math.round(54 * uiScale);
     const headerBottom = headerY + (headerHeight / 2);
-    const footerReserve = Math.round(112 * uiScale);
     const promptTop = headerBottom + Math.round(16 * uiScale);
-    const maxPromptHeight = Math.max(
-      Math.round(112 * uiScale),
-      Math.floor(panelBottom - footerReserve - optionsTotalHeight - promptTop - Math.round(14 * uiScale)),
-    );
-    const promptBoxHeight = maxPromptHeight;
+    const preferredPromptHeight = Math.round((choiceCount >= 6 ? 116 : (choiceCount >= 5 ? 136 : 158)) * uiScale);
+    const promptBoxHeight = preferredPromptHeight;
     const promptBoxY = promptTop + (promptBoxHeight / 2);
+    const optionsTop = promptTop + promptBoxHeight + Math.round(20 * uiScale);
+    const optionsBottom = optionsTop + optionsTotalHeight;
     const promptViewportWidth = innerWidth - Math.round(42 * uiScale);
-    const promptViewportHeight = promptBoxHeight - Math.round(16 * uiScale);
-    const promptViewportTop = promptBoxY - (promptBoxHeight / 2) + Math.round(8 * uiScale);
+    const promptViewportHeight = isWordScramble
+      ? Math.round(72 * treasureFrameScale)
+      : promptBoxHeight - Math.round(16 * uiScale);
+    const promptViewportTop = isWordScramble
+      ? treasureY(122)
+      : promptBoxY - (promptBoxHeight / 2) + Math.round(8 * uiScale);
     const promptBounds = new Phaser.Geom.Rectangle(
       centerX - (promptViewportWidth / 2),
       promptViewportTop,
@@ -264,69 +302,141 @@ export default class QuestionScene extends Phaser.Scene {
       promptViewportHeight,
     );
 
-    this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.overlay, 0.74).setInteractive();
-    this.add.rectangle(centerX + 12, centerY + 14, panelWidth + 18, panelHeight + 18, PALETTE.panelShadow, 0.34);
-    this.add.rectangle(centerX, centerY, panelWidth, panelHeight, PALETTE.panelBase, 1).setStrokeStyle(4, PALETTE.panelBorder, 1);
-    this.add.rectangle(centerX, centerY, panelWidth - 22, panelHeight - 22, PALETTE.panelInner, 1).setStrokeStyle(2, PALETTE.panelBorderSoft, 1);
+    // Blur only the scenes underneath this modal. The question artwork and
+    // all of its text remain on this camera, so they stay perfectly sharp.
+    if (this.game.renderer?.type === Phaser.WEBGL) {
+      this.scene.manager.getScenes(true).forEach((activeScene) => {
+        if (activeScene === this) return;
+        activeScene.cameras.cameras.forEach((camera) => {
+          if (!camera.postFX?.addBlur) return;
+          const blurEffect = camera.postFX.addBlur(0, 2, 2, 1, 0xffffff, 4);
+          cleanupHandlers.push(() => camera.postFX?.remove(blurEffect));
+        });
+      });
+    }
+
+    this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.overlay, 0.78).setInteractive();
+    const hasQuestionFrame = isWordScramble && this.textures.exists('game-one-ui-question-frame');
+    if (hasQuestionFrame) {
+      this.add.image(centerX, centerY, 'game-one-ui-question-frame')
+        .setDisplaySize(panelWidth, panelHeight);
+    } else if (isWordScramble && this.textures.exists('game-one-treasure-jb-background')) {
+      const panelRadius = Math.round(34 * uiScale);
+      addRoundedPanel(this, centerX + 10, centerY + 13, panelWidth - 8, panelHeight - 8, panelRadius, 0x160b05, 0.45);
+      this.add.image(centerX, centerY, 'game-one-treasure-jb-background').setDisplaySize(panelWidth, panelHeight);
+    } else {
+      this.add.rectangle(centerX + 12, centerY + 14, panelWidth + 18, panelHeight + 18, PALETTE.panelShadow, 0.34);
+      this.add.rectangle(centerX, centerY, panelWidth, panelHeight, PALETTE.panelBase, 1).setStrokeStyle(4, PALETTE.panelBorder, 1);
+      this.add.rectangle(centerX, centerY, panelWidth - 22, panelHeight - 22, PALETTE.panelInner, 1).setStrokeStyle(2, PALETTE.panelBorderSoft, 1);
+    }
 
     const headerWidth = panelWidth - Math.round(42 * uiScale);
-    this.add.rectangle(centerX, headerY, headerWidth, headerHeight, PALETTE.header, 1).setStrokeStyle(2, PALETTE.headerDark, 1);
-    addDiamond(this, panelLeft + Math.round(34 * uiScale), headerY, Math.round(12 * uiScale), PALETTE.headerAccent);
-    addDiamond(this, panelRight - Math.round(34 * uiScale), headerY, Math.round(12 * uiScale), PALETTE.headerAccent);
+    const challengeHeaderColor = isWordScramble ? 0x6b371e : PALETTE.header;
+    const challengeBorderColor = isWordScramble ? 0x3f2112 : PALETTE.headerDark;
+    const challengeAccentColor = isWordScramble ? 0xe0a73a : PALETTE.headerAccent;
+    if (isWordScramble) {
+      if (!hasQuestionFrame) addRoundedPanel(this, centerX, headerY, headerWidth, headerHeight, 14, challengeHeaderColor, 0.92, challengeBorderColor, 2);
+    } else {
+      this.add.rectangle(centerX, headerY, headerWidth, headerHeight, challengeHeaderColor, 1)
+        .setStrokeStyle(2, challengeBorderColor, 1);
+    }
+    if (!hasQuestionFrame) {
+      addDiamond(this, panelLeft + Math.round((isWordScramble ? 78 : 34) * uiScale), headerY, Math.round(12 * uiScale), challengeAccentColor);
+      addDiamond(this, panelRight - Math.round((isWordScramble ? 78 : 34) * uiScale), headerY, Math.round(12 * uiScale), challengeAccentColor);
+    }
 
-    this.add.text(centerX, headerY - Math.round(6 * uiScale), 'Question Challenge', {
-      fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: fontSize(13, uiScale),
-      color: '#fff7e2',
+    const headerKickerY = hasQuestionFrame ? treasureY(39) : headerY - Math.round(6 * uiScale);
+    const headerTitleY = hasQuestionFrame ? treasureY(60) : headerY + Math.round(12 * uiScale);
+    this.add.text(centerX, headerKickerY, isWordScramble ? 'Java Treasure' : 'Question Challenge', {
+      fontFamily: 'PixelOperator8, monospace',
+      fontSize: fontSize(hasQuestionFrame ? 8 : 13, hasQuestionFrame ? treasureFrameScale : uiScale),
+      fontStyle: 'bold',
+      color: isWordScramble ? '#ffe7a3' : '#fff7e2',
       align: 'center',
+      stroke: isWordScramble ? '#31551f' : undefined,
+      strokeThickness: isWordScramble ? Math.max(1, Math.round(treasureFrameScale)) : 0,
     }).setOrigin(0.5);
 
-    this.add.text(centerX, headerY + Math.round(12 * uiScale), 'Select the best answer', {
-      fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: fontSize(20, uiScale),
-      color: '#fff0c9',
+    this.add.text(centerX, headerTitleY, isWordScramble ? 'Unscramble the final answer' : 'Select the best answer', {
+      fontFamily: 'PixelOperator8, monospace',
+      fontSize: fontSize(hasQuestionFrame ? 10 : 20, hasQuestionFrame ? treasureFrameScale : uiScale),
+      fontStyle: 'bold',
+      color: isWordScramble ? '#fff3ce' : '#fff0c9',
       align: 'center',
+      stroke: isWordScramble ? '#8b3d1c' : undefined,
+      strokeThickness: isWordScramble ? Math.max(1, Math.round(treasureFrameScale)) : 0,
     }).setOrigin(0.5);
 
-    const coinBadgeWidth = Math.round(148 * uiScale);
-    const coinBadgeHeight = Math.round(30 * uiScale);
-    const closeButtonWidth = Math.round(96 * uiScale);
-    const closeButtonHeight = Math.round(28 * uiScale);
+    const coinBadgeWidth = Math.round(hasQuestionFrame ? 82 * treasureFrameScale : 148 * uiScale);
+    const coinBadgeHeight = Math.round(hasQuestionFrame ? 34 * treasureFrameScale : 30 * uiScale);
+    const closeButtonWidth = Math.round(hasQuestionFrame ? 46 * treasureFrameScale : 96 * uiScale);
+    const closeButtonHeight = Math.round(hasQuestionFrame ? 46 * treasureFrameScale : 28 * uiScale);
     const topControlGap = Math.round(20 * uiScale);
-    const closeQuestionX = innerRight - (closeButtonWidth / 2);
-    const coinBadgeY = topControlsY;
-    const coinBadgeX = closeQuestionX - (closeButtonWidth / 2) - topControlGap - (coinBadgeWidth / 2);
+    const closeQuestionX = hasQuestionFrame
+      ? panelLeft + (555 * treasureFrameScale)
+      : innerRight - (closeButtonWidth / 2);
+    const coinBadgeY = hasQuestionFrame ? treasureY(64) : topControlsY;
+    const coinBadgeX = hasQuestionFrame
+      ? panelLeft + (493 * treasureFrameScale)
+      : closeQuestionX - (closeButtonWidth / 2) - topControlGap - (coinBadgeWidth / 2);
 
-    this.add.rectangle(coinBadgeX, coinBadgeY, coinBadgeWidth, coinBadgeHeight, 0xfdf4de, 1)
-      .setStrokeStyle(2, PALETTE.headerDark, 1);
+    if (isWordScramble) {
+      if (!hasQuestionFrame) addRoundedPanel(this, coinBadgeX, coinBadgeY, coinBadgeWidth, coinBadgeHeight, 9, 0xf4d58a, 1, challengeBorderColor, 2);
+    } else {
+      this.add.rectangle(coinBadgeX, coinBadgeY, coinBadgeWidth, coinBadgeHeight, 0xfdf4de, 1)
+        .setStrokeStyle(2, PALETTE.headerDark, 1);
+    }
     const coinBalanceLabel = this.add.text(coinBadgeX, coinBadgeY, '', {
       fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: fontSize(22, uiScale),
-      color: PALETTE.textDark,
+      fontSize: fontSize(hasQuestionFrame ? 10 : 22, hasQuestionFrame ? treasureFrameScale : uiScale),
+      fontStyle: 'normal',
+      color: hasQuestionFrame ? '#ffffff' : (isWordScramble ? '#4b2816' : PALETTE.textDark),
+      stroke: hasQuestionFrame ? '#4b2816' : undefined,
+      strokeThickness: hasQuestionFrame ? Math.max(1, Math.round(treasureFrameScale)) : 0,
     }).setOrigin(0.5);
+    // The coin icon is painted into the left side of the artwork. Center the
+    // balance inside the remaining text area instead of over the icon.
+    if (hasQuestionFrame) {
+      coinBalanceLabel.setPosition(
+        panelLeft + (497 * treasureFrameScale),
+        coinBadgeY + (2 * treasureFrameScale),
+      );
+    }
 
     const closeQuestionButton = this.add.rectangle(
       closeQuestionX,
-      topControlsY,
+      coinBadgeY,
       closeButtonWidth,
       closeButtonHeight,
-      0xefe3c3,
-      1,
-    ).setStrokeStyle(2, PALETTE.panelBorder, 1)
-      .setInteractive({ useHandCursor: true });
-    const closeQuestionLabel = this.add.text(closeQuestionButton.x, closeQuestionButton.y, 'Close', {
+      isWordScramble ? 0xe7bd68 : 0xefe3c3,
+      hasQuestionFrame ? 0.001 : 1,
+    ).setStrokeStyle(2, isWordScramble ? challengeBorderColor : PALETTE.panelBorder, hasQuestionFrame ? 0 : 1)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(hasQuestionFrame ? 50 : 0);
+    const closeQuestionLabel = this.add.text(closeQuestionButton.x, closeQuestionButton.y, hasQuestionFrame ? '' : 'Close', {
       fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: fontSize(20, uiScale),
-      color: PALETTE.textDark,
+      fontSize: fontSize(hasQuestionFrame ? 30 : 20, uiScale),
+      color: isWordScramble ? '#4b2816' : PALETTE.textDark,
     }).setOrigin(0.5);
 
-    this.add.rectangle(centerX, promptBoxY, innerWidth, promptBoxHeight, PALETTE.promptBg, 1).setStrokeStyle(3, PALETTE.panelBorder, 1);
+    if (isWordScramble) {
+      if (!hasQuestionFrame) addRoundedPanel(this, centerX, promptBoxY, innerWidth, promptBoxHeight, 18, 0xffefbd, 0.72, 0x7b4823, 3);
+    } else {
+      this.add.rectangle(centerX, promptBoxY, innerWidth, promptBoxHeight, PALETTE.promptBg, 1)
+        .setStrokeStyle(3, PALETTE.panelBorder, 1);
+    }
     const promptPaddingX = Math.round(26 * uiScale);
-    const promptPaddingY = Math.round(8 * uiScale);
-    const promptTextWidth = Math.round(promptViewportWidth - (promptPaddingX * 2));
+    const promptPaddingY = Math.round(4 * uiScale);
+    const promptTextWidth = Math.round(isWordScramble && hasQuestionFrame
+      ? 330 * treasureFrameScale
+      : promptViewportWidth - (promptPaddingX * 2));
     const promptTextHeight = Math.round(promptViewportHeight - (promptPaddingY * 2));
-    const promptTextLeft = Math.round(promptBounds.x + promptPaddingX);
-    const promptTextTop = Math.round(promptViewportTop + promptPaddingY);
+    const promptTextLeft = Math.round(isWordScramble && hasQuestionFrame
+      ? centerX - (promptTextWidth / 2)
+      : promptBounds.x + promptPaddingX);
+    const promptTextTop = Math.round(isWordScramble && hasQuestionFrame
+      ? treasureY(125)
+      : promptViewportTop + promptPaddingY);
     const promptDomWrapper = document.createElement('div');
     promptDomWrapper.style.width = `${promptTextWidth}px`;
     promptDomWrapper.style.height = `${promptTextHeight}px`;
@@ -334,6 +444,7 @@ export default class QuestionScene extends Phaser.Scene {
     promptDomWrapper.style.justifyContent = 'center';
     promptDomWrapper.style.alignItems = 'flex-start';
     promptDomWrapper.style.overflow = 'hidden';
+    promptDomWrapper.style.overflowWrap = 'anywhere';
     promptDomWrapper.style.pointerEvents = 'none';
     promptDomWrapper.style.boxSizing = 'border-box';
     promptDomWrapper.style.background = 'transparent';
@@ -351,10 +462,11 @@ export default class QuestionScene extends Phaser.Scene {
     promptDomContent.style.justifyContent = 'flex-start';
 
     let promptDomTitle = null;
-    if (promptTitle) {
+    if (displayPromptTitle && !(isWordScramble && hasQuestionFrame)) {
       promptDomTitle = document.createElement('div');
-      promptDomTitle.textContent = promptTitle;
-      promptDomTitle.style.fontSize = `${Math.round(22 * uiScale)}px`;
+      promptDomTitle.textContent = displayPromptTitle;
+      promptDomTitle.style.fontFamily = 'PixelOperator8, monospace';
+      promptDomTitle.style.fontSize = `${Math.round(20 * uiScale)}px`;
       promptDomTitle.style.fontWeight = '700';
       promptDomTitle.style.lineHeight = '1.25';
       promptDomTitle.style.color = '#231821';
@@ -363,11 +475,27 @@ export default class QuestionScene extends Phaser.Scene {
       promptDomContent.appendChild(promptDomTitle);
     }
 
+    if (displayPromptTitle && isWordScramble && hasQuestionFrame) {
+      this.add.text(centerX, treasureY(105), displayPromptTitle.toUpperCase(), {
+        fontFamily: 'PixelOperator8, monospace',
+        fontSize: fontSize(11, treasureFrameScale),
+        fontStyle: 'bold',
+        color: '#fff8dc',
+        stroke: '#244b27',
+        strokeThickness: Math.max(1, Math.round(treasureFrameScale)),
+        align: 'center',
+      }).setOrigin(0.5);
+    }
+
     const promptDomBody = document.createElement('div');
-    promptDomBody.textContent = promptBody;
-    promptDomBody.style.fontSize = `${Math.round(22 * uiScale)}px`;
-    promptDomBody.style.fontWeight = '600';
-    promptDomBody.style.lineHeight = '1.25';
+    promptDomBody.textContent = isWordScramble && hasQuestionFrame
+      ? promptBody.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((line) => line.trim()).join('\n') || promptBody
+      : promptBody;
+    promptDomBody.style.fontSize = `${Math.round(isWordScramble && hasQuestionFrame
+      ? 13 * treasureFrameScale
+      : 20 * uiScale)}px`;
+    promptDomBody.style.fontWeight = '400';
+    promptDomBody.style.lineHeight = '1.35';
     promptDomBody.style.color = PALETTE.textDark;
     promptDomBody.style.whiteSpace = 'pre-wrap';
     promptDomBody.style.wordBreak = 'break-word';
@@ -376,84 +504,122 @@ export default class QuestionScene extends Phaser.Scene {
 
     promptDomWrapper.appendChild(promptDomContent);
 
-    const promptText = this.add.text(
-      centerX,
-      promptBoxY,
-      [promptTitle, promptBody].filter(Boolean).join('\n'),
+    const promptText = this.add.dom(promptTextLeft, promptTextTop, promptDomWrapper)
+      .setOrigin(0, 0);
+    const fitPromptText = () => fitDomTextGroup(promptDomWrapper, [
+      promptDomTitle ? { element: promptDomTitle, minSize: Math.round(13 * uiScale), step: 1 } : null,
       {
-        fontFamily: 'Manrope, Arial, sans-serif',
-        fontSize: fontSize(20, uiScale),
-        fontStyle: '600',
-        color: PALETTE.textDark,
-        align: 'center',
-        wordWrap: { width: promptTextWidth, useAdvancedWrap: true },
-        lineSpacing: Math.round(4 * uiScale),
+        element: promptDomBody,
+        minSize: Math.round((isWordScramble && hasQuestionFrame ? 9 : 12) * (isWordScramble && hasQuestionFrame ? treasureFrameScale : uiScale)),
+        step: 1,
       },
-    ).setOrigin(0.5);
+    ], 4);
+    fitPromptText();
+    const promptFitFrame = window.requestAnimationFrame(fitPromptText);
+    cleanupHandlers.push(() => window.cancelAnimationFrame(promptFitFrame));
 
-    const footerY = panelBottom - Math.round(44 * uiScale);
-    const feedbackWidth = innerWidth - Math.round(56 * uiScale);
-    const feedbackHeight = Math.round(66 * uiScale);
+    const feedbackWidth = isWordScramble && hasQuestionFrame
+      ? Math.round(238 * treasureFrameScale)
+      : innerWidth - Math.round(56 * uiScale);
+    const feedbackHeight = isWordScramble && hasQuestionFrame
+      ? Math.round(30 * treasureFrameScale)
+      : Math.round(90 * uiScale);
+    const footerY = isWordScramble
+      ? treasureY(356)
+      : Math.min(
+        panelBottom - (feedbackHeight / 2) - Math.round(8 * uiScale),
+        optionsBottom + Math.round(12 * uiScale) + (feedbackHeight / 2),
+      );
     const feedbackWrapper = document.createElement('div');
     feedbackWrapper.style.width = `${feedbackWidth}px`;
     feedbackWrapper.style.height = `${feedbackHeight}px`;
     feedbackWrapper.style.display = 'flex';
     feedbackWrapper.style.alignItems = 'center';
     feedbackWrapper.style.justifyContent = 'center';
-    feedbackWrapper.style.pointerEvents = 'none';
+    feedbackWrapper.style.overflowY = 'hidden';
+    feedbackWrapper.style.overflowX = 'hidden';
+    feedbackWrapper.style.pointerEvents = 'auto';
     feedbackWrapper.style.background = 'transparent';
     feedbackWrapper.style.boxSizing = 'border-box';
+    feedbackWrapper.style.padding = `0 ${Math.round(4 * treasureFrameScale)}px`;
+    feedbackWrapper.style.visibility = 'hidden';
 
     const feedbackContent = document.createElement('div');
     feedbackContent.style.width = '100%';
     feedbackContent.style.fontFamily = 'Manrope, Arial, sans-serif';
-    feedbackContent.style.fontSize = `${Math.round(18 * uiScale)}px`;
-    feedbackContent.style.fontWeight = '600';
-    feedbackContent.style.lineHeight = '1.35';
+    feedbackContent.style.fontSize = `${Math.round(isWordScramble && hasQuestionFrame
+      ? 8.5 * treasureFrameScale
+      : 16 * uiScale)}px`;
+    feedbackContent.style.fontWeight = '400';
+    feedbackContent.style.lineHeight = '1.15';
     feedbackContent.style.textAlign = 'center';
     feedbackContent.style.wordBreak = 'break-word';
-    feedbackContent.style.whiteSpace = 'pre-wrap';
+    feedbackContent.style.overflowWrap = 'anywhere';
+    feedbackContent.style.whiteSpace = isWordScramble && hasQuestionFrame ? 'nowrap' : 'pre-wrap';
     feedbackContent.style.color = PALETTE.textDark;
+    feedbackContent.style.boxSizing = 'border-box';
     feedbackContent.textContent = '';
 
     feedbackWrapper.appendChild(feedbackContent);
 
-    this.feedbackText = this.add.text(centerX, footerY, '', {
-      fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: fontSize(16, uiScale),
-      fontStyle: '600',
-      color: PALETTE.textDark,
-      align: 'center',
-      wordWrap: { width: feedbackWidth, useAdvancedWrap: true },
-    }).setOrigin(0.5);
+    // The reference footer starts every status line immediately after the
+    // bulb. A fixed left edge keeps Hint, Correct, and Incorrect aligned.
+    const feedbackX = isWordScramble && hasQuestionFrame
+      ? panelLeft + Math.round(309 * treasureFrameScale)
+      : centerX;
+    this.feedbackText = this.add.dom(feedbackX, footerY, feedbackWrapper).setOrigin(0.5);
 
     const showFeedback = (message, color = PALETTE.textDark) => {
-      this.feedbackText.setColor(color);
-      this.feedbackText.setText(message);
+      feedbackContent.style.color = color;
+      feedbackContent.textContent = message;
+      feedbackWrapper.style.visibility = message ? 'visible' : 'hidden';
+      feedbackWrapper.scrollTop = 0;
+      if (message && isWordScramble && hasQuestionFrame) {
+        feedbackContent.style.fontSize = `${Math.round(8.5 * treasureFrameScale)}px`;
+        window.requestAnimationFrame(() => {
+          if (!this.sys.isActive()) return;
+          fitDomTextGroup(feedbackWrapper, [{
+            element: feedbackContent,
+            minSize: Math.max(7, Math.round(6 * treasureFrameScale)),
+            step: 0.5,
+          }], 2);
+        });
+      }
     };
 
-    const purchasableHints = hints.slice(0, Math.min(2, hints.length));
+    const purchasableHints = hints.slice(0, Math.min(3, hints.length));
     const hasHintsAvailable = purchasableHints.length > 0;
-    const hintButtonWidth = Math.round(78 * uiScale);
-    const hintButtonHeight = Math.round(34 * uiScale);
-    const hintButtonX = innerLeft + Math.round(26 * uiScale);
-    const hintButtonY = topControlsY;
-    const hintHotspot = this.add.rectangle(hintButtonX, hintButtonY, hintButtonWidth, hintButtonHeight, PALETTE.hintIconBg, 1)
-      .setStrokeStyle(2, PALETTE.hintIconBorder, 1)
+    const hintButtonWidth = Math.round(hasQuestionFrame ? 86 * treasureFrameScale : 78 * uiScale);
+    const hintButtonHeight = Math.round(hasQuestionFrame ? 36 * treasureFrameScale : 34 * uiScale);
+    const hintButtonX = hasQuestionFrame
+      ? panelLeft + (103 * treasureFrameScale)
+      : innerLeft + Math.round(26 * uiScale);
+    const hintButtonY = hasQuestionFrame ? treasureY(64) : topControlsY;
+    const hintHotspot = this.add.rectangle(hintButtonX, hintButtonY, hintButtonWidth, hintButtonHeight, isWordScramble ? 0xe7bd68 : PALETTE.hintIconBg, 1)
+      .setStrokeStyle(2, isWordScramble ? challengeBorderColor : PALETTE.hintIconBorder, 1)
       .setInteractive({ useHandCursor: true });
     const hintHotspotInner = this.add.rectangle(
       hintButtonX,
       hintButtonY,
       hintButtonWidth - Math.round(20 * uiScale),
       hintButtonHeight - Math.round(14 * uiScale),
-      PALETTE.hintIconActive,
-      1
+      isWordScramble ? 0xf6d98b : PALETTE.hintIconActive,
+      hasQuestionFrame ? 0.001 : 1
     );
     const hintHotspotLabel = this.add.text(hintButtonX, hintButtonY + 1, 'Hint', {
       fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: fontSize(11, uiScale),
-      color: PALETTE.textDark,
+      fontSize: fontSize(hasQuestionFrame ? 13 : 11, hasQuestionFrame ? treasureFrameScale : uiScale),
+      fontStyle: 'bold',
+      color: isWordScramble ? '#4b2816' : PALETTE.textDark,
+      stroke: hasQuestionFrame ? '#f6d98b' : undefined,
+      strokeThickness: hasQuestionFrame ? Math.max(1, Math.round(0.7 * treasureFrameScale)) : 0,
     }).setOrigin(0.5);
+    if (hasQuestionFrame) {
+      hintHotspot.setAlpha(0.001);
+      hintHotspotInner.setAlpha(0.001);
+      // Keep the label centered in the clear area to the right of the bulb.
+      hintHotspotLabel.setPosition(panelLeft + (114 * treasureFrameScale), hintButtonY);
+    }
 
     const hintOverlayBackdrop = this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.modalOverlay, 0.82)
       .setVisible(false)
@@ -478,14 +644,16 @@ export default class QuestionScene extends Phaser.Scene {
     const hintJournalHeader = this.add.rectangle(centerX, hintJournalTop + Math.round(30 * uiScale), hintJournalWidth - Math.round(14 * uiScale), Math.round(42 * uiScale), PALETTE.header, 1)
       .setStrokeStyle(2, PALETTE.headerDark, 1);
     const hintJournalTitle = this.add.text(centerX, hintJournalTop + Math.round(28 * uiScale), 'Hint Journal', {
-      fontFamily: 'Manrope, Arial, sans-serif',
+      fontFamily: 'PixelOperator8, monospace',
       fontSize: fontSize(11, uiScale),
+      fontStyle: 'bold',
       color: '#fff7e2',
       align: 'center',
     }).setOrigin(0.5);
     const hintJournalSubtitle = this.add.text(centerX, hintJournalTop + Math.round(82 * uiScale), '', {
       fontFamily: 'Manrope, Arial, sans-serif',
       fontSize: fontSize(16, uiScale),
+      fontStyle: 'normal',
       color: PALETTE.modalMuted,
       align: 'center',
     }).setOrigin(0.5);
@@ -494,6 +662,7 @@ export default class QuestionScene extends Phaser.Scene {
     const hintJournalText = this.add.text(centerX - (hintJournalBodyWidth / 2) + hintJournalInnerPadding, hintJournalBodyTop, '', {
       fontFamily: 'Manrope, Arial, sans-serif',
       fontSize: fontSize(18, uiScale),
+      fontStyle: 'normal',
       color: PALETTE.textDark,
       wordWrap: { width: hintJournalBodyTextWidth },
       lineSpacing: Math.round(5 * uiScale),
@@ -501,6 +670,7 @@ export default class QuestionScene extends Phaser.Scene {
     const hintJournalFootnote = this.add.text(centerX - (hintJournalWidth / 2) + hintJournalInnerPadding, hintJournalFootnoteY, '', {
       fontFamily: 'Manrope, Arial, sans-serif',
       fontSize: fontSize(15, uiScale),
+      fontStyle: 'normal',
       color: PALETTE.modalMuted,
       wordWrap: { width: hintJournalWidth - (hintJournalInnerPadding * 2) },
       lineSpacing: Math.round(3 * uiScale),
@@ -586,7 +756,7 @@ export default class QuestionScene extends Phaser.Scene {
     const hintConfirmBg = this.add.rectangle(centerX, hintConfirmY, hintConfirmWidth, hintConfirmHeight, PALETTE.modalCard, 1)
       .setStrokeStyle(3, PALETTE.panelBorder, 1);
     const hintConfirmTitle = this.add.text(centerX, hintConfirmY - Math.round(42 * uiScale), 'Unlock Hint?', {
-      fontFamily: 'Manrope, Arial, sans-serif',
+      fontFamily: 'PixelOperator8, monospace',
       fontSize: fontSize(11, uiScale),
       color: PALETTE.textDark,
       align: 'center',
@@ -628,6 +798,8 @@ export default class QuestionScene extends Phaser.Scene {
     ]);
 
     let pendingHintPurchase = false;
+    let pendingAnswerResult = null;
+    let questionResultSent = false;
     const hideHintOverlays = () => {
       pendingHintPurchase = false;
       hintOverlayBackdrop.setVisible(false);
@@ -635,19 +807,26 @@ export default class QuestionScene extends Phaser.Scene {
       hintConfirmContainer.setVisible(false);
     };
     const closeQuestionScene = () => {
-      if (this.hasAnswered) {
+      if (!isWordScramble && this.question?.lockAttemptSessionOnClose) {
+        showFeedback('Complete this treasure attempt session before closing.', PALETTE.textSoft);
         return;
       }
 
       hideHintOverlays();
       this.hasAnswered = true;
-      closeQuestionButton.disableInteractive();
-      closeQuestionButton.setAlpha(0.6);
-      closeQuestionLabel.setAlpha(0.6);
+      if (questionResultSent) return;
+      questionResultSent = true;
       const levelScene = this.scene.get('LevelScene');
-      levelScene.events.emit('question:closed', {
-        questionId: this.questionId,
-      });
+      if (typeof pendingAnswerResult === 'boolean') {
+        levelScene.events.emit('question:answered', {
+          questionId: this.questionId,
+          correct: pendingAnswerResult,
+        });
+      } else {
+        levelScene.events.emit('question:closed', {
+          questionId: this.questionId,
+        });
+      }
       this.scene.stop();
     };
     const closeQuestionKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
@@ -765,8 +944,9 @@ export default class QuestionScene extends Phaser.Scene {
     const updateHintButtonState = () => {
       coinBalanceLabel.setText(`Coins: ${this.availableCoins}`);
       const hasUnlockedHints = this.hintIndex > 0;
-      hintHotspot.setFillStyle(hasUnlockedHints ? 0xfff3c7 : PALETTE.hintIconBg, 1);
-      hintHotspot.setStrokeStyle(2, hasUnlockedHints ? PALETTE.headerAccent : PALETTE.hintIconBorder, 1);
+      hintHotspotLabel.setText('Hint');
+      hintHotspot.setFillStyle(hasUnlockedHints ? 0xfff3c7 : (isWordScramble ? 0xe7bd68 : PALETTE.hintIconBg), 1);
+      hintHotspot.setStrokeStyle(2, hasUnlockedHints ? challengeAccentColor : (isWordScramble ? challengeBorderColor : PALETTE.hintIconBorder), 1);
       hintHotspotInner.setFillStyle(
         hasHintsAvailable
           ? (hasUnlockedHints ? PALETTE.headerAccent : PALETTE.hintIconActive)
@@ -808,12 +988,12 @@ export default class QuestionScene extends Phaser.Scene {
       }
       unlockNextHint();
     });
-    closeQuestionButton.on('pointerup', () => {
+    closeQuestionButton.on('pointerup', (pointer, localX, localY, event) => {
+      event?.stopPropagation?.();
       closeQuestionScene();
     });
 
     const optionButtons = [];
-    const optionsTop = promptTop + promptBoxHeight + Math.round(20 * uiScale);
     const optionWidth = innerWidth;
     const medallionRadius = Math.max(15, Math.round(17 * uiScale));
     const optionLabelX = innerLeft + Math.round(76 * uiScale);
@@ -822,7 +1002,222 @@ export default class QuestionScene extends Phaser.Scene {
       ? Phaser.Math.Clamp(answerIndexRaw, 0, preparedChoices.length - 1)
       : 0;
 
-    preparedChoices.forEach((choice, index) => {
+    if (isWordScramble) {
+      const jumbledWord = String(
+        this.question?.jumbledWord || legacyJumbledWordMatch?.[1] || '',
+      ).trim().toUpperCase();
+      const expectedAnswer = String(
+        this.question?.answer || preparedChoices[answerIndex]?.text || '',
+      ).replace(/[^a-z]/gi, '').toUpperCase();
+      const tileSize = Math.round(25 * treasureFrameScale);
+      const tileGap = Math.round(6 * treasureFrameScale);
+      const tileRowWidth = (jumbledWord.length * tileSize) + (Math.max(0, jumbledWord.length - 1) * tileGap);
+      const tileStartX = centerX - (tileRowWidth / 2) + (tileSize / 2);
+      const tileY = treasureY(222);
+
+      [...jumbledWord].forEach((letter, index) => {
+        const tileX = tileStartX + (index * (tileSize + tileGap));
+        addRoundedPanel(this, tileX + 3, tileY + 4, tileSize, tileSize, 7, 0x3b1d0c, 0.42);
+        addRoundedPanel(this, tileX, tileY, tileSize, tileSize, 7, 0xf4cf7a, 0.96, 0xb8732f, 2);
+        this.add.text(tileX, tileY, letter, {
+          fontFamily: 'Manrope, Arial, sans-serif',
+          fontSize: fontSize(16, treasureFrameScale),
+          fontStyle: 'bold',
+          color: '#4b2b20',
+        }).setOrigin(0.5);
+      });
+
+      const answerY = treasureY(259);
+      const answerGap = Math.max(5, Math.round(7 * treasureFrameScale));
+      const answerRowWidth = Math.round(innerWidth * 0.82);
+      const answerSlotSize = Math.min(
+        Math.round(26 * treasureFrameScale),
+        Math.floor((answerRowWidth - (answerGap * Math.max(0, expectedAnswer.length - 1))) / expectedAnswer.length),
+      );
+      const actualAnswerWidth = (answerSlotSize * expectedAnswer.length) + (answerGap * Math.max(0, expectedAnswer.length - 1));
+      const answerStartX = centerX - (actualAnswerWidth / 2) + (answerSlotSize / 2);
+      addRoundedPanel(
+        this,
+        centerX,
+        answerY,
+        actualAnswerWidth + Math.round(28 * treasureFrameScale),
+        answerSlotSize + Math.round(4 * treasureFrameScale),
+        Math.round(10 * treasureFrameScale),
+        0xfff0c8,
+        0.24,
+        0x2f6650,
+        2,
+      );
+      const answerSlots = Array.from({ length: expectedAnswer.length }, (_, index) => {
+        const x = answerStartX + (index * (answerSlotSize + answerGap));
+        const box = this.add.rectangle(x, answerY, answerSlotSize, answerSlotSize, 0xffdfa3, 0.72)
+          .setStrokeStyle(2, 0xe8bd70, 1);
+        const label = this.add.text(x, answerY, '', {
+          fontFamily: 'Manrope, Arial, sans-serif',
+          fontSize: fontSize(16, treasureFrameScale),
+          fontStyle: 'bold',
+          color: '#4b2816',
+        }).setOrigin(0.5);
+        return { box, label };
+      });
+
+      const answerWrapper = document.createElement('div');
+      answerWrapper.style.width = `${actualAnswerWidth}px`;
+      answerWrapper.style.height = `${answerSlotSize}px`;
+      answerWrapper.style.position = 'relative';
+
+      const answerInput = document.createElement('input');
+      answerInput.type = 'text';
+      answerInput.autocomplete = 'off';
+      answerInput.spellcheck = false;
+      answerInput.maxLength = expectedAnswer.length;
+      answerInput.setAttribute('aria-label', 'Unscrambled treasure answer');
+      answerInput.style.position = 'absolute';
+      answerInput.style.inset = '0';
+      answerInput.style.width = '100%';
+      answerInput.style.height = '100%';
+      answerInput.style.boxSizing = 'border-box';
+      answerInput.style.border = '0';
+      answerInput.style.outline = 'none';
+      answerInput.style.background = 'transparent';
+      answerInput.style.color = 'transparent';
+      answerInput.style.caretColor = 'transparent';
+      answerInput.style.opacity = '0.001';
+      answerInput.style.fontFamily = 'Manrope, Arial, sans-serif';
+      answerInput.style.fontSize = `${Math.round(21 * uiScale)}px`;
+      answerInput.style.fontWeight = '400';
+      answerInput.style.letterSpacing = '0.14em';
+      answerInput.style.textAlign = 'center';
+      answerInput.style.textTransform = 'uppercase';
+      answerInput.style.padding = '0';
+      answerInput.style.pointerEvents = 'auto';
+      answerInput.style.cursor = 'text';
+      answerWrapper.appendChild(answerInput);
+      answerWrapper.addEventListener('pointerdown', () => answerInput.focus());
+      answerInput.addEventListener('input', () => {
+        const letters = answerInput.value.replace(/[^a-z]/gi, '').toUpperCase();
+        if (answerInput.value !== letters) answerInput.value = letters;
+        answerSlots.forEach((slot, index) => { slot.label.setText(letters[index] || ''); });
+      });
+      this.add.dom(centerX, answerY, answerWrapper).setOrigin(0.5);
+      const answerFocusFrame = window.requestAnimationFrame(() => answerInput.focus());
+      cleanupHandlers.push(() => window.cancelAnimationFrame(answerFocusFrame));
+
+      // The green button is painted into the frame around source y=308.
+      // Keep its label, hit area, and status message on that same baseline.
+      const submitY = treasureY(308);
+      const submitButton = this.add.rectangle(
+        centerX,
+        submitY,
+        Math.round(270 * uiScale),
+        Math.round(42 * uiScale),
+        challengeHeaderColor,
+        1,
+      ).setStrokeStyle(2, challengeBorderColor, 1)
+        .setInteractive({ useHandCursor: true });
+      if (hasQuestionFrame) submitButton.setAlpha(0.001);
+      const submitLabel = this.add.text(
+        centerX,
+        hasQuestionFrame ? submitY - (2 * treasureFrameScale) : submitY,
+        'UNLOCK TREASURE',
+        {
+        fontFamily: 'Manrope, Arial, sans-serif',
+        fontSize: fontSize(hasQuestionFrame ? 12 : 16, hasQuestionFrame ? treasureFrameScale : uiScale),
+        fontStyle: 'bold',
+        color: '#fff4cc',
+        },
+      ).setOrigin(0.5);
+      let attemptInProgress = false;
+      const submitWordAnswer = () => {
+        if (this.hasAnswered || attemptInProgress) return;
+        const submittedAnswer = answerInput.value.replace(/[^a-z]/gi, '').toUpperCase();
+        if (!submittedAnswer) {
+          showFeedback('Enter the unscrambled word before unlocking the treasure.', '#8f4040');
+          answerInput.focus();
+          return;
+        }
+
+        hideHintOverlays();
+        attemptInProgress = true;
+        submitButton.disableInteractive();
+        answerInput.disabled = true;
+        const correct = submittedAnswer === expectedAnswer;
+        const answerSoundKey = correct ? 'gameOneCorrectAnswer' : 'gameOneIncorrectAnswer';
+        if (this.cache.audio.exists(answerSoundKey)) {
+          this.sound.play(answerSoundKey, { volume: getStudentSfxVolume(0.9) });
+        }
+        pendingAnswerResult = correct;
+        answerInput.style.borderColor = correct ? '#2f6237' : '#8f4040';
+        answerInput.style.background = correct ? '#eef8df' : '#fff0eb';
+        submitButton.setFillStyle(correct ? PALETTE.success : PALETTE.danger, 1);
+        submitButton.setStrokeStyle(3, correct ? PALETTE.successDark : PALETTE.dangerDark, 1);
+        const explanation = typeof this.question?.explanation === 'string'
+          ? this.question.explanation.trim()
+          : '';
+        const successText = typeof this.question?.successText === 'string' && this.question.successText.trim()
+          ? this.question.successText.trim()
+          : 'Correct!';
+        const configuredFailureMessages = Array.isArray(this.question?.failureMessages)
+          ? this.question.failureMessages.filter((message) => typeof message === 'string' && message.trim())
+          : [];
+        const failureMessages = configuredFailureMessages.length >= 3 ? configuredFailureMessages : [
+          'Incorrect. Review the three scroll clues and try again.',
+          'Incorrect. Think about what stores data in Java.',
+          'The chest remains sealed. Return to the checkpoint and try again.',
+        ];
+        const failureText = failureMessages[0];
+        const feedbackMessage = correct && explanation
+          ? `${successText} ${explanation}`
+          : (correct ? successText : failureText);
+        showFeedback(feedbackMessage, correct ? '#2f6237' : '#8f4040');
+        updateHintButtonState();
+
+        this.tweens.add({
+          targets: [submitButton, submitLabel],
+          scaleX: 1.025,
+          scaleY: 1.025,
+          duration: 120,
+          yoyo: true,
+        });
+
+        this.hasAnswered = true;
+        this.time.delayedCall(500, () => {
+          if (questionResultSent) return;
+          questionResultSent = true;
+          const levelScene = this.scene.get('LevelScene');
+          levelScene.events.emit('question:answered', {
+            questionId: this.questionId,
+            correct,
+          });
+          this.scene.stop();
+        });
+      };
+
+      submitButton.on('pointerover', () => {
+        if (!this.hasAnswered) submitButton.setFillStyle(0x8c5129, 1);
+      });
+      submitButton.on('pointerout', () => {
+        if (!this.hasAnswered) submitButton.setFillStyle(challengeHeaderColor, 1);
+      });
+      submitButton.on('pointerdown', submitWordAnswer);
+      const handleAnswerKeyDown = (event) => {
+        event.stopPropagation();
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          submitWordAnswer();
+        }
+      };
+      const stopAnswerKeyPropagation = (event) => event.stopPropagation();
+      answerInput.addEventListener('keydown', handleAnswerKeyDown);
+      answerInput.addEventListener('keyup', stopAnswerKeyPropagation);
+      answerInput.addEventListener('keypress', stopAnswerKeyPropagation);
+      cleanupHandlers.push(() => {
+        answerInput.removeEventListener('keydown', handleAnswerKeyDown);
+        answerInput.removeEventListener('keyup', stopAnswerKeyPropagation);
+        answerInput.removeEventListener('keypress', stopAnswerKeyPropagation);
+      });
+      this.time.delayedCall(120, () => answerInput.focus());
+    } else preparedChoices.forEach((choice, index) => {
       const y = optionsTop + (optionHeight / 2) + (index * (optionHeight + optionGap));
       const optionShadow = this.add.rectangle(centerX + Math.round(4 * uiScale), y + Math.round(4 * uiScale), optionWidth, optionHeight, PALETTE.optionShadow, 0.9);
       const optionBackground = this.add.rectangle(centerX, y, optionWidth, optionHeight, PALETTE.optionBg, 1)
@@ -830,31 +1225,74 @@ export default class QuestionScene extends Phaser.Scene {
         .setInteractive({ useHandCursor: true });
       const numberMedallion = this.add.circle(innerLeft + Math.round(36 * uiScale), y, medallionRadius, PALETTE.medallion, 1)
         .setStrokeStyle(2, PALETTE.headerDark, 1);
-      const numberLabel = this.add.text(numberMedallion.x, y, choice.label, {
-        fontFamily: 'Manrope, Arial, sans-serif',
-        fontSize: fontSize(13, uiScale),
-        fontStyle: '700',
-        color: PALETTE.medallionText,
-        align: 'center',
-      }).setOrigin(0.5);
+      const numberLabelWrapper = document.createElement('div');
+      numberLabelWrapper.style.width = `${Math.round(medallionRadius * 2)}px`;
+      numberLabelWrapper.style.height = `${Math.round(medallionRadius * 2)}px`;
+      numberLabelWrapper.style.display = 'flex';
+      numberLabelWrapper.style.alignItems = 'center';
+      numberLabelWrapper.style.justifyContent = 'center';
+      numberLabelWrapper.style.pointerEvents = 'none';
+      numberLabelWrapper.style.background = 'transparent';
+      numberLabelWrapper.style.boxSizing = 'border-box';
+
+      const numberLabelContent = document.createElement('div');
+      numberLabelContent.textContent = choice.label;
+      numberLabelContent.style.fontFamily = 'Manrope, Arial, sans-serif';
+      numberLabelContent.style.fontSize = `${Math.round(13 * uiScale)}px`;
+      numberLabelContent.style.fontWeight = '400';
+      numberLabelContent.style.lineHeight = '1';
+      numberLabelContent.style.display = 'flex';
+      numberLabelContent.style.alignItems = 'center';
+      numberLabelContent.style.justifyContent = 'center';
+      numberLabelContent.style.width = '100%';
+      numberLabelContent.style.height = '100%';
+      numberLabelContent.style.textAlign = 'center';
+      numberLabelContent.style.color = PALETTE.medallionText;
+      numberLabelWrapper.appendChild(numberLabelContent);
+
+      const numberLabel = this.add.dom(Math.round(numberMedallion.x), Math.round(y), numberLabelWrapper)
+        .setOrigin(0.5);
 
       const optionLabelWidth = optionWidth - Math.round(108 * uiScale);
       const optionLabelHeight = optionHeight - Math.round(8 * uiScale);
-      const optionLabel = this.add.text(optionLabelX, y, choice.text, {
-        fontFamily: 'Manrope, Arial, sans-serif',
-        fontSize: fontSize(16, uiScale),
-        fontStyle: '600',
-        color: PALETTE.textDark,
-        align: 'left',
-        wordWrap: { width: optionLabelWidth, useAdvancedWrap: true },
-      }).setOrigin(0, 0.5);
+      const optionLabelWrapper = document.createElement('div');
+      optionLabelWrapper.style.width = `${optionLabelWidth}px`;
+      optionLabelWrapper.style.height = `${optionLabelHeight}px`;
+      optionLabelWrapper.style.display = 'flex';
+      optionLabelWrapper.style.alignItems = 'center';
+      optionLabelWrapper.style.justifyContent = 'center';
+      optionLabelWrapper.style.pointerEvents = 'none';
+      optionLabelWrapper.style.background = 'transparent';
+      optionLabelWrapper.style.overflow = 'hidden';
+      optionLabelWrapper.style.boxSizing = 'border-box';
+
+      const optionLabelContent = document.createElement('div');
+      optionLabelContent.textContent = choice.text;
+      optionLabelContent.style.width = '100%';
+      optionLabelContent.style.height = '100%';
+      optionLabelContent.style.display = 'flex';
+      optionLabelContent.style.alignItems = 'center';
+      optionLabelContent.style.fontFamily = 'Manrope, Arial, sans-serif';
+      optionLabelContent.style.fontSize = `${Math.round(18 * uiScale)}px`;
+      optionLabelContent.style.fontWeight = '400';
+      optionLabelContent.style.lineHeight = '1.2';
+      optionLabelContent.style.color = PALETTE.textDark;
+      optionLabelContent.style.whiteSpace = 'pre-wrap';
+      optionLabelContent.style.wordBreak = 'break-word';
+      optionLabelContent.style.textAlign = 'left';
+      optionLabelWrapper.appendChild(optionLabelContent);
+
+      const optionLabel = this.add.dom(Math.round(optionLabelX), Math.round(y), optionLabelWrapper)
+        .setOrigin(0, 0.5);
 
       const buttonRecord = {
         optionBackground,
         optionShadow,
         numberMedallion,
         numberLabel,
+        numberLabelContent,
         optionLabel,
+        optionLabelContent,
       };
       optionButtons.push(buttonRecord);
 
@@ -885,6 +1323,10 @@ export default class QuestionScene extends Phaser.Scene {
         closeQuestionButton.setAlpha(0.6);
         closeQuestionLabel.setAlpha(0.6);
         const correct = index === answerIndex;
+        const answerSoundKey = correct ? 'gameOneCorrectAnswer' : 'gameOneIncorrectAnswer';
+        if (this.cache.audio.exists(answerSoundKey)) {
+          this.sound.play(answerSoundKey, { volume: getStudentSfxVolume(0.9) });
+        }
 
         optionButtons.forEach((button, buttonIndex) => {
           button.optionBackground.disableInteractive();
@@ -893,8 +1335,8 @@ export default class QuestionScene extends Phaser.Scene {
             button.optionBackground.setFillStyle(PALETTE.success, 1);
             button.optionBackground.setStrokeStyle(3, PALETTE.successDark, 1);
             button.numberMedallion.setFillStyle(PALETTE.successDark, 1);
-            button.numberLabel.setColor(PALETTE.medallionText);
-            button.optionLabel.setColor('#f3fbe9');
+            button.numberLabelContent.style.color = PALETTE.medallionText;
+            button.optionLabelContent.style.color = '#f3fbe9';
             return;
           }
 
@@ -902,8 +1344,8 @@ export default class QuestionScene extends Phaser.Scene {
             button.optionBackground.setFillStyle(PALETTE.danger, 1);
             button.optionBackground.setStrokeStyle(3, PALETTE.dangerDark, 1);
             button.numberMedallion.setFillStyle(PALETTE.dangerDark, 1);
-            button.numberLabel.setColor(PALETTE.medallionText);
-            button.optionLabel.setColor('#fff0eb');
+            button.numberLabelContent.style.color = PALETTE.medallionText;
+            button.optionLabelContent.style.color = '#fff0eb';
             return;
           }
 
@@ -939,7 +1381,7 @@ export default class QuestionScene extends Phaser.Scene {
           yoyo: true,
         });
 
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(500, () => {
           const levelScene = this.scene.get('LevelScene');
           levelScene.events.emit('question:answered', {
             questionId: this.questionId,

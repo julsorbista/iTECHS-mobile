@@ -1,0 +1,94 @@
+.game-five-combo-feedback {
+  position: absolute;
+  left: 50%;
+  top: 118px;
+  z-index: 40;
+  transform: translateX(-50%);
+  min-width: 180px;
+  padding: 12px 22px;
+  color: #fff7c2;
+  filter: drop-shadow(0 8px 5px rgba(23, 10, 3, 0.42));
+  font-size: 1.3rem;
+  font-weight: 900;
+  white-space: nowrap;
+  display: grid;
+  justify-items: center;
+  line-height: 1;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.game-five-combo-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  transform: rotate(-1deg);
+  text-shadow: 0 3px 0 #9a3412, 3px 0 0 #7c2d12, -3px 0 0 #7c2d12,
+    0 -3px 0 #7c2d12, 0 7px 8px rgba(0, 0, 0, 0.42);
+}
+
+.game-five-combo-number {
+  color: #fde047;
+  font-size: 1.85em;
+  font-style: italic;
+  letter-spacing: -0.05em;
+}
+
+.game-five-combo-word {
+  font-size: 1.05em;
+  font-style: italic;
+  letter-spacing: 0.06em;
+}
+
+.game-five-combo-multiplier {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 1.35em;
+  font-style: italic;
+  text-shadow: 0 3px 0 #0f766e, 3px 0 0 #115e59, -3px 0 0 #115e59,
+    0 -3px 0 #115e59, 0 0 16px rgba(45, 212, 191, 0.95);
+  animation: gameFiveMultiplierSlam 1.25s cubic-bezier(.2, .9, .25, 1) both;
+}
+
+.game-five-combo-burst {
+  position: absolute;
+  inset: 4px -18px;
+  z-index: -1;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 3%, transparent 4%),
+    repeating-conic-gradient(from 8deg, rgba(250, 204, 21, 0.78) 0 4deg, transparent 4deg 19deg);
+  clip-path: polygon(50% 0, 58% 35%, 88% 12%, 70% 43%, 100% 50%, 68% 58%,
+    88% 88%, 57% 66%, 50% 100%, 43% 66%, 12% 88%, 32% 57%, 0 50%,
+    32% 42%, 12% 12%, 43% 35%);
+  animation: gameFiveComboBurst 650ms ease-out both;
+}
+
+.game-five-combo-feedback--milestone {
+  min-width: 220px;
+  padding: 15px 26px;
+  font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+  animation: gameFiveComboMilestone 1.25s cubic-bezier(.16, .84, .24, 1) both;
+}
+
+@keyframes gameFiveComboMilestone {
+  0% { opacity: 0; transform: translate(-50%, 18px) scale(0.35) rotate(-7deg); filter: brightness(1.7) blur(5px); }
+  12% { opacity: 1; transform: translate(-50%, -5px) scale(1.42) rotate(3deg); filter: brightness(1.35) blur(0); }
+  23% { transform: translate(-50%, 2px) scale(0.9) rotate(-2deg); }
+  34%, 72% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(0); filter: brightness(1); }
+  100% { opacity: 0; transform: translate(-50%, -42px) scale(1.08); filter: blur(2px); }
+}
+
+@keyframes gameFiveMultiplierSlam {
+  0%, 17% { opacity: 0; transform: translateY(-12px) scale(2.2); }
+  28% { opacity: 1; transform: translateY(3px) scale(0.82); }
+  39%, 76% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(1.08); }
+}
+
+@keyframes gameFiveComboBurst {
+  0% { opacity: 0; transform: scale(0.25) rotate(-18deg); }
+  20% { opacity: 0.95; transform: scale(1.12) rotate(3deg); }
+  100% { opacity: 0; transform: scale(1.45) rotate(10deg); }
+}
+.game-five-shell { background: #F3E3B5; }
+.game-five-shell .game-five-hud { background: #F3E3B5; border-color: #5A351D; }
+.game-five-keyboard button:not(:disabled) { background: #fff7dc; }

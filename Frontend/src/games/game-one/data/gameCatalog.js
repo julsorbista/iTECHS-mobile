@@ -1,8 +1,8 @@
 export const gameOneCatalog = {
   gameType: 'GAME_ONE',
   title: '2D Phaser Adventure',
-  subtitle: 'Tutorial Grove to Level 05',
-  summary: 'A room-based platformer that teaches movement, hazard awareness, and question-driven room unlocks.',
+  subtitle: 'Hidden Value Grove to Echoing Labyrinth',
+  summary: 'A room-based platformer that teaches movement, exploration, and hazard awareness.',
   availableLevels: 5
 };
 

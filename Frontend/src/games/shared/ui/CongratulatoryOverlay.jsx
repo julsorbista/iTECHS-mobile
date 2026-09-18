@@ -1,6 +1,10 @@
-import React from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { CheckCircle2, ChevronRight, Star } from 'lucide-react';
 import { FALLBACK_CONGRATS_MESSAGE } from './completionText';
+import celebrationSound from '../../../assets/game-arcade/audio/YAY Kids (Celebration) Sound Effect [Free Download].mp3';
+import congratulationsFrame from '../../game-one/assets/ui/congratulations-frame.png';
+import { getStudentSfxVolume } from '../../../utils/studentMenuAudio';
 
 const CONFETTI_COLORS = ['#facc15', '#fb7185', '#38bdf8', '#34d399', '#a78bfa', '#fb923c'];
 const CONFETTI_PIECES = Array.from({ length: 52 }, (_, index) => ({
@@ -23,8 +27,63 @@ const CongratulatoryOverlay = ({
   message = FALLBACK_CONGRATS_MESSAGE,
   onNext,
   nextLabel = 'Next',
-}) => (
-  <div className="game-three-result-overlay">
+  renderInPortal = false,
+  soundDelayMs = 0,
+}) => {
+  const completionMessage = String(message || '').replace(/\s*Great job!\s*$/i, '').trim();
+
+  useEffect(() => {
+    const audio = new Audio(celebrationSound);
+    audio.volume = getStudentSfxVolume(1);
+    audio.preload = 'auto';
+    audio.muted = false;
+    audio.load();
+
+    let playbackStarted = false;
+    let playbackAttemptPending = false;
+
+    const playCelebration = () => {
+      if (playbackStarted || playbackAttemptPending || !audio.paused) return;
+
+      audio.volume = getStudentSfxVolume(1);
+      audio.muted = false;
+      audio.currentTime = 0;
+      playbackAttemptPending = true;
+      const playPromise = audio.play();
+      if (playPromise?.then) {
+        playPromise
+          .then(() => {
+            playbackAttemptPending = false;
+            playbackStarted = true;
+            window.removeEventListener('pointerdown', playCelebration);
+            window.removeEventListener('keydown', playCelebration);
+          })
+          .catch(() => {
+            playbackAttemptPending = false;
+            window.addEventListener('pointerdown', playCelebration, { once: true });
+            window.addEventListener('keydown', playCelebration, { once: true });
+          });
+      } else {
+        playbackAttemptPending = false;
+        playbackStarted = true;
+      }
+    };
+
+    const timerIds = [0, 300, 900].map((retryDelay) =>
+      window.setTimeout(playCelebration, soundDelayMs + retryDelay),
+    );
+
+    return () => {
+      timerIds.forEach((timerId) => window.clearTimeout(timerId));
+      window.removeEventListener('pointerdown', playCelebration);
+      window.removeEventListener('keydown', playCelebration);
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [soundDelayMs]);
+
+  const overlay = (
+  <div className="game-three-result-overlay game-congrats-overlay">
     <div className="game-congrats-confetti" aria-hidden="true">
       {CONFETTI_PIECES.map((piece, index) => (
         <span
@@ -46,7 +105,10 @@ const CongratulatoryOverlay = ({
       ))}
     </div>
 
-    <div className="game-three-result-card game-congrats-card">
+    <div
+      className="game-three-result-card game-congrats-card game-congrats-reference-card"
+      style={{ backgroundImage: `url(${congratulationsFrame})` }}
+    >
       <div className="game-congrats-content">
         <p className="student-mini-kicker">{kicker}</p>
 
@@ -55,18 +117,31 @@ const CongratulatoryOverlay = ({
           <span>{title}</span>
         </div>
 
-        <p className="text-center text-base font-semibold leading-7 text-slate-700">
-          {message}
-        </p>
+        <div className="game-congrats-stars" aria-label="3 stars">
+          <Star aria-hidden="true" />
+          <Star aria-hidden="true" />
+          <Star aria-hidden="true" />
+        </div>
+
+        <div className="game-congrats-copy">
+          <p className="game-congrats-message">{completionMessage}</p>
+          <p className="game-congrats-great-job">Great job!</p>
+        </div>
 
         <div className="game-three-result-actions">
           <button type="button" className="btn btn-primary" onClick={onNext}>
-            {nextLabel}
+            <span>{nextLabel}</span>
+            <ChevronRight aria-hidden="true" />
           </button>
         </div>
       </div>
     </div>
   </div>
-);
+  );
+
+  return renderInPortal && typeof document !== 'undefined'
+    ? createPortal(overlay, document.body)
+    : overlay;
+};
 
 export default CongratulatoryOverlay;

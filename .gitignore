@@ -22,3 +22,5 @@ Thumbs.db
 # Local database exports and backups
 Backend/data/backup-*.json
 Backend/data/*.sql
+
+.codex/

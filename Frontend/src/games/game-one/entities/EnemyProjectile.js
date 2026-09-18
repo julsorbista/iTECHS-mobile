@@ -30,6 +30,10 @@ export default class EnemyProjectile extends Phaser.Physics.Arcade.Sprite {
       : Boolean(config.flipWithDirection);
 
     applyConfiguredSpriteScale(this, manifest, config, { minWidth: 6 });
+    this.baseScaleX = Math.abs(this.scaleX);
+    this.baseScaleY = Math.abs(this.scaleY);
+    this.hasFireFlightEffect = this.animationKey === 'game-one-elemental-fire-projectile';
+    this.fireFlightPhase = Math.random() * Math.PI * 2;
     this.applyDirectionalVisuals();
     this.body.setAllowGravity(false);
     this.body.setImmovable(true);
@@ -61,6 +65,16 @@ export default class EnemyProjectile extends Phaser.Physics.Arcade.Sprite {
   update(time) {
     if (!this.active) {
       return;
+    }
+
+    if (this.hasFireFlightEffect) {
+      const elapsedSeconds = (time - this.spawnedAt) / 1000;
+      const flicker = Math.sin((elapsedSeconds * 15) + this.fireFlightPhase);
+      const stretch = 1 + (flicker * 0.07);
+      const squeeze = 1 - (flicker * 0.035);
+      this.setScale(this.baseScaleX * stretch, this.baseScaleY * squeeze);
+      this.setAlpha(0.92 + ((flicker + 1) * 0.04));
+      this.setAngle((this.directionalRotationDeg * this.direction) + (flicker * 2));
     }
 
     if (

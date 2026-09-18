@@ -181,6 +181,19 @@ export const getStudentSfxVolumePreference = () => {
   }
 };
 
+const scaleStudentVolume = (baseVolume, preferencePercent) => {
+  const normalizedBase = Math.max(0, Math.min(1, Number(baseVolume) || 0));
+  return normalizedBase * (clampVolumePercent(preferencePercent) / 100);
+};
+
+export const getStudentMusicVolume = (baseVolume = 1) => (
+  scaleStudentVolume(baseVolume, getStudentAudioVolumePreference())
+);
+
+export const getStudentSfxVolume = (baseVolume = 1) => (
+  scaleStudentVolume(baseVolume, getStudentSfxVolumePreference())
+);
+
 export const getStudentMusicPreference = () => {
   return getStudentAudioVolumePreference() > 0;
 };

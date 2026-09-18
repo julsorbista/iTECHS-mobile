@@ -1,4 +1,5 @@
 import { CheckCircle2 } from 'lucide-react';
+import { TutorialActionHand } from './TutorialHandPointer';
 
 const PlayableTutorialCoach = ({
   kicker = '',
@@ -70,13 +71,16 @@ const PlayableTutorialCoach = ({
                 {exitLabel}
               </button>
             )}
-            <button
-              type="button"
-              className="border-[3px] border-[#432644] bg-[#dff3ff] px-5 py-3 text-base font-black shadow-[4px_4px_0_#432644] transition hover:bg-[#cbe9f7]"
-              onClick={onContinue}
-            >
-              {currentStep.buttonLabel || 'Continue'}
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                className="border-[3px] border-[#432644] bg-[#dff3ff] px-5 py-3 text-base font-black shadow-[4px_4px_0_#432644] transition hover:bg-[#cbe9f7]"
+                onClick={onContinue}
+              >
+                {currentStep.buttonLabel || 'Continue'}
+              </button>
+              <TutorialActionHand />
+            </div>
           </div>
         </div>
       </div>

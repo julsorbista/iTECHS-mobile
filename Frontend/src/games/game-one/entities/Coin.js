@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getStudentSfxVolume } from '../../../utils/studentMenuAudio';
 
 const DEFAULT_COIN_SIZE = 36;
 
@@ -28,7 +29,7 @@ export default class Coin extends Phaser.Physics.Arcade.Sprite {
       const coinSoundKey = this.scene.manifest.sounds.coin.key;
       if (this.scene.cache.audio.exists(coinSoundKey)) {
         this.scene.sound.play(coinSoundKey, { 
-          volume: this.scene.manifest.sounds.coin.volume || 0.7 
+          volume: getStudentSfxVolume(this.scene.manifest.sounds.coin.volume || 0.7),
         });
       }
     }

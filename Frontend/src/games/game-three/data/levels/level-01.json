@@ -4,7 +4,7 @@
   "levelNumber": 1,
   "title": "Data Basics",
   "subtitle": "4 cards | 2 pairs",
-  "objective": "Find 2 matching pairs of programming concepts. Each solved pair reveals a multiple-choice question about that term.",
+  "objective": "Find 2 matching pairs of programming concepts before the flip attempts run out.",
   "viewport": {
     "width": 1280,
     "height": 720

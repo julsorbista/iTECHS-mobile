@@ -119,23 +119,35 @@
 
   .game-two-code-slot-stack {
     display: grid;
-    gap: 0.55rem;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 10px;
+    background: rgba(2, 6, 23, 0.34);
+    padding-block: 0.3rem;
   }
 
   .game-two-code-structure-line {
     display: grid;
     grid-template-columns: 2rem minmax(0, 1fr);
-    gap: 0.6rem;
+    gap: 0;
     align-items: stretch;
+    min-height: 3.45rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  }
+
+  .game-two-code-structure-line:last-child {
+    border-bottom: 0;
   }
 
   .game-two-code-line-number {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.8rem;
-    border-radius: 10px;
-    background: rgba(148, 163, 184, 0.14);
+    min-height: 3.45rem;
+    border-right: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 0;
+    background: rgba(148, 163, 184, 0.06);
     color: rgb(125, 211, 252);
     font-family: "Courier New", Courier, monospace;
     font-size: 0.82rem;
@@ -194,6 +206,82 @@
     background: rgba(6, 78, 59, 0.24);
   }
 
+  .game-two-code-reorder-slot {
+    min-width: 0;
+    min-height: 3.45rem;
+    margin: 0.28rem 0.45rem;
+    border-radius: 7px;
+  }
+
+  .game-two-code-reorder-slot.game-two-code-drop-slot-filled {
+    margin: 0;
+    border-color: transparent;
+    border-radius: 0;
+    background: transparent;
+    padding: 0 0.45rem;
+  }
+
+  .game-two-code-debug-repair-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+    width: 100%;
+  }
+
+  .game-two-code-broken-reference,
+  .game-two-code-answer-area {
+    display: grid;
+    gap: 0.45rem;
+    width: 100%;
+  }
+
+  .game-two-code-broken-reference {
+    padding: 0.8rem;
+    border: 2px solid rgba(251, 146, 60, 0.65);
+    border-radius: 12px;
+    background: rgba(124, 45, 18, 0.28);
+  }
+
+  .game-two-code-broken-reference span,
+  .game-two-code-answer-label,
+  .game-two-code-broken-reference small {
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .game-two-code-broken-reference span {
+    color: rgb(254, 215, 170);
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .game-two-code-broken-reference code {
+    color: rgb(254, 226, 226);
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1rem;
+    font-weight: 900;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .game-two-code-broken-reference small {
+    color: rgb(253, 186, 116);
+  }
+
+  .game-two-code-answer-label {
+    color: rgb(186, 230, 253);
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .game-two-code-answer-area .game-two-code-drop-slot {
+    width: 100%;
+    min-height: 5rem;
+    border-width: 3px;
+    background: rgba(14, 165, 233, 0.1);
+  }
+
   .game-two-code-placed-snippet {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
@@ -214,6 +302,34 @@
     font-family: "Courier New", Courier, monospace;
     font-size: 0.88rem;
     font-weight: 900;
+  }
+
+  .game-two-code-placed-line {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    min-height: 3.45rem;
+    border-radius: 0;
+    background: transparent;
+    color: rgb(226, 232, 240);
+    padding: 0.45rem 0.2rem;
+  }
+
+  .game-two-code-placed-line:hover {
+    background: rgba(125, 211, 252, 0.06);
+  }
+
+  .game-two-code-placed-line > svg {
+    color: rgb(100, 116, 139);
+  }
+
+  .game-two-code-placed-line code {
+    color: rgb(226, 232, 240);
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .game-two-code-placed-line .game-two-code-clear-slot {
+    background: rgba(248, 113, 113, 0.12);
+    color: rgb(254, 202, 202);
   }
 
   .game-two-code-clear-slot {
@@ -438,6 +554,10 @@
   min-height: 4.5rem;
 }
 
+.game-two-code-lab-shell .game-two-code-reorder-slot {
+  min-height: 3.45rem;
+}
+
 .game-two-code-lab-shell .game-two-code-drag-card {
   min-height: 4.75rem;
   padding: 0.9rem 1rem;
@@ -513,54 +633,6 @@
   text-transform: none;
 }
 
-.game-two-code-touch-handle {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  min-height: 2.5rem;
-  border-radius: 10px;
-  background: rgb(241, 245, 249);
-  color: rgb(71, 85, 105);
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.game-two-code-touch-handle:active {
-  cursor: grabbing;
-  background: rgb(224, 242, 254);
-  color: rgb(3, 105, 161);
-}
-
-.game-two-code-touch-ghost {
-  position: fixed;
-  z-index: 10000;
-  display: grid;
-  width: min(17rem, calc(100vw - 2rem));
-  gap: 0.2rem;
-  padding: 0.7rem 0.85rem;
-  border: 2px solid rgb(14, 165, 233);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.97);
-  color: rgb(15, 23, 42);
-  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.3);
-  pointer-events: none;
-  transform: translate(-50%, calc(-100% - 0.75rem));
-}
-
-.game-two-code-touch-ghost strong {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-}
-
-.game-two-code-touch-ghost code {
-  overflow-wrap: anywhere;
-  font-size: 0.8rem;
-}
-
 @media (max-width: 1100px) {
   .game-two-code-lab-shell .game-two-code-lab-layout {
     grid-template-columns: 1fr;
@@ -580,259 +652,712 @@
   .game-two-code-lab-shell .game-two-code-drop-workspace {
     grid-template-columns: 1fr;
   }
+}
 
-  .game-two-shell.game-two-code-lab-shell {
-    width: 100%;
-    min-width: 0;
-    min-height: 100dvh;
-    padding: 0.4rem;
-    overflow-x: hidden;
+.student-game-overlay-game-two-active .student-shell-overlay.student-shell {
+  padding: clamp(0.25rem, 0.65vw, 0.55rem);
+}
+
+.student-game-overlay-game-two-active .student-shell-main-game-two,
+.student-game-overlay-game-two-active .student-game-three-overlay-layout {
+  width: 100%;
+  max-width: none;
+}
+
+.student-game-overlay-game-two-active .student-game-three-overlay-layout {
+  gap: 0;
+  min-height: calc(100dvh - 1rem);
+}
+
+.student-game-overlay-game-two-active .student-game-two-frame-panel {
+  overflow: hidden !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 24px;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.student-game-overlay-game-two-active .student-game-two-frame-wrap,
+.student-game-overlay-game-two-active .student-game-two-frame-shell {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.game-two-fruit-shell {
+  position: relative;
+  width: 100%;
+  min-height: min(760px, calc(100vh - 112px));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(148, 101, 45, 0.55);
+  border-radius: 24px;
+  background: #050505 url("../../assets/game-two/industrial-frame-background.png") center / cover no-repeat;
+  color: #eafaff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  box-shadow: inset 0 0 38px rgba(255, 153, 39, 0.09), 0 24px 60px rgba(2, 6, 17, 0.28);
+  isolation: isolate;
+}
+
+.student-game-overlay-game-two-active .student-game-tutorial-test-button {
+  display: none;
+}
+
+.student-game-overlay-game-two-active .game-two-fruit-shell {
+  height: 100%;
+  min-height: calc(100dvh - 1rem);
+  aspect-ratio: auto;
+}
+
+.student-game-overlay-game-two-active .game-two-fruit-shell::after {
+  display: none;
+}
+
+.student-game-overlay-game-two-active .game-two-fruit-shell::before,
+.student-game-overlay-game-two-active .game-two-fruit-code-rain {
+  display: none;
+}
+
+.game-two-fruit-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(54, 217, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(rgba(54, 217, 255, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, transparent, black 20%, black 78%, transparent);
+}
+
+.game-two-fruit-shell::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  z-index: 3;
+  pointer-events: none;
+  border: 1px solid rgba(188, 255, 116, 0.18);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 0 28px rgba(54, 217, 255, 0.08),
+    0 0 18px rgba(188, 255, 116, 0.06);
+}
+
+.game-two-fruit-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100%;
+  min-height: 100%;
+  background: #050505;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.game-two-fruit-code-rain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  color: rgba(54, 217, 255, 0.14);
+  font: 700 16px "Courier New", monospace;
+  letter-spacing: 12px;
+  pointer-events: none;
+}
+
+.game-two-fruit-code-rain span {
+  position: absolute;
+  animation: game-two-fruit-rain linear infinite;
+}
+
+.game-two-fruit-code-rain span:nth-child(1) {
+  left: 7%;
+  animation-duration: 13s;
+}
+
+.game-two-fruit-code-rain span:nth-child(2) {
+  left: 25%;
+  animation-duration: 18s;
+  animation-delay: -7s;
+}
+
+.game-two-fruit-code-rain span:nth-child(3) {
+  left: 70%;
+  animation-duration: 15s;
+  animation-delay: -4s;
+}
+
+.game-two-fruit-code-rain span:nth-child(4) {
+  left: 89%;
+  animation-duration: 20s;
+  animation-delay: -12s;
+}
+
+.game-two-fruit-score,
+.game-two-fruit-lives {
+  position: absolute;
+  z-index: 4;
+  top: 18px;
+  display: grid;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.game-two-fruit-score {
+  left: clamp(28px, 3vw, 46px);
+}
+
+.game-two-fruit-lives {
+  top: 116px;
+  right: clamp(44px, 4vw, 72px);
+  text-align: right;
+}
+
+.game-two-fruit-score span,
+.game-two-fruit-combo > span,
+.game-two-fruit-code > span {
+  color: #8adcf2;
+  font-size: clamp(18px, 1.55vw, 24px);
+  font-weight: 1000;
+  letter-spacing: 1.8px;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.game-two-fruit-lives span {
+  color: #8adcf2;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.game-two-fruit-score strong {
+  color: #eafaff;
+  font-size: clamp(18px, 1.9vw, 28px);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 18px #36d9ff;
+}
+
+.game-two-fruit-lives strong {
+  color: #ff526b;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 12px #ff526b;
+}
+
+.game-two-fruit-mission {
+  position: absolute;
+  z-index: 4;
+  top: 18px;
+  left: 50%;
+  display: grid;
+  width: min(230px, 25vw);
+  padding: 11px 20px;
+  border: 2px solid #4a443a;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 16% 22%, rgba(255, 180, 66, 0.12), transparent 18%),
+    linear-gradient(180deg, rgba(55, 52, 46, 0.96), rgba(13, 14, 13, 0.94) 44%, rgba(35, 30, 24, 0.96));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 239, 194, 0.18),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 22px rgba(255, 153, 39, 0.08),
+    0 0 18px rgba(255, 153, 39, 0.13),
+    0 12px 24px rgba(0, 0, 0, 0.32);
+  text-align: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.game-two-fruit-mission strong {
+  color: #ffd15d;
+  overflow: hidden;
+  font-size: clamp(17px, 1.65vw, 24px);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 14px rgba(255, 183, 43, 0.72);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.game-two-fruit-actions {
+  position: absolute;
+  z-index: 6;
+  top: 22px;
+  left: auto;
+  right: clamp(8px, 1vw, 16px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+}
+
+.game-two-fruit-action-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  min-height: 42px;
+  padding: 9px 16px;
+  border: 2px solid #b8752d;
+  border-radius: 3px;
+  background:
+    linear-gradient(135deg, rgba(255, 191, 91, 0.18), transparent 24%, rgba(179, 103, 29, 0.2)),
+    linear-gradient(180deg, #5b5144, #17191b 72%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 232, 186, 0.25),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.66),
+    0 0 16px rgba(255, 153, 39, 0.2),
+    0 10px 18px rgba(0, 0, 0, 0.26);
+  color: #f3fbff;
+  font-family: inherit;
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(255, 195, 88, 0.38);
+  cursor: pointer;
+}
+
+.game-two-fruit-action-button:hover {
+  filter: brightness(1.08);
+}
+
+.game-two-fruit-back-button {
+  min-width: 100px;
+}
+
+.game-two-fruit-tutorial-button {
+  min-width: 168px;
+}
+
+.game-two-fruit-left,
+.game-two-fruit-right {
+  position: absolute;
+  z-index: 4;
+  top: 156px;
+  display: grid;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.game-two-fruit-left {
+  left: clamp(28px, 3vw, 46px);
+  width: min(330px, 30vw);
+}
+
+.game-two-fruit-right {
+  right: clamp(44px, 4vw, 72px);
+  top: 206px;
+  width: min(330px, 26vw);
+}
+
+.game-two-fruit-card {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 2px solid #4b463c;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 162, 43, 0.14), transparent 18%, transparent 82%, rgba(255, 162, 43, 0.1)),
+    linear-gradient(180deg, rgba(48, 47, 42, 0.96), rgba(11, 13, 14, 0.94) 39%, rgba(30, 27, 24, 0.96));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 241, 202, 0.16),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.62),
+    inset 0 0 24px rgba(255, 153, 39, 0.07),
+    0 0 18px rgba(255, 153, 39, 0.12),
+    0 14px 26px rgba(0, 0, 0, 0.34);
+}
+
+.game-two-fruit-card::before,
+.game-two-fruit-card::after,
+.game-two-fruit-mission::before,
+.game-two-fruit-mission::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #151515;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #d6c6a6 0 13%, #71695d 18% 42%, #1d1b18 48% 100%);
+  box-shadow: 0 0 0 1px rgba(255, 163, 50, 0.2), inset 0 0 4px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.game-two-fruit-card::before,
+.game-two-fruit-mission::before {
+  left: -5px;
+  top: -5px;
+}
+
+.game-two-fruit-card::after,
+.game-two-fruit-mission::after {
+  right: -5px;
+  bottom: -5px;
+}
+
+.game-two-fruit-combo,
+.game-two-fruit-output {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.game-two-fruit-output > span {
+  color: #ffd15d;
+  font-size: clamp(15px, 1.35vw, 19px);
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 183, 43, 0.48);
+}
+
+.game-two-fruit-combo {
+  min-height: 110px;
+}
+
+.game-two-fruit-output {
+  min-height: 270px;
+  grid-template-rows: auto minmax(96px, 1fr) minmax(104px, auto);
+  gap: 14px;
+}
+
+.game-two-fruit-code {
+  padding: 20px 22px 21px;
+}
+
+.game-two-fruit-combo strong,
+.game-two-fruit-output strong {
+  color: #ffd15d;
+  font-size: clamp(18px, 1.9vw, 28px);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 16px #ffb72b;
+}
+
+.game-two-fruit-output strong {
+  font-size: clamp(28px, 3.4vw, 40px);
+}
+
+.game-two-fruit-code-preview {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.game-two-fruit-code-preview strong {
+  color: #ffd15d;
+  font-size: clamp(18px, 1.45vw, 22px);
+  font-weight: 1000;
+  letter-spacing: 0.06em;
+  line-height: 1.05;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(255, 183, 43, 0.45);
+}
+
+.game-two-fruit-code code {
+  display: block;
+  min-width: 0;
+  max-height: none;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  color: #bcff74;
+  font: 800 clamp(14px, 0.95vw, 17px) "Courier New", monospace;
+  line-height: 1.18;
+  text-shadow: 0 0 12px rgba(188, 255, 116, 0.45);
+}
+
+.game-two-fruit-output code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+  max-height: 180px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #eafaff;
+  font: 800 clamp(20px, calc(1.55vw + 7px), 24px) "Courier New", monospace;
+  line-height: 1.42;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(54, 217, 255, 0.35);
+}
+
+.game-two-fruit-output strong {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 104px;
+  border-top: 1px solid rgba(138, 220, 242, 0.14);
+  text-align: center;
+}
+
+.game-two-fruit-output button,
+.game-two-fruit-output [class*="plus"] {
+  display: none !important;
+}
+
+.game-two-fruit-challenge-title {
+  color: #ffd15d;
+  font-size: clamp(22px, calc(1.25vw + 10px), 25px);
+  font-weight: 900;
+  line-height: 1.25;
+  text-shadow: 0 0 12px rgba(255, 209, 93, 0.38);
+}
+
+.game-two-fruit-flash {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 47%;
+  padding: 8px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(54, 217, 255, 0.45);
+  background: rgba(3, 10, 21, 0.62);
+  color: #eafaff;
+  font-size: clamp(20px, 3vw, 34px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow: 0 0 18px currentColor;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: game-two-fruit-flash-out 0.78s ease forwards;
+}
+
+.game-two-fruit-flash-bad {
+  color: #ff8fa0;
+}
+
+.game-two-slice-feedback {
+  position: absolute;
+  left: 50%;
+  top: 36%;
+  z-index: 9;
+  display: grid;
+  min-width: 190px;
+  place-items: center;
+  gap: 4px;
+  padding: 12px 20px;
+  border: 2px solid rgba(22, 20, 17, 0.9);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(44, 38, 31, 0.96), rgba(10, 12, 17, 0.94));
+  box-shadow: 0 0 28px rgba(255, 183, 43, 0.34), 0 12px 24px rgba(0, 0, 0, 0.44);
+  pointer-events: none;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: game-two-slice-feedback-pop 0.86s ease-out forwards;
+}
+
+.game-two-slice-feedback strong {
+  color: #ffd15d;
+  font-size: clamp(20px, 3vw, 38px);
+  font-weight: 1000;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(255, 209, 93, 0.85), 0 0 24px rgba(255, 134, 34, 0.5);
+}
+
+.game-two-slice-feedback span {
+  max-width: 320px;
+  overflow: hidden;
+  color: #f7efe0;
+  font: 800 clamp(11px, 1.35vw, 15px) "Courier New", monospace;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
+  white-space: nowrap;
+}
+
+.game-two-slice-feedback-syntax {
+  border-color: rgba(255, 209, 93, 0.82);
+}
+
+.game-two-slice-feedback-combo {
+  top: 28%;
+  border-color: rgba(255, 230, 123, 0.95);
+  background: radial-gradient(circle at center, rgba(255, 188, 52, 0.2), transparent 58%), linear-gradient(145deg, rgba(55, 43, 15, 0.98), rgba(12, 13, 20, 0.94));
+  animation-name: game-two-combo-feedback-pop;
+}
+
+.game-two-slice-feedback-combo strong {
+  font-size: clamp(28px, 4vw, 54px);
+}
+
+.game-two-slice-feedback-bomb {
+  border-color: rgba(255, 63, 79, 0.95);
+  box-shadow: 0 0 34px rgba(255, 51, 79, 0.48), 0 12px 24px rgba(0, 0, 0, 0.48);
+}
+
+.game-two-slice-feedback-bomb strong {
+  color: #ff6f82;
+  text-shadow: 0 0 10px rgba(255, 111, 130, 0.9), 0 0 24px rgba(255, 51, 79, 0.55);
+}
+
+.game-two-fruit-shake {
+  animation: game-two-fruit-shake 0.36s ease-in-out;
+}
+
+@keyframes game-two-fruit-rain {
+  from {
+    transform: translateY(-120px);
   }
-
-  .game-two-code-lab-shell .game-two-code-lab-layout,
-  .game-two-code-lab-shell .game-two-code-lab-main,
-  .game-two-code-lab-shell .game-two-code-lab-sidebar,
-  .game-two-code-lab-shell .game-two-code-drop-workspace,
-  .game-two-code-lab-shell .game-two-code-structure,
-  .game-two-code-lab-shell .game-two-code-snippet-tray {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.5rem;
-    margin: 0;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-main {
-    gap: 0.5rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-terminal,
-  .game-two-code-lab-shell .game-two-code-lab-task,
-  .game-two-code-lab-shell .game-two-side-card,
-  .game-two-code-lab-shell .game-two-task-list {
-    width: 100%;
-    min-width: 0;
-    padding: 0.65rem;
-    border-radius: 12px;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-terminal-bar {
-    align-items: flex-start;
-    gap: 0.25rem;
-    margin-bottom: 0.4rem;
-    font-size: 0.78rem;
-    line-height: 1.25;
-  }
-
-  .game-two-code-lab-shell .student-mini-kicker {
-    font-size: 0.68rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-terminal pre {
-    max-width: 100%;
-    max-height: 5.25rem;
-    overflow-x: auto;
-    overflow-y: auto;
-    font-size: 0.72rem;
-    line-height: 1.45;
-    white-space: pre;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-task {
-    gap: 0.5rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-task > h3 {
-    overflow-wrap: anywhere;
-    font-size: 1.25rem;
-    line-height: 1.2;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-task > p {
-    overflow-wrap: anywhere;
-    font-size: 0.88rem;
-    line-height: 1.4;
-  }
-
-  .game-two-code-lab-shell .game-two-code-drop-workspace {
-    gap: 0.5rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-structure,
-  .game-two-code-lab-shell .game-two-code-snippet-tray {
-    gap: 0.45rem;
-    padding: 0.6rem;
-    border-radius: 12px;
-  }
-
-  /* Keep the heading visible while all choices remain reachable on Android. */
-  .game-two-code-lab-shell .game-two-code-snippet-tray {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    height: clamp(14rem, 36dvh, 18rem);
-    max-height: 42dvh;
-    overflow: hidden;
-  }
-
-  .game-two-code-lab-shell .game-two-code-snippet-tray .game-two-code-drag-list {
-    flex: 1 1 auto;
-    min-height: 0;
-    max-height: none;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-gutter: stable;
-    padding-right: 0.3rem;
-    scrollbar-color: rgb(71, 85, 105) rgb(226, 232, 240);
-    scrollbar-width: auto;
-  }
-
-  .game-two-code-lab-shell .game-two-code-snippet-tray .game-two-code-drag-list::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  .game-two-code-lab-shell .game-two-code-snippet-tray .game-two-code-drag-list::-webkit-scrollbar-track {
-    border-radius: 999px;
-    background: rgb(226, 232, 240);
-  }
-
-  .game-two-code-lab-shell .game-two-code-snippet-tray .game-two-code-drag-list::-webkit-scrollbar-thumb {
-    min-height: 2.75rem;
-    border: 3px solid rgb(226, 232, 240);
-    border-radius: 999px;
-    background: rgb(71, 85, 105);
-  }
-
-  .game-two-code-lab-shell .game-two-code-structure-line {
-    grid-template-columns: 1.6rem minmax(0, 1fr);
-    gap: 0.4rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-line-number {
-    min-height: 3.25rem;
-    font-size: 0.7rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-fill-line {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    width: 100%;
-    font-size: 0.78rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-fill-line > code {
-    width: 100%;
-    min-height: auto;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-  }
-
-  .game-two-code-lab-shell .game-two-code-drop-slot {
-    width: 100%;
-    min-width: 0;
-    min-height: 3rem;
-    padding: 0.35rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-drop-slot > span,
-  .game-two-code-lab-shell .game-two-code-expression-note,
-  .game-two-code-lab-shell .game-two-question-feedback,
-  .game-two-code-lab-shell .game-two-hint-list {
-    font-size: 0.76rem;
-    line-height: 1.4;
-  }
-
-  .game-two-code-lab-shell .game-two-code-drag-card {
-    min-height: 3.25rem;
-    padding: 0.55rem 0.65rem;
-    flex: 0 0 auto;
-    touch-action: pan-y;
-  }
-
-  .game-two-code-lab-shell .game-two-code-touch-handle {
-    width: 2.75rem;
-    min-height: 2.75rem;
-    border: 1px solid rgb(203, 213, 225);
-  }
-
-  .game-two-code-lab-shell .game-two-question-footer {
-    position: sticky;
-    bottom: 0.35rem;
-    z-index: 4;
-    padding: 0.35rem;
-    border: 1px solid rgba(203, 213, 225, 0.9);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
-    backdrop-filter: blur(8px);
-  }
-
-  .game-two-code-lab-shell .game-two-code-drag-card code,
-  .game-two-code-lab-shell .game-two-code-placed-snippet code {
-    font-size: 0.78rem;
-    line-height: 1.4;
-  }
-
-  .game-two-code-lab-shell .game-two-question-footer {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-
-  .game-two-code-lab-shell .game-two-question-footer .btn {
-    width: 100%;
-    min-width: 0;
-    min-height: 2.8rem;
-    padding: 0.6rem 0.45rem;
-    font-size: 0.8rem;
-  }
-
-  .game-two-code-lab-shell .game-two-code-lab-sidebar {
-    gap: 0.65rem;
-  }
-
-  .game-two-code-lab-shell .game-two-side-card {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.4rem;
-  }
-
-  .game-two-code-lab-shell .game-two-side-card .student-stat-chip {
-    width: 100%;
-    min-width: 0;
-    min-height: 2.6rem;
-    padding: 0.5rem;
-    font-size: 0.75rem;
-    overflow-wrap: anywhere;
-  }
-
-  .game-two-code-lab-shell .game-two-task-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.4rem;
-  }
-
-  .game-two-code-lab-shell .game-two-task-tab {
-    min-width: 0;
-    min-height: 3rem;
-    padding: 0.5rem;
-    font-size: 0.76rem;
-  }
-
-  .game-two-code-lab-shell .game-two-task-tab strong {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  to {
+    transform: translateY(110vh);
   }
 }
 
+@keyframes game-two-fruit-shake {
+  25% {
+    transform: translate(-10px, 4px);
+  }
+  55% {
+    transform: translate(10px, -4px);
+  }
+  75% {
+    transform: translate(-6px, 2px);
+  }
+}
+
+@keyframes game-two-fruit-flash-out {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -42%) scale(0.86);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -68%) scale(0.98);
+  }
+}
+
+@keyframes game-two-slice-feedback-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -38%) scale(0.82) rotate(-2deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04) rotate(1deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translate(-50%, -58%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -76%) scale(0.94);
+  }
+}
+
+@keyframes game-two-combo-feedback-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -42%) scale(0.72);
+  }
+  16% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.16);
+  }
+  52% {
+    opacity: 1;
+    transform: translate(-50%, -54%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -82%) scale(0.92);
+  }
+}
+
+@media (max-width: 760px) {
+  .game-two-fruit-shell {
+    min-height: 560px;
+    aspect-ratio: 10 / 13;
+    border-radius: 18px;
+  }
+
+  .game-two-fruit-score {
+    left: 14px;
+  }
+
+  .game-two-fruit-lives {
+    right: 14px;
+  }
+
+  .game-two-fruit-actions {
+    top: 16px;
+    left: auto;
+    right: 8px;
+    gap: 10px;
+  }
+
+  .game-two-fruit-action-button {
+    height: 34px;
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+
+  .game-two-fruit-back-button {
+    min-width: 58px;
+  }
+
+  .game-two-fruit-tutorial-button {
+    min-width: 118px;
+  }
+
+  .game-two-fruit-mission {
+    top: 54px;
+    width: min(300px, 58vw);
+    padding: 7px 10px;
+  }
+
+  .game-two-fruit-left {
+    left: 18px;
+    top: 116px;
+    width: min(230px, 55vw);
+  }
+
+  .game-two-fruit-right {
+    right: 18px;
+    top: 242px;
+    width: min(210px, 48vw);
+  }
+
+  .game-two-fruit-card {
+    padding: 8px 10px;
+  }
+
+  .game-two-fruit-score span,
+  .game-two-fruit-combo > span,
+  .game-two-fruit-code > span {
+    font-size: 14px;
+    letter-spacing: 1.2px;
+  }
+
+  .game-two-fruit-lives span {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+  }
+}

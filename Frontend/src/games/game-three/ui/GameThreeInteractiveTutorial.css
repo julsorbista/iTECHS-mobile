@@ -1,0 +1,100 @@
+.g3-coach-backdrop { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; padding: 18px; background: #2d1b10b8; overflow: auto; }
+.g3-coach {
+  /* Level 1 library: parchment panels, wood, terracotta banners and olive plants. */
+  --g3-parchment: #fae8c8;
+  --g3-ink: #4d301f;
+  --g3-muted: #715039;
+  --g3-terracotta: #934b35;
+  --g3-olive: #46552b;
+  --g3-gold: #f6d68b;
+  position: relative; width: min(1080px, 100%); border: 1px solid #a8784c; border-radius: 22px; background: var(--g3-parchment); color: var(--g3-ink); font: 14px/1.5 'Space Grotesk', system-ui, sans-serif; box-shadow: 0 22px 90px #2d1b1070; outline: none; }
+.g3-coach *, .g3-coach *::before, .g3-coach *::after { box-sizing: border-box; }
+.g3-coach button { font: inherit; cursor: pointer; touch-action: manipulation; }
+.g3-coach button:disabled { cursor: default; }
+.g3-coach button:focus-visible { outline: 3px solid var(--g3-terracotta); outline-offset: 4px; }
+.g3-coach__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 22px; border-bottom: 1px solid #54321f; border-radius: 21px 21px 0 0; background: linear-gradient(145deg, #865b3c, #68412a); }
+.g3-coach__header > div { display: flex; align-items: center; gap: 10px; color: #f3dca4; }
+.g3-coach__header span { font-size: 9px; letter-spacing: .14em; }
+.g3-coach__header b { display: block; color: #fff1d5; font-size: 15px; letter-spacing: 0; }
+.g3-coach__skip, .g3-coach__back, .g3-coach__footer button { background: transparent; border: 0; color: var(--g3-muted); font-size: 12px !important; padding: 8px; }
+.g3-coach__skip:hover, .g3-coach__back:hover { color: var(--g3-terracotta); }
+.g3-coach .g3-coach__skip { color: #fae8c8; }
+.g3-coach .g3-coach__skip:hover { color: #fff; }
+.g3-coach .g3-coach__skip:focus-visible { outline-color: var(--g3-gold); }
+.g3-coach__layout { display: grid; grid-template-columns: minmax(0, 1fr) 345px; }
+.g3-coach__room { background-color: #c99a66; background-size: cover; background-position: center; min-width: 0; padding: 18px 24px 40px; }
+.g3-coach__room-heading { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; font-weight: 750; letter-spacing: .06em; color: var(--g3-ink); }
+.g3-coach__room-heading > span { padding: 4px 7px; border: 1px solid #bd936680; border-radius: 5px; background: #fae8c8eb; }
+.g3-coach__room-heading > span:last-child { display: flex; align-items: center; gap: 4px; }
+.g3-coach__board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 42px; width: min(100%, 440px); margin: 26px auto 32px; padding-right: 25px; }
+.g3-coach__board--single { margin-top: 90px; margin-bottom: 90px; }
+.g3-coach__card-slot { display: grid; justify-items: center; min-width: 0; }
+.g3-coach .g3-coach__card { height: clamp(120px, 24vh, 196px); width: auto; aspect-ratio: 477 / 625; border-radius: 14px; transition: box-shadow .3s; }
+.g3-coach .g3-coach__card .game-three-card-inner { width: 100%; height: 100%; aspect-ratio: 477 / 625; }
+.g3-coach__card.is-target { outline: 2px solid var(--g3-gold); outline-offset: 4px; box-shadow: 0 0 0 8px #e7bb722b, 0 0 25px #f6d68b66; }
+.g3-coach__card.is-mismatch { outline: 2px solid #b5593c; outline-offset: 4px; }
+.g3-coach__card .game-three-card-title { font-size: 16px; }
+.g3-coach__matched { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; align-items: center; border: 1px solid #777c48; border-radius: 20px; padding: 2px 9px; color: var(--g3-olive); background: #e3e5b9; font-size: 9px; font-weight: 800; }
+.g3-coach__practice-stats { display: flex; justify-content: center; gap: 36px; padding-right: 20px; }
+.g3-coach__practice-stats > span { display: flex; flex-direction: column; justify-content: center; min-width: 115px; padding: 6px 14px; background: #fae8c8f5; border: 1px solid #a8784c; border-radius: 10px; }
+.g3-coach__practice-stats small { color: var(--g3-muted); font-size: 10px; }
+.g3-coach__practice-stats strong { display: flex; align-items: center; gap: 5px; color: var(--g3-ink); font-size: 20px; line-height: 1.3; }
+.g3-coach__practice-stats .is-highlighted { outline: 2px solid var(--g3-terracotta); outline-offset: 4px; }
+.g3-coach__instructions { display: flex; flex-direction: column; padding: 30px 34px 44px 24px; min-width: 0; background: linear-gradient(145deg, #fae8c8, #efd3a4); }
+.g3-coach__step-number { display: flex; justify-content: space-between; align-items: center; font-size: 10px; letter-spacing: .1em; color: var(--g3-muted); }
+.g3-coach__step-number span { color: var(--g3-ink); }
+.g3-coach__progress { display: flex; gap: 5px; margin: 12px 0 27px; }
+.g3-coach__progress span { flex: 1; height: 4px; border-radius: 4px; background: #c7a77b; }
+.g3-coach__progress .is-active { background: var(--g3-terracotta); }
+.g3-coach h2 { margin: 0; font: 750 28px/1.16 'Space Grotesk', system-ui, sans-serif; color: var(--g3-ink); letter-spacing: -.035em; }
+.g3-coach__message { margin: 17px 0; min-height: 84px; font-size: 14px; }
+.g3-coach__message.is-success { color: var(--g3-olive); }
+.g3-coach__tip { display: flex; gap: 8px; padding: 12px 0; border-top: 1px solid #af7e4c55; color: var(--g3-muted); font-size: 12px; }
+.g3-coach__tip svg { flex-shrink: 0; margin-top: 3px; color: var(--g3-terracotta); }
+.g3-coach__tip p { margin: 0; }
+.g3-coach__level-note { color: var(--g3-ink); font-size: 12px; margin: 8px 0; }
+.g3-coach__retry { display: flex; gap: 6px; align-items: center; align-self: flex-start; padding: 6px 0; border: 0; background: none; color: var(--g3-olive); font-size: 12px !important; }
+.g3-coach nav { display: flex; gap: 8px; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 25px; }
+.g3-coach nav button { display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+.g3-coach__back:disabled { opacity: .3; }
+.g3-coach__next { padding: 10px 13px; border: 1px solid #6a3325; border-radius: 9px; background: var(--g3-terracotta); color: #fff3d8; font-weight: 750 !important; font-size: 12px !important; box-shadow: 0 3px 0 #643624; }
+.g3-coach__next:disabled { background: #d5b88d; color: #705336; border-color: #b28a5d; box-shadow: none; }
+.g3-coach__footer { display: flex; align-items: center; gap: 6px; padding: 12px 22px; color: var(--g3-muted); font-size: 10px; border-top: 1px solid #af7e4c55; }
+.g3-coach__footer svg { flex-shrink: 0; }
+.g3-coach__footer button { margin-left: auto; white-space: nowrap; }
+.g3-coach__hand { position: absolute; z-index: 6; width: 46px; height: 48px; pointer-events: none; transition: left 460ms cubic-bezier(.22, 1, .36, 1), top 460ms cubic-bezier(.22, 1, .36, 1); }
+.g3-coach__hand img { position: absolute; width: 46px; max-width: none; left: -9px; top: -4px; filter: drop-shadow(0 3px 3px #3d211780); transform-origin: 20% 10%; }
+.g3-coach__hand i { position: absolute; width: 14px; height: 14px; left: -7px; top: -7px; border: 2px solid var(--g3-gold); border-radius: 50%; animation: g3-hand-ring 1.8s ease-out infinite; }
+.g3-coach__hand--warning i { border-color: #b5593c; }
+.g3-coach__hand--tap img { animation: g3-hand-tap 1.8s ease-in-out infinite; }
+.g3-coach__hand--point img { animation: g3-hand-wait 2.4s ease-in-out infinite; }
+@keyframes g3-hand-tap { 0%,25%,100% { transform: translate(2px, 3px); } 40%,52% { transform: translate(-2px, -2px) scale(.9); } 70% { transform: translate(2px, 3px); } }
+@keyframes g3-hand-wait { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes g3-hand-ring { 0%,30% { opacity: 0; transform: scale(.7); } 42% { opacity: .8; } 80%,100% { opacity: 0; transform: scale(1.7); } }
+@media (max-width: 880px), (max-height: 740px) {
+  .g3-coach-backdrop { padding: 10px; }
+  .g3-coach__layout { grid-template-columns: minmax(0, 1fr) 300px; }
+  .g3-coach__header { padding: 9px 16px; }
+  .g3-coach__instructions { padding: 22px 30px 35px 20px; }
+  .g3-coach h2 { font-size: 24px; }
+  .g3-coach__room { padding: 14px 16px 38px; }
+  .g3-coach__board { margin: 18px auto 27px; gap: 24px 38px; padding-right: 22px; }
+  .g3-coach .g3-coach__card { height: clamp(100px, 23vh, 155px); }
+  .g3-coach__progress { margin-bottom: 20px; }
+  .g3-coach__message { font-size: 13px; min-height: 78px; }
+  .g3-coach__practice-stats { gap: 30px; padding-right: 18px; }
+  .g3-coach__practice-stats > span { min-width: 95px; padding: 5px 9px; }
+}
+@media (max-width: 620px) {
+  .g3-coach-backdrop { display: block; }
+  .g3-coach__layout { grid-template-columns: 1fr; }
+  .g3-coach__room { padding-top: 12px; }
+  .g3-coach__board { width: min(100%, 315px); }
+  .g3-coach .g3-coach__card { height: 120px; }
+  .g3-coach__instructions { padding: 18px 38px 38px 20px; }
+  .g3-coach__progress { margin-bottom: 14px; }
+  .g3-coach__message { min-height: 0; }
+  .g3-coach nav { padding-top: 14px; }
+  .g3-coach__footer { padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .g3-coach *, .g3-coach *::before, .g3-coach *::after { animation: none !important; transition: none !important; } }

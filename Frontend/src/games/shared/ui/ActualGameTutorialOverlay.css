@@ -211,6 +211,10 @@
 .actual-game-tutorial-overlay-platform {
   --tutorial-focus-x: 68%;
   --tutorial-focus-y: 58%;
+  --tutorial-player-left: 17%;
+  --tutorial-player-top: 50%;
+  --tutorial-player-width: clamp(55px, 6.86vw, 92px);
+  --tutorial-player-height: clamp(96px, 12vw, 160px);
 }
 
 .actual-game-tutorial-overlay-drag {
@@ -238,7 +242,13 @@
   --tutorial-focus-y: 62%;
 }
 
-.actual-tutorial-highlight-player { left: 18%; top: 58%; width: 88px; height: 88px; }
+.actual-tutorial-highlight-player {
+  left: var(--tutorial-player-left);
+  top: var(--tutorial-player-top);
+  width: var(--tutorial-player-width);
+  height: var(--tutorial-player-height);
+  border-radius: 18px;
+}
 .actual-tutorial-highlight-goal { left: 70%; top: 46%; width: 94px; height: 94px; }
 .actual-tutorial-highlight-fall { left: 48%; top: 24%; width: 86px; height: 86px; }
 .actual-tutorial-highlight-basket { left: 44%; top: 68%; width: 168px; height: 78px; border-radius: 22px; }
@@ -261,14 +271,19 @@
 
 .actual-tutorial-player {
   position: absolute;
-  left: 17%;
-  top: 50%;
-  width: clamp(96px, 12vw, 160px);
-  height: clamp(96px, 12vw, 160px);
-  object-fit: cover;
-  object-position: left top;
+  left: var(--tutorial-player-left);
+  top: var(--tutorial-player-top);
+  width: var(--tutorial-player-width);
+  height: var(--tutorial-player-height);
+  display: block;
+  overflow: hidden;
   filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.58));
-  animation: actualTutorialFloat 1.6s ease-in-out infinite;
+}
+
+.actual-tutorial-player img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .actual-tutorial-portal {

@@ -3,9 +3,9 @@
   "gameType": "GAME_SIX",
   "levelNumber": 4,
   "seedVersion": 2,
-  "title": "Syntax Rain Typing: Storm",
-  "subtitle": "Type twenty falling terms with faster drops.",
-  "objective": "Type twenty falling terms with faster drops.",
+  "title": "Fake Syntaxes",
+  "subtitle": "Identify real Java syntax among believable fakes.",
+  "objective": "Type twenty real Java terms while ignoring fake syntax.",
   "settings": {
     "targetWords": 20,
     "seconds": 420,

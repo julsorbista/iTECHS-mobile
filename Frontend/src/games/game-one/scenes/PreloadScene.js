@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { registerGameOneAnimations } from '../systems/animations';
+const treasureItemUrls = import.meta.glob('../assets/treasure/items/*.png', { eager: true, query: '?url', import: 'default' });
+const uiAssetUrls = import.meta.glob('../assets/ui/*.png', { eager: true, query: '?url', import: 'default' });
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -83,6 +85,16 @@ export default class PreloadScene extends Phaser.Scene {
 
     runtimeAssets.spritesheets.forEach((asset) => {
       this.load.spritesheet(asset.key, asset.url, asset.frameConfig);
+    });
+
+    Object.entries(treasureItemUrls).forEach(([path, url]) => {
+      const name = path.split('/').pop().replace(/\.png$/i, '');
+      this.load.image(`game-one-treasure-${name}`, url);
+    });
+
+    Object.entries(uiAssetUrls).forEach(([path, url]) => {
+      const name = path.split('/').pop().replace(/\.png$/i, '');
+      this.load.image(`game-one-ui-${name}`, url);
     });
 
     (runtimeAssets.audio || []).forEach((asset) => {

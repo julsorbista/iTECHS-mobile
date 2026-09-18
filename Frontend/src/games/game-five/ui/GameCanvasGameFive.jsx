@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   CheckCircle2,
-  Clock3,
   Coins,
   Heart,
   Loader2,
@@ -17,23 +16,17 @@ import combo5Sound from '../../../assets/game-arcade/audio/combo_5_x3.mp3';
 import combo10Sound from '../../../assets/game-arcade/audio/combo_10_x5.mp3';
 import {
   getStudentMusicPreference,
+  getStudentMusicVolume,
   getStudentSfxPreference,
+  getStudentSfxVolume,
 } from '../../../utils/studentMenuAudio';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
-import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import GameFiveInteractiveTutorial from './GameFiveInteractiveTutorial';
 import PlayableTutorialCoach from '../../shared/ui/PlayableTutorialCoach';
 import { buildGameFiveGuideContent } from '../../shared/ui/levelGuideBuilders';
 import { levelAPI } from '../../../utils/api';
-import { addUserCoins } from '../../shared/gameSessionPersistence';
-
-const getLegacyGameFiveTitlePattern = () => {
-  const encodedLegacyObjectName = 'c25vd21hbg==';
-  const legacyObjectName = typeof globalThis.atob === 'function'
-    ? globalThis.atob(encodedLegacyObjectName)
-    : ['s', 'n', 'o', 'w', 'm', 'a', 'n'].join('');
-  return new RegExp(['code', legacyObjectName].join('\\s+'), 'gi');
-};
-const LEGACY_GAME_FIVE_TITLE_PATTERN = getLegacyGameFiveTitlePattern();
+import { addUserCoins, spendUserCoins } from '../../shared/gameSessionPersistence';
+import './GameCanvasGameFive.css';
 
 const WORDS_BY_LEVEL = Object.freeze({
   1: [
@@ -91,6 +84,14 @@ const GAME_FIVE_TUTORIAL_STEPS = Object.freeze([
   { title: 'Use A Hint', body: 'The Hint button reveals extra help. In the real level, use hints when you are stuck.', buttonLabel: 'Use Hint' },
   { title: 'Protect Lives', body: 'Wrong letters remove lives. Finish the practice word to start the real Level 1.', buttonLabel: 'Finish Tutorial' },
 ]);
+
+const getGameFiveComboMultiplier = (combo) => {
+  const safeCombo = Math.max(0, Math.floor(Number(combo) || 0));
+  if (safeCombo >= 10) return 5;
+  if (safeCombo >= 5) return 3;
+  if (safeCombo >= 3) return 2;
+  return 1;
+};
 
 const CORRECT_ANSWER_SOUND_SRC = new URL(
   '../../../../assets/Game/game_two/Game 2_ Hardware/Music & Sound Effects/correct answer sf.mp3',
@@ -179,13 +180,6 @@ const getRobotImpactKey = (nextLives, maxLives) => {
   return 'hurt3';
 };
 
-const getGameFiveComboMultiplier = (comboCount) => {
-  if (comboCount >= 10) return 5;
-  if (comboCount >= 5) return 3;
-  if (comboCount >= 3) return 2;
-  return 1;
-};
-
 const buildAiClue = (entry, level, clueDepth, guessedLetters) => {
   const word = String(entry?.word || '').toUpperCase();
   const baseClue = String(entry?.clue || 'Think about a programming concept from your ICT lesson.');
@@ -213,12 +207,12 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
     if (typeof window === 'undefined' || typeof window.Audio === 'undefined') return undefined;
     const music = new Audio(musicSrc);
     music.loop = true;
-    music.volume = 0.48;
+    music.volume = getStudentMusicVolume(0.48);
     music.preload = 'auto';
     musicRef.current = music;
 
     const sfx = new Audio(sfxSrc);
-    sfx.volume = 0.55;
+    sfx.volume = getStudentSfxVolume(0.55);
     sfx.preload = 'auto';
     sfxRef.current = sfx;
 
@@ -275,6 +269,7 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
   }, [active]);
 
   const playSfx = useCallback(() => {
+    if (!getStudentSfxPreference()) return;
     const sfx = sfxRef.current;
     if (!sfx) return;
     try {
@@ -290,7 +285,7 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
     musicDuckedRef.current = Boolean(isDucked);
     const music = musicRef.current;
     if (!music) return;
-    music.volume = isDucked ? 0.14 : 0.48;
+    music.volume = getStudentMusicVolume(isDucked ? 0.14 : 0.48);
   }, []);
 
   return { playSfx, setMusicDucked };
@@ -306,17 +301,17 @@ const useAnswerSounds = () => {
 
     const correct = new Audio(CORRECT_ANSWER_SOUND_SRC);
     correct.preload = 'auto';
-    correct.volume = 0.7;
+    correct.volume = getStudentSfxVolume(0.7);
     correctRef.current = correct;
 
     const incorrect = new Audio(INCORRECT_ANSWER_SOUND_SRC);
     incorrect.preload = 'auto';
-    incorrect.volume = 0.7;
+    incorrect.volume = getStudentSfxVolume(0.7);
     incorrectRef.current = incorrect;
 
     const hint = new Audio(HINT_SOUND_SRC);
     hint.preload = 'auto';
-    hint.volume = 0.7;
+    hint.volume = getStudentSfxVolume(0.7);
     hintRef.current = hint;
 
     return () => {
@@ -357,7 +352,7 @@ const useComboMilestoneSounds = (active = true) => {
     ]);
     sounds.forEach((audio) => {
       audio.preload = 'auto';
-      audio.volume = 1;
+      audio.volume = getStudentSfxVolume(1);
       audio.load();
     });
     soundsRef.current = sounds;
@@ -398,12 +393,12 @@ const useRobotDestructionSounds = () => {
 
     const hit = new Audio(ROBOT_DESTROY_HIT_SOUND_SRC);
     hit.preload = 'auto';
-    hit.volume = 0.85;
+    hit.volume = getStudentSfxVolume(0.85);
     hitRef.current = hit;
 
     const destroyed = new Audio(ROBOT_DESTROYED_SOUND_SRC);
     destroyed.preload = 'auto';
-    destroyed.volume = 0.85;
+    destroyed.volume = getStudentSfxVolume(0.85);
     destroyedRef.current = destroyed;
 
     return () => {
@@ -450,12 +445,12 @@ const useRobotVoiceSounds = (setMusicDucked) => {
 
     const intro = new Audio(ROBOT_INTRO_VOICE_SRC);
     intro.preload = 'auto';
-    intro.volume = 1;
+    intro.volume = getStudentSfxVolume(1);
     introRef.current = intro;
 
     const guide = new Audio(ROBOT_GUIDE_VOICE_SRC);
     guide.preload = 'auto';
-    guide.volume = 1;
+    guide.volume = getStudentSfxVolume(1);
     guideRef.current = guide;
 
     return () => {
@@ -492,7 +487,7 @@ const useRobotVoiceSounds = (setMusicDucked) => {
 };
 
 const PixelPanel = ({ children, className = '' }) => (
-  <div className={`border-4 border-[#0f3a5f] bg-[#e0f2fe] text-[#082f49] shadow-[6px_6px_0_#082f49] ${className}`}>
+  <div className={`border-4 border-[#5b341d] bg-[#f6e0b3] text-[#3b2214] shadow-[6px_6px_0_#2b170c] ${className}`}>
     {children}
   </div>
 );
@@ -532,7 +527,7 @@ const RobotSprite = ({ spriteKey, animationId, onComplete }) => {
 
   return (
     <img
-      className="game-five-robot-sprite absolute bottom-6 left-1/2 h-[460px] w-[460px] max-w-none -translate-x-1/2 object-contain transition-transform duration-200 2xl:h-[520px] 2xl:w-[520px]"
+      className="absolute bottom-6 left-1/2 h-[460px] w-[460px] max-w-none -translate-x-1/2 object-contain transition-transform duration-200 2xl:h-[520px] 2xl:w-[520px]"
       src={frameSrc}
       alt="Code robot"
       draggable="false"
@@ -594,22 +589,35 @@ const GameCanvasGameFive = ({
   const [tutorialView, setTutorialView] = useState(
     showLevelGuideline ? 'guide' : null,
   );
+  const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
+  const [tutorialPractice, setTutorialPractice] = useState(null);
   const [tutorialCoachOpen, setTutorialCoachOpen] = useState(isTutorialLevel);
   const [clueDepth, setClueDepth] = useState(0);
   const [aiClue, setAiClue] = useState('');
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
+  const [hintPurchaseNotice, setHintPurchaseNotice] = useState('');
   const [hintedIndices, setHintedIndices] = useState([]);
   const [hintReveal, setHintReveal] = useState(null);
   const [robotImpact, setRobotImpact] = useState(null);
   const introVoicePlayedRef = useRef(false);
+  const tutorialRootRef = useRef(null);
   const guideVoicePlayedRef = useRef(false);
   const shouldPauseForTutorialCoach = Boolean(isTutorialLevel && tutorialCoachOpen);
   const showGuide = showTutorial && tutorialView === 'guide';
+  const activePractice = showTutorial && tutorialView === 'tutorial' ? tutorialPractice : null;
+  const practiceOpen = showTutorial && tutorialView === 'tutorial';
   const gameplayAudioActive = !showTutorial && !shouldPauseForTutorialCoach && !finished && !resultData;
 
   useEffect(() => {
+    if (!comboFeedback) return undefined;
+    const timeoutId = window.setTimeout(() => setComboFeedback(null), 1400);
+    return () => window.clearTimeout(timeoutId);
+  }, [comboFeedback]);
+
+  useEffect(() => {
     if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
+      setGuideOpenedDuringGameplay(false);
       setTutorialView('tutorial');
       setShowTutorial(true);
     }
@@ -638,6 +646,11 @@ const GameCanvasGameFive = ({
     buildAiClue(current, settings.level, clueDepth, guessed)
   ), [current, settings.level, clueDepth, guessed]);
   const activeClue = aiClue || fallbackClue;
+  const isCurrentWordSolved = useMemo(() => (
+    current.word
+      .split('')
+      .every((letter, index) => guessed.includes(letter) || hintedIndices.includes(index))
+  ), [current.word, guessed, hintedIndices]);
 
   useEffect(() => {
     if (
@@ -742,11 +755,6 @@ const GameCanvasGameFive = ({
     setCoins(persistedCoins);
     onCoinBalanceChange?.(persistedCoins);
     setScore(nextScore);
-    if (isTutorialLevel && tutorialStepIndex < 4) {
-      setTutorialStepIndex(4);
-      setTutorialCoachOpen(true);
-    }
-
     if (nextSolved >= settings.targetWords) {
       finish('COMPLETED', nextSolved, nextScore, finalMistakes);
       return;
@@ -757,7 +765,7 @@ const GameCanvasGameFive = ({
     setClueDepth(0);
     setHintedIndices([]);
     setAiClue('');
-  }, [combo, finish, isTutorialLevel, mistakes, onCoinBalanceChange, playComboMilestone, playerId, score, settings.level, settings.targetWords, solved, timeLeft, tutorialStepIndex]);
+  }, [combo, finish, mistakes, onCoinBalanceChange, playComboMilestone, playerId, score, settings.level, settings.targetWords, solved, timeLeft]);
 
   const chooseLetter = useCallback((rawLetter) => {
     const letter = String(rawLetter || '').toUpperCase();
@@ -792,13 +800,22 @@ const GameCanvasGameFive = ({
     }
 
     playCorrectAnswer();
-    const solvedWord = current.word
-      .split('')
-      .every((item, index) => nextGuessed.includes(item) || hintedIndices.includes(index));
-    if (!solvedWord) return;
+  }, [current.word, finish, finished, guessed, isGeneratingQuestions, isTutorialLevel, lives, mistakes, playCorrectAnswer, playGuideVoice, playIncorrectAnswer, playRobotDestructionSounds, resultData, score, settings.lives, shouldPauseForTutorialCoach, showTutorial, solved, tutorialStepIndex]);
+
+  useEffect(() => {
+    if (
+      !isCurrentWordSolved
+      || isGeneratingQuestions
+      || showTutorial
+      || shouldPauseForTutorialCoach
+      || finished
+      || resultData
+    ) {
+      return;
+    }
 
     completeCurrentWord(mistakes);
-  }, [completeCurrentWord, current.word, finish, finished, guessed, hintedIndices, isGeneratingQuestions, isTutorialLevel, lives, mistakes, playCorrectAnswer, playGuideVoice, playIncorrectAnswer, playRobotDestructionSounds, resultData, score, settings.lives, shouldPauseForTutorialCoach, showTutorial, solved, tutorialStepIndex]);
+  }, [completeCurrentWord, finished, isCurrentWordSolved, isGeneratingQuestions, mistakes, resultData, shouldPauseForTutorialCoach, showTutorial]);
 
   const revealRandomLetterHint = useCallback(async () => {
     if (isGeneratingQuestions || isGeneratingHint || clueDepth >= 3 || showTutorial || shouldPauseForTutorialCoach || finished || Boolean(resultData)) return;
@@ -808,6 +825,15 @@ const GameCanvasGameFive = ({
       .map((letter, index) => ({ letter, index }))
       .filter(({ letter, index }) => !guessed.includes(letter) && !hintedIndices.includes(index));
     if (hiddenIndices.length === 0) return;
+
+    const purchase = spendUserCoins(playerId, 1);
+    if (!purchase.success) {
+      setHintPurchaseNotice('You need 1 coin to reveal a hint.');
+      return;
+    }
+    setCoins(purchase.balance);
+    onCoinBalanceChange?.(purchase.balance);
+    setHintPurchaseNotice('');
 
     const selection = hiddenIndices[Math.floor(Math.random() * hiddenIndices.length)];
     const nextHintedIndices = [...hintedIndices, selection.index];
@@ -827,14 +853,6 @@ const GameCanvasGameFive = ({
       letter: selection.letter,
       key: `${wordIndex}-${selection.index}-${Date.now()}`,
     });
-
-    const solvedWord = current.word
-      .split('')
-      .every((letter, index) => guessed.includes(letter) || nextHintedIndices.includes(index));
-    if (solvedWord) {
-      completeCurrentWord(mistakes);
-      return;
-    }
 
     setIsGeneratingHint(true);
     try {
@@ -857,7 +875,7 @@ const GameCanvasGameFive = ({
     } finally {
       setIsGeneratingHint(false);
     }
-  }, [clueDepth, completeCurrentWord, current, finished, guessed, hintedIndices, isGeneratingHint, isGeneratingQuestions, isTutorialLevel, mistakes, playHint, resultData, settings.level, shouldPauseForTutorialCoach, showTutorial, tutorialStepIndex, wordIndex]);
+  }, [clueDepth, coins, current, finished, guessed, hintedIndices, isGeneratingHint, isGeneratingQuestions, isTutorialLevel, onCoinBalanceChange, playHint, playerId, resultData, settings.level, shouldPauseForTutorialCoach, showTutorial, tutorialStepIndex, wordIndex]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -871,87 +889,125 @@ const GameCanvasGameFive = ({
   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
   const seconds = String(timeLeft % 60).padStart(2, '0');
   const levelTitle = typeof levelData?.title === 'string' && levelData.title.trim().length > 0
-    ? levelData.title.replace(LEGACY_GAME_FIVE_TITLE_PATTERN, 'Code Robot')
+    ? levelData.title.replace(/code snowman/gi, 'Code Robot')
     : 'Code Robot';
 
   return (
-    <div className="game-five-shell min-h-[700px] w-full overflow-hidden border-4 border-[#082f49] bg-[#93c5fd] p-3 text-[#082f49] shadow-2xl" style={{ imageRendering: 'pixelated' }}>
-      <div className="game-five-header mb-3 flex flex-wrap items-center justify-between gap-3 border-4 border-[#0f3a5f] bg-[#bfdbfe] px-4 py-3 shadow-[4px_4px_0_#082f49]">
+    <div ref={tutorialRootRef} className={`game-five-shell ${practiceOpen ? 'game-five-guided' : ''} relative min-h-[700px] w-full overflow-hidden border-4 border-[#3b2214] bg-[#F3E3B5] p-3 text-[#3b2214] shadow-2xl`} style={{ imageRendering: 'pixelated' }}>
+      {comboFeedback && (
+        <div
+          key={comboFeedback.id}
+          className="game-five-combo-feedback game-five-combo-feedback--milestone"
+          role="status"
+          aria-label={`${comboFeedback.label}, multiplier times ${comboFeedback.multiplier}`}
+        >
+          <span className="game-five-combo-burst" aria-hidden="true" />
+          <span className="game-five-combo-line" aria-hidden="true">
+            <strong className="game-five-combo-number">{comboFeedback.count}</strong>
+            <span className="game-five-combo-word">COMBO</span>
+          </span>
+          <strong className="game-five-combo-multiplier" aria-hidden="true">
+            ×{comboFeedback.multiplier}
+          </strong>
+        </div>
+      )}
+      <div className="game-five-hud mb-3 flex flex-wrap items-center justify-between gap-3 border-4 border-[#5b341d] bg-[#d99645] px-4 py-3 shadow-[4px_4px_0_#2b170c]">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide">Game 5</p>
-          <h2 className="text-3xl font-bold text-[#075985]">{levelTitle}</h2>
+          <h2 className="text-3xl font-bold text-[#2f6f2c]">{levelTitle}</h2>
         </div>
-        <div className="game-five-status-row flex flex-wrap gap-3 text-lg font-semibold">
+        <div className="flex flex-wrap gap-3 text-lg font-semibold">
           <PixelPanel className="px-4 py-2">Level: {settings.level} <Star className="inline h-5 w-5 fill-yellow-300 text-yellow-500" /></PixelPanel>
           <PixelPanel className="game-five-coins-status px-4 py-2"><Coins className="inline h-5 w-5 text-yellow-500" /> Coins: {coins}</PixelPanel>
-          <PixelPanel className="game-five-lives-status px-4 py-2"><Heart className="inline h-5 w-5 fill-red-500 text-red-600" /> Lives: {lives}/{settings.lives}</PixelPanel>
+          <PixelPanel className="game-five-lives-status px-4 py-2"><span data-g5-target="lives"><Heart className="inline h-5 w-5 fill-red-500 text-red-600" /> Lives: {lives}/{settings.lives}</span></PixelPanel>
           <PixelPanel className="px-4 py-2">Round: {solved + 1}/{settings.targetWords}</PixelPanel>
-          {combo > 0 && <PixelPanel className="game-five-combo-status px-4 py-2">Combo: x{getGameFiveComboMultiplier(combo)}</PixelPanel>}
+          <button type="button" className="game-five-tutorial-button border-4 border-[#5b341d] bg-[#f6e0b3] px-4 py-2 font-semibold shadow-[4px_4px_0_#2b170c] hover:bg-[#fff0c4] disabled:opacity-50"
+            disabled={showTutorial || Boolean(resultData) || finished}
+            onClick={() => { setTutorialView('tutorial'); setShowTutorial(true); }}>Game Tutorial</button>
         </div>
       </div>
 
       <div className="game-five-layout grid gap-4 lg:grid-cols-[280px_460px_minmax(0,1fr)] xl:grid-cols-[300px_520px_minmax(0,1fr)] 2xl:grid-cols-[340px_620px_minmax(0,1fr)]">
-        <aside className="game-five-sidebar flex flex-col gap-4 lg:min-h-[760px]">
+        <aside className="game-five-sidebar flex flex-col gap-4 lg:min-h-[760px]" inert={practiceOpen ? '' : undefined}>
           <PixelPanel className="game-five-mission-panel p-5">
             <h3 className="mb-3 text-2xl font-bold uppercase">Mission</h3>
             <p className="text-lg font-medium leading-snug">Guess {settings.targetWords} programming words before the timer runs out. Wrong letters damage the code robot.</p>
             <div className="mt-5 grid grid-cols-2 gap-4">
-              <PixelPanel className="game-five-timer-status p-4 text-center"><Clock3 className="mx-auto h-7 w-7 text-green-700" /><strong className="block text-2xl font-semibold">{minutes}:{seconds}</strong><span className="text-sm font-semibold">Timer</span></PixelPanel>
-              <PixelPanel className="game-five-score-status p-4 text-center"><Star className="mx-auto h-7 w-7 fill-yellow-300 text-yellow-500" /><strong className="block text-2xl font-semibold">{score}</strong><span className="text-sm font-semibold">Score</span></PixelPanel>
+              <PixelPanel className="game-five-score-status col-span-2 p-4 text-center"><Star className="mx-auto h-7 w-7 fill-yellow-300 text-yellow-500" /><strong className="block text-2xl font-semibold">{score}</strong><span className="text-sm font-semibold">Score</span></PixelPanel>
               <PixelPanel className="p-4 text-center"><CheckCircle2 className="mx-auto h-7 w-7 text-green-700" /><strong className="block text-2xl font-semibold">{solved}/{settings.targetWords}</strong><span className="text-sm font-semibold">Words</span></PixelPanel>
-              <PixelPanel className="game-five-snow-status p-4 text-center"><Bot className="mx-auto h-7 w-7 text-blue-600" /><strong className="block text-2xl font-semibold">{lives}</strong><span className="text-sm font-semibold">Power</span></PixelPanel>
+              <PixelPanel className="game-five-snow-status p-4 text-center"><Bot className="mx-auto h-7 w-7 text-[#2f6f2c]" /><strong className="block text-2xl font-semibold">{lives}</strong><span className="text-sm font-semibold">Power</span></PixelPanel>
             </div>
           </PixelPanel>
           <PixelPanel className="flex-1 p-5">
             <h3 className="mb-2 text-2xl font-bold uppercase">Guide</h3>
             <p className="text-lg font-medium">Click letters or press your keyboard. Correct letters reveal the word. Wrong letters remove 1 life. If time runs out, the robot shuts down instantly.</p>
           </PixelPanel>
-          <button type="button" className="w-full border-4 border-[#0f3a5f] bg-[#dbeafe] px-5 py-3 text-xl font-semibold shadow-[4px_4px_0_#082f49] transition hover:bg-[#f0f9ff]" onClick={onExitRequest}>
+          <button type="button" className="w-full border-4 border-[#5b341d] bg-[#74ad45] px-5 py-3 text-xl font-semibold text-[#fff7df] shadow-[4px_4px_0_#2b170c] transition hover:bg-[#8cc856]" onClick={onExitRequest}>
             <LogOut className="inline h-5 w-5" /> Back
+          </button>
+          <button
+            type="button"
+            className="w-full border-4 border-[#5b341d] bg-[#74ad45] px-5 py-3 text-xl font-semibold text-[#fff7df] shadow-[4px_4px_0_#2b170c] transition hover:bg-[#8cc856]"
+            onClick={() => {
+              setGuideOpenedDuringGameplay(true);
+              setTutorialView('guide');
+              setShowTutorial(true);
+            }}
+          >
+            Guidelines
           </button>
         </aside>
 
-        <section className="game-five-robot-stage relative min-h-[510px] overflow-hidden border-4 border-[#0f3a5f] bg-gradient-to-b from-[#1e3a8a] via-[#60a5fa] to-[#e0f2fe] shadow-[5px_5px_0_#082f49]">
-          <div className="absolute inset-0 opacity-70" style={{ backgroundImage: 'radial-gradient(circle at 22% 18%, white 0 2px, transparent 3px), radial-gradient(circle at 72% 10%, white 0 2px, transparent 3px), radial-gradient(circle at 50% 30%, white 0 2px, transparent 3px)' }} />
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-[#eef7ff]" />
-          <div className="absolute bottom-7 left-1/2 h-14 w-[300px] -translate-x-1/2 rounded-[50%] border-4 border-[#6aa0c8] bg-[#bfe8ff] opacity-80 shadow-[0_0_18px_rgba(191,232,255,.9)]" />
+        <section className="game-five-robot-room relative min-h-[510px] overflow-hidden border-4 border-[#5b341d] bg-gradient-to-b from-[#5f8f3a] via-[#d8b46b] to-[#f6e0b3] shadow-[5px_5px_0_#2b170c]">
+          <div className="absolute inset-0 opacity-70" style={{ backgroundImage: 'radial-gradient(circle at 22% 18%, rgba(255, 247, 223, 0.95) 0 2px, transparent 3px), radial-gradient(circle at 72% 10%, rgba(255, 247, 223, 0.85) 0 2px, transparent 3px), radial-gradient(circle at 50% 30%, rgba(255, 247, 223, 0.8) 0 2px, transparent 3px)' }} />
+          <div data-g5-target="time" className="game-five-timer-status absolute left-1/2 top-8 z-20 -translate-x-1/2 text-center text-6xl font-black leading-none text-[#fff7df] drop-shadow-[0_5px_0_#3b2214]">
+            {minutes}:{seconds}
+          </div>
+          {practiceOpen && <span className="game-five-practice-paused">TIMER PAUSED · SAFE PRACTICE</span>}
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-[#7aa247]" />
+          <div className="absolute bottom-7 left-1/2 h-14 w-[300px] -translate-x-1/2 rounded-[50%] border-4 border-[#3f6b2d] bg-[#a8d66a] opacity-80 shadow-[0_0_18px_rgba(168,214,106,.78)]" />
           <RobotSprite
             spriteKey={robotSpriteKey}
             animationId={robotImpact?.id || robotSpriteKey}
             onComplete={handleRobotImpactComplete}
           />
-          <PixelPanel className="game-five-stage-tip absolute bottom-20 left-8 p-3 text-center text-sm font-semibold">TIP<br />Think like<br />a coder!</PixelPanel>
+          <PixelPanel className="absolute bottom-20 left-8 p-3 text-center text-sm font-semibold">TIP<br />Think like<br />a coder!</PixelPanel>
         </section>
 
-        <main className="game-five-play-area flex min-h-[760px] flex-col gap-5">
+        <main className="game-five-word-controls flex min-h-[760px] flex-col gap-5">
           <PixelPanel className="game-five-clue-panel min-h-[300px] p-5">
             <h3
-              className="-mt-10 mb-4 inline-block border-4 border-[#0f3a5f] bg-[#0369a1] px-5 py-2 text-2xl font-semibold uppercase text-[#e0f2fe] shadow-[4px_4px_0_#082f49] transition hover:bg-[#0284c7] disabled:opacity-60"
+              data-g5-target="hint"
+              className="-mt-10 mb-4 inline-block border-4 border-[#5b341d] bg-[#3f8b35] px-5 py-2 text-2xl font-semibold uppercase text-[#fff7df] shadow-[4px_4px_0_#2b170c] transition hover:bg-[#5fad45] disabled:opacity-60"
               role="button"
               tabIndex={0}
-              aria-disabled={isGeneratingHint || clueDepth >= 3 || showTutorial || Boolean(resultData)}
-              onClick={revealRandomLetterHint}
+              aria-disabled={activePractice ? !activePractice.canHint : isGeneratingHint || clueDepth >= 3 || showTutorial || Boolean(resultData) || coins < 1}
+              onClick={() => activePractice ? activePractice.hint() : revealRandomLetterHint()}
               onKeyDown={(event) => {
                 if (event.key !== 'Enter' && event.key !== ' ') return;
                 event.preventDefault();
-                revealRandomLetterHint();
+                if (activePractice) activePractice.hint(); else revealRandomLetterHint();
               }}
             >
-              {isGeneratingHint ? <><Loader2 className="mr-2 inline h-5 w-5 animate-spin" />Thinking...</> : 'Hint'}
+              {activePractice ? 'Hint (free practice)' : isGeneratingHint ? <><Loader2 className="mr-2 inline h-5 w-5 animate-spin" />Thinking...</> : 'Hint (-1 coin)'}
             </h3>
 
-            <PixelPanel className="game-five-clue-bubble mt-6 flex min-h-[205px] items-center gap-5 p-5">
-              <div className="game-five-clue-avatar h-24 w-24 shrink-0 rounded-full border-4 border-[#0f3a5f] bg-[#0ea5e9]" />
-              <p className="text-2xl font-medium leading-relaxed">{activeClue}</p>
+            {hintPurchaseNotice && (
+              <p className="mt-3 text-center text-base font-bold text-rose-700">{hintPurchaseNotice}</p>
+            )}
+
+            <PixelPanel className="mt-6 flex min-h-[205px] items-center gap-5 p-5">
+              <div className="h-24 w-24 shrink-0 rounded-full border-4 border-[#5b341d] bg-[#7bc858]" />
+              <p data-g5-target="clue" className="text-2xl font-medium leading-relaxed">{activePractice ? activePractice.sample.clue : activeClue}</p>
             </PixelPanel>
           </PixelPanel>
           <PixelPanel className="game-five-answer-panel mt-auto flex min-h-[280px] flex-wrap items-center justify-center gap-4 px-8 py-14 text-center text-7xl font-semibold">
-            {letters.map((letter, index) => {
-              const isVisible = guessed.includes(letter) || hintedIndices.includes(index);
-              const isHintReveal = isVisible && hintReveal?.index === index && hintReveal?.letter === letter;
+            {(activePractice ? activePractice.sample.word.split('') : letters).map((letter, index) => {
+              const isVisible = activePractice ? activePractice.guessed.includes(letter) || activePractice.hintIndex === index : guessed.includes(letter) || hintedIndices.includes(index);
+              const isHintReveal = activePractice ? activePractice.hintIndex === index : isVisible && hintReveal?.index === index && hintReveal?.letter === letter;
               return (
                 <span
-                  key={`${current.word}-${index}-${isHintReveal ? hintReveal.key : 'steady'}`}
+                  key={`${activePractice ? 'practice' : current.word}-${index}-${isHintReveal ? activePractice ? 'hint' : hintReveal.key : 'steady'}`}
                   className={`game-five-word-tile ${isVisible ? 'game-five-word-tile-filled' : ''} ${isHintReveal ? 'game-five-word-tile-hint' : ''}`}
                 >
                   {isVisible ? letter : '_'}
@@ -963,25 +1019,17 @@ const GameCanvasGameFive = ({
             {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
               <button
                 key={letter}
+                data-g5-target={`letter-${letter}`}
+                data-practice-wrong={activePractice?.wrongLetter === letter}
                 type="button"
-                className="min-h-[88px] border-4 border-[#0f3a5f] bg-[#dbeafe] py-5 text-4xl font-semibold shadow-[4px_4px_0_#082f49] transition hover:bg-[#f0f9ff] disabled:bg-[#94a3b8] disabled:text-[#334155] disabled:shadow-none"
-                disabled={guessed.includes(letter) || Boolean(resultData)}
-                onClick={() => chooseLetter(letter)}
+                className="min-h-[88px] border-4 border-[#5b341d] bg-[#f6e0b3] py-5 text-4xl font-semibold shadow-[4px_4px_0_#2b170c] transition hover:bg-[#fff0c4] disabled:bg-[#9a8060] disabled:text-[#4b3b2c] disabled:shadow-none"
+                disabled={activePractice ? !activePractice.canChoose || activePractice.guessed.includes(letter) : showTutorial || guessed.includes(letter) || Boolean(resultData)}
+                onClick={() => activePractice ? activePractice.choose(letter) : chooseLetter(letter)}
               >
                 {letter}
               </button>
             ))}
           </div>
-          {comboFeedback && (
-            <div
-              key={comboFeedback.id}
-              className="game-five-combo-feedback pointer-events-none fixed left-1/2 top-1/2 z-[10030] -translate-x-1/2 -translate-y-1/2 border-4 border-[#0f3a5f] bg-[#fef3c7] px-6 py-4 text-center text-3xl font-black text-[#075985] shadow-[6px_6px_0_#082f49]"
-              onAnimationEnd={() => setComboFeedback(null)}
-            >
-              <span className="block">{comboFeedback.label}</span>
-              <span className="block text-xl">Score x{comboFeedback.multiplier}</span>
-            </div>
-          )}
         </main>
       </div>
 
@@ -993,8 +1041,18 @@ const GameCanvasGameFive = ({
             lead={guideContent.lead}
             summary={guideContent.summary}
             sections={guideContent.sections}
-            onExit={onExitRequest}
+            onExit={guideOpenedDuringGameplay ? () => {
+              setGuideOpenedDuringGameplay(false);
+              setTutorialView(null);
+              setShowTutorial(false);
+            } : onExitRequest}
             onStart={() => {
+              if (guideOpenedDuringGameplay) {
+                setGuideOpenedDuringGameplay(false);
+                setTutorialView(null);
+                setShowTutorial(false);
+                return;
+              }
               if (continueToTutorialAfterGuide) {
                 setTutorialView('tutorial');
               } else {
@@ -1002,15 +1060,20 @@ const GameCanvasGameFive = ({
                 setShowTutorial(false);
               }
             }}
-            startLabel="Next"
+            startLabel={guideOpenedDuringGameplay ? 'Start' : 'Next'}
           />
         ) : (
-          <GameTutorialOverlay
-            gameType="GAME_FIVE"
+          <GameFiveInteractiveTutorial
+            rootRef={tutorialRootRef}
+            onPracticeChange={setTutorialPractice}
+            entry={current}
+            maxLives={settings.lives}
+            seconds={settings.seconds}
+            targetWords={settings.targetWords}
+            isFirstPlay={continueToTutorialAfterGuide && !gameTutorialRequested}
             levelNumber={levelData?.levelNumber || 1}
             onExit={onExitRequest}
             onStart={() => {
-              onGameTutorial?.();
               setTutorialView(null);
               setShowTutorial(false);
             }}

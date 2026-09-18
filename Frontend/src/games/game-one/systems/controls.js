@@ -7,7 +7,7 @@ const resolveKeyCode = (value, fallback) => {
   return Phaser.Input.Keyboard.KeyCodes[normalized] || fallback;
 };
 
-export const createControls = (scene, keybinds = {}, mobileControls = null) => {
+export const createControls = (scene, keybinds = {}) => {
   const cursors = scene.input.keyboard.createCursorKeys();
   const wasd = scene.input.keyboard.addKeys({
     up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -24,34 +24,54 @@ export const createControls = (scene, keybinds = {}, mobileControls = null) => {
   return {
     cursors,
     wasd,
-    mobileControls,
+    mobile: scene.game.__ITECHS_GAME_ONE_MOBILE_CONTROLS__ || null,
   };
 };
 
 export const readMovementIntent = (controls) => {
-  const mobileControls = controls.mobileControls || {};
-  const left = controls.cursors.left.isDown || controls.wasd.left.isDown || Boolean(mobileControls.left);
-  const right = controls.cursors.right.isDown || controls.wasd.right.isDown || Boolean(mobileControls.right);
+  const mobile = controls.mobile?.current || {};
+  const left = controls.cursors.left.isDown || controls.wasd.left.isDown || Boolean(mobile.left);
+  const right = controls.cursors.right.isDown || controls.wasd.right.isDown || Boolean(mobile.right);
   const upPressed = Phaser.Input.Keyboard.JustDown(controls.cursors.up)
     || Phaser.Input.Keyboard.JustDown(controls.wasd.up)
     || Phaser.Input.Keyboard.JustDown(controls.wasd.jump);
   const spacePressed = Phaser.Input.Keyboard.JustDown(controls.cursors.space);
   const dashPressed = Phaser.Input.Keyboard.JustDown(controls.wasd.dash);
   const attackPressed = Phaser.Input.Keyboard.JustDown(controls.wasd.attack);
-  const mobileJumpPressed = Boolean(mobileControls.jumpQueued);
-  if (mobileJumpPressed) {
-    mobileControls.jumpQueued = false;
+  const jumpPressed = upPressed || spacePressed || Boolean(mobile.jumpQueued);
+  const mobileDashPressed = Boolean(mobile.dashQueued);
+  const mobileAttackPressed = Boolean(mobile.attackQueued);
+
+  if (controls.mobile?.current) {
+    controls.mobile.current.jumpQueued = false;
+    controls.mobile.current.dashQueued = false;
+    controls.mobile.current.attackQueued = false;
   }
-  const jumpPressed = upPressed || spacePressed || mobileJumpPressed;
 
   return {
     left,
     right,
     jumpPressed,
-    dashPressed,
-    attackPressed,
+    dashPressed: dashPressed || mobileDashPressed,
+    attackPressed: attackPressed || mobileAttackPressed,
   };
 };
 
 export const wasPausePressed = (controls) => Phaser.Input.Keyboard.JustDown(controls.wasd.pause);
 export const wasInteractPressed = (controls) => Phaser.Input.Keyboard.JustDown(controls.wasd.interact);
+
+export const resetControls = (controls) => {
+  if (!controls) return;
+  const keys = [
+    ...Object.values(controls.cursors || {}),
+    ...Object.values(controls.wasd || {}),
+  ];
+  new Set(keys).forEach((key) => key?.reset?.());
+  if (controls.mobile?.current) {
+    controls.mobile.current.left = false;
+    controls.mobile.current.right = false;
+    controls.mobile.current.jumpQueued = false;
+    controls.mobile.current.dashQueued = false;
+    controls.mobile.current.attackQueued = false;
+  }
+};

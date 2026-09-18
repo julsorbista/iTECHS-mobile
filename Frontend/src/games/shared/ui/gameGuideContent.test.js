@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { buildGameOneGuideContent } from './gameGuideContent';
 
+const allGuideItems = (guide) => [
+  ...guide.summary,
+  ...guide.sections.flatMap((section) => section.items),
+];
+
+const expectTwoGuidePages = (guide) => {
+  expect(guide.sections).toHaveLength(1);
+  expect(guide.summary.length).toBeGreaterThan(0);
+  expect(guide.sections[0].items.length).toBeGreaterThan(0);
+};
+
 describe('Game 1 level-specific guide content', () => {
   it('shows scoring opportunities calculated from the selected level', () => {
     const guide = buildGameOneGuideContent({
@@ -24,11 +35,14 @@ describe('Game 1 level-specific guide content', () => {
 
     expect(guide.kicker).toBe('Game 1 · Level 4');
     expect(guide.title).toBe('Apex Sentinel Guide');
-    expect(guide.summary).toContain('3 coins available; collect at least 2.');
-    expect(guide.sections.find((section) => section.title === 'Lives & Timer').items)
+    const content = allGuideItems(guide);
+    expect(content).toContain('3 coins available; collect at least 2.');
+    expect(content)
       .toContain('Finish within 150 seconds or the attempt ends.');
-    expect(guide.sections.find((section) => section.title === 'Level 4 Score').items)
-      .toContain('Maximum base score for Level 4: 690 points.');
+    expect(content).toContain('This level starts with 4 lives.');
+    expect(content)
+      .toContain('Maximum base score for Level 4: 620 points.');
+    expectTwoGuidePages(guide);
   });
 
   it('removes combat bonuses when shooting is disabled', () => {
@@ -41,9 +55,38 @@ describe('Game 1 level-specific guide content', () => {
         ghosts: [{ id: 'g1' }],
       },
     });
-    const scoreItems = guide.sections.find((section) => section.title === 'Level 2 Score').items;
+    const scoreItems = allGuideItems(guide);
 
     expect(scoreItems.some((item) => item.includes('Successful enemy hits'))).toBe(false);
-    expect(scoreItems).toContain('Maximum base score for Level 2: 395 points.');
+    expect(scoreItems).toContain('Maximum base score for Level 2: 360 points.');
+    expectTwoGuidePages(guide);
+  });
+
+  it('shows the same default coin requirement enforced by the ending portal', () => {
+    const guide = buildGameOneGuideContent({
+      levelNumber: 3,
+      worldObjects: {
+        coins: Array.from({ length: 10 }, (_, index) => ({ id: `coin-${index + 1}` })),
+      },
+    });
+
+    expect(allGuideItems(guide)).toContain('10 coins available; collect at least 6.');
+    expectTwoGuidePages(guide);
+  });
+
+  it('counts only actual coins, not keys or scrolls', () => {
+    const guide = buildGameOneGuideContent({
+      levelNumber: 2,
+      worldObjects: {
+        coins: [
+          { id: 'coin-1', collectibleType: 'coin' },
+          { id: 'key-1', collectibleType: 'key' },
+          { id: 'scroll-1', collectibleType: 'scroll' },
+        ],
+      },
+    });
+
+    expect(allGuideItems(guide).some((item) => item.includes('1 coin available'))).toBe(true);
+    expectTwoGuidePages(guide);
   });
 });

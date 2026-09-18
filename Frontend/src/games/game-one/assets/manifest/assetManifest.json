@@ -4,7 +4,7 @@
     "frameWidth": 160,
     "frameHeight": 280,
     "frameCount": 20,
-    "scale": 0.48,
+    "scale": 0.32,
     "body": {
       "width": 98,
       "height": 192,
@@ -105,6 +105,23 @@
       "height": 32,
       "offsetX": 42,
       "offsetY": 47
+    }
+  },
+  "elementalProjectile": {
+    "key": "gameOneElementalProjectile",
+    "frameWidth": 150,
+    "frameHeight": 150,
+    "frameCount": 1,
+    "scale": 0.46,
+    "speed": 285,
+    "lifetimeMs": 2550,
+    "directionalRotationDeg": 0,
+    "flipWithDirection": true,
+    "body": {
+      "width": 54,
+      "height": 34,
+      "offsetX": 48,
+      "offsetY": 58
     }
   },
   "bossProjectile": {
@@ -232,8 +249,17 @@
     "room_1": {
       "key": "gameOneBgRoom1"
     },
+    "room_2": {
+      "key": "gameOneBgRoom2"
+    },
     "room_3": {
       "key": "gameOneBgRoom3"
+    },
+    "room_4": {
+      "key": "gameOneBgRoom4"
+    },
+    "room_5": {
+      "key": "gameOneBgRoom5"
     },
     "room_6": {
       "key": "gameOneBgRoom6"
@@ -245,15 +271,18 @@
   "platforms": {
     "grass": {
       "key": "gameOnePlatformGrass",
-      "visualHeight": 61
+      "tileWidth": 38,
+      "visualHeight": 34
     },
     "stone": {
       "key": "gameOnePlatformStone",
-      "visualHeight": 63
+      "tileWidth": 38,
+      "visualHeight": 34
     },
     "wood": {
       "key": "gameOnePlatformWood",
-      "visualHeight": 58
+      "tileWidth": 38,
+      "visualHeight": 34
     }
   },
   "sounds": {
@@ -285,6 +314,20 @@
       "key": "gameOneBackgroundMusic2",
       "volume": 0.38,
       "loop": true
+    }
+  },
+  "shadowSpirit": {
+    "key": "gameOneShadowSpirit",
+    "frameWidth": 443,
+    "frameHeight": 443,
+    "frameCount": 8,
+    "scale": 0.18,
+    "speed": 62,
+    "body": {
+      "width": 190,
+      "height": 190,
+      "offsetX": 121,
+      "offsetY": 145
     }
   },
   "slimeGreen": {

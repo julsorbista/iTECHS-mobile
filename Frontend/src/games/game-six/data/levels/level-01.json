@@ -3,9 +3,9 @@
   "gameType": "GAME_SIX",
   "levelNumber": 1,
   "seedVersion": 2,
-  "title": "Syntax Rain Typing: Warmup",
-  "subtitle": "Type five falling programming terms in two minutes.",
-  "objective": "Type five falling programming terms in two minutes.",
+  "title": "Speed-Up Wave",
+  "subtitle": "Type falling Java terms as the wave gradually speeds up.",
+  "objective": "Type each falling Java term before it reaches the bottom.",
   "settings": {
     "targetWords": 5,
     "seconds": 120,

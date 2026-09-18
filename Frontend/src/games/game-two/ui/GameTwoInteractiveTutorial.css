@@ -1,0 +1,55 @@
+.g2-coach { position: fixed; z-index: 2147483000; overflow: hidden; pointer-events: auto; color: #edf8f5; font: 12px/1.45 system-ui, sans-serif; --gold: #ffd15d; --green: #a9edb4; }
+.g2-coach *, .g2-coach *::before, .g2-coach *::after { box-sizing: border-box; }
+.g2-coach button { font: inherit; cursor: pointer; touch-action: manipulation; }
+.g2-coach button:disabled { opacity: .5; cursor: default; }
+.g2-coach button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.g2-coach__shade { position: absolute; inset: 0; background: #060c1438; }
+.g2-coach__panel { position: absolute; z-index: 4; padding: 13px 15px 10px; border: 1px solid #977e51; border-radius: 12px; background: linear-gradient(145deg, #302d25f5, #111a1df7); box-shadow: inset 0 1px 0 #efcc8366, 0 6px 22px #0005; }
+.g2-coach__panel header { display: flex; align-items: center; justify-content: space-between; font-size: 9px; color: var(--green); }
+.g2-coach__panel header span { display: flex; gap: 5px; align-items: center; font-weight: 800; letter-spacing: .07em; }
+.g2-coach__panel header button, .g2-coach__back, .g2-coach__panel footer button { background: none; color: #cfcec5; border: 0; padding: 3px; }
+.g2-coach__progress { display: flex; gap: 4px; margin: 9px 0 10px; }
+.g2-coach__progress span { flex: 1; height: 3px; background: #626154; border-radius: 4px; }
+.g2-coach__progress span.is-active { background: var(--gold); }
+.g2-coach__panel h3 { margin: 0; color: #fff5d4; font: 750 18px/1.25 system-ui, sans-serif; letter-spacing: -.02em; }
+.g2-coach__panel p { margin: 8px 0; font-size: 12px; }
+.g2-coach__panel p.is-success { color: var(--green); }
+.g2-coach__tip { display: flex; gap: 6px; color: #bec8c2; font-size: 10px; line-height: 1.45; }
+.g2-coach__tip svg { flex-shrink: 0; margin-top: 1px; color: var(--gold); }
+.g2-coach__panel nav { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; padding-right: 27px; }
+.g2-coach__panel nav button { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+.g2-coach__next { padding: 7px 10px; border: 1px solid #ddf8d9; border-radius: 6px; background: var(--green); color: #1b3428; font-weight: 750 !important; box-shadow: 0 3px 0 #54735b; }
+.g2-coach__panel footer { display: flex; align-items: center; gap: 4px; border-top: 1px solid #ffffff1c; margin-top: 10px; padding-top: 7px; font-size: 8px; color: #b9c4ba; }
+.g2-coach__panel footer svg { flex-shrink: 0; }
+.g2-coach__panel footer button { margin-left: auto; font-size: 9px; }
+.g2-coach__wanted { display: flex; gap: 8px; align-items: center; margin: 7px 0; font-size: 9px; color: var(--gold); }
+.g2-coach__wanted code { color: var(--green); font-size: 12px; overflow-wrap: anywhere; }
+.g2-coach__focus { position: absolute; z-index: 2; border: 2px solid var(--gold); border-radius: 12px; box-shadow: 0 0 0 5px #ffd15d22; pointer-events: none; animation: g2-focus 2.4s ease-in-out infinite; }
+.g2-coach__focus--warning { border-color: #ff8492; box-shadow: 0 0 0 5px #ff849222; }
+.g2-coach__arena { position: absolute; z-index: 3; border-radius: 16px; background: radial-gradient(ellipse at center, #11171b77, #10182011); }
+.g2-coach__arena-label { position: absolute; left: 50%; top: 0; transform: translateX(-50%); font-size: 8px; font-weight: 750; letter-spacing: .08em; color: #d5dec7; white-space: nowrap; pointer-events: none; }
+.g2-coach__arena canvas { position: absolute; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+.g2-coach__swipe-path { position: absolute; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.g2-coach__swipe-path path { stroke: #d8f8c3; stroke-width: 2; stroke-dasharray: 5 6; fill: none; opacity: .5; }
+.g2-coach__pieces { position: absolute; z-index: 3; font-size: 8px; color: #c4d7c2; padding: 5px; }
+.g2-coach__pieces > span { display: block; margin-bottom: 5px; letter-spacing: .08em; }
+.g2-coach__pieces > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.g2-coach__pieces code { border: 1px solid #657060; padding: 4px 5px; border-radius: 5px; font-size: 10px; color: #bcc6bb; background: #101b22e8; max-width: 100%; overflow-wrap: anywhere; }
+.g2-coach__pieces code.is-next { border-color: var(--gold); color: #fff0bf; }
+.g2-coach__pieces code.is-done { color: var(--green); border-color: #71b680; }
+.g2-coach__success { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: var(--green); pointer-events: none; }
+.g2-coach__success strong { font-size: 17px; }
+.g2-coach__success span { font-size: 10px; color: #d1dccd; }
+.g2-coach__hand { position: absolute; z-index: 6; width: 48px; height: 52px; pointer-events: none; transition: left 300ms ease, top 300ms ease, opacity 150ms; }
+.g2-coach__hand > div { position: absolute; width: 48px; height: 52px; }
+.g2-coach__hand img { position: absolute; width: 48px; max-width: none; left: -10px; top: -5px; filter: drop-shadow(0 3px 3px #0008); transform-origin: 20% 10%; }
+.g2-coach__hand--mirrored img { scale: -1 1; left: -38px; transform-origin: 50% 10%; }
+.g2-coach__hand i { position: absolute; width: 12px; height: 12px; left: -6px; top: -6px; border: 2px solid #ffd15d; border-radius: 50%; opacity: .65; }
+.g2-coach__hand--swipe > div { animation: g2-swipe 2.6s ease-in-out infinite; }
+.g2-coach__hand--point img { animation: g2-point 2.4s ease-in-out infinite; }
+.g2-coach__hand--warning img { animation: g2-point 2.4s ease-in-out infinite; filter: drop-shadow(0 2px 5px #ff849280); }
+.g2-coach__hand--warning i { border-color: #ff8492; animation: g2-focus 2.4s ease-in-out infinite; }
+@keyframes g2-swipe { 0%,12% { transform: translate(0, -4px); opacity: 1; } 22% { transform: translate(0, 2px) scale(.96); } 66%,78% { transform: translate(var(--dx), var(--dy)) scale(.96); opacity: 1; } 87% { transform: translate(var(--dx), var(--dy)); opacity: 0; } 88%,100% { transform: translate(0, -4px); opacity: 0; } }
+@keyframes g2-point { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes g2-focus { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.25); } }
+@media (prefers-reduced-motion: reduce) { .g2-coach * { animation: none !important; transition: none !important; } }

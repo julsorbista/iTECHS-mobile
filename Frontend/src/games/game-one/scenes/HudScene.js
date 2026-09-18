@@ -6,6 +6,10 @@ export default class HudScene extends Phaser.Scene {
   }
 
   create() {
+    this.hudPanel = this.add.rectangle(185, 38, 338, 52, 0x0f172a, 0)
+      .setOrigin(0.5)
+      .setStrokeStyle(0, 0xfde68a, 0);
+
     this.healthText = this.add.text(24, 18, '♥♥♥', {
       fontFamily: 'Manrope, Arial, sans-serif',
       fontSize: '34px',
@@ -14,9 +18,40 @@ export default class HudScene extends Phaser.Scene {
 
     this.coinText = this.add.text(24, 66, '🪙 0', {
       fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: '24px',
+      fontSize: '22px',
       color: '#fde68a'
     });
+
+    this.controlsPanel = this.add.graphics();
+    this.controlsPanel.fillStyle(0x111827, 0.92);
+    this.controlsPanel.fillRoundedRect(20, 54, 324, 36, 8);
+    this.controlsPanel.lineStyle(2, 0x8b5cf6, 0.95);
+    this.controlsPanel.strokeRoundedRect(20, 54, 324, 36, 8);
+
+    const createKeycap = (x, label) => {
+      const key = this.add.rectangle(x, 72, 24, 24, 0x312e81, 1)
+        .setStrokeStyle(1, 0xc4b5fd, 0.95);
+      const keyLabel = this.add.text(x, 72, label, {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '12px',
+        fontStyle: 'bold',
+        color: '#ffffff',
+      }).setOrigin(0.5).setResolution(2);
+      return [key, keyLabel];
+    };
+    const createControlLabel = (x, label) => this.add.text(x, 72, label, {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: '11px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+    }).setOrigin(0, 0.5).setResolution(2);
+
+    this.moveKeycaps = [...createKeycap(37, 'A'), ...createKeycap(64, 'D')];
+    this.moveControlLabel = createControlLabel(81, 'MOVE');
+    this.jumpKeycaps = createKeycap(151, 'W');
+    this.jumpControlLabel = createControlLabel(168, 'JUMP');
+    this.attackKeycaps = createKeycap(247, 'J');
+    this.attackControlLabel = createControlLabel(264, 'ATTACK');
 
     this.timerText = this.add.text(24, 100, '', {
       fontFamily: 'Manrope, Arial, sans-serif',
@@ -24,13 +59,33 @@ export default class HudScene extends Phaser.Scene {
       color: '#93c5fd'
     });
 
-    this.menuButton = this.add.rectangle(1182, 36, 156, 34, 0x1e293b, 0.9)
+    this.objectiveText = this.add.text(640, 18, '', {
+      fontFamily: 'Manrope, Arial, sans-serif',
+      fontSize: '13px',
+      color: '#f8fafc',
+      align: 'center',
+      wordWrap: { width: 620 },
+    }).setOrigin(0.5, 0).setShadow(1, 2, '#020617', 4, true, true);
+
+    this.areaText = this.add.text(1116, 20, '', {
+      fontFamily: 'Manrope, Arial, sans-serif',
+      fontSize: '13px',
+      color: '#fde68a',
+    }).setOrigin(1, 0).setShadow(1, 2, '#020617', 4, true, true);
+
+    this.healthText.setPosition(28, 20).setFontSize(25);
+    this.coinText.setPosition(145, 22).setFontSize(18);
+    this.timerText.setPosition(28, 70);
+    this.healthText.setShadow(1, 2, '#0f172a', 4, true, true);
+    this.coinText.setShadow(1, 2, '#0f172a', 4, true, true);
+
+    this.menuButton = this.add.rectangle(1202, 34, 116, 30, 0x1e293b, 0.82)
       .setOrigin(0.5)
       .setStrokeStyle(2, 0x67e8f9, 0.9)
       .setInteractive({ useHandCursor: true });
-    this.menuButtonLabel = this.add.text(1182, 36, 'Menu [Esc]', {
+    this.menuButtonLabel = this.add.text(1202, 34, 'Menu  Esc', {
       fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: '14px',
+      fontSize: '12px',
       color: '#cffafe',
     }).setOrigin(0.5);
 
@@ -45,11 +100,11 @@ export default class HudScene extends Phaser.Scene {
       levelScene?.togglePause?.(true);
     });
 
-    this.footerText = this.add.text(1248, 686, 'Move: WASD / Arrows  Jump: W / Up / Space  Double Jump: Jump Again  Air Dash: Space  Attack: J  Menu: ESC', {
+    this.footerText = this.add.text(1248, 692, 'Move: WASD / Arrows  |  Jump: Space  |  Menu: Esc', {
       fontFamily: 'Manrope, Arial, sans-serif',
-      fontSize: '14px',
+      fontSize: '10px',
       color: '#e2e8f0'
-    }).setOrigin(1, 1);
+    }).setOrigin(1, 1).setVisible(false);
 
     this.syncFromRegistry();
 
@@ -64,7 +119,12 @@ export default class HudScene extends Phaser.Scene {
     this.registry.events.on('changedata-timerEnabled', this.syncFromRegistry, this);
     this.registry.events.on('changedata-timerSecondsRemaining', this.syncFromRegistry, this);
     this.registry.events.on('changedata-coinGoal', this.syncFromRegistry, this);
-    this.registry.events.on('changedata-statueProgress', this.syncFromRegistry, this);
+    this.registry.events.on('changedata-keysCollected', this.syncFromRegistry, this);
+    this.registry.events.on('changedata-keyGoal', this.syncFromRegistry, this);
+    this.registry.events.on('changedata-currentRoomKeyGoal', this.syncFromRegistry, this);
+    this.registry.events.on('changedata-scrollsCollected', this.syncFromRegistry, this);
+    this.registry.events.on('changedata-scrollGoal', this.syncFromRegistry, this);
+    this.registry.events.on('changedata-objective', this.syncFromRegistry, this);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.registry.events.off('changedata-roomLabel', this.syncFromRegistry, this);
@@ -78,7 +138,12 @@ export default class HudScene extends Phaser.Scene {
       this.registry.events.off('changedata-timerEnabled', this.syncFromRegistry, this);
       this.registry.events.off('changedata-timerSecondsRemaining', this.syncFromRegistry, this);
       this.registry.events.off('changedata-coinGoal', this.syncFromRegistry, this);
-      this.registry.events.off('changedata-statueProgress', this.syncFromRegistry, this);
+      this.registry.events.off('changedata-keysCollected', this.syncFromRegistry, this);
+      this.registry.events.off('changedata-keyGoal', this.syncFromRegistry, this);
+      this.registry.events.off('changedata-currentRoomKeyGoal', this.syncFromRegistry, this);
+      this.registry.events.off('changedata-scrollsCollected', this.syncFromRegistry, this);
+      this.registry.events.off('changedata-scrollGoal', this.syncFromRegistry, this);
+      this.registry.events.off('changedata-objective', this.syncFromRegistry, this);
     });
   }
 
@@ -97,7 +162,15 @@ export default class HudScene extends Phaser.Scene {
     const coinsCollected = Number(this.registry.get('coinsCollected') || 0);
     const coinBalance = Number(this.registry.get('coinBalance') ?? coinsCollected);
     const coinGoal = Number(this.registry.get('coinGoal') || 0);
+    const keysCollected = Number(this.registry.get('keysCollected') || 0);
+    const keyGoal = Number(this.registry.get('keyGoal') || 0);
+    const currentRoomKeyGoal = Number(this.registry.get('currentRoomKeyGoal') || 0);
+    const scrollsCollected = Number(this.registry.get('scrollsCollected') || 0);
+    const scrollGoal = Number(this.registry.get('scrollGoal') || 0);
     const timerEnabled = Boolean(this.registry.get('timerEnabled'));
+    const roomIndex = Number(this.registry.get('roomIndex') || 1);
+    const roomCount = Number(this.registry.get('roomCount') || 1);
+    const objective = String(this.registry.get('objective') || '').trim();
     const timerSecondsRemaining = Number(this.registry.get('timerSecondsRemaining'));
     const minutes = Number.isFinite(timerSecondsRemaining) ? Math.floor(timerSecondsRemaining / 60) : 0;
     const seconds = Number.isFinite(timerSecondsRemaining) ? timerSecondsRemaining % 60 : 0;
@@ -126,7 +199,13 @@ export default class HudScene extends Phaser.Scene {
     this.coinText.setText(coinGoal > 0
       ? `🪙 ${coinBalance}  Goal ${coinsCollected}/${coinGoal}`
       : `🪙 ${coinBalance}`);
+    this.coinText.setText(`🪙 ${coinBalance}    \ud83d\udd11 ${keysCollected}/${keyGoal}    \ud83d\udcdc ${scrollsCollected}/${scrollGoal}`);
+    if (currentRoomKeyGoal <= 0) {
+      this.coinText.setText(`🪙 ${coinBalance}    \u{1F4DC} ${scrollsCollected}/${scrollGoal}`);
+    }
     this.timerText.setVisible(timerEnabled);
     this.timerText.setText(timerEnabled ? `Timer ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}` : '');
+    this.objectiveText.setText(objective);
+    this.areaText.setText(`Room ${roomIndex}/${roomCount}`);
   }
 }

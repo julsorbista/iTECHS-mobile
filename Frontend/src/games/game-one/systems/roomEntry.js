@@ -80,6 +80,11 @@ export const getLocalCellSpawn = (cellRecord) => {
   };
 };
 
+export const getRoomWorldPosition = (cellRecord, localPosition = {}) => ({
+  x: Number(cellRecord?.bounds?.left ?? cellRecord?.origin?.x ?? 0) + Number(localPosition.x || 0),
+  y: Number(cellRecord?.bounds?.top ?? cellRecord?.origin?.y ?? 0) + Number(localPosition.y || 0),
+});
+
 export const resolveTargetRoomEntryPosition = ({
   targetRecord,
 }) => {

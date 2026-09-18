@@ -20,29 +20,29 @@
     {
       "id": "g2l3-t1",
       "type": "complete",
-      "title": "Loop Start",
-      "prompt": "Complete the loop so i starts at 0.",
-      "snippet": "for (int i = ____; i < 3; i++) {",
-      "answer": "0",
+      "title": "Store An Index",
+      "prompt": "Complete the Java statement so index starts at 0.",
+      "snippet": "____",
+      "answer": "int index = 0;",
       "acceptedAnswers": [
-        "0"
+        "int index = 0;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "1"
+          "label": "int index == 0;"
         },
         {
           "id": "b",
-          "label": "0"
+          "label": "int index = 0;"
         },
         {
           "id": "c",
-          "label": "\"0\""
+          "label": "index int = 0;"
         },
         {
           "id": "d",
-          "label": "i"
+          "label": "int index: 0;"
         }
       ],
       "points": 120,
@@ -55,29 +55,29 @@
     {
       "id": "g2l3-t2",
       "type": "debug",
-      "title": "Fix Infinite Loop",
-      "prompt": "The loop counts the wrong way. Drag the repaired loop header into the blank.",
-      "snippet": "____\n  System.out.println(i);\n}",
-      "answer": "for (int i = 0; i < 5; i++) {",
+      "title": "Store A Limit",
+      "prompt": "Complete the Java statement that stores a loop limit.",
+      "snippet": "____",
+      "answer": "int limit = 5;",
       "acceptedAnswers": [
-        "for (int i = 0; i < 5; i++) {"
+        "int limit = 5;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "for (int i = 0; i < 5; i--) {"
+          "label": "int limit == 5;"
         },
         {
           "id": "b",
-          "label": "for (int i = 0; i < 5; i++) {"
+          "label": "int limit = 5;"
         },
         {
           "id": "c",
-          "label": "for (int i = 0; i < 5) {"
+          "label": "limit int = 5;"
         },
         {
           "id": "d",
-          "label": "for (i = 0; i < 5; i++) {"
+          "label": "int limit: 5;"
         }
       ],
       "points": 160,
@@ -91,29 +91,29 @@
     {
       "id": "g2l3-t3",
       "type": "complete",
-      "title": "Array Access",
-      "prompt": "Drag the expression that reads the first item in items.",
-      "snippet": "String first = ____;",
-      "answer": "items[0]",
+      "title": "Store A City",
+      "prompt": "Complete the Java statement that stores a city name.",
+      "snippet": "____",
+      "answer": "String city = \"Manila\";",
       "acceptedAnswers": [
-        "items[0]"
+        "String city = \"Manila\";"
       ],
       "options": [
         {
           "id": "a",
-          "label": "items[1]"
+          "label": "String city == \"Manila\";"
         },
         {
           "id": "b",
-          "label": "items(0)"
+          "label": "String city = Manila;"
         },
         {
           "id": "c",
-          "label": "items[0]"
+          "label": "String city = \"Manila\";"
         },
         {
           "id": "d",
-          "label": "items.first"
+          "label": "city String = \"Manila\";"
         }
       ],
       "points": 130,
@@ -127,8 +127,8 @@
     {
       "id": "g2l3-t4",
       "type": "choice",
-      "title": "Loop Count",
-      "prompt": "How many times does this Java loop run? for (int i = 0; i < 4; i++)",
+      "title": "Print A Status",
+      "prompt": "Complete the Java statement that prints a status message.",
       "correctOptionId": "d",
       "points": 130,
       "coinReward": 1,
@@ -136,19 +136,19 @@
       "options": [
         {
           "id": "a",
-          "label": "0 times"
+          "label": "System.out.print(\"Ready!\");"
         },
         {
           "id": "b",
-          "label": "3 times"
+          "label": "System.println(\"Ready!\");"
         },
         {
           "id": "c",
-          "label": "5 times"
+          "label": "println(Ready!);"
         },
         {
           "id": "d",
-          "label": "4 times"
+          "label": "System.out.println(\"Ready!\");"
         }
       ],
       "hints": [
