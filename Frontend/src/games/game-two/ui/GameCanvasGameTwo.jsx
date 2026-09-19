@@ -9,13 +9,35 @@ import industrialFrameBackground from '../../../assets/game-two/industrial-frame
 import beepOne from '../../game-six/assets/beep-1.mp3';
 import beepTwo from '../../game-six/assets/beep-2.mp3';
 import beepThree from '../../game-six/assets/beep-3.mp3';
-import { getStudentMusicPreference } from '../../../utils/studentMenuAudio';
+import {
+  getStudentAudioVolumePreference,
+  getStudentMusicPreference,
+  getStudentSfxPreference,
+  getStudentSfxVolumePreference,
+} from '../../../utils/studentMenuAudio';
 
 const SWORD_SLICE_SOUND_SRC = new URL('../assets/processed/swordslice.mp3', import.meta.url).href;
 const SYNTAX_SLICE_SOUND_SRC = new URL('../assets/processed/sfxgame2.mp3', import.meta.url).href;
 const BOMB_ERROR_SOUND_SRC = new URL('../assets/processed/error.mp3', import.meta.url).href;
 const COMBO_SOUND_SRC = new URL('../assets/processed/game2combo.mp3', import.meta.url).href;
 const BACKGROUND_MUSIC_SRC = new URL('../assets/processed/game2background.mp3', import.meta.url).href;
+
+const getComboMultiplier = (combo) => {
+  if (combo >= 10) return 5;
+  if (combo >= 5) return 3;
+  if (combo >= 3) return 2;
+  return 1;
+};
+
+const COMBO_MILESTONES = [3, 5, 10];
+
+const getStudentMusicVolume = (baseVolume = 1) => (
+  baseVolume * (getStudentAudioVolumePreference() / 100)
+);
+
+const getStudentSfxVolume = (baseVolume = 1) => (
+  baseVolume * (getStudentSfxVolumePreference() / 100)
+);
 
 const LEVEL_CONFIG = Object.freeze({
   1: { target: 2, spawnRate: 1750, speed: 90, bombChance: 0.12, decoyChance: 0.22, correctChance: 0.42, correctGap: 1, maxObjects: 4 },
@@ -78,7 +100,7 @@ const GameTwoAnnouncementBoard = ({ levelNumber = 1, targetCodes = [], onStart }
 
     const sound = sourceSound.cloneNode();
     sound.muted = false;
-    sound.volume = 1;
+    sound.volume = getStudentSfxVolume(1);
     sound.currentTime = 0;
     sound.play().catch(() => {});
 
@@ -334,67 +356,47 @@ const buildScoreProfile = (levelData, config) => {
   };
 };
 
+const removeDuplicateGuideItems = (items) => {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = String(item).trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+const splitGuideItemsIntoTwoPages = (items, title) => {
+  const dedupedItems = removeDuplicateGuideItems(items);
+  const splitIndex = Math.max(1, Math.ceil(dedupedItems.length / 2));
+  return {
+    summary: dedupedItems.slice(0, splitIndex),
+    sections: [{ title, items: dedupedItems.slice(splitIndex) }],
+  };
+};
+
 const buildGuideContent = (levelData, config) => {
   const levelNumber = levelData?.levelNumber || 1;
   const scoreProfile = buildScoreProfile(levelData, config);
+  const guidePages = splitGuideItemsIntoTwoPages([
+    `Complete ${config.target} Java output${config.target === 1 ? '' : 's'} to clear Level ${levelNumber}.`,
+    'Slice gold syntax cards in the exact order shown by Java Code.',
+    'Avoid red decoy cards and bombs while protecting your 3 Lives.',
+    'If you do not slice anything for 20 consecutive seconds, the game ends due to inactivity.',
+    'Correct syntax slices earn 40 base points, multiplied by ×2 at Combo 3, ×3 at Combo 5, and ×5 at Combo 10.',
+    'Each completed Java output adds a 120-point completion reward using the active Combo multiplier.',
+    `Recorded base score: syntax slice rewards + (${config.target} completed outputs × completion reward) − decoy/bomb penalties.`,
+    `With no decoy or bomb mistakes, the estimated Level ${levelNumber} base score is ${scoreProfile.noMistakeScore} points across about ${scoreProfile.requiredSlices} required syntax slices.`,
+    `Clear ${config.target} / ${config.target} Outputs to pass this level.`,
+    'Passing the level unlocks the next available Game 2 level.',
+  ], `Level ${levelNumber} Guide`);
+
   return {
     kicker: `Game 2 · Level ${levelNumber}`,
     title: 'Code Ninja Guide',
-    lead: 'Read the slicing rules, code guide, hazards, lives, scoring, and passing requirement for this level.',
-    summary: [
-      `Complete ${config.target} Java output${config.target === 1 ? '' : 's'} to clear Level ${levelNumber}.`,
-      'Slice gold syntax cards in the exact order shown by Java Code.',
-      'Avoid red decoy cards and bombs while protecting your 3 Lives.',
-    ],
-    sections: [
-      {
-        title: `Level ${levelNumber} Mechanics Guide`,
-        items: [
-          `Complete ${config.target} Java output${config.target === 1 ? '' : 's'} by slicing the required syntax cards in the order shown by Java Code.`,
-          'Correct Code is the guide for the current challenge; Sliced Code shows the pieces already collected.',
-          'Use mouse, touch, or pointer drag to cut moving syntax cards and bombs.',
-          `Objects spawn every ${config.spawnRate} ms with ${config.speed} movement speed and up to ${config.maxObjects} active objects on screen.`,
-          `This level includes about ${Math.round(config.decoyChance * 100)}% decoy pressure and ${Math.round(config.bombChance * 100)}% bomb pressure when hazards appear.`,
-        ],
-      },
-      {
-        title: 'Correct & Decoy Syntax',
-        items: [
-          'Gold/yellow mechanical cards are correct syntax targets and move your Sliced Code forward.',
-          'Red/crimson mechanical cards are decoys or wrong-order syntax; avoid slicing them.',
-          'Both card types can look similar, so match the card text against the next Java Code piece before cutting.',
-        ],
-      },
-      {
-        title: 'Bombs, Lives, and Attempts',
-        items: [
-          'Every level attempt begins with 3 Lives.',
-          'Slicing a red decoy removes 1 Life and resets Combo to 0x.',
-          'Slicing a bomb removes 1 Life and resets Combo to 0x.',
-          'If you do not slice anything for 20 consecutive seconds, the game ends due to inactivity.',
-          'Losing all Lives ends the attempt; use Retry to restart the same level.',
-        ],
-      },
-      {
-        title: `Level ${levelNumber} Score`,
-        items: [
-          'The on-screen correct syntax reward is 40 points plus Combo bonus per slice.',
-          'Each completed Java output adds a 120-point completion reward plus 15 points per current Combo level.',
-          `Recorded base score: syntax slice rewards + (${config.target} completed outputs × completion reward) − decoy/bomb penalties.`,
-          `With no decoy or bomb mistakes, the estimated Level ${levelNumber} base score is ${scoreProfile.noMistakeScore} points across about ${scoreProfile.requiredSlices} required syntax slices.`,
-          'Combo is bonus scoring for accurate slicing and does not directly change the required Output target.',
-        ],
-      },
-      {
-        title: 'Stars and Passing',
-        items: [
-          `Clear ${config.target} / ${config.target} Outputs to pass this level.`,
-          'A completed run earns up to 3 Stars for Game 2.',
-          'Mistakes, lost Lives, and retries can lower the quality of the attempt even when the level is cleared.',
-          'Passing the level unlocks the next available Game 2 level.',
-        ],
-      },
-    ],
+    lead: 'Read the output target, hazards, score, Stars, and level-only requirements before you begin.',
+    summary: guidePages.summary,
+    sections: guidePages.sections,
   };
 };
 
@@ -437,9 +439,11 @@ const GameCanvasGameTwo = ({
   const config = useMemo(() => getLevelConfig(levelNumber), [levelNumber]);
   const challenges = useMemo(() => buildChallenges(levelData, config.target), [config.target, levelData]);
   const guideContent = useMemo(() => buildGuideContent(levelData, config), [config, levelData]);
-  const [showTutorial, setShowTutorial] = useState(true);
+  const initialShowTutorial = Boolean(showLevelGuideline) || levelNumber > 1;
+  const [showTutorial, setShowTutorial] = useState(initialShowTutorial);
   const [tutorialView, setTutorialView] = useState(showLevelGuideline ? 'guide' : 'announcement');
   const [tutorialLaunchedFromIntro, setTutorialLaunchedFromIntro] = useState(false);
+  const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const showGuide = showTutorial && tutorialView === 'guide';
   const showFirstHandGuide = showTutorial && tutorialView === 'tutorial';
   const showAnnouncement = showTutorial && tutorialView === 'announcement';
@@ -481,7 +485,7 @@ const GameCanvasGameTwo = ({
   const backgroundMusicBlockedRef = useRef(false);
 
   const playSound = useCallback((soundRef, soundSrc) => {
-    if (typeof window === 'undefined' || typeof window.Audio === 'undefined' || !getStudentMusicPreference()) {
+    if (typeof window === 'undefined' || typeof window.Audio === 'undefined' || !getStudentSfxPreference()) {
       return;
     }
 
@@ -489,7 +493,7 @@ const GameCanvasGameTwo = ({
       if (!soundRef.current) {
         soundRef.current = new Audio(soundSrc);
         soundRef.current.preload = 'auto';
-        soundRef.current.volume = 0.78;
+        soundRef.current.volume = getStudentSfxVolume(0.78);
       } else {
         soundRef.current.currentTime = 0;
       }
@@ -542,7 +546,7 @@ const GameCanvasGameTwo = ({
     const backgroundMusic = new Audio(BACKGROUND_MUSIC_SRC);
     backgroundMusic.loop = true;
     backgroundMusic.preload = 'auto';
-    backgroundMusic.volume = 0.22;
+    backgroundMusic.volume = getStudentMusicVolume(0.22);
     backgroundMusicRef.current = backgroundMusic;
 
     const playPromise = backgroundMusic.play();
@@ -646,9 +650,10 @@ const GameCanvasGameTwo = ({
   }, []);
 
   useEffect(() => {
-    setShowTutorial(true);
+    setShowTutorial(Boolean(showLevelGuideline) || levelNumber > 1);
     setTutorialView(showLevelGuideline ? 'guide' : 'announcement');
     setTutorialLaunchedFromIntro(false);
+    setGuideOpenedDuringGameplay(false);
   }, [levelNumber, shouldAutoOpenFirstHandGuide, showLevelGuideline]);
 
   useEffect(() => {
@@ -720,6 +725,10 @@ const GameCanvasGameTwo = ({
     if (kind === 'correct') text = challenge.pieces[state.pieceIndex] || challenge.pieces[0];
     if (kind === 'wrong') text = pick(challenge.decoys.length ? challenge.decoys : FALLBACK_DECOYS);
     const mobileUiScale = state.mobileUiScale || 1;
+    const validTargetValues = new Set(
+      challenges.flatMap((entry) => [entry.targetCode, ...(entry.pieces || [])]).filter(Boolean),
+    );
+    const isValidDuplicate = kind === 'wrong' && validTargetValues.has(text);
     let width = 118 * mobileUiScale;
     let height = 138 * mobileUiScale;
     if (kind !== 'bomb') {
@@ -743,6 +752,7 @@ const GameCanvasGameTwo = ({
       id: `${Date.now()}-${Math.random()}`,
       kind,
       text,
+      isValidDuplicate,
       x: clamp(x, width / 2 + 20, state.width - width / 2 - 20),
       y: spawnY,
       width,
@@ -854,22 +864,23 @@ const GameCanvasGameTwo = ({
     state.lastSliceAt = performance.now();
     playSound(swordSliceSoundRef, SWORD_SLICE_SOUND_SRC);
     if (item.kind === 'correct' && item.text === challenge.pieces[state.pieceIndex]) {
-      const previousCombo = state.combo;
-      state.combo = Math.min(3, state.combo + 1);
-      if (previousCombo < 3 && state.combo === 3 && state.lives < 3) {
+      state.combo += 1;
+      const comboMultiplier = getComboMultiplier(state.combo);
+      const reachedComboMilestone = COMBO_MILESTONES.includes(state.combo);
+      if (reachedComboMilestone && state.lives < 3) {
         state.lives = Math.min(3, state.lives + 1);
       }
       playSound(syntaxSliceSoundRef, SYNTAX_SLICE_SOUND_SRC);
       state.pieceIndex += 1;
-      state.score += 40 + state.combo * 10;
+      state.score += 40 * comboMultiplier;
       burst(ctx, item.x, item.y, '#ffd15d', 18);
       addCorrectSliceEffect(item, sliceStart || { x: item.x - 52, y: item.y + 36 }, sliceEnd || { x: item.x + 52, y: item.y - 36 });
-      if (previousCombo < 3 && state.combo === 3) {
+      if (reachedComboMilestone) {
         playSound(comboSoundRef, COMBO_SOUND_SRC);
-        triggerSliceFeedback('combo', '3x Combo', 'Combo streak!');
+        triggerSliceFeedback('combo', `${state.combo} Combo`, `Score multiplier ×${comboMultiplier}`);
       }
       if (state.pieceIndex >= challenge.pieces.length) {
-        state.score += 120 + state.combo * 15;
+        state.score += 120 * comboMultiplier;
         completeChallenge(ctx, state, challenge);
       }
       syncHud();
@@ -1128,7 +1139,11 @@ const GameCanvasGameTwo = ({
         }
         if (!item.dead) {
           if (item.kind === 'bomb') drawBomb(ctx, item);
-          else drawSyntaxCard(ctx, item, item.kind === 'correct' ? '#ffd15d' : '#ff334f');
+          else drawSyntaxCard(
+            ctx,
+            item,
+            item.kind === 'correct' || item.isValidDuplicate ? '#74ff8a' : '#ff334f',
+          );
         }
       });
       state.items = state.items.filter((item) => !item.dead);
@@ -1238,6 +1253,30 @@ const GameCanvasGameTwo = ({
     resetRun();
   };
 
+  const openGameplayGuidelines = () => {
+    setGuideOpenedDuringGameplay(true);
+    setTutorialLaunchedFromIntro(false);
+    setTutorialView('guide');
+    setShowTutorial(true);
+    const state = stateRef.current;
+    if (state) {
+      state.running = false;
+      state.last = performance.now();
+      state.lastSliceAt = performance.now();
+    }
+  };
+
+  const closeGameplayGuidelines = () => {
+    setGuideOpenedDuringGameplay(false);
+    setTutorialView(null);
+    setShowTutorial(false);
+    const state = stateRef.current;
+    if (state) {
+      state.last = performance.now();
+      state.lastSliceAt = performance.now();
+    }
+  };
+
   return (
     <div ref={appRef} className="game-two-fruit-shell">
       <canvas
@@ -1281,6 +1320,13 @@ const GameCanvasGameTwo = ({
           }}
         >
           Game Tutorial
+        </button>
+        <button
+          type="button"
+          className="game-two-fruit-action-button game-two-fruit-tutorial-button"
+          onClick={openGameplayGuidelines}
+        >
+          Guidelines
         </button>
         <button
           type="button"
@@ -1339,8 +1385,12 @@ const GameCanvasGameTwo = ({
           lead={guideContent.lead}
           summary={guideContent.summary}
           sections={guideContent.sections}
-          onExit={onExitRequest}
+          onExit={guideOpenedDuringGameplay ? closeGameplayGuidelines : onExitRequest}
           onStart={() => {
+            if (guideOpenedDuringGameplay) {
+              closeGameplayGuidelines();
+              return;
+            }
             if (shouldAutoOpenFirstHandGuide) {
               setTutorialLaunchedFromIntro(true);
               setTutorialView('tutorial');
@@ -1348,7 +1398,7 @@ const GameCanvasGameTwo = ({
             }
             beginIntroSequence();
           }}
-          startLabel="Next"
+          startLabel={guideOpenedDuringGameplay ? 'Continue' : 'Next'}
           lockLandscapeOnStart
         />
       )}
@@ -1411,7 +1461,7 @@ const GameCanvasGameTwo = ({
               </div>
               <div className="game-two-result-stats">
                 <span>Output: <strong>{outputs}</strong> / {config.target}</span>
-                <span>Score: <strong>{score}</strong></span>
+                <span>Final score: <strong>{Number(resultData?.finalScore ?? score)}</strong></span>
                 <span>Lives: <strong>{lives}</strong> / 3</span>
                 <span>Stars earned: <strong>{resultData?.starsEarned ?? (localResult === 'COMPLETED' ? 3 : 0)}</strong></span>
               </div>

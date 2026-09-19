@@ -185,6 +185,7 @@ const StudentGameOverlay = ({
   const isGameFour = normalizedGameType === 'GAME_FOUR';
   const isGameFive = normalizedGameType === 'GAME_FIVE';
   const isGameSix = normalizedGameType === 'GAME_SIX';
+  const shouldShowLevelGuideline = numericLevelNumber === 1;
 
   useEffect(() => {
     setAutoShowGameTutorial(false);
@@ -796,7 +797,7 @@ const StudentGameOverlay = ({
                         initialCoins={sharedCoinBalance}
                         onCoinBalanceChange={setSharedCoinBalance}
                         suppressIntroTutorial={!autoShowGameTutorial}
-                        showLevelGuideline
+                        showLevelGuideline={shouldShowLevelGuideline}
                         continueToTutorialAfterGuide={continueToTutorialAfterGuide}
                         gameTutorialRequested={gameTutorialRequest}
                       />
@@ -821,7 +822,7 @@ const StudentGameOverlay = ({
                     freeMistakes={sessionInfo.policy?.freeMistakes ?? 3}
                     hintStarCost={sessionInfo.policy?.hintStarCost ?? 1}
                     suppressIntroTutorial={!autoShowGameTutorial}
-                    showLevelGuideline
+                    showLevelGuideline={shouldShowLevelGuideline}
                     continueToTutorialAfterGuide={continueToTutorialAfterGuide}
                     gameTutorialRequested={gameTutorialRequest}
                   />
@@ -888,7 +889,7 @@ const StudentGameOverlay = ({
                         onNextLevel={handleNextLevel}
                         onTutorialRequest={() => setGameTutorialRequest((request) => request + 1)}
                         suppressIntroTutorial={!autoShowGameTutorial}
-                        showLevelGuideline
+                        showLevelGuideline={shouldShowLevelGuideline}
                         continueToTutorialAfterGuide={continueToTutorialAfterGuide}
                         gameTutorialRequested={gameTutorialRequest}
                         playerId={user?.id || 'guest'}
@@ -914,7 +915,7 @@ const StudentGameOverlay = ({
                         initialCoins={sharedCoinBalance}
                         onCoinBalanceChange={setSharedCoinBalance}
                         suppressIntroTutorial={!autoShowGameTutorial}
-                        showLevelGuideline
+                        showLevelGuideline={shouldShowLevelGuideline}
                         continueToTutorialAfterGuide={continueToTutorialAfterGuide}
                         gameTutorialRequested={gameTutorialRequest}
                       />
@@ -938,7 +939,7 @@ const StudentGameOverlay = ({
                         initialCoins={sharedCoinBalance}
                         onCoinBalanceChange={setSharedCoinBalance}
                         suppressIntroTutorial={!autoShowGameTutorial}
-                        showLevelGuideline
+                        showLevelGuideline={shouldShowLevelGuideline}
                         continueToTutorialAfterGuide={continueToTutorialAfterGuide}
                         gameTutorialRequested={gameTutorialRequest}
                       />
@@ -962,7 +963,7 @@ const StudentGameOverlay = ({
                         onNextLevel={handleNextLevel}
                         onRuntimeBootReady={() => setRuntimeBootReady(true)}
                         initialShowTutorial={autoShowGameTutorial}
-                        showLevelGuideline
+                        showLevelGuideline={shouldShowLevelGuideline}
                         continueToTutorialAfterGuide={continueToTutorialAfterGuide}
                         gameTutorialRequested={gameTutorialRequest}
                       />

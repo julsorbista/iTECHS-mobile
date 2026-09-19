@@ -2570,10 +2570,128 @@
   }
 }
 
+/* Tacda-authored dashboard guidelines: mobile-sized expansion with the existing level panel as the layout base. */
+.student-dashboard-guidelines-card {
+  margin-top: 0.75rem;
+  overflow: hidden;
+  border: 2px solid rgba(90, 53, 29, 0.22);
+  border-radius: 1rem;
+  background: rgba(255, 249, 232, 0.84);
+  color: #5A351D;
+  box-shadow: 0 8px 18px rgba(90, 53, 29, 0.12);
+}
+
+.student-dashboard-guidelines-scroll {
+  max-height: min(34vh, 15rem);
+  overflow-y: auto;
+  padding: 0.8rem;
+  overscroll-behavior: contain;
+}
+
+.student-dashboard-guidelines-scroll h4 {
+  margin: 0 0 0.65rem;
+  color: #3F6545;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.student-dashboard-guidelines-scroll ul {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.student-dashboard-guidelines-scroll li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: clamp(0.72rem, 2.2vw, 0.86rem);
+  line-height: 1.35;
+}
+
+.student-dashboard-guidelines-icon {
+  display: inline-flex;
+  flex: 0 0 1.55rem;
+  width: 1.55rem;
+  height: 1.55rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: rgba(215, 163, 74, 0.2);
+}
+
+.student-dashboard-guidelines-icon img {
+  width: 1.1rem;
+  height: 1.1rem;
+  object-fit: contain;
+}
+
+/* Tacda-authored Game 4 warm surrounding theme. Gameplay card/background dimensions and controls remain mobile-owned. */
+.student-game-overlay-game-four .game-four-header,
+.student-game-overlay-game-four .game-four-sidebar,
+.student-game-overlay-game-four .game-four-sidebar section,
+.student-game-overlay-game-four .game-four-side-actions,
+.student-game-overlay-game-four .game-four-arrange-shell,
+.student-game-overlay-game-four .game-four-arrange-card,
+.student-game-overlay-game-four .game-four-arrange-feedback {
+  background: #F3E3B5 !important;
+  border-color: #D7A34A !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-objective-card,
+.student-game-overlay-game-four .game-four-assembly-output,
+.student-game-overlay-game-four .game-four-arrange-coins {
+  background: #FFF2CE !important;
+  border-color: #D7A34A !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-hud-status,
+.student-game-overlay-game-four .game-four-arrange-actions button,
+.student-game-overlay-game-four .game-four-token-bank button,
+.student-game-overlay-game-four .game-four-assembled-token {
+  border-color: #D7A34A !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-hud-tutorial-button,
+.student-game-overlay-game-four .game-four-check-answer-button {
+  background: #3F6545 !important;
+  border-color: #3F6545 !important;
+  color: #FFF8E8 !important;
+}
+
+.student-game-overlay-game-four .game-four-reset-answer-button,
+.student-game-overlay-game-four .game-four-arrange-actions button:not(.game-four-check-answer-button) {
+  background: #A9B98E !important;
+  color: #3F382A !important;
+}
+
+.student-game-overlay-game-four .game-four-sidebar h3,
+.student-game-overlay-game-four .game-four-sidebar-guide-heading,
+.student-game-overlay-game-four .game-four-sidebar-gear-title,
+.student-game-overlay-game-four .game-four-hud-label,
+.student-game-overlay-game-four .game-four-hud-text,
+.student-game-overlay-game-four .game-four-arrange-card h3,
+.student-game-overlay-game-four .game-four-arrange-card > p:first-child,
+.student-game-overlay-game-four .game-four-token-label {
+  color: #3F6545 !important;
+}
+
+.student-game-overlay-game-four .game-four-arrange-feedback p,
+.student-game-overlay-game-four .game-four-arrange-card > h3 + p {
+  color: #5A351D !important;
+}
+
 /* Final mobile Guidelines button/content adjustment requested: buttons +7px more, content slightly higher. */
 @media (orientation: portrait), (max-width: 820px) {
   body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
-    top: 27.5% !important;
+    top: 26.8% !important;
   }
 
   body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
@@ -2820,7 +2938,7 @@
 /* Final mobile Guidelines button/content adjustment requested: buttons +7px more, content slightly higher. */
 @media (orientation: portrait), (max-width: 820px) {
   body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
-    top: 27.5% !important;
+    top: 23.5% !important;
   }
 
   body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
@@ -11506,6 +11624,858 @@ body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide
   }
 }
 
+/* Final MOBILE Game 4 landscape layout: keep every existing element while aligning
+   the Catch and Arrange phases to the same compact landscape hierarchy. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four .game-four-layout > div:first-child {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    min-height: 0 !important;
+    gap: clamp(0.3rem, 0.8dvh, 0.55rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 3.65fr) !important;
+    align-items: stretch !important;
+    min-width: 0 !important;
+    min-height: clamp(3.35rem, 13dvh, 5.25rem) !important;
+    gap: clamp(0.3rem, 0.75vw, 0.55rem) !important;
+    padding: clamp(0.28rem, 0.8dvh, 0.5rem) clamp(0.4rem, 0.85vw, 0.7rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header > div:first-child {
+    min-width: 0 !important;
+    align-self: center !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud {
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    min-width: 0 !important;
+    gap: clamp(0.18rem, 0.55vw, 0.38rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-status {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-label,
+  .student-game-overlay-game-four .game-four-hud-value {
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-catch-layout {
+    display: grid !important;
+    grid-template-columns: minmax(12.5rem, 0.82fr) minmax(0, 2.5fr) !important;
+    min-height: 0 !important;
+    gap: clamp(0.3rem, 0.8vw, 0.55rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-play-card {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-shell {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, 0.48fr) !important;
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto !important;
+    align-content: stretch !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    gap: clamp(0.22rem, 0.7dvh, 0.42rem) clamp(0.35rem, 0.9vw, 0.65rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-header {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: clamp(0.45rem, 1vw, 0.8rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-header > div:first-child {
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-coins {
+    flex: 0 0 auto !important;
+  }
+
+  .student-game-overlay-game-four .game-four-assembly-output {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+    min-height: clamp(3.1rem, 12dvh, 5.2rem) !important;
+    margin-top: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-token-label {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-token-bank {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+    align-content: start !important;
+    align-items: start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin-top: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+    align-self: center !important;
+    min-width: 0 !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+    overflow: visible !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-feedback {
+    grid-column: 1 / -1 !important;
+    grid-row: 5 !important;
+    min-width: 0 !important;
+    margin-top: 0 !important;
+    overflow: auto !important;
+  }
+
+  /* Keep the existing Hint/feedback row visible without allowing it to
+     expand the entire Arrangement screen. */
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback {
+    align-self: stretch !important;
+    min-height: clamp(3rem, 8dvh, 4.25rem) !important;
+    max-height: clamp(5rem, 18dvh, 8rem) !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Final top-header-only sizing for both MOBILE Game 4 phases. */
+/* Arrangement header correction: retain only Mission, Level, Lives, Round, and Tutorial. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-header {
+    grid-template-columns: minmax(14rem, 1.8fr) minmax(7rem, 0.9fr) minmax(7rem, 0.9fr) minmax(7rem, 0.9fr) minmax(8rem, 14vw) !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-round-status {
+    margin-right: clamp(0.5rem, 1vw, 1rem) !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-tutorial-button {
+    justify-self: stretch !important;
+    width: 100% !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-header {
+    grid-template-columns: minmax(14rem, 1.8fr) minmax(7rem, 0.9fr) minmax(7rem, 0.9fr) minmax(7rem, 0.9fr) minmax(10rem, 1.2fr) !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-coins-status,
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-tutorial-button + .game-four-hud-tutorial-button {
+    display: none !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-level-status {
+    grid-column: 2 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-lives-status {
+    grid-column: 3 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-round-status {
+    grid-column: 4 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-tutorial-button {
+    grid-column: 5 !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-header {
+    display: grid !important;
+    grid-template-columns: minmax(14rem, 1.6fr) minmax(5.2rem, 0.72fr) minmax(5.2rem, 0.72fr) minmax(5.2rem, 0.72fr) minmax(5.2rem, 0.72fr) minmax(8rem, 1fr) minmax(8rem, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    height: clamp(4.6rem, 17dvh, 6.8rem) !important;
+    min-height: 0 !important;
+    align-items: stretch !important;
+    gap: clamp(0.3rem, 0.75vw, 0.58rem) !important;
+    padding: clamp(0.42rem, 1.05dvh, 0.72rem) clamp(0.5rem, 0.95vw, 0.8rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-header > div:first-child {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    align-self: center !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-header p {
+    margin: 0 0 0.2rem !important;
+    font-size: clamp(0.58rem, 1.8dvh, 0.8rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-header h2 {
+    font-size: clamp(1rem, 3.5dvh, 1.42rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud {
+    display: contents !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-status {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(0.16rem, 0.5dvh, 0.3rem) !important;
+    padding: clamp(0.28rem, 0.7dvh, 0.5rem) clamp(0.18rem, 0.45vw, 0.35rem) !important;
+    font-size: clamp(0.56rem, 1.9dvh, 0.82rem) !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(0.16rem, 0.35vw, 0.28rem) !important;
+    min-width: 0 !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-icon,
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-image-icon {
+    width: clamp(1.05rem, 4.8dvh, 1.55rem) !important;
+    height: clamp(1.05rem, 4.8dvh, 1.55rem) !important;
+    flex: 0 0 auto !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-value {
+    font-size: clamp(0.72rem, 2.8dvh, 1.08rem) !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-tutorial-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: clamp(0.35rem, 0.9dvh, 0.62rem) clamp(0.5rem, 0.9vw, 0.8rem) !important;
+    font-size: clamp(0.62rem, 2.1dvh, 0.92rem) !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-level-status { grid-column: 2 !important; grid-row: 1 !important; }
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-coins-status { grid-column: 3 !important; grid-row: 1 !important; }
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-lives-status { grid-column: 4 !important; grid-row: 1 !important; }
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-round-status { grid-column: 5 !important; grid-row: 1 !important; }
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-tutorial-button { grid-column: 6 !important; grid-row: 1 !important; }
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-hud-tutorial-button + .game-four-hud-tutorial-button { grid-column: 7 !important; grid-row: 1 !important; }
+}
+
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four .game-four-header {
+    display: grid !important;
+    grid-template-columns:
+      minmax(14rem, 1.6fr)
+      minmax(5.2rem, 0.72fr)
+      minmax(5.2rem, 0.72fr)
+      minmax(5.2rem, 0.72fr)
+      minmax(5.2rem, 0.72fr)
+      minmax(8rem, 1fr)
+      minmax(8rem, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    height: clamp(4.6rem, 17dvh, 6.8rem) !important;
+    min-height: 0 !important;
+    align-items: stretch !important;
+    gap: clamp(0.3rem, 0.75vw, 0.58rem) !important;
+    padding: clamp(0.42rem, 1.05dvh, 0.72rem) clamp(0.5rem, 0.95vw, 0.8rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header > div:first-child {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    align-self: center !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header p {
+    margin: 0 0 0.2rem !important;
+    font-size: clamp(0.58rem, 1.8dvh, 0.8rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header h2 {
+    font-size: clamp(1rem, 3.5dvh, 1.42rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud {
+    display: contents !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-status {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(0.16rem, 0.5dvh, 0.3rem) !important;
+    padding: clamp(0.28rem, 0.7dvh, 0.5rem) clamp(0.18rem, 0.45vw, 0.35rem) !important;
+    border-width: 2px !important;
+    box-shadow: none !important;
+    font-size: clamp(0.56rem, 1.9dvh, 0.82rem) !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(0.16rem, 0.35vw, 0.28rem) !important;
+    min-width: 0 !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-icon,
+  .student-game-overlay-game-four .game-four-hud-image-icon {
+    width: clamp(1.05rem, 4.8dvh, 1.55rem) !important;
+    height: clamp(1.05rem, 4.8dvh, 1.55rem) !important;
+    flex: 0 0 auto !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-value {
+    font-size: clamp(0.72rem, 2.8dvh, 1.08rem) !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-tutorial-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: clamp(0.35rem, 0.9dvh, 0.62rem) clamp(0.5rem, 0.9vw, 0.8rem) !important;
+    font-size: clamp(0.62rem, 2.1dvh, 0.92rem) !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-level-status {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-coins-status {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-lives-status {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-round-status {
+    grid-column: 5 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-tutorial-button {
+    grid-column: 6 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-tutorial-button + .game-four-hud-tutorial-button {
+    grid-column: 7 !important;
+    grid-row: 1 !important;
+  }
+}
+
+/* Final correction: keep the complete HUD and Arrange actions on one landscape row. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-card {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.78fr) !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    align-content: start !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    align-self: center !important;
+    gap: clamp(0.25rem, 0.65vw, 0.5rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions button {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-check-answer-button {
+    color: #FFFFFF !important;
+  }
+
+  .student-game-overlay-game-four .game-four-level-status {
+    order: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-coins-status {
+    order: 2 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-lives-status {
+    order: 3 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-round-status {
+    order: 4 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-tutorial-button {
+    order: 5 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-tutorial-button + .game-four-hud-tutorial-button {
+    order: 6 !important;
+  }
+}
+
+/* Arrange phase only: one compact seven-column landscape header and one horizontal action row. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-header {
+    display: grid !important;
+    grid-template-columns:
+      minmax(11rem, 1.65fr)
+      minmax(3.8rem, 0.6fr)
+      minmax(3.8rem, 0.6fr)
+      minmax(3.8rem, 0.6fr)
+      minmax(3.8rem, 0.6fr)
+      minmax(7rem, 1fr)
+      minmax(7rem, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    height: clamp(3.35rem, 13dvh, 5.25rem) !important;
+    min-height: 0 !important;
+    align-items: stretch !important;
+    gap: clamp(0.18rem, 0.45vw, 0.32rem) !important;
+    padding: clamp(0.24rem, 0.65dvh, 0.42rem) clamp(0.32rem, 0.65vw, 0.55rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-header > div:first-child {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    align-self: center !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud {
+    display: contents !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-status {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    padding-left: clamp(0.12rem, 0.35vw, 0.28rem) !important;
+    padding-right: clamp(0.12rem, 0.35vw, 0.28rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-level-status {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-coins-status {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-lives-status {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-round-status {
+    grid-column: 5 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-tutorial-button {
+    grid-column: 6 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-tutorial-button + .game-four-hud-tutorial-button {
+    grid-column: 7 !important;
+    grid-row: 1 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-card {
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 0.8fr) !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    align-content: start !important;
+    gap: clamp(0.16rem, 0.5dvh, 0.3rem) clamp(0.35rem, 0.8vw, 0.6rem) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    align-items: end !important;
+    min-width: 0 !important;
+    gap: clamp(0.35rem, 0.8vw, 0.6rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child {
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-coins {
+    align-self: end !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    min-height: clamp(3rem, 9dvh, 4.8rem) !important;
+    margin: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-token-label {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    margin: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-token-bank {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    align-content: start !important;
+    overflow: visible !important;
+    margin: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    align-self: center !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: clamp(0.22rem, 0.55vw, 0.42rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions button {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback {
+    grid-column: 1 / -1 !important;
+    grid-row: 5 !important;
+    margin: 0 !important;
+    min-height: clamp(2.1rem, 5dvh, 3rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-check-answer-button {
+    color: #FFFFFF !important;
+  }
+}
+
+/* Arrange body only: use the available landscape height for the drop zone and
+   working row, while keeping the existing status panel in its own bottom row. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-shell {
+    display: grid !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: clamp(0.45rem, 1.1dvh, 0.75rem) clamp(0.55rem, 1.1vw, 0.95rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.9fr) !important;
+    grid-template-rows: auto auto minmax(6rem, 0.95fr) auto minmax(6rem, 0.8fr) auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    align-content: stretch !important;
+    gap: clamp(0.35rem, 0.9dvh, 0.62rem) clamp(0.45rem, 0.9vw, 0.75rem) !important;
+    padding: clamp(0.55rem, 1.35dvh, 0.9rem) clamp(0.65rem, 1.15vw, 1rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header {
+    display: contents !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    align-self: start !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-coins {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: stretch !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: clamp(0.45rem, 0.9vw, 0.75rem) !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: clamp(0.4rem, 1dvh, 0.7rem) clamp(0.55rem, 1vw, 0.85rem) !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output:empty::before {
+    content: 'Your Java statement will appear here';
+    color: rgba(90, 53, 29, 0.62);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-label {
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: clamp(0.4rem, 0.8vw, 0.7rem) !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    line-height: 1.15 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-label span {
+    display: inline !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-bank {
+    grid-column: 1 !important;
+    grid-row: 5 !important;
+    align-self: center !important;
+    align-content: center !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    gap: clamp(0.35rem, 0.7vw, 0.65rem) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-bank button,
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembled-token {
+    flex: 0 0 auto !important;
+    min-height: clamp(2.25rem, 6.5dvh, 3.4rem) !important;
+    padding: clamp(0.42rem, 1dvh, 0.7rem) clamp(0.8rem, 1.2vw, 1.25rem) !important;
+    font-size: clamp(0.76rem, 2.1dvh, 1.05rem) !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions {
+    grid-column: 2 !important;
+    grid-row: 5 !important;
+    align-self: center !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: clamp(0.3rem, 0.65vw, 0.55rem) !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions button {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: clamp(2.25rem, 6.5dvh, 3.4rem) !important;
+    padding: clamp(0.42rem, 1dvh, 0.7rem) clamp(0.55rem, 0.9vw, 0.9rem) !important;
+    font-size: clamp(0.62rem, 1.75dvh, 0.9rem) !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-check-answer-button {
+    color: #FFFFFF !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback {
+    grid-column: 1 / -1 !important;
+    grid-row: 6 !important;
+    align-self: end !important;
+    min-width: 0 !important;
+    min-height: clamp(2.7rem, 7dvh, 4rem) !important;
+    margin: 0 !important;
+    padding: clamp(0.5rem, 1.1dvh, 0.8rem) !important;
+    overflow: auto !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-shell {
+    display: grid !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-card {
+    display: grid !important;
+    grid-template-rows: auto minmax(7rem, 1fr) auto minmax(5.5rem, 0.85fr) auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    align-content: stretch !important;
+    gap: clamp(0.28rem, 0.8dvh, 0.52rem) clamp(0.35rem, 0.8vw, 0.6rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header {
+    align-self: start !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output {
+    min-height: 0 !important;
+    height: 100% !important;
+    align-self: stretch !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-token-label {
+    align-self: end !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-token-bank,
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions {
+    align-self: center !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback {
+    align-self: end !important;
+    min-height: 0 !important;
+  }
+}
+
 @media (orientation: portrait) {
   body > .game-guide-backdrop.game-guide-wood {
     padding: 0 !important;
@@ -12461,7 +13431,7 @@ body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide
 /* Final mobile Guidelines button/content adjustment requested: buttons +7px more, content slightly higher. */
 @media (orientation: portrait), (max-width: 820px) {
   body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
-    top: 27.5% !important;
+    top: 23.5% !important;
   }
 
   body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
@@ -12771,5 +13741,883 @@ body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide
 
   .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud-value {
     font-size: clamp(0.78rem, 3.2vw, 1.05rem) !important;
+  }
+}
+
+/* Final ordering for the Tacda-authored warm Game 4 surrounding theme. */
+.student-game-overlay-game-four .game-four-header,
+.student-game-overlay-game-four .game-four-sidebar,
+.student-game-overlay-game-four .game-four-sidebar section,
+.student-game-overlay-game-four .game-four-side-actions,
+.student-game-overlay-game-four .game-four-arrange-shell,
+.student-game-overlay-game-four .game-four-arrange-card,
+.student-game-overlay-game-four .game-four-arrange-feedback {
+  background: #F3E3B5 !important;
+  border-color: #D7A34A !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-objective-card,
+.student-game-overlay-game-four .game-four-assembly-output,
+.student-game-overlay-game-four .game-four-arrange-coins {
+  background: #FFF2CE !important;
+  border-color: #D7A34A !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-hud-status,
+.student-game-overlay-game-four .game-four-arrange-actions button,
+.student-game-overlay-game-four .game-four-token-bank button,
+.student-game-overlay-game-four .game-four-assembled-token {
+  border-color: #D7A34A !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-hud-tutorial-button,
+.student-game-overlay-game-four .game-four-check-answer-button {
+  background: #3F6545 !important;
+  border-color: #3F6545 !important;
+  color: #FFF8E8 !important;
+}
+
+.student-game-overlay-game-four .game-four-reset-answer-button,
+.student-game-overlay-game-four .game-four-arrange-actions button:not(.game-four-check-answer-button) {
+  background: #A9B98E !important;
+  color: #3F382A !important;
+}
+
+.student-game-overlay-game-four .game-four-sidebar h3,
+.student-game-overlay-game-four .game-four-sidebar-guide-heading,
+.student-game-overlay-game-four .game-four-sidebar-gear-title,
+.student-game-overlay-game-four .game-four-hud-label,
+.student-game-overlay-game-four .game-four-hud-text,
+.student-game-overlay-game-four .game-four-arrange-card h3,
+.student-game-overlay-game-four .game-four-arrange-card > p:first-child,
+.student-game-overlay-game-four .game-four-token-label,
+.student-game-overlay-game-four .game-four-arrange-feedback p,
+.student-game-overlay-game-four .game-four-arrange-card > h3 + p {
+  color: #3F6545 !important;
+}
+
+/* Landscape-only Guidelines board. Portrait rules and the existing portrait asset remain unchanged. */
+@media (orientation: landscape) {
+  body > .game-guide-backdrop.game-guide-wood {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood {
+    width: min(96vw, calc(96dvh * 1.7778)) !important;
+    height: min(96dvh, calc(96vw / 1.7778)) !important;
+    aspect-ratio: 16 / 9 !important;
+    background-color: transparent !important;
+    background-image: var(--game-guide-landscape-bg) !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: 100% 100% !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-main-title {
+    display: none !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-grid {
+    grid-row: 2 !important;
+    width: 70% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 4% 0 0 !important;
+    justify-self: center !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 2.5% 1% !important;
+    overflow: hidden !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section h4 {
+    margin: 0 0 0.55rem !important;
+    padding: 0.25rem 0.7rem !important;
+    font-size: clamp(0.62rem, 1.35vw, 0.95rem) !important;
+    line-height: 1.08 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    min-height: 0 !important;
+    padding: 0 0.2rem 0.4rem !important;
+    gap: clamp(0.18rem, 0.7vw, 0.42rem) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    grid-template-columns: clamp(1.7rem, 4vw, 2.6rem) minmax(0, 1fr) !important;
+    min-height: auto !important;
+    gap: clamp(0.3rem, 0.9vw, 0.65rem) !important;
+    padding: 0.12rem 0 !important;
+    font-size: clamp(0.58rem, 1.28vw, 0.88rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-item-icon img {
+    width: clamp(1.55rem, 3.2vw, 2.2rem) !important;
+    height: clamp(1.55rem, 3.2vw, 2.2rem) !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-actions {
+    grid-row: 3 !important;
+    width: 74% !important;
+    height: 100% !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(5.2rem, auto) minmax(0, 1fr) !important;
+    align-items: center !important;
+    justify-self: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-back {
+    justify-self: start !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-next,
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-spacer {
+    justify-self: end !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-nav-button {
+    width: clamp(4.8rem, 12vw, 7.4rem) !important;
+    min-width: 0 !important;
+    height: clamp(2rem, 6.2vw, 3.25rem) !important;
+    min-height: 0 !important;
+    padding: 0 0.45rem !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-image: url('./assets/guidelines-icons/buttons.png') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: 100% 100% !important;
+    box-shadow: none !important;
+    color: #f7ffe7 !important;
+    font-size: clamp(0.55rem, 1.45vw, 0.82rem) !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-status {
+    justify-self: center !important;
+    align-self: center !important;
+    min-width: clamp(4.2rem, 11vw, 6.8rem) !important;
+    gap: clamp(0.12rem, 0.45vw, 0.28rem) !important;
+    color: #2b2116 !important;
+    font-size: clamp(0.52rem, 1.3vw, 0.78rem) !important;
+    line-height: 1 !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-page-dots {
+    justify-content: center !important;
+    gap: clamp(0.12rem, 0.42vw, 0.24rem) !important;
+    max-width: clamp(4.2rem, 11vw, 6.8rem) !important;
+  }
+
+  /* Keep the navigation fixed while giving the guideline rows their own scroll space. */
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0.24rem 0.2rem 0.55rem !important;
+    gap: clamp(0.2rem, 0.62vw, 0.38rem) !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+  }
+
+  body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide-section ul li {
+    align-items: center !important;
+    min-height: clamp(2.25rem, 5.4vw, 3.35rem) !important;
+    padding: clamp(0.22rem, 0.52vw, 0.36rem) 0 !important;
+    line-height: 1.25 !important;
+  }
+}
+
+/* Last cascade layer for the MOBILE Game 4 landscape layout. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four .game-four-layout > div:first-child {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    min-height: 0 !important;
+    gap: clamp(0.3rem, 0.8dvh, 0.55rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 3.65fr) !important;
+    align-items: stretch !important;
+    min-width: 0 !important;
+    min-height: clamp(3.35rem, 13dvh, 5.25rem) !important;
+    gap: clamp(0.3rem, 0.75vw, 0.55rem) !important;
+    padding: clamp(0.28rem, 0.8dvh, 0.5rem) clamp(0.4rem, 0.85vw, 0.7rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-header > div:first-child {
+    min-width: 0 !important;
+    align-self: center !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud {
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    min-width: 0 !important;
+    gap: clamp(0.18rem, 0.55vw, 0.38rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-mode-assemble .game-four-hud {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-hud-status {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-catch-layout {
+    display: grid !important;
+    grid-template-columns: minmax(12.5rem, 0.82fr) minmax(0, 2.5fr) !important;
+    min-height: 0 !important;
+    gap: clamp(0.3rem, 0.8vw, 0.55rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-sidebar {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-play-card {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-shell {
+    display: grid !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, 0.48fr) !important;
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto !important;
+    align-content: stretch !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    gap: clamp(0.22rem, 0.7dvh, 0.42rem) clamp(0.35rem, 0.9vw, 0.65rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-header {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: clamp(0.45rem, 1vw, 0.8rem) !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-header > div:first-child {
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-coins {
+    flex: 0 0 auto !important;
+  }
+
+  .student-game-overlay-game-four .game-four-assembly-output {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+    min-height: clamp(3.1rem, 12dvh, 5.2rem) !important;
+    margin-top: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-token-label {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .student-game-overlay-game-four .game-four-token-bank {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+    align-content: start !important;
+    align-items: start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin-top: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+    align-self: center !important;
+    min-width: 0 !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+    overflow: visible !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four .game-four-arrange-feedback {
+    grid-column: 1 / -1 !important;
+    grid-row: 5 !important;
+    min-width: 0 !important;
+    margin-top: 0 !important;
+    overflow: auto !important;
+  }
+}
+
+/* Final visibility correction for the existing Arrangement Hint/feedback area. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback {
+    grid-column: 1 / -1 !important;
+    grid-row: 5 !important;
+    align-self: stretch !important;
+    min-width: 0 !important;
+    min-height: clamp(2.8rem, 7dvh, 4.25rem) !important;
+    max-height: clamp(5rem, 18dvh, 8rem) !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: clamp(0.45rem, 1dvh, 0.75rem) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Compact the upper Arrangement sections so the existing Hint row has room
+   below the code-piece/action row without changing Arrangement behavior. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child {
+    padding-block: 0 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child > p:first-child {
+    margin-bottom: 0.15rem !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child h3 {
+    margin: 0 !important;
+    line-height: 1.05 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child h3 + p {
+    margin-top: 0.18rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-coins {
+    min-height: 0 !important;
+    padding-block: clamp(0.22rem, 0.55dvh, 0.38rem) !important;
+    line-height: 1 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback:empty {
+    min-height: 0 !important;
+    max-height: 0 !important;
+    padding-block: 0 !important;
+    border-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback:not(:empty) {
+    min-height: clamp(2.55rem, 6.5dvh, 3.8rem) !important;
+    max-height: clamp(5rem, 17dvh, 7.5rem) !important;
+    padding-block: clamp(0.35rem, 0.8dvh, 0.6rem) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Cohesive WEB-equivalent Arrangement hierarchy for landscape MOBILE. */
+@media (orientation: landscape) and (max-height: 700px) {
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-shell {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: clamp(0.35rem, 0.9dvh, 0.6rem) clamp(0.45rem, 0.9vw, 0.75rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.7fr) !important;
+    grid-template-rows: auto auto minmax(5.5rem, 0.95fr) auto minmax(4.2rem, 0.72fr) auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: clamp(0.45rem, 1dvh, 0.7rem) clamp(0.55rem, 1vw, 0.85rem) !important;
+    gap: clamp(0.22rem, 0.55dvh, 0.38rem) clamp(0.35rem, 0.8vw, 0.6rem) !important;
+    overflow: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header {
+    display: contents !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    align-self: start !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-coins {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: clamp(0.22rem, 0.55dvh, 0.38rem) clamp(0.5rem, 0.9vw, 0.75rem) !important;
+    gap: clamp(0.35rem, 0.8vw, 0.6rem) !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: clamp(0.35rem, 0.8dvh, 0.6rem) !important;
+    align-self: stretch !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-label {
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+    display: flex !important;
+    align-items: baseline !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    gap: clamp(0.35rem, 0.8vw, 0.6rem) !important;
+    line-height: 1.1 !important;
+    text-align: left !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-label span {
+    display: inline !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-bank {
+    grid-column: 1 !important;
+    grid-row: 5 !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    gap: clamp(0.28rem, 0.65vw, 0.5rem) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions {
+    grid-column: 2 !important;
+    grid-row: 5 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: clamp(0.25rem, 0.55vw, 0.45rem) !important;
+    overflow: visible !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions button {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: clamp(2rem, 6dvh, 3rem) !important;
+    padding-inline: clamp(0.35rem, 0.7vw, 0.7rem) !important;
+    white-space: nowrap !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback {
+    grid-column: 1 / -1 !important;
+    grid-row: 6 !important;
+    align-self: stretch !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback:empty {
+    min-height: 0 !important;
+    max-height: 0 !important;
+    padding-block: 0 !important;
+    border-width: 0 !important;
+  }
+
+  .student-game-overlay-game-four.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback:not(:empty) {
+    min-height: clamp(2.55rem, 6.5dvh, 3.8rem) !important;
+    max-height: clamp(5rem, 17dvh, 7.5rem) !important;
+    padding-block: clamp(0.35rem, 0.8dvh, 0.6rem) !important;
+  }
+}
+
+/* Game 4 Arrangement theme only: match the active WEB warm palette without
+   changing the mobile Arrangement layout, header, or Catch/Gameplay screen. */
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-shell {
+  background: #fff8df !important;
+  border-color: #5A351D !important;
+  color: #5A351D !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(215, 163, 74, 0.24),
+    0 12px 30px rgba(90, 53, 29, 0.18) !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-card {
+  background: #FFFFFF !important;
+  border-color: #5A351D !important;
+  color: #5A351D !important;
+  box-shadow:
+    inset 0 0 0 4px rgba(215, 163, 74, 0.24),
+    0 18px 42px rgba(90, 53, 29, 0.18) !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-card h3,
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child > p:first-child,
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-label {
+  color: #3F6545 !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-header > div:first-child > p:last-child {
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-coins {
+  background: #F3E3B5 !important;
+  border-color: #5A351D !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-coins-icon {
+  color: #f59e0b !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-coins strong {
+  color: #0c4a6e !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output,
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback {
+  background: #FFFFFF !important;
+  border-color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output:empty::before {
+  color: rgba(12, 74, 110, 0.58) !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembly-output > span,
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-bank > button,
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-assembled-token {
+  background: #F3E3B5 !important;
+  border-color: #5A351D !important;
+  color: #5A351D !important;
+  box-shadow: 0 5px 0 rgba(90, 53, 29, 0.22) !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-token-bank > button:hover {
+  background: #fff1c9 !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions button {
+  border-color: #5A351D !important;
+  box-shadow: 0 5px 0 rgba(90, 53, 29, 0.22) !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-check-answer-button {
+  background: #3F6545 !important;
+  color: #F3E3B5 !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-check-answer-button:hover {
+  background: #34573a !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-reset-answer-button {
+  background: #D7A34A !important;
+  color: #5A351D !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-actions button:not(.game-four-check-answer-button):not(.game-four-reset-answer-button) {
+  background: #FFFFFF !important;
+  color: #24192a !important;
+}
+
+.student-game-overlay-game-four .game-four-mode-assemble .game-four-arrange-feedback p {
+  color: #0f8f6f !important;
+}
+
+/* Dashboard Level Guidelines: WEB-equivalent warm frame and scrollable rows,
+   scoped away from Game 4 and other dashboard controls. */
+.student-shell-warm .student-dashboard-guidelines-toggle.student-action-button {
+  background: linear-gradient(180deg, #65446c 0%, #4d3158 100%) !important;
+  border: 3px solid #5a3b62 !important;
+  border-radius: 18px !important;
+  color: #fff4d4 !important;
+  box-shadow: 5px 5px 0 var(--student-warm-shadow) !important;
+}
+
+.student-shell-warm .student-dashboard-guidelines-toggle .student-action-button-inner {
+  color: #fff4d4 !important;
+  text-shadow: 0 2px 0 rgba(35, 20, 42, 0.42) !important;
+}
+
+.student-shell-warm .student-dashboard-guidelines-toggle svg {
+  flex: 0 0 auto;
+}
+
+.student-shell-warm .student-dashboard-guidelines-card {
+  position: relative;
+  margin-top: 0.72rem;
+  padding: 0.64rem;
+  overflow: hidden;
+  border: 3px solid #7d5f31;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 249, 225, 0.42), transparent 34%),
+    linear-gradient(135deg, #f6e5b3 0%, #e7c982 52%, #dcb86a 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 242, 188, 0.58),
+    inset 0 0 0 5px rgba(157, 111, 41, 0.32),
+    4px 4px 0 rgba(74, 48, 64, 0.55);
+}
+
+.student-shell-warm .student-dashboard-guidelines-card::before {
+  content: '';
+  position: absolute;
+  inset: 0.28rem;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(#6d5025, #6d5025) top left / 2.28rem 5px no-repeat,
+    linear-gradient(#6d5025, #6d5025) top left / 5px 2.28rem no-repeat,
+    linear-gradient(#6d5025, #6d5025) top right / 2.28rem 5px no-repeat,
+    linear-gradient(#6d5025, #6d5025) top right / 5px 2.28rem no-repeat,
+    linear-gradient(#6d5025, #6d5025) bottom left / 2.28rem 5px no-repeat,
+    linear-gradient(#6d5025, #6d5025) bottom left / 5px 2.28rem no-repeat,
+    linear-gradient(#6d5025, #6d5025) bottom right / 2.28rem 5px no-repeat,
+    linear-gradient(#6d5025, #6d5025) bottom right / 5px 2.28rem no-repeat;
+  filter: drop-shadow(2px 2px 0 rgba(61, 40, 18, 0.28));
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll {
+  position: relative;
+  z-index: 1;
+  max-height: min(292px, 34vh);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.92rem 0.72rem 0.82rem;
+  border: 1px solid rgba(131, 94, 39, 0.24);
+  border-radius: 7px;
+  background:
+    radial-gradient(circle at 20% 16%, rgba(255, 250, 230, 0.32), transparent 36%),
+    linear-gradient(180deg, rgba(247, 226, 174, 0.72), rgba(232, 199, 128, 0.66));
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 68, 34, 0.55) rgba(255, 246, 213, 0.35);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 246, 213, 0.35);
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 68, 34, 0.55);
+  border-radius: 999px;
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll h4 {
+  margin: 0 0 0.85rem;
+  color: #231915;
+  font-family: 'Oxanium', 'Space Grotesk', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll li {
+  display: grid;
+  grid-template-columns: 3.05rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.72rem;
+  min-height: 3.7rem;
+  padding: 0.48rem 0.62rem;
+  border-radius: 12px;
+  background: rgba(244, 223, 171, 0.54);
+  box-shadow:
+    inset 0 -2px 0 rgba(198, 153, 70, 0.28),
+    0 1px 0 rgba(255, 247, 221, 0.28);
+}
+
+.student-shell-warm .student-dashboard-guidelines-scroll li > span:last-child {
+  min-width: 0;
+  color: #261c17;
+  font-size: 0.96rem;
+  font-weight: 400;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+
+.student-shell-warm .student-dashboard-guidelines-icon,
+.student-shell-warm .student-dashboard-guidelines-icon-code,
+.student-shell-warm .student-dashboard-guidelines-icon-check,
+.student-shell-warm .student-dashboard-guidelines-icon-hazard,
+.student-shell-warm .student-dashboard-guidelines-icon-wrong,
+.student-shell-warm .student-dashboard-guidelines-icon-coin,
+.student-shell-warm .student-dashboard-guidelines-icon-star,
+.student-shell-warm .student-dashboard-guidelines-icon-score,
+.student-shell-warm .student-dashboard-guidelines-icon-heart,
+.student-shell-warm .student-dashboard-guidelines-icon-move,
+.student-shell-warm .student-dashboard-guidelines-icon-grid,
+.student-shell-warm .student-dashboard-guidelines-icon-cards,
+.student-shell-warm .student-dashboard-guidelines-icon-hint,
+.student-shell-warm .student-dashboard-guidelines-icon-question,
+.student-shell-warm .student-dashboard-guidelines-icon-lock,
+.student-shell-warm .student-dashboard-guidelines-icon-retry,
+.student-shell-warm .student-dashboard-guidelines-icon-trophy,
+.student-shell-warm .student-dashboard-guidelines-icon-fruit,
+.student-shell-warm .student-dashboard-guidelines-icon-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.72rem;
+  height: 2.72rem;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.student-shell-warm .student-dashboard-guidelines-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .student-shell-warm .student-dashboard-guidelines-card {
+    padding: 0.52rem;
+  }
+
+  .student-shell-warm .student-dashboard-guidelines-scroll {
+    max-height: min(260px, 38vh);
+    padding: 0.8rem 0.58rem 0.72rem;
+  }
+
+  .student-shell-warm .student-dashboard-guidelines-scroll li {
+    grid-template-columns: 2.72rem minmax(0, 1fr);
+    min-height: 3.35rem;
+    gap: 0.58rem;
+    padding: 0.42rem 0.5rem;
+  }
+
+  .student-shell-warm .student-dashboard-guidelines-icon,
+  .student-shell-warm .student-dashboard-guidelines-icon-code,
+  .student-shell-warm .student-dashboard-guidelines-icon-check,
+  .student-shell-warm .student-dashboard-guidelines-icon-hazard,
+  .student-shell-warm .student-dashboard-guidelines-icon-wrong,
+  .student-shell-warm .student-dashboard-guidelines-icon-coin,
+  .student-shell-warm .student-dashboard-guidelines-icon-star,
+  .student-shell-warm .student-dashboard-guidelines-icon-score,
+  .student-shell-warm .student-dashboard-guidelines-icon-heart,
+  .student-shell-warm .student-dashboard-guidelines-icon-move,
+  .student-shell-warm .student-dashboard-guidelines-icon-grid,
+  .student-shell-warm .student-dashboard-guidelines-icon-cards,
+  .student-shell-warm .student-dashboard-guidelines-icon-hint,
+  .student-shell-warm .student-dashboard-guidelines-icon-question,
+  .student-shell-warm .student-dashboard-guidelines-icon-lock,
+  .student-shell-warm .student-dashboard-guidelines-icon-retry,
+  .student-shell-warm .student-dashboard-guidelines-icon-trophy,
+  .student-shell-warm .student-dashboard-guidelines-icon-fruit,
+  .student-shell-warm .student-dashboard-guidelines-icon-dot {
+    width: 2.42rem;
+    height: 2.42rem;
+  }
+
+  .student-shell-warm .student-dashboard-guidelines-scroll li > span:last-child {
+    font-size: 0.88rem;
   }
 }

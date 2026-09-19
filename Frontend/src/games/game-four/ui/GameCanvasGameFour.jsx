@@ -2042,6 +2042,7 @@ const GameCanvasGameFour = ({
   const comboStreakRef = useRef(0);
   const comboCatchIdRef = useRef(null);
   const submittedRef = useRef(false);
+  const pendingAwardedCoinBalanceRef = useRef(null);
   const backgroundMusicRef = useRef(null);
   const backgroundMusicBlockedRef = useRef(false);
   const catchTokenSoundRef = useRef(null);
@@ -2076,8 +2077,9 @@ const GameCanvasGameFour = ({
 
   const awardSharedCoins = useCallback((amount = 0) => {
     const result = addUserCoins(playerId, amount);
-    return syncCoinBalance(result.balance);
-  }, [playerId, syncCoinBalance]);
+    pendingAwardedCoinBalanceRef.current = result.balance;
+    return result.balance;
+  }, [playerId]);
 
   const spendSharedCoins = useCallback((amount = 0) => {
     const result = spendUserCoins(playerId, amount);
@@ -2090,6 +2092,16 @@ const GameCanvasGameFour = ({
   useEffect(() => {
     setCoins(normalizedInitialCoins);
   }, [normalizedInitialCoins]);
+
+  useEffect(() => {
+    if (pendingAwardedCoinBalanceRef.current === null) {
+      return;
+    }
+
+    const nextBalance = pendingAwardedCoinBalanceRef.current;
+    pendingAwardedCoinBalanceRef.current = null;
+    syncCoinBalance(nextBalance);
+  }, [fallingItems, syncCoinBalance]);
 
   useEffect(() => {
     if (mode !== 'catch') {
@@ -3226,15 +3238,13 @@ const GameCanvasGameFour = ({
                   Step: {Math.min(tutorialStepIndex + 1, GAME_FOUR_TUTORIAL_STEPS.length)} / {GAME_FOUR_TUTORIAL_STEPS.length}
               </span>
               )}
-              {!isAssembleMode && (
-                <span className="game-four-hud-status game-four-coins-status border-[3px] border-[#70415f] bg-[#fff7dc] px-3 py-2 shadow-[4px_4px_0_#432644]">
-                  <span className="game-four-hud-label">
-                    <Coins className="game-four-hud-icon" />
-                    Coins
-                  </span>
-                  <strong className="game-four-hud-value">{coins}</strong>
+              <span className="game-four-hud-status game-four-coins-status border-[3px] border-[#70415f] bg-[#fff7dc] px-3 py-2 shadow-[4px_4px_0_#432644]">
+                <span className="game-four-hud-label">
+                  <Coins className="game-four-hud-icon" />
+                  Coins
                 </span>
-              )}
+                <strong className="game-four-hud-value">{coins}</strong>
+              </span>
               <span className="game-four-hud-status game-four-lives-status border-[3px] border-[#70415f] bg-[#fff7dc] px-3 py-2 shadow-[4px_4px_0_#432644]">
                 <span className="game-four-hud-label">
                   {isAssembleMode ? (
@@ -3246,7 +3256,7 @@ const GameCanvasGameFour = ({
                 </span>
                 <strong className="game-four-hud-value">{lives} / {startingLives}</strong>
               </span>
-              {!isAssembleMode && (
+              <>
                 <button
                   type="button"
                   className="game-four-hud-status game-four-hud-tutorial-button"
@@ -3254,7 +3264,17 @@ const GameCanvasGameFour = ({
                 >
                   Game Tutorial
                 </button>
-              )}
+                <button
+                  type="button"
+                  className="game-four-hud-status game-four-hud-tutorial-button"
+                  onClick={() => {
+                    setTutorialView('guide');
+                    setShowTutorial(true);
+                  }}
+                >
+                  Guidelines
+                </button>
+              </>
               <span className="game-four-hud-status game-four-round-status border-[3px] border-[#70415f] bg-[#fff7dc] px-3 py-2 shadow-[4px_4px_0_#432644]">
                 <span className="game-four-hud-label">
                   {isAssembleMode && (
@@ -3775,7 +3795,6 @@ const GameCanvasGameFour = ({
                         setShowTutorial(false);
                       }
                     }}
-                    startLabel="Next"
                     lockLandscapeOnStart
                   />
                 ) : null}

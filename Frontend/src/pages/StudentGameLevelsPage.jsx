@@ -7,7 +7,10 @@ import { Capacitor } from '@capacitor/core';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import { StatusBar } from '@capacitor/status-bar';
 import {
+  ChevronDown,
   ChevronRight,
+  ChevronUp,
+  Info,
   Lock,
   Play,
   Star,
@@ -22,6 +25,26 @@ import StudentShell from '../components/student/StudentShell';
 import StudentStoryFrame from '../components/student/StudentStoryFrame';
 import { getStudentGameTheme } from '../components/student/studentGameTheme';
 import { getLevelStoryBriefing } from '../utils/storyline';
+import { getDashboardGuideContent } from '../games/shared/ui/gameGuideContent';
+import iconCards from '../assets/guidelines-icons/icon-cards.png';
+import iconCheck from '../assets/guidelines-icons/icon-check.png';
+import iconClock from '../assets/guidelines-icons/icon-clock.png';
+import iconCode from '../assets/guidelines-icons/icon-code.png';
+import iconCoin from '../assets/guidelines-icons/icon-coin.png';
+import iconDot from '../assets/guidelines-icons/icon-dot.png';
+import iconFruit from '../assets/guidelines-icons/icon-fruit.png';
+import iconGrid from '../assets/guidelines-icons/icon-grid.png';
+import iconHazard from '../assets/guidelines-icons/icon-hazard.png';
+import iconHeart from '../assets/guidelines-icons/icon-heart.png';
+import iconHint from '../assets/guidelines-icons/icon-hint.png';
+import iconLock from '../assets/guidelines-icons/icon-lock.png';
+import iconMove from '../assets/guidelines-icons/icon-move.png';
+import iconQuestion from '../assets/guidelines-icons/icon-question.png';
+import iconRetry from '../assets/guidelines-icons/icon-retry.png';
+import iconScore from '../assets/guidelines-icons/icon-score.png';
+import iconStar from '../assets/guidelines-icons/icon-star.png';
+import iconTrophy from '../assets/guidelines-icons/icon-trophy.png';
+import iconWrong from '../assets/guidelines-icons/icon-wrong.png';
 import studentMenuBackground from '../../assets/Game/game_one/Background/background_menu.avif';
 import { startStudentMenuLoop, stopStudentMenuLoop, playStudentClickSound } from '../utils/studentMenuAudio';
 
@@ -34,6 +57,48 @@ const PANEL_TRANSITION = {
 
 const formatPercent = (value) => `${Math.round(Number(value || 0))}%`;
 const GAME_ONE_NEXT_LEVEL_MIN_STARS = 2;
+
+const DASHBOARD_GUIDE_ICON_IMAGES = {
+  cards: iconCards, check: iconCheck, clock: iconClock, code: iconCode, coin: iconCoin,
+  dot: iconDot, fruit: iconFruit, grid: iconGrid, hazard: iconHazard, heart: iconHeart,
+  hint: iconHint, lock: iconLock, move: iconMove, question: iconQuestion, retry: iconRetry,
+  score: iconScore, star: iconStar, trophy: iconTrophy, wrong: iconWrong,
+};
+
+const getDashboardGuideIconType = (item = '') => {
+  const text = String(item).toLowerCase();
+  if (text.includes('time') || text.includes('timer') || text.includes('ms') || text.includes('second') || text.includes('spawn') || text.includes('speed')) return 'clock';
+  if (text.includes('gear') || text.includes('gears') || text.includes('carrot') || text.includes('orange') || text.includes('restore')) return 'fruit';
+  if (text.includes('bomb') || text.includes('hazard') || text.includes('trap') || text.includes('enemy')) return 'hazard';
+  if (text.includes('lock')) return 'lock';
+  if (text.includes('coin')) return 'coin';
+  if (text.includes('hint')) return 'hint';
+  if (text.includes('question')) return 'question';
+  if (text.includes('star')) return 'star';
+  if (text.includes('life') || text.includes('lives') || text.includes('heart') || text.includes('health')) return 'heart';
+  if (text.includes('score') || text.includes('point') || text.includes('reward')) return 'score';
+  if (text.includes('wrong') || text.includes('mistake') || text.includes('fail') || text.includes('incorrect')) return 'wrong';
+  if (text.includes('pass') || text.includes('unlock') || text.includes('clear') || text.includes('complete') || text.includes('finish') || text.includes('objective') || text.includes('goal')) return 'trophy';
+  if (text.includes('card') || text.includes('pair') || text.includes('match')) return 'cards';
+  if (text.includes('board') || text.includes('grid') || text.includes('column')) return 'grid';
+  if (text.includes('code') || text.includes('syntax') || text.includes('java') || text.includes('token') || text.includes('output')) return 'code';
+  if (text.includes('move') || text.includes('drag') || text.includes('swipe') || text.includes('slice') || text.includes('key') || text.includes('control') || text.includes('arrow')) return 'move';
+  if (text.includes('retry') || text.includes('reset') || text.includes('restart') || text.includes('attempt')) return 'retry';
+  if (text.includes('answer') || text.includes('correct')) return 'check';
+  return 'dot';
+};
+
+const getDashboardGuideDisplay = (content) => {
+  const sourceItems = (content?.sections || []).flatMap((section) => section?.items || []);
+  const seen = new Set();
+  const items = (sourceItems.length ? sourceItems : content?.summary || []).filter((item) => {
+    const key = String(item).trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return { title: content?.sections?.[0]?.title || content?.title || 'Guidelines', items };
+};
 
 const getLevelStateLabel = (status) => {
   if (status === 'NOT_READY') {
@@ -89,6 +154,7 @@ const StudentGameLevelsPage = () => {
   const [activeLevelNumber, setActiveLevelNumber] = useState(null);
   const [pendingStoryLevelNumber, setPendingStoryLevelNumber] = useState(null);
   const [pendingStoryPageIndex, setPendingStoryPageIndex] = useState(0);
+  const [isDashboardGuideOpen, setIsDashboardGuideOpen] = useState(false);
 
   const loadLevels = useCallback(async () => {
     setLoading(true);
@@ -136,6 +202,7 @@ const StudentGameLevelsPage = () => {
     setActiveLevelNumber(null);
     setPendingStoryLevelNumber(null);
     setPendingStoryPageIndex(0);
+    setIsDashboardGuideOpen(false);
   }, [gameType, user?.id]);
 
   useEffect(() => {
@@ -266,6 +333,14 @@ const StudentGameLevelsPage = () => {
       percent: totalLevels > 0 ? Math.round((completedLevels / totalLevels) * 100) : 0,
     };
   }, [displayLevels]);
+  const dashboardGuideContent = useMemo(
+    () => getDashboardGuideContent(gameState?.gameType || gameType),
+    [gameState?.gameType, gameType],
+  );
+  const dashboardGuideDisplay = useMemo(
+    () => getDashboardGuideDisplay(dashboardGuideContent),
+    [dashboardGuideContent],
+  );
 
   return (
     <StudentShell backgroundImage={studentMenuBackground} className="student-shell-warm">
@@ -415,6 +490,52 @@ const StudentGameLevelsPage = () => {
                 <p className="student-body-copy student-body-copy-tight">
                   {selectedLevel?.description || 'The selected mission description will appear here.'}
                 </p>
+
+                <div className="mt-4">
+                  <StudentActionButton
+                    variant="slate"
+                    size="compact"
+                    className="student-button-inline student-dashboard-guidelines-toggle w-full"
+                    contentClassName="justify-between"
+                    onClick={() => setIsDashboardGuideOpen((current) => !current)}
+                    disabled={!selectedLevel}
+                    aria-expanded={isDashboardGuideOpen}
+                  >
+                    <span className="inline-flex items-center gap-2"><Info className="h-4 w-4" />Level Guidelines</span>
+                    {isDashboardGuideOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </StudentActionButton>
+                </div>
+
+                <AnimatePresence initial={false}>
+                  {isDashboardGuideOpen && selectedLevel && (
+                    <motion.section
+                      className="student-dashboard-guidelines-card"
+                      initial={{ opacity: 0, height: 0, y: -6 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -6 }}
+                      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                      aria-label="Dashboard level guidelines"
+                    >
+                      <div className="student-dashboard-guidelines-scroll">
+                        <h4>{dashboardGuideDisplay.title}</h4>
+                        <ul>
+                          {dashboardGuideDisplay.items.map((item, index) => {
+                            const iconType = getDashboardGuideIconType(item);
+                            const iconSrc = DASHBOARD_GUIDE_ICON_IMAGES[iconType] || DASHBOARD_GUIDE_ICON_IMAGES.dot;
+                            return (
+                              <li key={`${item}-${index}`}>
+                                <span className={`student-dashboard-guidelines-icon student-dashboard-guidelines-icon-${iconType}`} aria-hidden="true">
+                                  <img src={iconSrc} alt="" draggable="false" />
+                                </span>
+                                <span>{item}</span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    </motion.section>
+                  )}
+                </AnimatePresence>
 
                 <div className="mt-4 flex flex-col gap-2">
                   <div className="student-insight-row">

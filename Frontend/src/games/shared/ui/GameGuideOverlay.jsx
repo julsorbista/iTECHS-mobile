@@ -20,6 +20,7 @@ import iconStar from '../../../assets/guidelines-icons/icon-star.png';
 import iconTrophy from '../../../assets/guidelines-icons/icon-trophy.png';
 import iconWrong from '../../../assets/guidelines-icons/icon-wrong.png';
 import guidelinesMobileBackground from '../../../assets/guidelines-icons/Guidelinesformobile.png';
+import guidelinesLandscapeBackground from '../../../assets/guidelines-icons/background1landdscape.png';
 import { Capacitor } from '@capacitor/core';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 
@@ -94,8 +95,8 @@ const GameGuideOverlay = ({
   sections = [],
   onExit,
   onStart,
-  exitLabel = 'Exit Level',
-  startLabel = 'Start Level',
+  exitLabel = 'Exit',
+  startLabel = 'Start',
   lockLandscapeOnStart = false,
 }) => {
   const pagedSections = [
@@ -207,7 +208,10 @@ const GameGuideOverlay = ({
     <div className={`game-guide-backdrop game-guide-wood ${themeClass}`}>
       <div
         className="game-guide-card game-guide-card--wood"
-        style={{ '--game-guide-mobile-bg': `url(${guidelinesMobileBackground})` }}
+        style={{
+          '--game-guide-mobile-bg': `url(${guidelinesMobileBackground})`,
+          '--game-guide-landscape-bg': `url(${guidelinesLandscapeBackground})`,
+        }}
       >
         <div className="game-guide-vine game-guide-vine-left" aria-hidden="true" />
         <div className="game-guide-vine game-guide-vine-right" aria-hidden="true" />
@@ -233,7 +237,7 @@ const GameGuideOverlay = ({
         </div>
         <div className="game-guide-actions">
           <button type="button" className="game-guide-nav-button game-guide-nav-back" onClick={handleBack}>
-            ← BACK
+            ← {isFirstPage ? exitLabel : 'Back'}
           </button>
           <div className="game-guide-page-status" aria-label={`Page ${currentPage + 1} of ${safeSections.length}`}>
             <div className="game-guide-page-dots" aria-hidden="true">
@@ -245,7 +249,7 @@ const GameGuideOverlay = ({
           </div>
           {(!isLastPage || onStart) ? (
             <button type="button" className="game-guide-nav-button game-guide-nav-next" onClick={handleNext} disabled={isStarting}>
-              {isLastPage ? 'START →' : 'NEXT →'}
+              {isLastPage ? startLabel : 'NEXT →'}
             </button>
           ) : <span className="game-guide-nav-spacer" aria-hidden="true" />}
         </div>
