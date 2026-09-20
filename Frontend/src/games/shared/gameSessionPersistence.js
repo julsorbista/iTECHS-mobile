@@ -31,12 +31,8 @@ export const getBaseStarsFromPercentage = (percentage = 0) => {
   return 0;
 };
 
-export const getFinalStarsAfterHints = (baseStars = 0, hintsUsed = 0) => (
-  clamp(
-    Math.round(Number(baseStars || 0)) - Math.max(0, Math.round(Number(hintsUsed || 0))),
-    0,
-    3,
-  )
+export const getFinalStarsAfterHints = (baseStars = 0) => (
+  clamp(Math.round(Number(baseStars || 0)), 0, 3)
 );
 
 export const getStarsFromHints = (hintsUsed = 0) => (

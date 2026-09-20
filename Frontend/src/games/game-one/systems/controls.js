@@ -36,8 +36,10 @@ export const readMovementIntent = (controls) => {
     || Phaser.Input.Keyboard.JustDown(controls.wasd.up)
     || Phaser.Input.Keyboard.JustDown(controls.wasd.jump);
   const spacePressed = Phaser.Input.Keyboard.JustDown(controls.cursors.space);
-  const dashPressed = Phaser.Input.Keyboard.JustDown(controls.wasd.dash);
-  const attackPressed = Phaser.Input.Keyboard.JustDown(controls.wasd.attack);
+  const dashPressed = Phaser.Input.Keyboard.JustDown(controls.wasd.dash) || Boolean(mobileControls.dashQueued);
+  const attackPressed = Phaser.Input.Keyboard.JustDown(controls.wasd.attack) || Boolean(mobileControls.attackQueued);
+  mobileControls.dashQueued = false;
+  mobileControls.attackQueued = false;
   const mobileJumpPressed = Boolean(mobileControls.jumpQueued);
   if (mobileJumpPressed) {
     mobileControls.jumpQueued = false;
@@ -54,4 +56,14 @@ export const readMovementIntent = (controls) => {
 };
 
 export const wasPausePressed = (controls) => Phaser.Input.Keyboard.JustDown(controls.wasd.pause);
-export const wasInteractPressed = (controls) => Phaser.Input.Keyboard.JustDown(controls.wasd.interact);
+export const wasInteractPressed = (controls) => {
+  const pressed = Phaser.Input.Keyboard.JustDown(controls.wasd.interact) || Boolean(controls.mobileControls?.interactQueued);
+  if (controls.mobileControls) controls.mobileControls.interactQueued = false;
+  return pressed;
+};
+
+export const resetControls = (controls) => {
+  if (!controls) return;
+  new Set([...Object.values(controls.cursors || {}), ...Object.values(controls.wasd || {})]).forEach(key => key?.reset?.());
+  if (controls.mobileControls) Object.keys(controls.mobileControls).forEach(key => { controls.mobileControls[key] = false; });
+};

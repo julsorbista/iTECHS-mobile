@@ -1,381 +1,86 @@
 {
-  "id": "game-one-level-02",
-  "gameType": "GAME_ONE",
-  "levelNumber": 2,
-  "title": "Canopy Crossfire",
-  "subtitle": "Question-Locked Paths and Projectile Timing",
-  "congratulatoryMessage": "Great work! You pushed through the crossfire and kept your focus through every locked path challenge.",
-  "viewport": {
-    "width": 1280,
-    "height": 720
-  },
-  "questions": [
+  "id":"game-one-level-02","gameType":"GAME_ONE","levelNumber":2,
+  "title":"Temple of Data Types","subtitle":"Discover What Kinds of Values Java Can Store",
+  "congratulatoryMessage":"DATA TEMPLE RESTORED! You discovered that Java uses data types to identify the kind of information a variable can store.",
+  "treasureHunt":true,
+  "missionTitle":"MISSION: Restore the Data Temple",
+  "missionText":"The Lost Java Treasure revealed an ancient temple. Collect three hidden learning scrolls, then use their clues to unlock the Data Core.",
+  "viewport":{"width":1280,"height":720},
+  "settings":{"playerHealth":3,"timerEnabled":false,"allowMidairDash":true,"allowProjectile":true,"allowDoubleJump":false,"coinGoal":0},
+  "questions":[{
+    "id":"data-core-riddle","topic":"Java data types","challengeType":"WORD_SCRAMBLE","maxAttempts":3,
+    "jumbledWord":"ATAD EPYT","answer":"DATA TYPE",
+    "formattedQuestion":"FINAL TREASURE RIDDLE\nI tell Java what kind of value can be stored. I can describe whole numbers, decimals, truth values, or text. What am I?",
+    "riddleVariants":[
+      "I tell Java what kind of value can be stored. I can describe whole numbers, decimals, truth values, or text. What am I?",
+      "I classify information as int, double, boolean, String, or another kind Java understands. What am I?",
+      "Before Java stores a value, I describe the form of data that belongs in its container. What am I?",
+      "I determine whether a Java value represents a whole number, decimal, truth value, or text. What am I?",
+      "Java uses me to know which operations and values are valid for stored information. What am I?",
+      "I am the category assigned to data so Java knows how that information should be handled. What am I?"
+    ],
+    "prompt":"I tell Java what kind of value can be stored. I can describe whole numbers, decimals, truth values, or text. What am I? Jumbled word: ATAD EPYT",
+    "choices":["DATA TYPE","VARIABLE","METHOD","COMPILER"],"answerIndex":0,
+    "hints":["Review what int, double, boolean, and String have in common.","Unscramble ATAD EPYT."],
+    "failureMessages":["Incorrect. Review the three scroll clues and try again.","Incorrect. Think about what tells Java what kind of value is being stored.","The Data Core remains sealed. Return to the checkpoint and try again."],
+    "successText":"Correct! The Data Core is restored.","damageOnWrongAnswer":1,"lockAttemptSessionOnClose":true
+  }],
+  "rooms":[
     {
-      "id": "ram-question",
-      "prompt": "What does RAM stand for?",
-      "choices": [
-        "Random Access Memory",
-        "Read Access Module",
-        "Remote Application Manager",
-        "Rapid Action Memory"
+      "id":"room-1","backgroundKey":"room_2","objective":"Number Chamber: find Scroll #1 to learn about whole and decimal numbers.","spawn":{"x":100,"y":570},
+      "platforms":[
+        {"id":"r1-start","x":145,"y":672,"width":190,"bodyHeight":34,"textureKey":"stone"},{"id":"r1-a","x":360,"y":570,"width":152,"bodyHeight":34,"textureKey":"grass"},{"id":"r1-b","x":575,"y":455,"width":152,"bodyHeight":34,"textureKey":"stone","moveAxis":"y","moveDistance":65,"moveDuration":1800},{"id":"r1-c","x":790,"y":545,"width":152,"bodyHeight":34,"textureKey":"grass"},{"id":"r1-d","x":975,"y":410,"width":152,"bodyHeight":34,"textureKey":"stone"},{"id":"r1-exit","x":1160,"y":672,"width":152,"bodyHeight":34,"textureKey":"grass"},
+        {"id":"r1-spikes","x":675,"y":672,"width":380,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"spikes","hazardSpriteFrame":"floor-spikes","damage":1}
       ],
-      "answerIndex": 0,
-      "successText": "Correct. The bridge rose over the shot lane.",
-      "failureText": "Not yet. Touch the villain again and try another answer."
+      "coins":[
+        {"id":"level2-hint-coin-1","collectibleType":"coin","x":360,"y":500,"size":30},
+        {"id":"r1-speed","collectibleType":"speed","spriteFrame":"speed-potion","x":575,"y":360,"size":44},
+        {"id":"scroll-1","collectibleType":"scroll","scrollStyle":"red","spriteFrame":"scroll-red","scrollId":"scroll-1","clueText":"INT stores whole numbers: int score = 10;\n\nDOUBLE stores decimal numbers: double price = 19.99;\n\nClue: Some values are whole, while others continue beyond the decimal point.","x":975,"y":345,"size":50}
+      ],
+      "ghosts":[{"id":"r1-ghost","enemyType":"ghost","x":700,"y":560,"patrolDistance":80,"speed":98,"size":58,"chasePlayer":true}],"projectileEnemies":[],
+      "portal":{"x":1160,"y":590,"locked":true,"endsLevel":false,"targetRoomId":"room-2","requiredScrollId":"scroll-1","lockedMessage":"Portal Locked — Find Scroll #1.","size":84}
     },
     {
-      "id": "input-question",
-      "prompt": "Which device is mainly used to type letters and numbers into a computer?",
-      "choices": [
-        "Monitor",
-        "Keyboard",
-        "Speaker",
-        "Printer"
+      "id":"room-2","backgroundKey":"room_3","objective":"Truth Chamber: find Scroll #2 to learn about true and false values.","spawn":{"x":100,"y":570},
+      "platforms":[
+        {"id":"r2-start","x":145,"y":672,"width":190,"bodyHeight":34,"textureKey":"grass"},{"id":"r2-a","x":345,"y":535,"width":114,"bodyHeight":34,"textureKey":"stone"},{"id":"r2-b","x":535,"y":405,"width":114,"bodyHeight":34,"textureKey":"grass","moveAxis":"x","moveDistance":90,"moveDuration":1900},{"id":"r2-c","x":750,"y":520,"width":114,"bodyHeight":34,"textureKey":"stone"},{"id":"r2-d","x":935,"y":390,"width":114,"bodyHeight":34,"textureKey":"grass"},{"id":"r2-exit","x":1160,"y":672,"width":152,"bodyHeight":34,"textureKey":"stone"},
+        {"id":"r2-fire","x":635,"y":672,"width":228,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"fire","hazardSpriteFrame":"fireball","damage":1},{"id":"r2-spikes","x":905,"y":672,"width":190,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"spikes","hazardSpriteFrame":"floor-spikes","damage":1}
       ],
-      "answerIndex": 1,
-      "successText": "Correct. The climb path is now open.",
-      "failureText": "That answer did not open the route. Try the villain again."
+      "coins":[{"id":"level2-hint-coin-2","collectibleType":"coin","x":750,"y":450,"size":30},{"id":"r2-jump","collectibleType":"jump","spriteFrame":"speed-potion","x":345,"y":470,"size":44},{"id":"scroll-2","collectibleType":"scroll","scrollStyle":"blue","spriteFrame":"scroll-blue","scrollId":"scroll-2","clueText":"BOOLEAN stores one of two values: true or false.\n\nExample: boolean isOpen = true;\n\nClue: Some information has only two possible states.","x":935,"y":325,"size":50}],
+      "ghosts":[{"id":"r2-ghost","enemyType":"ghost","x":570,"y":565,"patrolDistance":65,"speed":108,"size":58,"chasePlayer":true},{"id":"r2-slime","enemyType":"slimegreen","x":1030,"y":600,"patrolDistance":40,"speed":118,"size":58,"canJump":false}],"projectileEnemies":[],
+      "portal":{"x":1160,"y":590,"locked":true,"endsLevel":false,"targetRoomId":"room-3","requiredScrollId":"scroll-2","lockedMessage":"Portal Locked — Find Scroll #2.","size":84}
     },
     {
-      "id": "os-question",
-      "prompt": "Which software manages the computer's hardware and lets programs run?",
-      "choices": [
-        "Operating system",
-        "Mouse driver",
-        "Web browser",
-        "Photo editor"
+      "id":"room-3","backgroundKey":"room_4","objective":"Text Chamber: find Scroll #3 to learn how Java stores text.","spawn":{"x":100,"y":570},
+      "platforms":[
+        {"id":"r3-start","x":145,"y":672,"width":190,"bodyHeight":34,"textureKey":"stone"},{"id":"r3-a","x":335,"y":550,"width":114,"bodyHeight":34,"textureKey":"grass","moveAxis":"y","moveDistance":70,"moveDuration":1700},{"id":"r3-b","x":520,"y":420,"width":76,"bodyHeight":34,"textureKey":"stone"},{"id":"r3-c","x":700,"y":535,"width":76,"bodyHeight":34,"textureKey":"grass"},{"id":"r3-d","x":875,"y":390,"width":76,"bodyHeight":34,"textureKey":"stone"},{"id":"r3-e","x":1035,"y":520,"width":114,"bodyHeight":34,"textureKey":"grass"},{"id":"r3-exit","x":1160,"y":672,"width":152,"bodyHeight":34,"textureKey":"stone"},
+        {"id":"r3-spikes","x":610,"y":672,"width":304,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"spikes","hazardSpriteFrame":"floor-spikes","damage":1},{"id":"r3-fire","x":930,"y":672,"width":152,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"fire","hazardSpriteFrame":"fireball","damage":1}
       ],
-      "answerIndex": 0,
-      "successText": "Correct. The safer upper route is now open.",
-      "failureText": "Not quite. Touch the villain again to retry the question."
+      "coins":[{"id":"level2-hint-coin-3","collectibleType":"coin","x":700,"y":465,"size":30},{"id":"r3-speed","collectibleType":"speed","spriteFrame":"speed-potion","x":335,"y":470,"size":44},{"id":"r3-jump","collectibleType":"jump","spriteFrame":"speed-potion","x":875,"y":325,"size":44},{"id":"r3-health","collectibleType":"health","spriteFrame":"health-heart","x":520,"y":355,"size":44},{"id":"r3-shield","collectibleType":"shield","spriteFrame":"shield","x":1035,"y":455,"size":44},{"id":"scroll-3","collectibleType":"scroll","scrollStyle":"green","spriteFrame":"scroll-green","scrollId":"scroll-3","clueText":"STRING stores text or a sequence of characters.\n\nExample: String name = \"Java\";\n\nClue: Numbers, truth, and words may all be stored, but Java must know what kind of value each one represents.","x":875,"y":270,"size":50}],
+      "ghosts":[{"id":"r3-ghost","enemyType":"ghost","x":540,"y":560,"patrolDistance":55,"speed":125,"size":58,"chasePlayer":true,"chaseDelayMs":3000},{"id":"r3-orange","enemyType":"slimeorange","x":780,"y":600,"patrolDistance":35,"speed":122,"size":58,"canJump":false},{"id":"r3-green","enemyType":"slimegreen","x":1090,"y":600,"patrolDistance":30,"speed":128,"size":58,"canJump":false}],"projectileEnemies":[],
+      "portal":{"x":1160,"y":590,"locked":true,"endsLevel":false,"targetRoomId":"room-4","requiredScrollId":"scroll-3","lockedMessage":"Portal Locked — Find Scroll #3.","size":84}
     },
     {
-      "id": "storage-question",
-      "prompt": "Which device is used for long-term file storage?",
-      "choices": [
-        "RAM only",
-        "Monitor",
-        "Hard drive or SSD",
-        "Keyboard"
+      "id":"room-4","backgroundKey":"room_5","objective":"Mixed Data Trial: combine boosts and moving platforms to reach the Data Core.","spawn":{"x":100,"y":570},
+      "platforms":[
+        {"id":"r4-start","x":145,"y":672,"width":190,"bodyHeight":34,"textureKey":"grass"},{"id":"r4-a","x":330,"y":535,"width":114,"bodyHeight":34,"textureKey":"stone","moveAxis":"y","moveDistance":-75,"moveDuration":1800},{"id":"r4-b","x":520,"y":405,"width":76,"bodyHeight":34,"textureKey":"grass"},{"id":"r4-c","x":720,"y":535,"width":76,"bodyHeight":34,"textureKey":"stone"},{"id":"r4-d","x":900,"y":400,"width":76,"bodyHeight":34,"textureKey":"grass"},{"id":"r4-e","x":1050,"y":525,"width":114,"bodyHeight":34,"textureKey":"stone"},{"id":"r4-exit","x":1160,"y":672,"width":152,"bodyHeight":34,"textureKey":"grass"},
+        {"id":"r4-spikes","x":650,"y":672,"width":380,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"spikes","hazardSpriteFrame":"floor-spikes","damage":1},{"id":"r4-fire","x":950,"y":672,"width":152,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"fire","hazardSpriteFrame":"fireball","damage":1}
       ],
-      "answerIndex": 2,
-      "successText": "Correct. The exit portal is unlocked.",
-      "failureText": "That did not unlock the portal. Try the villain again."
+      "coins":[{"id":"r4-speed","collectibleType":"speed","spriteFrame":"speed-potion","x":330,"y":455,"size":44},{"id":"r4-jump","collectibleType":"jump","spriteFrame":"speed-potion","x":720,"y":470,"size":44},{"id":"r4-health","collectibleType":"health","spriteFrame":"health-heart","x":900,"y":335,"size":44},{"id":"r4-shield","collectibleType":"shield","spriteFrame":"shield","x":1050,"y":460,"size":44}],
+      "ghosts":[{"id":"r4-ghost","enemyType":"ghost","x":570,"y":565,"patrolDistance":60,"speed":132,"size":60,"chasePlayer":true,"chaseDelayMs":2200},{"id":"r4-orange","enemyType":"slimeorange","x":790,"y":600,"patrolDistance":35,"speed":130,"size":58,"canJump":false},{"id":"r4-green","enemyType":"slimegreen","x":1090,"y":600,"patrolDistance":30,"speed":134,"size":58,"canJump":false}],"projectileEnemies":[],
+      "portal":{"x":1160,"y":590,"locked":false,"endsLevel":false,"targetRoomId":"room-5","size":84}
+    },
+    {
+      "id":"room-5","backgroundKey":"room_6","objective":"Data Core: survive the final chamber and unlock the treasure using all three scroll clues.","spawn":{"x":100,"y":570},
+      "platforms":[
+        {"id":"r5-start","x":145,"y":672,"width":190,"bodyHeight":34,"textureKey":"stone"},{"id":"r5-a","x":330,"y":540,"width":76,"bodyHeight":34,"textureKey":"grass"},{"id":"r5-b","x":500,"y":395,"width":76,"bodyHeight":34,"textureKey":"stone","disappearEveryMs":1900},{"id":"r5-c","x":670,"y":520,"width":76,"bodyHeight":34,"textureKey":"grass"},{"id":"r5-d","x":840,"y":385,"width":76,"bodyHeight":34,"textureKey":"stone"},{"id":"r5-e","x":1000,"y":520,"width":76,"bodyHeight":34,"textureKey":"grass"},{"id":"r5-chest","x":1160,"y":672,"width":152,"bodyHeight":34,"textureKey":"stone"},
+        {"id":"r5-spikes","x":650,"y":672,"width":304,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"spikes","hazardSpriteFrame":"floor-spikes","damage":1},{"id":"r5-fire-2","x":940,"y":672,"width":76,"bodyHeight":16,"textureKey":"stone","hazard":true,"hazardType":"fire","hazardSpriteFrame":"fireball","damage":1}
+      ],
+      "coins":[{"id":"r5-speed","collectibleType":"speed","spriteFrame":"speed-potion","x":330,"y":460,"size":44},{"id":"r5-jump","collectibleType":"jump","spriteFrame":"speed-potion","x":670,"y":455,"size":44},{"id":"r5-health","collectibleType":"health","spriteFrame":"health-heart","x":840,"y":320,"size":44},{"id":"r5-shield","collectibleType":"shield","spriteFrame":"shield","x":1000,"y":455,"size":44}],
+      "ghosts":[{"id":"r5-ghost","enemyType":"ghost","x":540,"y":565,"patrolDistance":55,"speed":136,"size":60,"chasePlayer":true,"chaseDelayMs":5000},{"id":"r5-orange","enemyType":"slimeorange","x":735,"y":600,"patrolDistance":30,"speed":134,"size":58,"canJump":false},{"id":"r5-green","enemyType":"slimegreen","x":1060,"y":600,"patrolDistance":25,"speed":140,"size":58,"canJump":false}],
+      "projectileEnemies":[{"id":"r5-elemental","enemyType":"elemental","x":900,"y":320,"fireDirection":"LEFT","fireIntervalMs":1900,"projectileSpeed":290,"projectileLifetimeMs":2500,"initialDelayMs":1200,"size":62}],
+      "portal":{"id":"data-core-treasure","x":1160,"y":580,"locked":true,"endsLevel":true,"appearance":"TREASURE_CHEST","size":96,"requiredCoins":3,"questionId":"data-core-riddle","treasureQuestionId":"data-core-riddle"}
     }
   ],
-  "rooms": [
-    {
-      "id": "room-1",
-      "backgroundKey": "tutorialGrove",
-      "objective": "You can scout ahead or climb to the statue, but the path only opens after the question is answered.",
-      "postUnlockObjective": "The bridge is up. Cross the lane, avoid the shots, and reach the portal.",
-      "spawn": { "x": 120, "y": 560 },
-      "platforms": [
-        { "id": "left-floor", "x": 360, "y": 684, "width": 720, "bodyHeight": 72, "textureKey": "stone" },
-        { "id": "right-floor", "x": 1070, "y": 684, "width": 420, "bodyHeight": 72, "textureKey": "stone" },
-        { "id": "statue-step-1", "x": 250, "y": 612, "width": 140, "bodyHeight": 24, "textureKey": "stone" },
-        { "id": "statue-step-2", "x": 380, "y": 540, "width": 140, "bodyHeight": 24, "textureKey": "grass" },
-        { "id": "statue-ledge", "x": 520, "y": 468, "width": 240, "bodyHeight": 24, "textureKey": "wood" },
-        { "id": "caster-perch", "x": 930, "y": 612, "width": 180, "bodyHeight": 24, "textureKey": "wood" }
-      ],
-      "unlockPlatforms": [
-        {
-          "id": "bridge-1",
-          "x": 790,
-          "y": 620,
-          "width": 180,
-          "bodyHeight": 24,
-          "textureKey": "grass",
-          "lockedByQuestionId": "ram-question",
-          "startsHidden": true
-        }
-      ],
-      "barriers": [],
-      "coins": [
-        { "id": "coin-1", "x": 520, "y": 418 },
-        { "id": "coin-2", "x": 790, "y": 570 },
-        { "id": "coin-3", "x": 1070, "y": 632 }
-      ],
-      "ghosts": [],
-      "projectileEnemies": [
-        {
-          "id": "caster-1",
-          "enemyType": "elemental",
-          "x": 930,
-          "y": 555,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1750,
-          "projectileSpeed": 270,
-          "projectileLifetimeMs": 2500,
-          "initialDelayMs": 1100
-        }
-      ],
-      "villain": {
-        "x": 520,
-        "y": 402,
-        "questionId": "ram-question"
-      },
-      "portal": {
-        "x": 1150,
-        "y": 556,
-        "locked": false,
-        "targetRoomId": "room-2"
-      }
-    },
-    {
-      "id": "room-2",
-      "backgroundKey": "swampTrail",
-      "objective": "Answer the question to reveal the climb and remove the gate to the upper route.",
-      "postUnlockObjective": "The climb is ready. Use the new platforms, avoid the shots, and reach the portal above.",
-      "spawn": { "x": 120, "y": 560 },
-      "platforms": [
-        { "id": "floor", "x": 640, "y": 684, "width": 1280, "bodyHeight": 72, "textureKey": "grass" },
-        { "id": "villain-ledge", "x": 260, "y": 556, "width": 220, "bodyHeight": 24, "textureKey": "wood" },
-        { "id": "low-caster-perch", "x": 970, "y": 610, "width": 200, "bodyHeight": 24, "textureKey": "stone" },
-        { "id": "upper-caster-perch", "x": 1060, "y": 414, "width": 220, "bodyHeight": 24, "textureKey": "stone" },
-        { "id": "portal-landing", "x": 1080, "y": 350, "width": 300, "bodyHeight": 24, "textureKey": "wood" }
-      ],
-      "unlockPlatforms": [
-        {
-          "id": "step-1",
-          "x": 510,
-          "y": 560,
-          "width": 170,
-          "bodyHeight": 24,
-          "textureKey": "grass",
-          "lockedByQuestionId": "input-question",
-          "startsHidden": true
-        },
-        {
-          "id": "step-2",
-          "x": 695,
-          "y": 478,
-          "width": 170,
-          "bodyHeight": 24,
-          "textureKey": "grass",
-          "lockedByQuestionId": "input-question",
-          "startsHidden": true
-        },
-        {
-          "id": "step-3",
-          "x": 880,
-          "y": 396,
-          "width": 170,
-          "bodyHeight": 24,
-          "textureKey": "grass",
-          "lockedByQuestionId": "input-question",
-          "startsHidden": true
-        }
-      ],
-      "barriers": [
-        {
-          "id": "climb-gate",
-          "x": 805,
-          "y": 520,
-          "width": 74,
-          "height": 184,
-          "bodyHeight": 176,
-          "textureKey": "stone",
-          "lockedByQuestionId": "input-question",
-          "unlockBehavior": "drop"
-        }
-      ],
-      "coins": [
-        { "id": "coin-4", "x": 260, "y": 506 },
-        { "id": "coin-5", "x": 695, "y": 428 },
-        { "id": "coin-6", "x": 1080, "y": 300 }
-      ],
-      "ghosts": [],
-      "projectileEnemies": [
-        {
-          "id": "caster-2",
-          "enemyType": "elemental",
-          "x": 970,
-          "y": 553,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1700,
-          "projectileSpeed": 280,
-          "projectileLifetimeMs": 2600,
-          "initialDelayMs": 900
-        },
-        {
-          "id": "caster-3",
-          "enemyType": "elemental",
-          "x": 1060,
-          "y": 357,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 2000,
-          "projectileSpeed": 300,
-          "projectileLifetimeMs": 2600,
-          "initialDelayMs": 1500
-        }
-      ],
-      "villain": {
-        "x": 260,
-        "y": 490,
-        "questionId": "input-question"
-      },
-      "portal": {
-        "x": 1145,
-        "y": 274,
-        "locked": false,
-        "targetRoomId": "room-3"
-      }
-    },
-    {
-      "id": "room-3",
-      "backgroundKey": "swampTrail",
-      "objective": "Answer the question to open the safer upper route while hazards remain active below.",
-      "postUnlockObjective": "The upper route is open. Climb above the ghost and move past the shooter to the portal.",
-      "spawn": { "x": 120, "y": 560 },
-      "platforms": [
-        { "id": "floor", "x": 640, "y": 684, "width": 1280, "bodyHeight": 72, "textureKey": "wood" },
-        { "id": "villain-ledge", "x": 280, "y": 548, "width": 220, "bodyHeight": 24, "textureKey": "grass" },
-        { "id": "caster-perch", "x": 990, "y": 520, "width": 220, "bodyHeight": 24, "textureKey": "stone" },
-        { "id": "portal-landing", "x": 1110, "y": 350, "width": 280, "bodyHeight": 24, "textureKey": "wood" }
-      ],
-      "unlockPlatforms": [
-        {
-          "id": "upper-step-1",
-          "x": 520,
-          "y": 472,
-          "width": 180,
-          "bodyHeight": 24,
-          "textureKey": "grass",
-          "lockedByQuestionId": "os-question",
-          "startsHidden": true
-        },
-        {
-          "id": "upper-step-2",
-          "x": 760,
-          "y": 390,
-          "width": 180,
-          "bodyHeight": 24,
-          "textureKey": "stone",
-          "lockedByQuestionId": "os-question",
-          "startsHidden": true
-        },
-        {
-          "id": "upper-step-3",
-          "x": 970,
-          "y": 320,
-          "width": 180,
-          "bodyHeight": 24,
-          "textureKey": "wood",
-          "lockedByQuestionId": "os-question",
-          "startsHidden": true
-        }
-      ],
-      "barriers": [
-        {
-          "id": "upper-route-gate",
-          "x": 430,
-          "y": 516,
-          "width": 72,
-          "height": 176,
-          "bodyHeight": 168,
-          "textureKey": "wood",
-          "lockedByQuestionId": "os-question",
-          "unlockBehavior": "drop"
-        }
-      ],
-      "coins": [
-        { "id": "coin-7", "x": 280, "y": 498 },
-        { "id": "coin-8", "x": 760, "y": 340 },
-        { "id": "coin-9", "x": 1110, "y": 300 }
-      ],
-      "ghosts": [
-        {
-          "id": "ghost-1",
-          "x": 690,
-          "y": 592,
-          "patrolDistance": 250,
-          "speed": 84
-        }
-      ],
-      "projectileEnemies": [
-        {
-          "id": "caster-4",
-          "enemyType": "elemental",
-          "x": 990,
-          "y": 463,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1800,
-          "projectileSpeed": 295,
-          "projectileLifetimeMs": 2500,
-          "initialDelayMs": 1200
-        }
-      ],
-      "villain": {
-        "x": 280,
-        "y": 482,
-        "questionId": "os-question"
-      },
-      "portal": {
-        "x": 1145,
-        "y": 274,
-        "locked": false,
-        "targetRoomId": "room-4"
-      }
-    },
-    {
-      "id": "room-4",
-      "backgroundKey": "ruinsGate",
-      "objective": "Reach the villain, answer correctly, then time the last run to the exit portal.",
-      "postUnlockObjective": "The portal is unlocked. Move through the final crossfire and clear the level.",
-      "spawn": { "x": 120, "y": 560 },
-      "platforms": [
-        { "id": "floor", "x": 640, "y": 684, "width": 1280, "bodyHeight": 72, "textureKey": "stone" },
-        { "id": "cover-1", "x": 410, "y": 596, "width": 180, "bodyHeight": 24, "textureKey": "wood" },
-        { "id": "villain-ledge", "x": 660, "y": 508, "width": 220, "bodyHeight": 24, "textureKey": "grass" },
-        { "id": "cover-2", "x": 870, "y": 452, "width": 180, "bodyHeight": 24, "textureKey": "wood" },
-        { "id": "low-caster-perch", "x": 990, "y": 612, "width": 180, "bodyHeight": 24, "textureKey": "stone" },
-        { "id": "high-caster-perch", "x": 1080, "y": 414, "width": 200, "bodyHeight": 24, "textureKey": "stone" }
-      ],
-      "unlockPlatforms": [],
-      "barriers": [],
-      "coins": [
-        { "id": "coin-10", "x": 410, "y": 546 },
-        { "id": "coin-11", "x": 660, "y": 458 },
-        { "id": "coin-12", "x": 1080, "y": 364 }
-      ],
-      "ghosts": [],
-      "projectileEnemies": [
-        {
-          "id": "caster-5",
-          "enemyType": "elemental",
-          "x": 990,
-          "y": 555,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1700,
-          "projectileSpeed": 305,
-          "projectileLifetimeMs": 2550,
-          "initialDelayMs": 900
-        },
-        {
-          "id": "caster-6",
-          "enemyType": "elemental",
-          "x": 1080,
-          "y": 357,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 2050,
-          "projectileSpeed": 310,
-          "projectileLifetimeMs": 2550,
-          "initialDelayMs": 1450
-        }
-      ],
-      "villain": {
-        "x": 660,
-        "y": 442,
-        "questionId": "storage-question"
-      },
-      "portal": {
-        "x": 1150,
-        "y": 556,
-        "locked": true,
-        "endsLevel": true,
-        "questionId": "storage-question"
-      }
-    }
-  ]
+  "treasureQuestionId":"data-core-riddle"
 }

@@ -3,9 +3,9 @@
   "gameType": "GAME_FIVE",
   "levelNumber": 1,
   "seedVersion": 2,
-  "title": "Code Snowman: Variables",
-  "subtitle": "Guess five basic programming words before the snowman melts.",
-  "objective": "Guess five basic programming words before the snowman melts.",
+  "title": "Code Robot: Variables",
+  "subtitle": "Guess five basic programming words before the robot shuts down.",
+  "objective": "Guess five basic programming words before the robot shuts down.",
   "settings": {
     "targetWords": 5,
     "seconds": 180,

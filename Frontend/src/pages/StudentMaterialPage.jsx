@@ -19,6 +19,8 @@ import {
   Trophy,
   User,
   Video,
+  Volume2,
+  VolumeX,
   XCircle,
 } from 'lucide-react';
 import StudentShell from '../components/student/StudentShell';
@@ -30,6 +32,14 @@ import {
   getStudentAvatarByKey,
 } from '../assets/student-avatars/avatarCatalog';
 import studentMenuBackground from '../../assets/Game/game_one/Background/background_menu.avif';
+import {
+  getStudentAudioVolumePreference,
+  getStudentSfxVolumePreference,
+  playStudentClickSound,
+  setStudentMenuVolume,
+  startStudentMenuLoop,
+  stopStudentMenuLoop,
+} from '../utils/studentMenuAudio';
 
 const RESULT_STORAGE_PREFIX = 'student-material-result:';
 const QUIZ_DRAFT_STORAGE_PREFIX = 'student-material-quiz-draft:';
@@ -110,8 +120,6 @@ const chunkArray = (items, size) => {
 
   return chunks;
 };
-
-const NORMAL_LESSON_FONT = 'Manrope, "Segoe UI", system-ui, sans-serif';
 
 const LessonMediaImage = ({ source, alt, className, onOpen }) => {
   const [displaySource, setDisplaySource] = useState('');
@@ -222,6 +230,8 @@ const LessonMediaVideo = ({ video }) => {
   );
 };
 
+
+const NORMAL_LESSON_FONT = 'Manrope, "Segoe UI", system-ui, sans-serif';
 const getStatusChipClass = (status) => {
   if (status === 'COMPLETED') {
     return 'border-emerald-300 bg-emerald-50 text-emerald-700';
@@ -410,11 +420,95 @@ const StudentMaterialPage = () => {
   const [showReviewAnswers, setShowReviewAnswers] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [maxViewedOutlineIndex, setMaxViewedOutlineIndex] = useState(0);
+  const [showAudioControls, setShowAudioControls] = useState(false);
+  const [audioPreferences, setAudioPreferences] = useState(() => ({
+    musicVolume: getStudentAudioVolumePreference(),
+    sfxVolume: getStudentSfxVolumePreference(),
+  }));
   const hasStartedRef = useRef(false);
   const initialProgressLoadedRef = useRef(false);
   const lastSavedProgressKeyRef = useRef('');
   const progressTickStartedAtRef = useRef(Date.now());
   const previewTopRef = useRef(null);
+  const audioControlsRef = useRef(null);
+
+  useEffect(() => {
+    setStudentMenuVolume(audioPreferences.musicVolume);
+    if (audioPreferences.musicVolume > 0) {
+      startStudentMenuLoop();
+    } else {
+      stopStudentMenuLoop({ rewind: false });
+    }
+
+    try {
+      window.localStorage.setItem('studentMenuPreferences', JSON.stringify(audioPreferences));
+    } catch (error) {
+      // Ignore storage failures in restricted browser contexts.
+    }
+  }, [audioPreferences]);
+
+  useEffect(() => {
+    const playModuleClickSound = (event) => {
+      if (event.target.closest('button, a')) {
+        playStudentClickSound();
+      }
+    };
+    document.addEventListener('click', playModuleClickSound);
+    return () => document.removeEventListener('click', playModuleClickSound);
+  }, []);
+
+  useEffect(() => {
+    const retryMusicAfterInteraction = () => {
+      if (getStudentAudioVolumePreference() > 0) {
+        startStudentMenuLoop();
+      }
+    };
+    window.addEventListener('pointerdown', retryMusicAfterInteraction, { once: true });
+    window.addEventListener('keydown', retryMusicAfterInteraction, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', retryMusicAfterInteraction);
+      window.removeEventListener('keydown', retryMusicAfterInteraction);
+    };
+  }, []);
+
+  useEffect(() => {
+    const closeAudioControls = (event) => {
+      if (!audioControlsRef.current?.contains(event.target)) {
+        setShowAudioControls(false);
+      }
+    };
+    window.addEventListener('pointerdown', closeAudioControls);
+    return () => window.removeEventListener('pointerdown', closeAudioControls);
+  }, []);
+
+  const updateAudioPreference = (key) => (event) => {
+    const nextVolume = Math.max(0, Math.min(100, Number(event.target.value) || 0));
+    setAudioPreferences((current) => {
+      const nextPreferences = { ...current, [key]: nextVolume };
+      try {
+        window.localStorage.setItem('studentMenuPreferences', JSON.stringify(nextPreferences));
+      } catch (error) {
+        // Ignore storage failures in restricted browser contexts.
+      }
+
+      if (key === 'musicVolume') {
+        setStudentMenuVolume(nextVolume);
+        if (nextVolume > 0) {
+          startStudentMenuLoop();
+        } else {
+          stopStudentMenuLoop({ rewind: false });
+        }
+      }
+
+      return nextPreferences;
+    });
+  };
+
+  const previewSoundEffect = () => {
+    if (getStudentSfxVolumePreference() > 0) {
+      playStudentClickSound();
+    }
+  };
 
   const avatar = getStudentAvatarByKey(user?.avatarKey || DEFAULT_STUDENT_AVATAR_KEY);
 
@@ -1124,16 +1218,9 @@ const StudentMaterialPage = () => {
           className="mx-auto mb-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_18px_40px_rgba(15,23,42,0.12)]"
           style={{ width: `${Math.min(70, Math.max(18, Number(media?.width || 34)))}%` }}
         >
-          <LessonMediaImage
-            source={media.src}
-            alt={media.alt || fallbackTitle || materialDetail.title}
-            className="max-h-[280px] w-full object-contain bg-slate-50"
-            onOpen={(resolvedSource) => openFullscreenImage({
-              src: resolvedSource,
-              alt: media.alt || fallbackTitle || materialDetail.title,
-              caption: media.caption,
-            })}
-          />
+          <LessonMediaImage source={media.src} alt={media.alt || fallbackTitle || materialDetail.title}
+  className="max-h-[280px] w-full object-contain bg-slate-50"
+  onOpen={(src) => openFullscreenImage({ src, alt: media.alt || fallbackTitle || materialDetail.title, caption: media.caption })} />
           {media.caption ? (
             <p
               className="border-t border-slate-200 px-4 py-3 text-sm text-slate-600"
@@ -1167,13 +1254,15 @@ const StudentMaterialPage = () => {
       )
       : (
         <>
-          {lessonVideo ? <LessonMediaVideo video={lessonVideo} /> : null}
           {renderInlineImage(lessonMedia, activeOutlineItem?.title)}
-          <div className="space-y-6">
+          {lessonVideo ? (
+            <LessonMediaVideo video={lessonVideo} />
+          ) : null}
+          <div className="min-w-0 space-y-6 px-3 pb-4 sm:px-5">
             {slideParagraphs.map((paragraph, index) => (
               <p
                 key={`${activeOutlineItem?.id || 'slide'}-paragraph-${index}`}
-                className="text-[1.2rem] leading-10 text-slate-700"
+                className="max-w-full break-words text-[1.2rem] leading-10 text-slate-700"
                 style={{ fontFamily: NORMAL_LESSON_FONT }}
               >
                 {paragraph}
@@ -1334,8 +1423,8 @@ const StudentMaterialPage = () => {
                                 onClick={() => {
                                   if (itemIndex >= 0) {
                                     setActiveOutlineIndex(itemIndex);
-                                    setActiveLessonPageIndex(0);
                                     setIsMobileOutlineVisible(false);
+                                    setActiveLessonPageIndex(0);
                                   }
                                 }}
                                 className={clsx(
@@ -1369,8 +1458,8 @@ const StudentMaterialPage = () => {
                                         onClick={() => {
                                           if (itemIndex >= 0) {
                                             setActiveOutlineIndex(itemIndex);
+                                    setIsMobileOutlineVisible(false);
                                             setActiveLessonPageIndex(subtopicIndex + 1);
-                                            setIsMobileOutlineVisible(false);
                                           }
                                         }}
                                         className="flex w-full items-start gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50/70"
@@ -1481,14 +1570,13 @@ const StudentMaterialPage = () => {
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  className="student-material-mobile-outline-toggle"
-                  onClick={() => setIsMobileOutlineVisible((current) => !current)}
-                >
+                <button type="button" className="student-material-mobile-outline-toggle"
+                  aria-expanded={isMobileOutlineVisible}
+                  onClick={() => setIsMobileOutlineVisible(current => !current)}>
                   <BookOpen className="h-4 w-4" />
                   {isMobileOutlineVisible ? 'View Lesson' : 'Course Outline'}
                 </button>
+                {renderAudioControls()}
                 <span
                   className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800"
                   style={{ fontFamily: NORMAL_LESSON_FONT }}
@@ -1811,8 +1899,6 @@ const StudentMaterialPage = () => {
 
               <div className="rounded-[22px] border border-slate-200 bg-white p-4 text-[#2f2016]">
                 <div className="space-y-3 text-lg font-semibold" style={{ fontFamily: 'Manrope, "Segoe UI", sans-serif' }}>
-                  <div className="flex items-center justify-between"><span>XP Reward</span><span>+{result.xpReward}</span></div>
-                  <div className="flex items-center justify-between"><span>Coin Reward</span><span>+{result.coinReward}</span></div>
                   <div className="flex items-center justify-between"><span>Quiz Score</span><span>{result.correctCount} / {result.totalQuestions}</span></div>
                   <div className="flex items-center justify-between"><span>Stars</span><span>{'★'.repeat(stars)}{'☆'.repeat(3 - stars)}</span></div>
                 </div>
@@ -1826,8 +1912,8 @@ const StudentMaterialPage = () => {
                   <ChevronRight className="h-4 w-4" />
                 </PixelHeaderActionButton>
               ) : null}
-              <PixelHeaderActionButton onClick={navigateBackToModule}>
-                Back to Module
+              <PixelHeaderActionButton onClick={result.passed ? navigateBackToMaterials : navigateBackToModule}>
+                {result.passed ? 'Back to Materials' : 'Back to Module'}
               </PixelHeaderActionButton>
               {!result.passed ? (
                 <PixelHeaderActionButton onClick={handleRetakeQuiz}>
@@ -1858,6 +1944,77 @@ const StudentMaterialPage = () => {
             ) : null}
           </div>
         </section>
+      </div>
+    );
+  };
+
+  const renderAudioControls = () => {
+    const allMuted = audioPreferences.musicVolume === 0 && audioPreferences.sfxVolume === 0;
+
+    return (
+      <div
+        ref={audioControlsRef}
+        className="relative z-[60]"
+        style={{ fontFamily: NORMAL_LESSON_FONT }}
+      >
+        {showAudioControls ? (
+          <div className="student-module-audio-popover absolute right-0 top-[calc(100%+10px)] w-[min(320px,calc(100vw-32px))] rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(15,50,70,0.18)]">
+            <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Module Audio</p>
+                <h3 className="text-base font-black text-slate-900">Sound settings</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAudioControls(false)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+                aria-label="Close volume controls"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            </div>
+
+            {[
+              { key: 'musicVolume', label: 'Music', value: audioPreferences.musicVolume },
+              { key: 'sfxVolume', label: 'Sound FX', value: audioPreferences.sfxVolume },
+            ].map((control) => (
+              <label key={control.key} className="mb-3 block rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-3 last:mb-0">
+                <span className="mb-2 flex items-center justify-between text-xs font-bold text-slate-700">
+                  <span>{control.label}</span>
+                  <span className="rounded-full bg-emerald-50 px-2 py-1 tabular-nums font-black text-emerald-700">{control.value}%</span>
+                </span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={control.value}
+                  onChange={updateAudioPreference(control.key)}
+                  onPointerUp={control.key === 'sfxVolume' ? previewSoundEffect : undefined}
+                  onKeyUp={control.key === 'sfxVolume' ? previewSoundEffect : undefined}
+                  className="h-2 w-full cursor-pointer accent-emerald-500"
+                  aria-label={`${control.label} volume`}
+                />
+              </label>
+            ))}
+          </div>
+        ) : null}
+
+        <button
+          type="button"
+          onClick={() => setShowAudioControls((current) => !current)}
+          className={clsx(
+            'inline-flex h-10 items-center gap-2 rounded-full border px-3 text-xs font-bold transition',
+            showAudioControls
+              ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+              : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50',
+          )}
+          aria-expanded={showAudioControls}
+          aria-label="Open module volume controls"
+        >
+          {allMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          <span>Audio</span>
+        </button>
       </div>
     );
   };

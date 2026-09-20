@@ -51,6 +51,7 @@ export default class SlimeEnemy extends Phaser.Physics.Arcade.Sprite {
     this.lastDirectionChangeAt = scene.time.now;
     this.nextJumpAt = 0;
     this.jumpForce = Number(config.jumpForce || manifest.jumpForce || JUMP_FORCE);
+    this.canJump = config.canJump !== false;
     this.directionChangeIntervalMs = Number(config.directionChangeIntervalMs || DIRECTION_CHANGE_INTERVAL_MS);
     this.animationKey = typeof config.animationKey === 'string' && config.animationKey.trim()
       ? config.animationKey.trim()
@@ -94,7 +95,7 @@ export default class SlimeEnemy extends Phaser.Physics.Arcade.Sprite {
       this.direction *= -1;
     }
 
-    if (currentTime >= this.nextJumpAt && (this.body.blocked.down || this.body.touching.down)) {
+    if (this.canJump && currentTime >= this.nextJumpAt && (this.body.blocked.down || this.body.touching.down)) {
       this.setVelocityY(this.jumpForce);
       this.nextJumpAt = currentTime + this.directionChangeIntervalMs;
     }

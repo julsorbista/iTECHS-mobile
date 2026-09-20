@@ -1,4 +1,6 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import TutorialHandPointer, { inferTutorialHandAction } from './TutorialHandPointer';
+import GameOneTutorialDemonstration from './GameOneTutorialDemonstration';
 import { createPortal } from 'react-dom';
 
 const GAME_TUTORIALS = {
@@ -6,37 +8,35 @@ const GAME_TUTORIALS = {
     kicker: 'Game 1',
     root: '.game-one-frame-shell',
     steps: [
-      { title: 'How to Play the 2D Action Game', body: 'Complete the level objectives and reach the ending portal.', items: ['Move through the platform level and avoid hazards.', 'Collect required coins and clear Question Statues.', 'Enter the ending portal after the objectives are complete.'], target: '.game-one-frame-shell > div:first-child' },
-      { title: 'Lives', items: ['The hearts show your current health.', 'Taking damage removes health.', 'Reaching 0 hearts ends the attempt.'], fallback: [0.015, 0.025, 0.06, 0.055] },
-      { title: 'Question Rules', items: ['Touch an unanswered Question Statue to open its challenge.', 'A correct answer clears the challenge.', 'A wrong answer adds a mistake and restarts the room.'], fallback: [0.54, 0.66, 0.085, 0.27] },
-      { title: 'Room Failure', items: ['Wrong answers restart the current room; there is no fixed three-question room limit in the game code.', "Each wrong answer increases the run's mistake count and activates the danger surge.", 'The attempt ends when health reaches 0 or another level-failure condition is triggered.'], fallback: [0.015, 0.025, 0.06, 0.055] },
-      { title: 'Score & Rewards', items: ['Completion, coins, cleared questions, enemy hits, and accuracy contribute to the score.', 'Avoiding wrong answers provides a precision bonus.', 'Your final result records the score and earned Stars.'], fallback: [0.015, 0.08, 0.06, 0.06] },
-      { title: 'Condition', items: ['Complete the required objectives.', 'Unlock the ending portal.', 'Reach the portal to complete the level.'], fallback: [0.91, 0.78, 0.08, 0.17] },
+      { title: 'Goal and Controls', body: 'Explore all five rooms, complete each room objective, and recover the Java treasure.', items: ['Move with A/D or Left/Right Arrow keys and jump with W, Up Arrow, or Space.', 'Collect the required items shown in the objective before entering a locked room portal.', 'In the final room, use all three scroll clues to solve the treasure riddle.'], target: '.game-one-frame-shell > div:first-child' },
+      { title: 'Lives', items: ['The three hearts show your current health.', 'Most enemy attacks and hazards remove one heart.', 'Reaching 0 hearts ends the level attempt.'], fallback: [0.015, 0.025, 0.06, 0.055] },
+      { title: 'Combat and Hazards', items: ['Press J to fire your Arc Bolt when attacks are enabled.', 'Avoid enemies, projectiles, spikes, fire, and dangerous falls.', 'Some enemies can be defeated; keep moving when fighting is optional.'], fallback: [0.052, 0.725, 0.068, 0.155] },
+      { title: 'Damage and Restarts', items: ['Taking damage removes health and returns you to the current room start.', 'Use safe platforms and press Shift for an air dash when it is enabled.', 'The attempt ends only when your health reaches 0; these levels have no countdown timer.'], fallback: [0.015, 0.025, 0.06, 0.055] },
+      { title: 'Coins & Scroll Clues', items: ['The coin number shows how many coins you can use for hints.', 'The scroll counter shows how many clue scrolls you have collected out of three.', 'Collect all three scroll clues before solving the final treasure riddle.'], fallback: [0.105, 0.02, 0.13, 0.065] },
+      { title: 'Room Portals', items: ['Collect the objective items shown at the top of the room.', 'A sealed portal opens after that room\'s required items are collected.', 'Enter the blue portal to continue to the next room; the final treasure chest completes the level.'], fallback: [0.88, 0.755, 0.05, 0.155] },
     ],
   },
   GAME_TWO: {
     kicker: 'Game 2',
     root: '.game-two-fruit-shell',
     steps: [
-      { title: 'Welcome to Game 2', body: 'Slice the correct Java syntax pieces to complete the active code challenge.', items: ['Read the Java Code panel for the current target code.', 'Swipe through the correct syntax objects in order.', 'Avoid bombs and decoy syntax while completing outputs.'], target: '.game-two-fruit-canvas' },
-      { title: 'Java Code Guide', items: ['Correct Code shows the target syntax for the current challenge.', 'Sliced Code shows the pieces you have already sliced.', 'Follow the displayed syntax order so the game accepts your slices.'], target: '.game-two-fruit-code' },
-      { title: 'Slicing Objects', items: ['Correct syntax pieces build the current Java code.', 'Decoy syntax is wrong and costs a life when sliced.', 'Bombs also cost a life when sliced.'], target: '.game-two-fruit-canvas' },
-      { title: 'Combo & Lives', items: ['Correct slices increase the Combo.', 'Reaching 3x Combo can restore one missing life.', 'The Lives panel shows how many hearts remain.'], targets: ['.game-two-fruit-combo', '.game-two-fruit-lives'] },
-      { title: 'Output Progress', items: ['Output shows the result for the completed code.', 'The progress number shows completed outputs for the level.', 'Each new challenge replaces the previous completed code.'], target: '.game-two-fruit-output' },
-      { title: 'Condition', items: ['Complete the required number of outputs.', 'Slice actively because 20 seconds without slicing ends the attempt.', 'Clearing the target outputs finishes the level.'], target: '.game-two-fruit-mission' },
+      { title: 'Welcome to Syntax Slice', body: 'Build Java statements by slicing the correct syntax pieces in order.', items: [], target: '.game-two-fruit-shell' },
+      { title: 'Read the Java Code Panel', items: ['The challenge title identifies the active task.', 'CORRECT CODE shows the complete target statement.', 'SLICED CODE shows the pieces you have selected.'], target: '.game-two-fruit-code' },
+      { title: 'Avoid Hazards', items: ['Gold syntax pieces are valid answers.', 'Red decoys are incorrect and can break your streak.', 'Never slice a bomb: it removes one life.'], examples: [{ type: 'decoy', label: 'Red decoy', value: 'int score == 10;' }, { type: 'bomb', label: 'Bomb', value: 'Do not slice' }], target: '.game-two-fruit-canvas' },
+      { title: 'Build Combo and Output', items: ['Correct slices increase your combo.', 'Finishing a statement advances the Output counter.', 'Higher combos award more points for accurate play.'], targets: ['.game-two-fruit-combo', '.game-two-fruit-output'] },
+      { title: 'Watch Lives and Score', items: ['The score shows your points for this level.', 'Lives show how many mistakes you can still make.', 'Accurate slices protect your lives and grow your score.'], targets: ['.game-two-fruit-score', '.game-two-fruit-lives'] },
+      { title: 'Start the Level', items: ['Read the Java Code panel before each challenge.', 'Slice every required piece before it leaves the playfield.', 'Complete the target number of outputs to clear the level.'], target: '.game-two-fruit-mission' },
     ],
   },
   GAME_THREE: {
     kicker: 'Game 3',
     root: '.game-three-shell',
     steps: [
-      { title: 'Welcome to Memory Card Game', body: 'Match Java concept cards and answer the question for each pair.', items: ['Flip two cards at a time.', 'Matching cards open a question.', 'Resolve every pair to finish the board.'], target: '.game-three-board' },
+      { title: 'Welcome to Memory Card Game', body: 'Match the Java concept cards before your flip attempts run out.', items: ['Flip two cards at a time.', 'Matching cards stay revealed.', 'Resolve every pair to finish the board.'], target: '.game-three-board' },
       { title: 'Mechanics', items: ['Select two face-down cards to compare them.', 'A matching pair stays revealed.', 'A mismatch flips back after the preview.'], targets: ['.game-three-board .game-three-card:nth-child(1)', '.game-three-board .game-three-card:nth-child(2)'] },
-      { title: 'Question Rules', items: ['Each matched pair opens one question.', 'Arrange the answer tiles, then submit.', 'Correct answers add a point and coin.'], target: '.game-three-board-footer' },
-      { title: 'Attempts', items: ['Each two-card selection spends one flip attempt.', 'The counter shows the remaining attempts.', 'Resolve all pairs before attempts run out.'], targets: ['.game-three-side-metrics .game-three-metric:nth-child(4)', '.game-three-side-metrics .game-three-metric:nth-child(5)'] },
-      { title: 'Hints & Coins', items: ['Correct answers award coins.', 'Hints spend the configured coin cost.', 'Hints do not directly subtract points.'], target: '.game-three-side-metrics .game-three-metric:nth-child(3)' },
-      { title: 'Score System', items: ['Correct questions increase the displayed score.', 'Wrong questions add no point.', 'The result is calculated after all pairs are resolved.'], targets: ['.game-three-side-metrics .game-three-metric:nth-child(1)', '.game-three-side-metrics .game-three-metric:nth-child(2)'] },
-      { title: 'Condition', items: ['Match every pair and resolve its question.', 'Finish before flip attempts run out.', 'A passing result unlocks the next level.'], target: '.game-three-side-card:last-child' },
+      { title: 'Attempts', items: ['Each two-card selection spends one flip attempt.', 'The counter shows the remaining attempts.', 'Resolve all pairs before attempts run out.'], target: '.game-three-side-metrics .game-three-metric:nth-child(3)' },
+      { title: 'Score System', items: ['Each matched pair adds one Star.', 'Mismatched cards add no Star.', 'The result is calculated after all pairs are resolved.'], targets: ['.game-three-side-metrics .game-three-metric:nth-child(1)', '.game-three-side-metrics .game-three-metric:nth-child(2)'] },
+      { title: 'How to Finish', items: ['Match every pair on the board.', 'Finish before flip attempts run out.', 'Use your memory to avoid unnecessary mismatches.'], target: '.game-three-side-card:last-child' },
     ],
   },
   GAME_FOUR: {
@@ -44,36 +44,36 @@ const GAME_TUTORIALS = {
     root: '.game-four-stage',
     steps: [
       { title: 'How to Play Game 4', body: 'Catch the required Java pieces, then arrange them in the correct syntax order.', items: ['Move the catcher beneath falling code.', 'Avoid bombs and do not miss required pieces.', 'Arrange the collected pieces to complete each round.'], target: '.game-four-play-card' },
-      { title: 'Mechanics', items: ['Catch every required code piece.', 'Missing a required piece ends a normal attempt.', 'The game switches to Arrange Phase after collection.'], target: '.game-four-catcher-target' },
-      { title: 'Controls', items: ['Press and hold the left on-screen circle to move left.', 'Press and hold the right on-screen circle to move right.', 'Move the basket under a falling object to catch it automatically.'], target: '.game-four-mobile-controls' },
-      { title: 'Lives & Gear', items: ['Bombs remove one life.', 'Three gears restore one missing life.', 'Reaching 0 lives ends the attempt.'], targets: ['.game-four-lives-status', '.game-four-sidebar-gear-card'] },
-      { title: 'Hints & Coins', items: ['Falling coins add hint currency.', 'Reveal Hint spends 1 coin.', 'Hints help with the current Java objective.'], target: '.game-four-coins-status' },
-      { title: 'Score System', items: ['Correct statements award points.', 'Collected gears add bonus points.', 'Complete every round for the final score.'], targets: ['.game-four-level-status', '.game-four-round-status'] },
-      { title: 'Condition', items: ['Complete the catch and arrange phases.', 'Use the Guide card when checking the goal.', 'Finish every round to complete the level.'], target: '.game-four-sidebar-guide-card' },
+      { title: 'Mechanics', items: ['Catch every required code piece.', 'Move the catcher beneath each falling piece.', 'The game switches to Arrange Phase after collection.'], target: '.game-four-catcher' },
+      { title: 'Controls', items: ['Move with A/D or Left/Right Arrow keys.', 'Catch objects with the basket opening.', 'Select or drag pieces during Arrange Phase.'], target: '.game-four-sidebar-movement-card' },
+      { title: 'Lives', items: ['Bombs remove one life.', 'Three gears restore one missing life.', 'Reaching 0 lives ends the attempt.'], targets: ['.game-four-lives-status', '.game-four-fruit-status'] },
+      { title: 'Hints & Coins', items: ['Falling coins add to the shared balance.', 'Reveal Hint spends 1 coin.', 'Hints do not directly subtract points.'], target: '.game-four-coins-status' },
+      { title: 'Score System', items: ['Correct statements award points.', 'Gear adds bonus points.', 'Complete every round for the final score.'], targets: ['.game-four-level-status', '.game-four-round-status'] },
+      { title: 'How to Finish', items: ['Complete both the Catch and Arrange phases.', 'Finish every round in the level.', 'Keep at least 1 Star to pass and unlock the next level.'], target: '.game-four-objective-card' },
     ],
   },
   GAME_FIVE: {
     kicker: 'Game 5',
     root: '.game-five-shell',
     steps: [
-      { title: 'Welcome to Code Snowman', body: 'Guess each programming word before the snowman melts.', items: ['Read the clue and answer length.', 'Choose letters using the keyboard.', 'Solve all required words before time runs out.'], target: '.game-five-shell > div:nth-child(2)' },
-      { title: 'Mechanics', items: ['Use the clue and blanks to determine the word.', 'Correct letters reveal matching positions.', 'Wrong letters melt the snowman.'], target: '.game-five-answer-panel' },
-      { title: 'Lives', items: ['Lives and Snow Left show remaining health.', 'Incorrect letters remove one life.', 'Losing all lives ends the attempt.'], target: '.game-five-lives-status' },
+      { title: 'Welcome to Code Robot', body: 'Guess each programming word before the robot shuts down.', items: ['Read the clue and answer length.', 'Choose letters using the keyboard.', 'Solve all required words before time runs out.'], target: '.game-five-shell > div:nth-child(2)' },
+      { title: 'Mechanics', items: ['Use the clue and blanks to determine the word.', 'Correct letters reveal matching positions.', 'Wrong letters damage the robot.'], target: '.game-five-answer-panel' },
+      { title: 'Lives', items: ['Lives and Power show remaining health.', 'Incorrect letters remove one life.', 'Losing all lives ends the attempt.'], target: '.game-five-lives-status' },
       { title: 'Controls', items: ['Click an on-screen letter or use the keyboard.', 'A selected letter cannot be used again.', 'Hint reveals additional help.'], target: '.game-five-keyboard' },
       { title: 'Score System', items: ['Solved words add points.', 'Remaining time can add a bonus.', 'Mistakes reduce the submitted result.'], target: '.game-five-score-status' },
-      { title: 'Condition', items: ['Solve the required number of words.', 'Finish before time or lives run out.', 'A passing result unlocks the next level.'], target: '.game-five-mission-panel' },
+      { title: 'How to Finish', items: ['Solve the required number of words shown in the mission panel.', 'Finish before time or lives run out.', 'Completing every required word passes the level.'], target: '.game-five-mission-panel' },
     ],
   },
   GAME_SIX: {
     kicker: 'Game 6',
     root: '.game-six-shell',
     steps: [
-      { title: 'Welcome to Syntax Rain Typing', body: 'Type the falling programming terms before they reach the bottom.', items: ['Read a visible falling term.', 'Type the exact word.', 'Press Enter before it lands.'], target: '.game-six-playfield' },
+      { title: 'Welcome to Syntax Rain Typing', body: 'Type correctly spelled Java terms before they reach the bottom.', items: ['Read the complete falling Java term.', 'Type that same word accurately.', 'Build consecutive correct answers to increase your combo multiplier.'], target: '.game-six-playfield' },
       { title: 'Mechanics', items: ['Terms fall through the playfield.', 'Type a term exactly to clear it.', 'Falling speed increases as the level progresses.'], target: '.game-six-instruction' },
       { title: 'Lives', items: ['Wrong submissions remove health.', 'Missed terms also remove health.', 'Reaching 0 health ends the attempt.'], target: '.game-six-health-status' },
       { title: 'Controls', items: ['Type in the answer field.', 'Press Enter or select the Enter button.', 'Only exact visible terms are accepted.'], target: '.game-six-answer-form' },
-      { title: 'Score System', items: ['Cleared terms award points.', 'Speed and position can add bonuses.', 'Reward streaks award coins.'], target: '.game-six-score-status' },
-      { title: 'Condition', items: ['Clear the required number of terms.', 'Finish before time or health runs out.', 'A passing result unlocks the next level.'], target: '.game-six-goal-status' },
+      { title: 'Score System', items: ['Cleared terms award points.', 'Each correct answer gives exactly 100 points.', 'Reward streaks award coins.'], target: '.game-six-score-status' },
+      { title: 'How to Finish', items: ['Clear the required number of terms shown in the goal panel.', 'Finish before time or health runs out.', 'Completing every required term passes the level.'], target: '.game-six-goal-status' },
     ],
   },
 };
@@ -85,25 +85,38 @@ const isVisible = (element) => {
   return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
 };
 
-const GameTutorialOverlay = ({ gameType, levelNumber = 1, onExit, onStart }) => {
+const GameTutorialOverlay = ({
+  gameType,
+  levelNumber = 1,
+  isAutomaticFirstPlay = false,
+  tutorialCapabilities = {},
+  onExit,
+  onStart,
+}) => {
   const config = GAME_TUTORIALS[gameType] || GAME_TUTORIALS.GAME_ONE;
   const [stepIndex, setStepIndex] = useState(0);
   const [spotlights, setSpotlights] = useState([]);
-  const cardRef = useRef(null);
-  const [mobilePanelPosition, setMobilePanelPosition] = useState(null);
-  const step = config.steps[stepIndex];
-  const isLastStep = stepIndex === config.steps.length - 1;
-
-  useEffect(() => {
-    const shouldRevealMobileTarget = (
-      (gameType === 'GAME_TWO' && stepIndex >= 4)
-      || ['GAME_THREE', 'GAME_FOUR', 'GAME_FIVE', 'GAME_SIX'].includes(gameType)
-    );
-    const targetSelector = step.target || step.targets?.[0];
-    if (!shouldRevealMobileTarget || !targetSelector || window.innerWidth > 720) return;
-    const target = document.querySelector(`${config.root} ${targetSelector}`);
-    target?.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
-  }, [config.root, gameType, step.target, step.targets, stepIndex]);
+  const allowProjectile = tutorialCapabilities.allowProjectile !== false;
+  const allowMidairDash = tutorialCapabilities.allowMidairDash !== false;
+  const steps = useMemo(() => {
+    if (gameType !== 'GAME_ONE') return config.steps;
+    return config.steps.map((item, index) => {
+      if (index === 2 && !allowProjectile) {
+        return { ...item, items: item.items.filter((text) => !text.includes('Arc Bolt')) };
+      }
+      if (index === 3 && !allowMidairDash) {
+        return {
+          ...item,
+          items: item.items.map((text) => (
+            text.includes('Shift') ? 'Use safe platforms and controlled jumps to avoid taking damage.' : text
+          )),
+        };
+      }
+      return item;
+    });
+  }, [allowMidairDash, allowProjectile, config.steps, gameType]);
+  const step = steps[stepIndex];
+  const isLastStep = stepIndex === steps.length - 1;
 
   useEffect(() => {
     const position = () => {
@@ -120,7 +133,10 @@ const GameTutorialOverlay = ({ gameType, levelNumber = 1, onExit, onStart }) => 
       })[0] || document;
       const selectors = step.targets || (step.target ? [step.target] : []);
       const elements = selectors
-        .flatMap((selector) => Array.from(root.querySelectorAll(selector)))
+        .flatMap((selector) => [
+          ...(root.matches?.(selector) ? [root] : []),
+          ...Array.from(root.querySelectorAll(selector)),
+        ])
         .filter(isVisible);
 
       if (elements.length > 0) {
@@ -139,9 +155,12 @@ const GameTutorialOverlay = ({ gameType, levelNumber = 1, onExit, onStart }) => 
           }];
 
         setSpotlights(spotlightRects.map((rect) => {
-          const pad = gameType === 'GAME_TWO' ? 4 : 7;
+          const isGameTwoScore = gameType === 'GAME_TWO' && step.title === 'Watch Lives and Score';
+          const isGameFourMechanics = gameType === 'GAME_FOUR' && step.title === 'Mechanics';
+          const pad = isGameTwoScore ? 7 : (gameType === 'GAME_TWO' ? 4 : 7);
+          const padTop = isGameFourMechanics ? 28 : pad;
           const left = Math.max(10, rect.left - pad);
-          const top = Math.max(10, rect.top - pad);
+          const top = Math.max(10, rect.top - padTop);
           const right = Math.min(window.innerWidth - 10, rect.right + pad);
           const bottom = Math.min(window.innerHeight - 10, rect.bottom + pad);
           return { left, top, width: right - left, height: bottom - top };
@@ -155,7 +174,12 @@ const GameTutorialOverlay = ({ gameType, levelNumber = 1, onExit, onStart }) => 
         return;
       }
       const rect = fallbackTarget.getBoundingClientRect();
-      const [x, y, width, height] = step.fallback || [0.05, 0.08, 0.72, 0.72];
+      const fallback = gameType === 'GAME_ONE'
+        && step.title === 'Combat and Hazards'
+        && !isAutomaticFirstPlay
+        ? [0.052, 0.78, 0.068, 0.16]
+        : step.fallback;
+      const [x, y, width, height] = fallback || [0.05, 0.08, 0.72, 0.72];
       setSpotlights([{
         left: rect.left + rect.width * x,
         top: rect.top + rect.height * y,
@@ -171,79 +195,24 @@ const GameTutorialOverlay = ({ gameType, levelNumber = 1, onExit, onStart }) => 
       window.removeEventListener('resize', position);
       window.removeEventListener('scroll', position, true);
     };
-  }, [config.root, gameType, step]);
+  }, [config.root, gameType, isAutomaticFirstPlay, step]);
 
   const panelOnLeft = useMemo(() => (
-    (gameType === 'GAME_THREE' && stepIndex >= 3)
-    || (gameType === 'GAME_TWO' && stepIndex >= 3)
-    || (gameType === 'GAME_FOUR' && stepIndex >= 3)
+    (gameType === 'GAME_ONE' && stepIndex === 5)
+    || (gameType === 'GAME_THREE' && stepIndex >= 2)
+    || (gameType === 'GAME_FOUR' && stepIndex >= 3 && stepIndex < 6)
     || (gameType === 'GAME_FIVE' && [1, 3].includes(stepIndex))
   ), [gameType, stepIndex]);
 
-  useLayoutEffect(() => {
-    const positionPanel = () => {
-      const useCompactLandscapePanel = gameType === 'GAME_FOUR' && window.innerHeight <= 600;
-      if ((window.innerWidth > 720 && !useCompactLandscapePanel) || !cardRef.current) {
-        setMobilePanelPosition(null);
-        return;
-      }
-      const visualViewport = window.visualViewport;
-      const viewportWidth = visualViewport?.width || window.innerWidth;
-      const viewportTop = visualViewport?.offsetTop || 0;
-      const viewportHeight = visualViewport?.height || window.innerHeight;
-      const viewportBottom = viewportTop + viewportHeight;
-      const width = Math.min(320, viewportWidth - 32);
-      const measuredHeight = cardRef.current.getBoundingClientRect().height || cardRef.current.scrollHeight;
-      const cardHeight = Math.min(measuredHeight, viewportHeight * 0.48, 390);
-      const margin = 12;
-      const left = Math.round((viewportWidth - width) / 2);
-      let top = viewportBottom - cardHeight - margin;
-      const visibleSpotlights = spotlights.filter((item) => (
-        item.top + item.height > viewportTop + margin
-        && item.top < viewportBottom - margin
-      ));
-      if (visibleSpotlights.length) {
-        const targetTop = Math.max(viewportTop, Math.min(...visibleSpotlights.map((item) => item.top)));
-        const targetBottom = Math.min(viewportBottom, Math.max(...visibleSpotlights.map((item) => item.top + item.height)));
-        const below = targetBottom + margin;
-        const above = targetTop - cardHeight - margin;
-        if (below + cardHeight <= viewportBottom - margin) top = below;
-        else if (above >= viewportTop + margin) top = above;
-        else {
-          const roomAbove = targetTop - viewportTop;
-          const roomBelow = viewportBottom - targetBottom;
-          top = roomAbove >= roomBelow ? above : below;
-        }
-      }
-      top = Math.max(viewportTop + margin, Math.min(top, viewportBottom - cardHeight - margin));
-      setMobilePanelPosition({ left, top, width });
-    };
-    const frame = window.requestAnimationFrame(positionPanel);
-    window.addEventListener('resize', positionPanel);
-    window.visualViewport?.addEventListener('resize', positionPanel);
-    window.visualViewport?.addEventListener('scroll', positionPanel);
-    const observer = new ResizeObserver(positionPanel);
-    observer.observe(cardRef.current);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener('resize', positionPanel);
-      window.visualViewport?.removeEventListener('resize', positionPanel);
-      window.visualViewport?.removeEventListener('scroll', positionPanel);
-      observer.disconnect();
-    };
-  }, [gameType, spotlights, stepIndex]);
-
   const overlay = (
-    <div
-      className={`game-guide-backdrop game-guide-tour game-guide-tour-step-${stepIndex % 4} game-guide-tour-page-${stepIndex + 1} ${
-      gameType === 'GAME_TWO' ? 'game-guide-tour-game-two ' : gameType === 'GAME_FOUR' ? 'game-guide-tour-game-four ' : ''
-    }${step.noSpotlight ? 'game-guide-tour-no-spotlight ' : ''}${panelOnLeft ? 'game-guide-tour-panel-left' : ''}`}
-      style={{ backdropFilter: 'none', WebkitBackdropFilter: 'none' }}
-    >
+    <div className={`game-guide-backdrop game-guide-tour game-guide-tour-step-${stepIndex % 4} ${
+      gameType === 'GAME_TWO' ? 'game-guide-tour-game-two ' : ''
+    }${gameType === 'GAME_ONE' ? 'game-guide-tour-game-one ' : ''
+    }${panelOnLeft ? 'game-guide-tour-panel-left' : ''}`}>
       {spotlights.map((style, index) => (
         <div
           key={`${stepIndex}-${index}`}
-          className={`game-guide-spotlight ${stepIndex === 0 ? 'game-guide-spotlight-borderless' : ''} ${index > 0 ? 'game-guide-spotlight-secondary' : ''}`}
+          className={`game-guide-spotlight ${index > 0 ? 'game-guide-spotlight-secondary' : ''}`}
           style={{
             display: 'block',
             left: `${Math.round(style.left)}px`,
@@ -254,29 +223,52 @@ const GameTutorialOverlay = ({ gameType, levelNumber = 1, onExit, onStart }) => 
           aria-hidden="true"
         />
       ))}
-      <section
-        ref={cardRef}
-        className="game-guide-card"
-        role="dialog"
-        aria-modal="true"
-        aria-label={step.title}
-        style={mobilePanelPosition ? {
-          '--game-tour-mobile-left': `${mobilePanelPosition.left}px`,
-          '--game-tour-mobile-top': `${mobilePanelPosition.top}px`,
-          '--game-tour-mobile-width': `${mobilePanelPosition.width}px`,
-        } : undefined}
-      >
+      {gameType === 'GAME_ONE' ? (
+        <GameOneTutorialDemonstration
+          stepIndex={stepIndex}
+          target={spotlights[0]}
+          allowProjectile={allowProjectile}
+          allowMidairDash={allowMidairDash}
+        />
+      ) : (
+        <TutorialHandPointer
+          target={spotlights[0]}
+          secondaryTarget={spotlights[1]}
+          action={inferTutorialHandAction(step, gameType)}
+        />
+      )}
+      <section className="game-guide-card" role="dialog" aria-modal="true" aria-label={step.title}>
         <div className="game-guide-tour-meta">
           <span>{config.kicker} · Level {levelNumber}</span>
-          <span>{stepIndex + 1} of {config.steps.length}</span>
+          <span>{stepIndex + 1} of {steps.length}</span>
         </div>
         <h3>{step.title}</h3>
-        {step.body ? <p className="game-guide-lead">{step.body}</p> : null}
-        <ul className="game-guide-summary">
-          {step.items.map((item) => <li key={item}>{item}</li>)}
-        </ul>
+        {gameType === 'GAME_ONE' ? (
+          <p className="game-guide-game-one-action">{step.body || step.items[0]}</p>
+        ) : (
+          <>
+            {step.body ? <p className="game-guide-lead">{step.body}</p> : null}
+            <ul className="game-guide-summary">
+              {step.items.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </>
+        )}
+        {step.examples ? (
+          <div className="game-guide-game-two-examples" aria-label="Hazard examples">
+            {step.examples.map((example) => (
+              <div className={`game-guide-game-two-example game-guide-game-two-example-${example.type}`} key={example.type}>
+                {example.type === 'bomb' ? (
+                  <span className="game-guide-game-two-bomb" aria-hidden="true"><i /></span>
+                ) : (
+                  <span className="game-guide-game-two-decoy" aria-hidden="true">{example.value}</span>
+                )}
+                <span><strong>{example.label}</strong><small>{example.type === 'bomb' ? example.value : 'Wrong syntax'}</small></span>
+              </div>
+            ))}
+          </div>
+        ) : null}
         <div className="game-guide-tour-dots" aria-hidden="true">
-          {config.steps.map((item, index) => (
+          {steps.map((item, index) => (
             <span key={item.title} className={index === stepIndex ? 'is-active' : ''} />
           ))}
         </div>

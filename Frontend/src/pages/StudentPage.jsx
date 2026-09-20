@@ -25,6 +25,8 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
+import { ScreenOrientation } from '@capacitor/screen-orientation';
 import { authAPI, handleAPIError, userAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import StudentActionButton from '../components/student/StudentActionButton';
@@ -223,6 +225,7 @@ const StudentPage = () => {
   const [materials, setMaterials] = useState([]);
   const [materialsTeacher, setMaterialsTeacher] = useState(null);
   const [materialsLoading, setMaterialsLoading] = useState(true);
+  const [materialsRefreshKey, setMaterialsRefreshKey] = useState(0);
   const [materialsProgressSummary, setMaterialsProgressSummary] = useState({
     overallProgressPercent: 0,
     completedModules: 0,
@@ -244,6 +247,16 @@ const StudentPage = () => {
   const [activeAvatarCategory, setActiveAvatarCategory] = useState(() => getStudentAvatarCategory(user?.avatarKey || getStoredAvatarForUser(user?.id)));
   const [selectedAvatarKey, setSelectedAvatarKey] = useState(() => user?.avatarKey || getStoredAvatarForUser(user?.id) || DEFAULT_STUDENT_AVATAR_KEY);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return undefined;
+
+    ScreenOrientation.lock({
+      orientation: activePanel === 'progress' ? 'landscape-primary' : 'portrait-primary',
+    }).catch(() => undefined);
+
+    return undefined;
+  }, [activePanel]);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -476,7 +489,12 @@ const StudentPage = () => {
           return;
         }
 
-        setLeaderboard(Array.isArray(response.data?.leaderboard) ? response.data.leaderboard : []);
+        const rows = Array.isArray(response.data?.leaderboard) ? response.data.leaderboard : [];
+        setLeaderboard([...rows].sort((left, right) => (
+          Number(right.totalStars || 0) - Number(left.totalStars || 0)
+          || Number(right.completedActivities || 0) - Number(left.completedActivities || 0)
+          || String(left.studentName || '').localeCompare(String(right.studentName || ''))
+        )).map((row, index) => ({ ...row, rank: index + 1 })));
       } catch (error) {
         if (!cancelled) {
           setLeaderboard([]);
@@ -554,7 +572,7 @@ const StudentPage = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [materialsRefreshKey]);
 
   const handleLogout = () => {
     stopStudentMenuLoop({ rewind: true });
@@ -630,6 +648,7 @@ const StudentPage = () => {
         });
         setCourseCodeForm(nextCode);
         setCourseConfirmCode('');
+        setMaterialsRefreshKey((current) => current + 1);
         toast.success(response.message || 'Course code updated.');
       }
     } catch (error) {
@@ -1002,7 +1021,7 @@ const StudentPage = () => {
           <table className="student-progress-table">
             <thead>
               <tr>
-                <th>Rank</th>
+                <th>Star Rank</th>
                 <th>Student Name</th>
                 <th>Total Stars</th>
               </tr>
@@ -1017,7 +1036,7 @@ const StudentPage = () => {
                 <tr key={row.studentId}>
                   <td>#{row.rank}</td>
                   <td>{row.studentName}</td>
-                  <td>{row.totalStars || 0}</td>
+                  <td>⭐ {row.totalStars || 0}</td>
                 </tr>
               ))}
               {!leaderboardLoading && !leaderboard.length && (
@@ -1389,7 +1408,7 @@ const StudentPage = () => {
   );
 
   const renderProfileEditor = () => (
-    <motion.section key="profileEditor" className="student-content-stack" {...PANEL_TRANSITION}>
+    <motion.section key="profileEditor" className="student-content-stack student-profile-editor-content" {...PANEL_TRANSITION}>
       <section className="student-profile-editor-layout">
         <div className="student-panel student-profile-editor-preview-panel">
           <div>

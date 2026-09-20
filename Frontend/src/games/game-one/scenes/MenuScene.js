@@ -100,6 +100,8 @@ export default class MenuScene extends Phaser.Scene {
 
   showPauseMenu({
     onResume,
+    onRestart,
+    onHowToPlay,
     onExit,
     missionStage = 'INIT',
     missionPrimary = '',
@@ -153,6 +155,22 @@ export default class MenuScene extends Phaser.Scene {
           onClick: () => {
             this.hideMenu('pause');
             onResume?.();
+          }
+        },
+        {
+          label: 'Restart Level',
+          tone: 'secondary',
+          onClick: () => {
+            this.hideMenu('pause');
+            onRestart?.();
+          }
+        },
+        {
+          label: 'Controls',
+          tone: 'muted',
+          onClick: () => {
+            this.hideMenu('pause');
+            onHowToPlay?.();
           }
         },
         {
@@ -355,7 +373,10 @@ export default class MenuScene extends Phaser.Scene {
       });
 
       buttons.forEach((buttonConfig) => {
-        actionRow.add(this.createActionButton(buttonConfig), 0, 'center', 0, false);
+        actionRow.add(this.createActionButton({
+          ...buttonConfig,
+          width: buttons.length > 3 ? 150 : 212,
+        }), 0, 'center', 0, false);
       });
 
       this.panel.add(actionRow, 0, 'center', { top: 8 }, false);
@@ -405,9 +426,9 @@ export default class MenuScene extends Phaser.Scene {
     return card;
   }
 
-  createActionButton({ label, tone = 'muted', onClick }) {
+  createActionButton({ label, tone = 'muted', onClick, width = 212 }) {
     const palette = BUTTON_TONES[tone] || BUTTON_TONES.muted;
-    const background = this.rexUI.add.roundRectangle(0, 0, 212, 58, 18, palette.fill, 1)
+    const background = this.rexUI.add.roundRectangle(0, 0, width, 58, 18, palette.fill, 1)
       .setStrokeStyle(3, palette.stroke, 1);
     const text = this.add.text(0, 0, label, {
       fontFamily: 'Manrope, Arial, sans-serif',
@@ -418,7 +439,7 @@ export default class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     const button = this.rexUI.add.label({
-      width: 212,
+      width,
       height: 58,
       background,
       text,

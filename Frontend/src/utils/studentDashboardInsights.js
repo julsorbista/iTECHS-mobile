@@ -12,17 +12,45 @@ const toTimestamp = (value) => {
   return Number.isFinite(timestamp) ? timestamp : Number.NaN;
 };
 
-const NEEDS_ATTENTION_INACTIVE_DAYS = 14;
-const HIGH_PERFORMANCE_DASHBOARD_PERCENT = 70;
-const DASHBOARD_SCORE_WEIGHTS = {
-  assessment: 0.4,
-  game: 0.25,
-  progress: 0.25,
-  stars: 0.1,
+export const DEFAULT_DASHBOARD_SCORE_WEIGHTS = Object.freeze({
+  assessment: 30,
+  game: 50,
+  module: 10,
+  stars: 10,
+});
+
+export const normalizeDashboardScoreWeights = (weights = {}) => {
+  const normalized = {
+    assessment: Number(weights.assessment ?? weights.assessmentWeight ?? DEFAULT_DASHBOARD_SCORE_WEIGHTS.assessment),
+    game: Number(weights.game ?? weights.gameWeight ?? DEFAULT_DASHBOARD_SCORE_WEIGHTS.game),
+    module: Number(weights.module ?? weights.moduleWeight ?? DEFAULT_DASHBOARD_SCORE_WEIGHTS.module),
+    stars: Number(weights.stars ?? weights.starsWeight ?? DEFAULT_DASHBOARD_SCORE_WEIGHTS.stars),
+  };
+  const total = Object.values(normalized).reduce((sum, value) => sum + value, 0);
+  const isValid = Object.values(normalized).every((value) => Number.isFinite(value) && value >= 0 && value <= 100);
+  return isValid && Math.abs(total - 100) < 0.001
+    ? normalized
+    : { ...DEFAULT_DASHBOARD_SCORE_WEIGHTS };
 };
-const HINT_PENALTY_PERCENT = 5;
-const MAX_HINT_PENALTY_PERCENT = 30;
-const HIDDEN_DASHBOARD_STUDENT_NAMES = new Set(['noah kim']);
+
+export const hasMeaningfulPerformanceParticipation = (student) => {
+  const assessmentScore = getStudentDashboardMetric(student, 'assessmentAverageScore');
+  const gameProgress = getStudentDashboardMetric(student, 'gameProgressPercent');
+  const moduleProgress = getStudentDashboardMetric(student, 'moduleProgressPercent');
+  const progressPercent = getStudentDashboardMetric(student, 'progressPercent');
+  const completedLevels = getStudentDashboardMetric(student, 'completedLevels');
+  const completedModules = getStudentDashboardMetric(student, 'completedModules');
+  const totalStars = getStudentDashboardMetric(student, 'totalStars');
+
+  return assessmentScore > 0
+    || gameProgress > 0
+    || moduleProgress > 0
+    || progressPercent > 0
+    || completedLevels > 0
+    || completedModules > 0
+    || totalStars > 0;
+};
+const HIDDEN_DASHBOARD_STUDENT_NAMES = new Set();
 const FORCED_NEEDS_ATTENTION_PRIORITY = new Map();
 const FORCED_NEEDS_ATTENTION_STUDENT_NAMES = new Set();
 
@@ -66,23 +94,7 @@ const getForcedNeedsAttentionPriority = (student) => {
 };
 
 const hasStudentDashboardTopPerformerSignals = (student) => {
-  const assessmentAttemptsCount = getStudentDashboardMetric(student, 'assessmentAttemptsCount');
-  const attemptedAssessments = getStudentDashboardMetric(student, 'attemptedAssessments');
-  const totalStars = getStudentDashboardMetric(student, 'totalStars');
-  const gameAttemptsCount = getStudentDashboardMetric(student, 'gameAttemptsCount');
-  const completedModules = getStudentDashboardMetric(student, 'completedModules');
-  const progressPercent = getStudentDashboardMetric(student, 'progressPercent');
-  const gameProgressPercent = getStudentDashboardMetric(student, 'gameProgressPercent');
-
-  return (
-    totalStars > 0
-    || completedModules > 0
-    || gameAttemptsCount > 0
-    || assessmentAttemptsCount > 0
-    || attemptedAssessments > 0
-    || progressPercent > 0
-    || gameProgressPercent > 0
-  );
+  return hasMeaningfulPerformanceParticipation(student);
 };
 
 export const getStudentDashboardMetric = (student, key) => toNumber(student?.metrics?.[key]);
@@ -104,27 +116,44 @@ const getStudentDashboardHintCount = (student) => Math.max(
   getStudentDashboardMetric(student, 'aiAssistedAttempts')
 );
 
-export const getStudentDashboardPerformancePercent = (student) => {
+export const getStudentDashboardPerformancePercent = (student, weights = student?.metrics?.gradingWeights) => {
+  const gradingWeights = normalizeDashboardScoreWeights(weights);
   const assessmentScore = clampPercent(getStudentDashboardMetric(student, 'assessmentAverageScore'));
+  const moduleProgress = clampPercent(getStudentDashboardMetric(student, 'moduleProgressPercent'));
   const gameProgress = clampPercent(getStudentDashboardMetric(student, 'gameProgressPercent'));
-  const overallProgress = clampPercent(getStudentDashboardMetric(student, 'progressPercent'));
   const totalStars = getStudentDashboardMetric(student, 'totalStars');
   const possibleStars = getStudentDashboardPossibleStars(student);
   const starPercent = possibleStars > 0 ? clampPercent((totalStars / possibleStars) * 100) : 0;
-  const hintPenalty = Math.min(
-    MAX_HINT_PENALTY_PERCENT,
-    getStudentDashboardHintCount(student) * HINT_PENALTY_PERCENT
-  );
-
   const score = (
-    (assessmentScore * DASHBOARD_SCORE_WEIGHTS.assessment)
-    + (gameProgress * DASHBOARD_SCORE_WEIGHTS.game)
-    + (overallProgress * DASHBOARD_SCORE_WEIGHTS.progress)
-    + (starPercent * DASHBOARD_SCORE_WEIGHTS.stars)
-    - hintPenalty
+    (assessmentScore * gradingWeights.assessment / 100)
+    + (gameProgress * gradingWeights.game / 100)
+    + (moduleProgress * gradingWeights.module / 100)
+    + (starPercent * gradingWeights.stars / 100)
   );
 
   return Math.round(clampPercent(score));
+};
+
+export const getStudentDashboardPerformanceStatus = (studentOrPercent) => {
+  if (typeof studentOrPercent !== 'number' && !hasMeaningfulPerformanceParticipation(studentOrPercent)) {
+    return 'Provisional';
+  }
+  const percent = typeof studentOrPercent === 'number'
+    ? clampPercent(studentOrPercent)
+    : getStudentDashboardPerformancePercent(studentOrPercent);
+  if (percent >= 90) return 'Excellent';
+  if (percent >= 80) return 'Very Good';
+  if (percent >= 70) return 'Good';
+  if (percent >= 60) return 'Developing';
+  return 'Low Performance';
+};
+
+export const getStudentDashboardRiskLevel = (riskScore) => {
+  const score = Math.max(0, toNumber(riskScore));
+  if (score >= 6) return 'Critical Attention';
+  if (score >= 4) return 'High Risk';
+  if (score >= 2) return 'Moderate Risk';
+  return 'Low Risk';
 };
 
 export const getStudentDashboardLatestActivityAt = (student) => (
@@ -181,12 +210,8 @@ const hasStudentDashboardAttemptActivity = (student) => {
 export const compareStudentsByDashboardPerformance = (left, right) => {
   const leftAssessmentScore = getStudentDashboardMetric(left, 'assessmentAverageScore');
   const rightAssessmentScore = getStudentDashboardMetric(right, 'assessmentAverageScore');
-  const leftStars = getStudentDashboardMetric(left, 'totalStars');
-  const rightStars = getStudentDashboardMetric(right, 'totalStars');
-  const leftGamePerformance = getStudentDashboardMetric(left, 'gameProgressPercent');
-  const rightGamePerformance = getStudentDashboardMetric(right, 'gameProgressPercent');
-  const leftOverallProgress = getStudentDashboardMetric(left, 'progressPercent');
-  const rightOverallProgress = getStudentDashboardMetric(right, 'progressPercent');
+  const leftModuleProgress = getStudentDashboardMetric(left, 'moduleProgressPercent');
+  const rightModuleProgress = getStudentDashboardMetric(right, 'moduleProgressPercent');
   const leftOverallPerformance = getStudentDashboardPerformancePercent(left);
   const rightOverallPerformance = getStudentDashboardPerformancePercent(right);
 
@@ -195,30 +220,20 @@ export const compareStudentsByDashboardPerformance = (left, right) => {
     return overallGap;
   }
 
-  const starGap = rightStars - leftStars;
-  if (starGap !== 0) {
-    return starGap;
-  }
-
   const assessmentGap = rightAssessmentScore - leftAssessmentScore;
   if (assessmentGap !== 0) {
     return assessmentGap;
   }
 
-  const gameGap = rightGamePerformance - leftGamePerformance;
-  if (gameGap !== 0) {
-    return gameGap;
-  }
-
-  const progressGap = rightOverallProgress - leftOverallProgress;
-  if (progressGap !== 0) {
-    return progressGap;
+  const moduleGap = rightModuleProgress - leftModuleProgress;
+  if (moduleGap !== 0) {
+    return moduleGap;
   }
 
   return getStudentDashboardName(left).localeCompare(getStudentDashboardName(right), undefined, { sensitivity: 'base' });
 };
 
-const buildStudentAttentionProfile = (student, now, lowStarThreshold) => {
+const buildStudentAttentionProfile = (student, now) => {
   const totalStars = getStudentDashboardMetric(student, 'totalStars');
   const completedModules = getStudentDashboardMetric(student, 'completedModules');
   const totalModules = getStudentDashboardMetric(student, 'totalModules');
@@ -248,14 +263,12 @@ const buildStudentAttentionProfile = (student, now, lowStarThreshold) => {
     && hasGameParticipation
   );
   const missingTrackedParticipation = !hasAllTrackedParticipation;
-  const highPerformance = (
-    dashboardPerformancePercent >= HIGH_PERFORMANCE_DASHBOARD_PERCENT
-  );
+  const hasMeaningfulParticipation = hasMeaningfulPerformanceParticipation(student);
 
   let riskScore = 0;
   const reasons = [];
 
-  if (!hasStartedLearning || !hasActualActivity) {
+  if (!hasStartedLearning || !hasActualActivity || !hasMeaningfulParticipation) {
     return {
       student,
       totalStars,
@@ -278,69 +291,13 @@ const buildStudentAttentionProfile = (student, now, lowStarThreshold) => {
       excluded: true,
       exclusionReason: 'no-meaningful-activity',
       missingTrackedParticipation,
-      highPerformance,
+      riskLevel: getStudentDashboardRiskLevel(0),
     };
   }
 
-  if (!hasAllTrackedParticipation) {
-    if (!hasModuleParticipation) {
-      riskScore += 2;
-      reasons.push('no-module-participation');
-    }
-
-    if (!hasAssessmentParticipation) {
-      riskScore += 2;
-      reasons.push('no-assessment-participation');
-    }
-
-    if (!hasGameParticipation) {
-      riskScore += 2;
-      reasons.push('no-game-participation');
-    }
-  }
-
-  if (gameAttemptsCount > 0 && gameProgressPercent < 40) {
-    riskScore += 1;
-    reasons.push('low-game');
-  }
-
-  if (attemptedAssessments > 0 && assessmentAverageScore < 60) {
+  if (dashboardPerformancePercent < 70) {
     riskScore += 2;
-    reasons.push('low-assessment');
-  } else if (attemptedAssessments > 0 && assessmentAverageScore < 75) {
-    riskScore += 1;
-    reasons.push('fair-assessment');
-  }
-
-  if (progressPercent < 25) {
-    riskScore += 2;
-    reasons.push('poor-progress');
-  } else if (progressPercent < 50) {
-    riskScore += 1;
-    reasons.push('slow-progress');
-  }
-
-  if (totalStars <= lowStarThreshold) {
-    riskScore += 1;
-    reasons.push('low-stars');
-  }
-
-  if (totalHintsUsed > 0) {
-    riskScore += totalHintsUsed >= 3 ? 2 : 1;
-    reasons.push('ai-hint-usage');
-  }
-
-  if (startedModules > 0 && totalModules > 0 && completedModules < totalModules) {
-    riskScore += 1;
-    reasons.push('incomplete-modules');
-  }
-
-  if (inactiveDays > NEEDS_ATTENTION_INACTIVE_DAYS) {
-    riskScore += 2;
-    reasons.push('long-inactivity');
-  } else if (inactiveDays > 7) {
-    riskScore += 1;
-    reasons.push('recent-inactivity');
+    reasons.push({ code: 'low-overall-performance', label: 'Overall performance below 70%', points: 2 });
   }
 
   return {
@@ -365,12 +322,11 @@ const buildStudentAttentionProfile = (student, now, lowStarThreshold) => {
     excluded: false,
     exclusionReason: '',
     missingTrackedParticipation,
-    highPerformance,
+    riskLevel: getStudentDashboardRiskLevel(riskScore),
   };
 };
 
 export const buildStudentDashboardInsights = (students = [], options = {}) => {
-  const topLimit = Number.isFinite(Number(options.topLimit)) ? Number(options.topLimit) : 5;
   const attentionLimit = Number.isFinite(Number(options.attentionLimit)) ? Number(options.attentionLimit) : 5;
   const now = Date.now();
 
@@ -383,39 +339,26 @@ export const buildStudentDashboardInsights = (students = [], options = {}) => {
   );
 
   const activeStudents = uniqueStudents.filter((student) => (
-    hasStudentDashboardActivity(student)
-    && hasStudentDashboardStartedLearning(student)
+    hasMeaningfulPerformanceParticipation(student)
     && !isHiddenDashboardStudent(student)
   ));
 
   const topPerformerCandidates = activeStudents.filter((student) => (
     hasStudentDashboardTopPerformerSignals(student)
+    && hasMeaningfulPerformanceParticipation(student)
+    && getStudentDashboardPerformancePercent(student) >= 70
   ));
 
-  const lowStarThreshold = getPercentileValue(
-    activeStudents.map((student) => getStudentDashboardMetric(student, 'totalStars')),
-    0.4
-  );
-
   const topStudents = [...topPerformerCandidates]
-    .sort(compareStudentsByDashboardPerformance)
-    .slice(0, topLimit);
-
-  const topStudentIds = new Set(topStudents.map((student) => student.id));
+    .sort(compareStudentsByDashboardPerformance);
 
   const needsAttention = activeStudents
-    .map((student) => buildStudentAttentionProfile(student, now, lowStarThreshold))
+    .map((student) => buildStudentAttentionProfile(student, now))
     .filter((profile) => !profile.excluded)
     .filter((profile) => (
       shouldForceNeedsAttention(profile.student)
-      || !topStudentIds.has(profile.student.id)
+      || profile.dashboardPerformancePercent < 70
     ))
-    .filter((profile) => (
-      shouldForceNeedsAttention(profile.student)
-      || profile.missingTrackedParticipation
-      || !profile.highPerformance
-    ))
-    .filter((profile) => shouldForceNeedsAttention(profile.student) || profile.riskScore >= 1)
     .sort((left, right) => {
       const leftForcedPriority = getForcedNeedsAttentionPriority(left.student);
       const rightForcedPriority = getForcedNeedsAttentionPriority(right.student);
@@ -427,23 +370,9 @@ export const buildStudentDashboardInsights = (students = [], options = {}) => {
         return right.riskScore - left.riskScore;
       }
 
-      const gameGap = left.gameProgressPercent - right.gameProgressPercent;
-      if (gameGap !== 0) {
-        return gameGap;
-      }
-
-      if (right.inactiveDays !== left.inactiveDays) {
-        return right.inactiveDays - left.inactiveDays;
-      }
-
-      const assessmentGap = left.assessmentAverageScore - right.assessmentAverageScore;
-      if (assessmentGap !== 0) {
-        return assessmentGap;
-      }
-
-      const progressGap = left.progressPercent - right.progressPercent;
-      if (progressGap !== 0) {
-        return progressGap;
+      const performanceGap = left.dashboardPerformancePercent - right.dashboardPerformancePercent;
+      if (performanceGap !== 0) {
+        return performanceGap;
       }
 
       return compareStudentsByDashboardPerformance(left.student, right.student);

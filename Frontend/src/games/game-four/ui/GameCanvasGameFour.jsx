@@ -1249,17 +1249,25 @@ import {
   Coins,
   Heart,
   Loader2,
+  LogOut,
   Star,
   XCircle,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getStudentMusicPreference } from '../../../utils/studentMenuAudio';
+import {
+  getStudentMusicPreference,
+  getStudentMusicVolume,
+  getStudentSfxPreference,
+  getStudentSfxVolume,
+} from '../../../utils/studentMenuAudio';
 import { levelAPI } from '../../../utils/api';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
-import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import GameFourInteractiveTutorial from './GameFourInteractiveTutorial';
 import PlayableTutorialCoach from '../../shared/ui/PlayableTutorialCoach';
+import { TutorialActionHand } from '../../shared/ui/TutorialHandPointer';
 import { addUserCoins, spendUserCoins } from '../../shared/gameSessionPersistence';
 import { buildGameFourGuideContent } from '../../shared/ui/levelGuideBuilders';
+import './GameCanvasGameFour.css';
 
 // Add screen shake CSS animation
 const shakeStyle = `
@@ -1532,7 +1540,7 @@ const CATCH_FRUIT_SOUND_SRC = new URL(
 ).href;
 
 const CATCH_COIN_SOUND_SRC = new URL(
-  '../../../../assets/Game/game_four/Music&Sound Effects/catch-coin.mp3',
+  '../assets/audio/coins.mp3',
   import.meta.url,
 ).href;
 
@@ -1547,7 +1555,7 @@ const GAME_FOUR_COMBO_SOUND_SRC = new URL(
 ).href;
 
 const GAME_OVER_SOUND_SRC = new URL(
-  '../../../../assets/Game/game_four/Music&Sound Effects/game-over.mp3',
+  '../../game-six/assets/game-over-sfx.mp3',
   import.meta.url,
 ).href;
 
@@ -1587,7 +1595,7 @@ const ITEM_IMAGE_BY_TYPE = Object.freeze({
 });
 
 const GAME_FOUR_STORY_PAGE_MODULES = import.meta.glob(
-  '../../../../assets/Game/game_four/Storyline/*.{png,jpg,jpeg,webp,svg}',
+  '../../../assets/story/world4/*.{png,jpg,jpeg,webp,svg}',
   {
     eager: true,
     import: 'default',
@@ -1601,7 +1609,7 @@ const GAME_FOUR_STORY_PAGES = Object.entries(GAME_FOUR_STORY_PAGE_MODULES)
     const pageNumber = Number.parseInt(fileName, 10);
     return { pageNumber, src };
   })
-  .filter((page) => Number.isFinite(page.pageNumber) && page.pageNumber >= 1 && page.pageNumber <= 7)
+  .filter((page) => Number.isFinite(page.pageNumber) && page.pageNumber >= 1 && page.pageNumber <= 8)
   .sort((first, second) => first.pageNumber - second.pageNumber)
   .map((page) => page.src);
 
@@ -1633,6 +1641,12 @@ const MISS_LINE_Y = 540;
 const MAX_COIN_SPAWNS_PER_ROUND = 2;
 const MAX_LIVES = 3;
 const FRUITS_PER_EXTRA_LIFE = 3;
+const getGameFourComboMultiplier = (combo) => {
+  if (combo >= 10) return 5;
+  if (combo >= 5) return 3;
+  if (combo >= 3) return 2;
+  return 1;
+};
 const GAME_FOUR_TUTORIAL_STEPS = Object.freeze([
   {
     title: 'Practice Tutorial',
@@ -1640,9 +1654,9 @@ const GAME_FOUR_TUTORIAL_STEPS = Object.freeze([
     buttonLabel: 'Start Practice',
   },
   {
-    title: 'Catch A Fruit',
-    body: 'Fruit fills the fruit meter. Catch 3 fruits to gain 1 extra life, but lives can only go up to 3/3.',
-    buttonLabel: 'Catch The Fruit',
+    title: 'Catch A Gear',
+    body: 'Gear fills the gear meter. Catch 3 gears to gain 1 extra life, but lives can only go up to 3/3.',
+    buttonLabel: 'Catch The Gear',
     targetKind: 'bonus',
     targetValue: 'orange',
   },
@@ -1677,6 +1691,7 @@ const CODE_CATCH_SPARK_OFFSETS = Object.freeze([
 ]);
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
 const getLevelNumber = (levelData) => clamp(Math.round(Number(levelData?.levelNumber) || 1), 1, 99);
 const resolveLevelBasedSpawnInterval = (levelNumber, fallback) => {
   if (levelNumber <= 1) return 1200;
@@ -1890,6 +1905,7 @@ const makeFallingItem = (
     itemsOnScreen = [],
     coinsSpawned = 0,
     forceCoin = false,
+    forceToken = null,
   } = options;
   const remainingTargetTokens = getSpawnableTargetTokens(round, inventory, itemsOnScreen);
   const shouldUseCodeToken = Math.random() < 0.45 && remainingTargetTokens.length > 0;
@@ -1900,7 +1916,9 @@ const makeFallingItem = (
     { kind: 'bonus', value: 'carrot' },
     { kind: 'bonus', value: 'orange' },
   ];
-  const candidate = forceCoin && coinsSpawned < MAX_COIN_SPAWNS_PER_ROUND
+  const candidate = forceToken !== null
+    ? { kind: 'token', value: forceToken }
+    : forceCoin && coinsSpawned < MAX_COIN_SPAWNS_PER_ROUND
     ? { kind: 'coin', value: 'coin' }
     : shouldUseCodeToken
     ? { kind: 'token', value: randomFrom(remainingTargetTokens) }
@@ -1954,9 +1972,11 @@ const GameCanvasGameFour = ({
   onCoinBalanceChange,
 }) => {
   const viewport = levelData?.viewport || DEFAULT_VIEWPORT;
+  const tutorialRootRef = useRef(null);
   const isTutorialLevel = Boolean(levelData?.isTutorialLevel);
   const levelNumber = getLevelNumber(levelData);
   const isFirstLevelGuide = levelNumber === 1;
+  const isFinalLevel = levelNumber >= 5;
   const rounds = useMemo(
     () => buildGeneratedRounds(levelData, levelNumber),
     [levelData, levelNumber],
@@ -1989,6 +2009,7 @@ const GameCanvasGameFour = ({
       ? 'guide'
       : null,
   );
+  const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const [roundIndex, setRoundIndex] = useState(0);
   const [mode, setMode] = useState('catch');
   const [inventory, setInventory] = useState([]);
@@ -2044,6 +2065,7 @@ const GameCanvasGameFour = ({
   const submittedRef = useRef(false);
   const backgroundMusicRef = useRef(null);
   const backgroundMusicBlockedRef = useRef(false);
+  const gameplayPausedRef = useRef(true);
   const catchTokenSoundRef = useRef(null);
   const catchFruitSoundRef = useRef(null);
   const catchCoinSoundRef = useRef(null);
@@ -2142,6 +2164,26 @@ const GameCanvasGameFour = ({
   const shouldPauseForTutorialCoach = Boolean(isTutorialLevel && tutorialCoachOpen && currentTutorialStep);
   const showGuide = showTutorial && tutorialView === 'guide';
   const showPracticeIntro = showTutorial && tutorialView === 'practice';
+  const [tutorialDemo, setTutorialDemo] = useState(null);
+  const activeDemo = showPracticeIntro ? tutorialDemo : null;
+  const canInitializeGameplay = Boolean(
+    activeRound
+    && !showStoryline
+    && !showTutorial
+    && !shouldPauseForTutorialCoach
+  );
+  const isGameplayActive = Boolean(
+    canInitializeGameplay
+    && mode === 'catch'
+    && !localOutcome
+    && !resultData
+    && !isSubmitting
+  );
+  const isGameplayPaused = showStoryline || showTutorial || shouldPauseForTutorialCoach;
+  gameplayPausedRef.current = isGameplayPaused;
+  useEffect(() => {
+    if (isGameplayPaused) keyStateRef.current = { left: false, right: false };
+  }, [isGameplayPaused]);
 
   useEffect(() => {
     if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
@@ -2183,7 +2225,8 @@ const GameCanvasGameFour = ({
     const id = `game-four-combo-${Date.now()}-${Math.random()}`;
     setComboFeedback({
       id,
-      count: Math.max(1, Math.min(3, Math.round(Number(count || 1)))),
+      count: Math.max(1, Math.round(Number(count || 1))),
+      multiplier: getGameFourComboMultiplier(count),
     });
     const timerId = window.setTimeout(() => {
       setComboFeedback((current) => (current?.id === id ? null : current));
@@ -2215,6 +2258,7 @@ const GameCanvasGameFour = ({
 
     setShowTutorial(shouldShowIntroTutorial);
     setTutorialView(shouldShowIntroTutorial ? 'guide' : null);
+    setGuideOpenedDuringGameplay(false);
     setShowStoryline(hasStoryline);
     setStoryPageIndex(0);
     setRoundIndex(0);
@@ -2273,18 +2317,20 @@ const GameCanvasGameFour = ({
     const backgroundMusic = new Audio(GAME_FOUR_BACKGROUND_MUSIC_SRC);
     backgroundMusic.loop = true;
     backgroundMusic.preload = 'auto';
-    backgroundMusic.volume = 0.45;
+    backgroundMusic.volume = getStudentMusicVolume(0.45);
     backgroundMusicRef.current = backgroundMusic;
 
-    const playPromise = backgroundMusic.play();
-    if (playPromise?.catch) {
-      playPromise.catch(() => {
-        backgroundMusicBlockedRef.current = true;
-      });
+    if (!gameplayPausedRef.current) {
+      const playPromise = backgroundMusic.play();
+      if (playPromise?.catch) {
+        playPromise.catch(() => {
+          backgroundMusicBlockedRef.current = true;
+        });
+      }
     }
 
     const resumeBackgroundMusic = () => {
-      if (!backgroundMusicBlockedRef.current || !getStudentMusicPreference()) {
+      if (gameplayPausedRef.current || !getStudentMusicPreference()) {
         return;
       }
 
@@ -2315,13 +2361,32 @@ const GameCanvasGameFour = ({
     };
   }, []);
 
+  useEffect(() => {
+    const backgroundMusic = backgroundMusicRef.current;
+    if (!backgroundMusic || !getStudentMusicPreference()) {
+      return;
+    }
+
+    if (isGameplayPaused) {
+      backgroundMusic.pause();
+      return;
+    }
+
+    const playPromise = backgroundMusic.play();
+    if (playPromise?.catch) {
+      playPromise.catch(() => {
+        backgroundMusicBlockedRef.current = true;
+      });
+    }
+  }, [isGameplayPaused]);
+
   // Initialize sound effects
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.Audio === 'undefined') {
       return undefined;
     }
 
-    if (!getStudentMusicPreference()) {
+    if (!getStudentSfxPreference()) {
       return undefined;
     }
 
@@ -2330,7 +2395,7 @@ const GameCanvasGameFour = ({
         if (!soundRef.current) {
           soundRef.current = new Audio(soundSrc);
           soundRef.current.preload = 'auto';
-          soundRef.current.volume = 0.7;
+          soundRef.current.volume = getStudentSfxVolume(0.7);
         } else {
           soundRef.current.currentTime = 0;
         }
@@ -2391,6 +2456,14 @@ const GameCanvasGameFour = ({
     coinsSpawnedThisRoundRef.current = 0;
     spawnAccumulatorRef.current = 0;
     previousTsRef.current = null;
+    setMode('catch');
+    setCatchEffects([]);
+    setRevealedHintCount(0);
+    setHintMessage('');
+    setFeedbackMessage('');
+    setRoundFeedback('');
+    // Initialize only for a new round. Opening either guide pauses the existing
+    // items through isGameplayActive; it must not clear inventory or hint state.
     setFallingItems(() => (
       activeRound
         ? Array.from({ length: concurrentFallingCount }, (_, index) => (
@@ -2418,16 +2491,10 @@ const GameCanvasGameFour = ({
           })
         : []
     ));
-    setMode('catch');
-    setCatchEffects([]);
-    setRevealedHintCount(0);
-    setHintMessage('');
-    setFeedbackMessage('');
-    setRoundFeedback('');
-  }, [activeRound, concurrentFallingCount, fallSpeed, roundIndex]);
+  }, [activeRound, concurrentFallingCount, fallSpeed, isTutorialLevel, roundIndex]);
 
   useEffect(() => {
-    if (!isTutorialLevel || tutorialCoachOpen || mode !== 'catch' || !activeRound || !currentTutorialStep?.targetKind) {
+    if (!isGameplayActive || !isTutorialLevel || tutorialCoachOpen || !currentTutorialStep?.targetKind) {
       return;
     }
 
@@ -2466,14 +2533,15 @@ const GameCanvasGameFour = ({
     concurrentFallingCount,
     currentTutorialStep,
     fallSpeed,
+    isGameplayActive,
     inventory,
     isTutorialLevel,
-    mode,
     tutorialCoachOpen,
   ]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
+      if (gameplayPausedRef.current) return;
       if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
         keyStateRef.current.left = true;
       }
@@ -2501,11 +2569,13 @@ const GameCanvasGameFour = ({
   }, []);
 
   useEffect(() => {
-    if (!activeRound || showStoryline || showTutorial || shouldPauseForTutorialCoach || localOutcome || resultData || isSubmitting || mode !== 'catch') {
+    if (!isGameplayActive) {
       if (requestRef.current) {
         cancelAnimationFrame(requestRef.current);
         requestRef.current = null;
       }
+      previousTsRef.current = null;
+      keyStateRef.current = { left: false, right: false };
       return undefined;
     }
 
@@ -2653,16 +2723,14 @@ const GameCanvasGameFour = ({
               }
               nextItems.push(spawnedItem);
             } else if (item.kind === 'bonus') {
-              bonusDelta += 5;
               window.playCatchFruitSound?.();
               if (comboCatchIdRef.current !== item.id) {
                 comboCatchIdRef.current = item.id;
-                nextFruitCatchCount += 1;
-                const nextComboCount = comboStreakRef.current >= 3
-                  ? 1
-                  : comboStreakRef.current + 1;
+                const nextComboCount = comboStreakRef.current + 1;
                 comboStreakRef.current = nextComboCount;
-                if (nextComboCount > 1) {
+                bonusDelta += 5 * getGameFourComboMultiplier(nextComboCount);
+                nextFruitCatchCount += 1;
+                if ([3, 5, 10].includes(nextComboCount)) {
                   window.playGameFourComboSound?.();
                   triggerComboFeedback(nextComboCount);
                 }
@@ -2703,6 +2771,8 @@ const GameCanvasGameFour = ({
               nextItems.push(spawnedItem);
             } else if (item.kind === 'bomb') {
               window.playCatchBombSound?.();
+              comboStreakRef.current = 0;
+              comboCatchIdRef.current = null;
               damageTaken += 1;
               simulatedLives = Math.max(0, simulatedLives - 1);
               setScreenShake(true);
@@ -2775,18 +2845,50 @@ const GameCanvasGameFour = ({
                   {
                     itemsOnScreen: nextItems,
                     coinsSpawned: coinsSpawnedThisRoundRef.current,
+                    forceToken: item.value,
                   },
                 );
                 if (spawnedItem.kind === 'coin') {
                   coinsSpawnedThisRoundRef.current += 1;
                 }
                 nextItems.push(spawnedItem);
-              } else {
+            } else {
+              comboStreakRef.current = 0;
+              comboCatchIdRef.current = null;
+              damageTaken += 1;
+              simulatedLives = Math.max(0, simulatedLives - 1);
+              setScreenShake(true);
+              setTimeout(() => setScreenShake(false), 500);
+
+              if (simulatedLives <= 0) {
                 window.playGameOverSound?.();
-                immediateFailure = `Game over: you missed ${item.value}.`;
+                immediateFailure = 'Game over: no lives remaining.';
+              } else {
+                nextFeedbackMessage = `Missed ${item.value}! ${simulatedLives}/${startingLives} lives remaining. It will fall again.`;
+                itemIdRef.current += 1;
+                const respawnY = resolveRespawnY(nextItems, levelNumber);
+                const spawnedItem = makeFallingItem(
+                  activeRound,
+                  nextInventory,
+                  ZIP_GAME_AREA_WIDTH,
+                  fallSpeed,
+                  itemIdRef.current,
+                  respawnY,
+                  {
+                    itemsOnScreen: nextItems,
+                    coinsSpawned: coinsSpawnedThisRoundRef.current,
+                    forceToken: item.value,
+                  },
+                );
+                if (spawnedItem.kind === 'coin') {
+                  coinsSpawnedThisRoundRef.current += 1;
+                }
+                nextItems.push(spawnedItem);
               }
+            }
             } else if (item.kind === 'bonus') {
               comboStreakRef.current = 0;
+              comboCatchIdRef.current = null;
               itemIdRef.current += 1;
               const respawnY = resolveRespawnY(nextItems, levelNumber);
               const spawnedItem = makeFallingItem(
@@ -2915,6 +3017,7 @@ const GameCanvasGameFour = ({
     bonusPoints,
     mistakes,
     hintsUsed,
+    isGameplayActive,
     coins,
     fruitCatchCount,
     lives,
@@ -2927,7 +3030,7 @@ const GameCanvasGameFour = ({
       return;
     }
 
-    if (!isTutorialLevel && lives <= 0) {
+    if (isGameplayActive && !isTutorialLevel && lives <= 0) {
       setLocalOutcome(buildRoundCompleteState({
         roundsCleared,
         totalRounds,
@@ -2938,7 +3041,7 @@ const GameCanvasGameFour = ({
         coinsRemaining: coins,
       }));
     }
-  }, [bonusPoints, coins, hintsUsed, isSubmitting, isTutorialLevel, lives, localOutcome, mistakes, points, resultData, roundsCleared, totalRounds]);
+  }, [bonusPoints, coins, hintsUsed, isGameplayActive, isSubmitting, isTutorialLevel, lives, localOutcome, mistakes, points, resultData, roundsCleared, totalRounds]);
 
   useEffect(() => {
     if (!isTutorialLevel || mode !== 'assemble' || localOutcome || resultData || isSubmitting) {
@@ -3087,9 +3190,30 @@ const GameCanvasGameFour = ({
           `The statement is missing ${missingCount} code piece${missingCount === 1 ? '' : 's'}.${misplacedText}`,
         );
       } else {
+        const nextLives = Math.max(0, lives - 1);
         const positionList = mismatchedIndexes.map((index) => index + 1).join(', ');
+        setLives(nextLives);
+        setMistakes((value) => value + 1);
+
+        if (nextLives <= 0) {
+          window.playGameOverSound?.();
+          const failureMessage = 'Game over: no lives remaining.';
+          setFeedbackMessage(failureMessage);
+          setRoundFeedback(failureMessage);
+          setLocalOutcome(buildRoundCompleteState({
+            roundsCleared,
+            totalRounds,
+            points,
+            bonusPoints,
+            mistakes: mistakes + 1,
+            hintsUsed,
+            coinsRemaining: coins,
+          }));
+          return;
+        }
+
         setFeedbackMessage(
-          `${mismatchedIndexes.length} code piece${mismatchedIndexes.length === 1 ? ' is' : 's are'} out of place at position${mismatchedIndexes.length === 1 ? '' : 's'} ${positionList}. Drag the red pieces to reorder them.`,
+          `Incorrect order. You lost 1 heart (${nextLives}/${startingLives} remaining). ${mismatchedIndexes.length} code piece${mismatchedIndexes.length === 1 ? ' is' : 's are'} out of place at position${mismatchedIndexes.length === 1 ? '' : 's'} ${positionList}. Drag the red pieces to reorder them.`,
         );
       }
       return;
@@ -3123,7 +3247,11 @@ const GameCanvasGameFour = ({
   };
 
   const hintDisplay = hintMessage || '';
-  const isAssembleMode = mode === 'assemble';
+  // Tutorial models only override rendering; real round state stays paused.
+  const isAssembleMode = (activeDemo?.mode || mode) === 'assemble';
+  const displayItems = activeDemo ? (activeDemo.item ? [{ ...activeDemo.item, id: 'tutorial-item', x: activeDemo.item.x * (ZIP_GAME_AREA_WIDTH - ITEM_SIZE), y: activeDemo.item.y * (ZIP_GAME_AREA_HEIGHT - ITEM_SIZE) }] : []) : fallingItems;
+  const displayAssembled = activeDemo?.assembled || assembledTokens;
+  const displayRemaining = activeDemo?.mode === 'assemble' ? activeDemo.remaining : remainingAssemblyTokens;
   const shouldShowTopHint = !isAssembleMode && Boolean(hintDisplay);
   const shouldShowTopFeedback = !isAssembleMode && Boolean(feedbackMessage);
   const hintButtonDisabled = activeHints.length === 0
@@ -3136,7 +3264,7 @@ const GameCanvasGameFour = ({
     ? 'No Hints'
     : revealedHintCount >= activeHints.length
       ? 'All Hints Shown'
-      : `Reveal Hint${resolvedHintCost > 0 ? ` - ${resolvedHintCost} Coin${resolvedHintCost === 1 ? '' : 's'}` : ''}`;
+      : `Reveal Hint (-${resolvedHintCost} Coin${resolvedHintCost === 1 ? '' : 's'})`;
   const fruitsRemainingForLife = FRUITS_PER_EXTRA_LIFE - fruitCatchCount;
   const fruitProgressText = fruitCatchCount > 0
     ? `Caught ${fruitCatchCount}/${FRUITS_PER_EXTRA_LIFE} fruits. Catch ${fruitsRemainingForLife} more for an extra life.`
@@ -3144,7 +3272,7 @@ const GameCanvasGameFour = ({
   const fruitSlots = Array.from({ length: FRUITS_PER_EXTRA_LIFE }, (_, index) => index < fruitCatchCount);
   const visualCounterScaleY = playfieldScale.y ? playfieldScale.x / playfieldScale.y : 1;
   return (
-    <div className={clsx(
+    <div ref={tutorialRootRef} className={clsx(
       'game-four-readable-ui game-four-stage relative overflow-visible border-[4px] border-[#70415f] bg-[#f5d98c] p-3 shadow-[10px_10px_0_#432644]',
       isAssembleMode && 'game-four-mode-assemble',
     )}>
@@ -3204,6 +3332,19 @@ const GameCanvasGameFour = ({
                 <button
                   type="button"
                   className="game-four-hud-status game-four-hud-tutorial-button"
+                  onClick={() => {
+                    setGuideOpenedDuringGameplay(true);
+                    setTutorialView('guide');
+                    setShowTutorial(true);
+                  }}
+                >
+                  Guidelines
+                </button>
+              )}
+              {!isAssembleMode && (
+                <button
+                  type="button"
+                  className="game-four-hud-status game-four-hud-tutorial-button"
                   onClick={() => onTutorialRequest?.()}
                 >
                   Game Tutorial
@@ -3223,7 +3364,7 @@ const GameCanvasGameFour = ({
             </div>
           </section>
 
-          {mode === 'catch' ? (
+          {!isAssembleMode ? (
             <div className="game-four-catch-layout grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_300px] gap-3">
               <aside className="game-four-sidebar grid content-start gap-3 border-[4px] border-[#70415f] bg-[#fff3c8] p-3 shadow-[8px_8px_0_rgba(67,38,68,0.8)]">
                 <section className="game-four-objective-card border-[3px] border-[#70415f] bg-[#fff1b8] p-3">
@@ -3262,7 +3403,7 @@ const GameCanvasGameFour = ({
                 <section className="game-four-sidebar-guide-card">
                   <p className="game-four-sidebar-guide-heading">Guide</p>
                   <p className="game-four-sidebar-guide-text">
-                    Catch the correct Java code pieces, then arrange them in the proper order to form a valid variable declaration. Avoid wrong pieces and hazards to complete each round.
+                    Catch the correct code, avoid the bombs, and catch gears for extra lives!
                   </p>
                 </section>
 
@@ -3295,7 +3436,8 @@ const GameCanvasGameFour = ({
                       className="border-[3px] border-[#432644] bg-white px-3 py-2 text-sm font-black shadow-[3px_3px_0_#432644] transition hover:bg-slate-100"
                       onClick={onExitRequest}
                     >
-                      Back
+                      <LogOut className="mr-1 inline h-4 w-4" aria-hidden="true" />
+                      <span>Back</span>
                     </button>
                   </div>
                 </section>
@@ -3322,9 +3464,11 @@ const GameCanvasGameFour = ({
                       transform: `scale(${playfieldScale.x}, ${playfieldScale.y})`,
                     }}
                   >
-                    {fallingItems.map((item) => (
+                    {displayItems.map((item) => (
                       <div
                         key={item.id}
+                        data-demo-falling={activeDemo ? '' : undefined}
+                        data-demo-motion={activeDemo ? '' : undefined}
                         className="absolute flex items-center justify-center"
                         style={{
                           left: item.x,
@@ -3395,13 +3539,14 @@ const GameCanvasGameFour = ({
                           <strong className="game-four-combo-number">{comboFeedback.count}</strong>
                           <span className="game-four-combo-word">COMBO</span>
                         </span>
-                        <strong className="game-four-combo-multiplier" aria-hidden="true">×{comboFeedback.count}</strong>
+                        <strong className="game-four-combo-multiplier" aria-hidden="true">×{comboFeedback.multiplier}</strong>
                       </div>
                     )}
 
                     <div
                       className="game-four-catcher absolute"
-                      style={{ left: playerX, bottom: `${PLAYER_BOTTOM_OFFSET}px`, width: PLAYER_WIDTH, height: PLAYER_HEIGHT }}
+                      data-demo-motion={activeDemo ? '' : undefined}
+                      style={{ left: activeDemo ? activeDemo.player * (ZIP_GAME_AREA_WIDTH - PLAYER_WIDTH) : playerX, bottom: `${PLAYER_BOTTOM_OFFSET}px`, width: PLAYER_WIDTH, height: PLAYER_HEIGHT }}
                     >
                       <span
                         className="game-four-catcher-target pointer-events-none absolute bottom-0"
@@ -3483,7 +3628,7 @@ const GameCanvasGameFour = ({
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={() => handleReorderAssemblyToken(assembledTokens.length)}
                 >
-                  {assembledTokens.length > 0 ? assembledTokens.map((token, index) => (
+                  {displayAssembled.length > 0 ? displayAssembled.map((token, index) => (
                     <span
                       key={`${token}-${index}`}
                       className={clsx(
@@ -3521,7 +3666,7 @@ const GameCanvasGameFour = ({
                   <span className="mt-1 block normal-case tracking-normal">Drag pieces to reorder them. Click an assembled piece to return it.</span>
                 </p>
                 <div className="game-four-token-bank mt-3 flex flex-wrap justify-center gap-3">
-                  {remainingAssemblyTokens.length > 0 ? remainingAssemblyTokens.map((token, index) => (
+                  {displayRemaining.length > 0 ? displayRemaining.map((token, index) => (
                     <button
                       key={`${token}-${index}`}
                       type="button"
@@ -3629,13 +3774,16 @@ const GameCanvasGameFour = ({
                       />
                     ))}
                   </div>
-                  <button
-                    type="button"
-                    className="border-[3px] border-[#432644] bg-[#dff3ff] px-5 py-3 text-base font-black shadow-[4px_4px_0_#432644] transition hover:bg-[#cbe9f7]"
-                    onClick={handleContinueTutorialStep}
-                  >
-                    {currentTutorialStep.buttonLabel}
-                  </button>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="border-[3px] border-[#432644] bg-[#dff3ff] px-5 py-3 text-base font-black shadow-[4px_4px_0_#432644] transition hover:bg-[#cbe9f7]"
+                      onClick={handleContinueTutorialStep}
+                    >
+                      {currentTutorialStep.buttonLabel}
+                    </button>
+                    <TutorialActionHand />
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
@@ -3669,7 +3817,8 @@ const GameCanvasGameFour = ({
                       className="btn btn-secondary"
                       onClick={onExitRequest}
                     >
-                      Exit Level
+                      <LogOut className="h-4 w-4" aria-hidden="true" />
+                      <span>Back</span>
                     </button>
                   </div>
 
@@ -3720,8 +3869,18 @@ const GameCanvasGameFour = ({
                     lead={guideContent.lead}
                     summary={guideContent.summary}
                     sections={guideContent.sections}
-                    onExit={onExitRequest}
+                    onExit={guideOpenedDuringGameplay ? () => {
+                      setGuideOpenedDuringGameplay(false);
+                      setTutorialView(null);
+                      setShowTutorial(false);
+                    } : onExitRequest}
                     onStart={() => {
+                      if (guideOpenedDuringGameplay) {
+                        setGuideOpenedDuringGameplay(false);
+                        setTutorialView(null);
+                        setShowTutorial(false);
+                        return;
+                      }
                       if (continueToTutorialAfterGuide) {
                         setTutorialView('practice');
                       } else {
@@ -3729,12 +3888,18 @@ const GameCanvasGameFour = ({
                         setShowTutorial(false);
                       }
                     }}
-                    startLabel="Next"
+                    startLabel={guideOpenedDuringGameplay ? 'Continue' : 'Next'}
                   />
                 ) : null}
                 {showPracticeIntro ? (
-                  <GameTutorialOverlay
-                    gameType="GAME_FOUR"
+                  <GameFourInteractiveTutorial
+                    onDemo={setTutorialDemo}
+                    rootRef={tutorialRootRef}
+                    isFirstPlay={continueToTutorialAfterGuide && !gameTutorialRequested}
+                    tokens={activeRound?.targetTokens || []}
+                    assets={{ player: PLAYER_IMAGE, bomb: BOMB_IMAGE, coin: COIN_IMAGE, bonus: [BANANA_IMAGE, CARROT_IMAGE, ORANGE_IMAGE], background: GAME_FOUR_BACKGROUND_IMAGE, arrangeBackground: GAME_FOUR_ARRANGE_BACKGROUND_IMAGE }}
+                    hintCost={resolvedHintCost}
+                    maxLives={startingLives}
                     levelNumber={levelData?.levelNumber || 1}
                     onExit={onExitRequest}
                     onStart={() => {
@@ -3749,7 +3914,7 @@ const GameCanvasGameFour = ({
         )}
 
         <AnimatePresence>
-          {(localOutcome || ((resultData && !hideResultOverlay) || isSubmitting)) && !showStoryline && !showTutorial && (
+          {!hideResultOverlay && (localOutcome || resultData || isSubmitting) && !showStoryline && !showTutorial && (
             <motion.div
               className="game-four-result-backdrop absolute inset-0 z-50 flex items-center justify-center bg-black/45 px-5"
               initial={{ opacity: 0 }}
@@ -3814,7 +3979,7 @@ const GameCanvasGameFour = ({
                       </div>
                     </div>
 
-                    <div className="game-four-result-actions mt-6 flex flex-wrap justify-end gap-3">
+                    <div className="game-four-result-actions mt-6 flex flex-wrap justify-center gap-3">
                       <button
                         type="button"
                         className="border-2 border-slate-900 bg-white px-5 py-3 text-sm font-black text-slate-900 transition hover:bg-slate-100"
@@ -3837,7 +4002,7 @@ const GameCanvasGameFour = ({
                         >
                           Start Level 1
                         </button>
-                      ) : canAdvanceLevel && (
+                      ) : canAdvanceLevel && !isFinalLevel && (
                         <button
                           type="button"
                           className="border-2 border-slate-900 bg-[#dff3ff] px-5 py-3 text-sm font-black text-slate-900 transition hover:bg-[#cbe9f7]"

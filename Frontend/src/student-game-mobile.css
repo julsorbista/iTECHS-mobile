@@ -1,0 +1,248 @@
+/* Native game layouts: keep the reference artwork, size the UI to the viewport. */
+/* Screen-level dialogs must not inherit the game container's scroll position. */
+.student-loading-viewport { position: fixed; inset: 0; z-index: 10030; display: grid; place-items: center; background: #172322e8; padding: 12px; }
+@media (max-width: 1024px) {
+  body .student-loading-viewport .student-level-loading-reference {
+    width: min(94vw, calc((100dvh - 24px) * 1.289), 560px) !important;
+    height: auto !important; min-height: 0 !important; max-height: none !important;
+    aspect-ratio: 553 / 429 !important; margin: 0 !important;
+  }
+  body .student-level-loading-reference .student-level-loading-copy { inset: 27% 16% 16%; gap: 7px; }
+  body .student-level-loading-reference .student-level-loading-kicker { font-size: 10px !important; letter-spacing: .04em; }
+  body .student-level-loading-reference .student-level-loading-copy h2 { font-size: 17px !important; }
+  body .student-level-loading-reference .student-level-loading-copy > p:not(.student-level-loading-kicker) { max-width: 100%; font-size: 12px !important; }
+  body .student-level-loading-track { flex-shrink: 0; height: 16px; border-width: 2px; }
+  body .student-level-loading-percent { font-size: 14px !important; padding: 3px 8px !important; }
+  body .game-guide-backdrop.game-guide-wood { position: fixed !important; inset: 0 !important; height: 100dvh !important; display: grid !important; place-items: center !important; padding: 8px !important; z-index: 10040; }
+  body .game-guide-backdrop .game-guide-card--wood { width: min(94vw, 720px) !important; height: min(640px, calc(100dvh - 16px)) !important; max-height: none !important; max-width: none !important; aspect-ratio: auto !important; margin: 0 !important; }
+  body .game-guide-card--wood .game-guide-grid { inset: 21% 13% 23% !important; }
+  body .game-guide-card--wood .game-guide-section { display: flex !important; flex-direction: column !important; padding: 4px !important; gap: 6px !important; }
+  body .game-guide-card--wood .game-guide-section h4 { flex-shrink: 0; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 6px !important; font-size: 12px !important; line-height: 1.3 !important; }
+  body .game-guide-card--wood .game-guide-section ul { margin: 0 !important; padding: 2px !important; }
+  body .game-guide-card--wood .game-guide-section ul li { flex: 0 0 auto !important; height: auto !important; overflow: visible !important; grid-template-columns: 24px minmax(0,1fr) !important; min-height: 0 !important; gap: 7px !important; padding: 5px 0 !important; }
+  body .game-guide-card--wood .game-guide-section ul li > span:last-child { font: 600 13px/1.4 Manrope, sans-serif !important; }
+  body .game-guide-card--wood .game-guide-item-icon { width: 24px !important; height: 24px !important; }
+  body .game-guide-card--wood .game-guide-actions { left: 12% !important; right: 12% !important; bottom: 6% !important; height: 44px !important; grid-template-columns: 1fr 44px 1fr !important; gap: 4px !important; }
+  body .game-guide-card--wood .game-guide-nav-button { width: 100% !important; min-width: 0 !important; min-height: 44px !important; height: 44px !important; padding: 4px !important; background: linear-gradient(#537d2c, #2f571e) !important; border: 2px solid #643e19 !important; border-radius: 6px; color: #fff !important; font: 700 12px/1.2 Manrope,sans-serif !important; }
+  body .game-guide-card--wood .game-guide-page-status { min-width: 0 !important; font-size: 10px !important; }
+  body .game-guide-card--wood .game-guide-page-dots { gap: 3px !important; }
+  body .game-guide-card--wood .game-guide-page-dots span { width: 5px !important; height: 5px !important; border-width: 1px !important; }
+  body .in-game-tutorial .in-game-tutorial__panel { padding: 86px 32px 40px; }
+  body .in-game-tutorial .in-game-tutorial__content { flex: 1; overflow-y: auto; }
+  body .in-game-tutorial .in-game-tutorial__content h3 { font-size: 14px; }
+  body .in-game-tutorial .in-game-tutorial__content p { font-size: 12px; }
+  body .in-game-tutorial nav { flex-shrink: 0; }
+  body .in-game-tutorial .in-game-tutorial__safe { display: none; }
+  body .game-one-results-overlay, body .game-congrats-overlay { position: fixed !important; inset: 0 !important; height: 100dvh !important; display: grid !important; place-items: center !important; padding: 8px !important; overflow: hidden !important; }
+  body .game-one-results-card { width: min(94vw, 410px) !important; height: min(510px, calc(100dvh - 16px)) !important; min-height: 0 !important; padding: 0 !important; aspect-ratio: auto !important; background-size: 100% 100% !important; }
+  body .game-one-results-list { left: 34%; right: 21%; top: 26%; bottom: 29%; }
+  body .game-one-results-list > div { grid-template-columns: minmax(0, 1fr) minmax(30px, .45fr); gap: 6px; transform: none !important; }
+  body .game-one-results-list p { font-size: 12px !important; overflow-wrap: anywhere; }
+  body .game-one-results-list strong { min-width: 0; font-size: 13px !important; text-align: right; }
+  body .game-one-results-actions { left: 13%; right: 13%; top: 76%; gap: 4px; }
+  body .game-one-results-actions button { height: 44px !important; min-height: 44px; font: 700 11px/1.2 Manrope,sans-serif !important; white-space: normal; overflow-wrap: anywhere; padding: 4px !important; }
+  body .game-congrats-reference-card { width: min(94vw, 410px) !important; height: min(490px, calc(100dvh - 16px)) !important; min-height: 0 !important; aspect-ratio: auto !important; background-size: 100% 100% !important; padding: 0 !important; }
+  body .game-congrats-content { position: absolute; inset: 25% 14% 17% !important; min-height: 0; gap: 8px !important; }
+  body .game-congrats-reference-card .game-congrats-message { font-size: 19px !important; }
+  body .game-congrats-reference-card .game-congrats-great-job { font-size: 17px !important; }
+  body .game-congrats-reference-card .game-congrats-stars svg { width: 30px; height: 30px; }
+  body:has(.game-congrats-overlay) #root { visibility: hidden; }
+  body .announcement-guide-backdrop { padding: 8px !important; display: grid !important; place-items: center !important; }
+  body .announcement-guide-board { width: min(94vw, 620px) !important; height: min(440px, calc(100dvh - 16px)) !important; min-height: 0 !important; aspect-ratio: auto !important; background-size: 100% 100% !important; }
+  body .announcement-guide-paper { inset: 23% 13% 17% !important; padding: 0 !important; gap: 6px !important; }
+  body .announcement-guide-paper h2 { font-size: 24px !important; }
+  body .announcement-guide-challenge-title { font-size: 15px !important; line-height: 1.3 !important; }
+  body .announcement-guide-instruction { font-size: 13px !important; line-height: 1.4 !important; }
+  body .announcement-guide-countdown { min-height: 0; gap: 4px; }
+  body .announcement-guide-countdown p { font-size: 16px; margin: 0; }
+  body .announcement-guide-countdown strong { font-size: clamp(40px, 17dvh, 88px); line-height: 1; }
+  body .student-story-image-actions { bottom: 34px !important; }
+  body .student-story-image-actions button { min-height: 44px; }
+  body .student-module-audio-popover { position: fixed; top: 120px; left: 12px; right: 12px; width: auto; max-height: calc(100dvh - 144px); overflow-y: auto; }
+}
+@media (max-width: 640px) {
+  #root .student-game-overlay .game-five-timer-status { left: 10px !important; top: 8px !important; right: auto !important; translate: none !important; transform: none !important; width: auto !important; font-size: 26px !important; z-index: 20 !important; }
+  #root .student-game-overlay .game-six-falling-word { left: clamp(4px, var(--word-x), calc(100% - 214px)) !important; width: 210px; min-width: 0 !important; max-width: calc(100% - 8px) !important; transform: none !important; white-space: normal; overflow: visible; }
+  #root .student-game-overlay .game-six-variable-declaration { white-space: normal !important; overflow-wrap: anywhere; overflow: visible !important; }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  body .g1-parchment .g1-parchment__panel { padding: 88px 32px 34px !important; }
+  body .g1-parchment .g1-parchment__footer { margin-bottom: 0; }
+  body .g1-parchment .g1-parchment__movements { grid-template-columns: 76px minmax(0,1fr); }
+  body .g1-parchment .g1-parchment__control-list li { font: 12px/1.5 Manrope,sans-serif; }
+  body .g1-parchment .g1-parchment__control-list b { min-width: 44px; }
+  #root .student-game-overlay .game-four-mode-assemble .game-four-layout { height: calc(100dvh - 20px) !important; }
+  #root .student-game-overlay .game-four-arrange-shell { padding: 4px !important; min-height: 0 !important; overflow: visible !important; }
+  #root .student-game-overlay .game-four-arrange-card { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(40px,1fr) auto auto; gap: 4px 8px; min-height: 0 !important; padding: 6px !important; }
+  #root .student-game-overlay .game-four-arrange-header { grid-column: 1 / -1; }
+  #root .student-game-overlay .game-four-arrange-header h3 { font-size: 16px !important; }
+  #root .student-game-overlay .game-four-arrange-header p { margin: 0 !important; font-size: 11px !important; }
+  #root .student-game-overlay .game-four-assembly-output { grid-column: 1; grid-row: 2; min-height: 40px !important; margin: 0 !important; padding: 4px !important; gap: 4px !important; }
+  #root .student-game-overlay .game-four-token-label { display: none; }
+  #root .student-game-overlay .game-four-token-bank { grid-column: 2; grid-row: 2; margin: 0 !important; gap: 4px !important; align-content: center; }
+  #root .student-game-overlay .game-four-token-bank button, #root .student-game-overlay .game-four-assembly-output button { padding: 4px 8px !important; min-height: 36px; font-size: 12px !important; }
+  #root .student-game-overlay .game-four-arrange-actions { grid-column: 1 / -1; margin: 0 !important; gap: 6px !important; }
+  #root .student-game-overlay .game-four-arrange-actions button { min-height: 40px !important; padding: 5px 8px !important; font-size: 12px !important; }
+  #root .student-game-overlay .game-four-arrange-feedback { grid-column: 1 / -1; min-height: 22px !important; margin: 0 !important; padding: 3px !important; }
+  #root .student-game-overlay .game-four-arrange-feedback p { margin: 0 !important; font-size: 11px !important; }
+}
+@media (max-width: 1024px) {
+  #root .student-game-overlay .student-shell,
+  #root .student-game-overlay .student-panel,
+  #root .student-game-overlay .student-game-frame-wrap,
+  #root .student-game-overlay .student-game-frame-shell {
+    margin: 0 !important; padding: 2px !important; border-width: 0 !important;
+    box-shadow: none !important; border-radius: 4px !important;
+  }
+  #root .student-game-overlay .student-shell-overlay,
+  #root .student-game-overlay .student-shell-main,
+  #root .student-game-overlay .student-game-one-play-layout,
+  #root .student-game-overlay .student-game-one-panel,
+  #root .student-game-overlay .student-game-three-frame-panel,
+  #root .student-game-overlay .student-game-frame-wrap,
+  #root .student-game-overlay .student-game-frame-shell {
+    width: 100% !important; max-width: 100% !important; min-width: 0 !important;
+    min-height: 0 !important; padding: 4px !important; gap: 6px !important;
+    box-sizing: border-box;
+  }
+  #root .student-game-overlay .student-body-copy { font-size: 13px !important; line-height: 1.45; }
+  #root .student-game-overlay .student-section-title { font-size: 18px !important; }
+  #root .student-game-overlay .student-eyebrow { font-size: 10px !important; }
+  #root .student-game-overlay .student-game-tutorial-test-button { min-height: 44px; font-size: 12px; }
+  .in-game-tutorial .in-game-tutorial__panel { padding: 72px 28px 24px; gap: 8px; }
+  .in-game-tutorial .in-game-tutorial__content h3 { font-size: 16px; }
+  .in-game-tutorial .in-game-tutorial__content p { font-size: 13px; line-height: 1.4; }
+  .in-game-tutorial .in-game-tutorial__copy { gap: 6px; }
+  .in-game-tutorial nav { margin: 0; }
+  .in-game-tutorial nav button { min-height: 44px; }
+  .in-game-tutorial .in-game-tutorial__close { min-width: 44px; min-height: 44px; top: 9%; }
+  .game-guide-backdrop .game-guide-card { max-width: min(390px, 96vw); max-height: 94dvh; }
+  .game-guide-backdrop .game-guide-grid { min-height: 0; overflow-y: auto; }
+  .game-guide-backdrop .game-guide-nav-button { min-width: 44px; min-height: 44px; }
+}
+
+@media (max-width: 640px) and (orientation: portrait) {
+  #root .student-game-overlay { padding: 4px !important; overflow-y: auto !important; }
+  #root .student-game-overlay .game-three-layout { grid-template-columns: minmax(0, 1fr) !important; gap: 8px !important; }
+  #root .student-game-overlay .game-three-board-shell { width: 100% !important; height: min(82vw, 39dvh) !important; aspect-ratio: auto; }
+  #root .student-game-overlay .game-three-board { padding: 4px; gap: 6px; }
+  #root .student-game-overlay .game-three-card-inner { width: 100% !important; height: 100% !important; min-height: 0 !important; }
+  #root .student-game-overlay .game-three-side-panel { width: 100% !important; min-width: 0; padding: 8px !important; gap: 8px; }
+  #root .student-game-overlay .game-three-side-panel { display: grid !important; grid-template-columns: 1fr 1fr; }
+  #root .student-game-overlay .game-three-side-card { grid-column: 1 / -1; padding: 8px; }
+  #root .student-game-overlay .game-three-side-metrics { display: flex; flex-wrap: wrap; gap: 6px; }
+  #root .student-game-overlay .game-three-metric { padding: 6px; font-size: 12px; flex: 1; }
+  #root .student-game-overlay .game-three-board-footer { gap: 4px; margin-top: 6px; }
+  #root .student-game-overlay .game-three-board-note { padding: 6px 8px; font-size: 12px; }
+  #root .student-game-overlay .game-three-tutorial-button { min-height: 44px; padding: 6px; font-size: 13px; }
+
+  #root .student-game-overlay .game-five-shell { min-height: 0 !important; padding: 6px; height: auto !important; max-height: none !important; overflow-y: visible !important; scrollbar-gutter: auto; }
+  #root .student-game-overlay .game-five-hud { padding: 8px; gap: 6px; margin-bottom: 8px; }
+  #root .student-game-overlay .game-five-hud h2 { font-size: 18px; }
+  #root .student-game-overlay .game-five-hud > div:last-child { gap: 6px; font-size: 12px; }
+  #root .student-game-overlay .game-five-hud > div:last-child > * { padding: 5px; border-width: 2px; }
+  #root .student-game-overlay .game-five-tutorial-button { min-height: 44px; }
+  #root .student-game-overlay .game-five-layout { display: flex; flex-direction: column; gap: 10px; }
+  #root .student-game-overlay .game-five-robot-room { order: 0; min-height: 0; height: 180px; flex-shrink: 0; }
+  #root .student-game-overlay .game-five-robot-room > img { width: 180px; height: 180px; bottom: 0; }
+  #root .student-game-overlay .game-five-timer-status { top: 8px; left: 8px; right: auto; transform: none; font-size: 26px; }
+
+  body .game-guide-backdrop.game-guide-wood { z-index: 10060 !important; }
+  body .game-guide-backdrop .game-guide-card--wood { pointer-events: auto; }
+  #root .student-game-overlay .game-five-robot-room > div:last-child { left: auto; right: 4px; bottom: 4px; padding: 4px; font-size: 10px; }
+  #root .student-game-overlay .game-five-word-controls { order: 1; min-height: 0; gap: 8px; }
+  #root .student-game-overlay .game-five-sidebar { order: 2; min-height: 0; gap: 8px; }
+  #root .student-game-overlay .game-five-clue-panel { min-height: 0; padding: 8px; }
+  #root .student-game-overlay .game-five-clue-panel > button,
+  #root .student-game-overlay .game-five-clue-panel > h3 { margin: 0; padding: 6px 10px; min-height: 44px; font-size: 14px; }
+  #root .student-game-overlay .game-five-clue-panel > div { margin-top: 8px; padding: 8px; min-height: 0; gap: 8px; }
+  #root .student-game-overlay .game-five-clue-panel > div > div { width: 28px; height: 28px; }
+  #root .student-game-overlay .game-five-clue-panel p { font-size: 14px; line-height: 1.4; }
+  #root .student-game-overlay .game-five-answer-panel { min-height: 54px; padding: 8px; gap: 4px; font-size: 22px; }
+  #root .student-game-overlay .game-five-word-tile { width: 25px; min-width: 0; height: 34px; font-size: 22px; }
+  #root .student-game-overlay .game-five-keyboard { margin-top: 0; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+  #root .student-game-overlay .game-five-keyboard button { min-height: 44px; padding: 4px 0; font-size: 18px; border-width: 2px; }
+
+  #root .student-game-overlay .game-six-shell { padding: 6px; }
+  #root .student-game-overlay .game-six-header { padding: 6px; margin-bottom: 6px; gap: 6px; }
+  #root .student-game-overlay .game-six-header h2 { font-size: 18px; }
+  #root .student-game-overlay .game-six-header > div:last-child { gap: 5px; font-size: 12px; }
+  #root .student-game-overlay .game-six-top-stat { padding: 5px; }
+  #root .student-game-overlay button.game-six-top-stat { min-height: 44px; }
+  #root .student-game-overlay .game-six-shell > .grid { display: flex; flex-direction: column; gap: 8px; }
+  #root .student-game-overlay .game-six-playfield { order: 0; height: clamp(240px, 58dvh, 520px); min-height: 0 !important; }
+  #root .student-game-overlay .game-six-sidebar { order: 1; }
+  #root .student-game-overlay .game-six-instruction { top: 6px; width: 94%; padding: 6px; font-size: 12px; }
+  #root .student-game-overlay .game-six-falling-word { padding: 5px 8px; font-size: 15px; }
+  #root .student-game-overlay .game-six-answer-form { width: 96%; bottom: 10px; gap: 4px; }
+  #root .student-game-overlay .game-six-answer-input { padding: 8px; font-size: 16px; }
+  #root .student-game-overlay .game-six-enter-button { padding: 8px; font-size: 14px; min-height: 44px; }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  #root .student-game-overlay { padding: 0 !important; }
+  #root .student-game-overlay .student-shell-overlay { height: 100dvh !important; }
+  #root .student-game-overlay .student-game-one-panel > div:first-child:has(.student-section-title) { display: none; }
+  #root .student-game-overlay .student-game-one-top-controls { position: absolute; top: 8px; left: 12px; right: 12px; z-index: 40; width: auto; justify-content: flex-start; gap: 6px; }
+  #root .student-game-overlay .student-game-one-top-controls button { width: auto; min-width: 88px; min-height: 34px; padding: 4px 7px; font: 700 10px/1.15 Manrope,sans-serif; letter-spacing: 0; white-space: normal; }
+  #root .student-game-overlay .game-one-frame-shell { margin-top: 18px; padding-bottom: 52px; }
+  #root .student-game-overlay .game-one-canvas-viewport { height: calc(100dvh - 98px) !important; max-height: none !important; width: auto !important; max-width: 100%; margin: auto; border-radius: 8px; }
+  #root .student-game-overlay .game-one-mobile-controls { bottom: 8px; left: 6px; right: 6px; }
+  #root .student-game-overlay .game-one-mobile-actions { max-width: none; flex-wrap: nowrap; justify-content: flex-end; }
+  #root .student-game-overlay .game-one-mobile-control-button { min-width: 48px; min-height: 48px; font-size: 11px; }
+  #root .student-game-overlay-game-two-active .student-shell, #root .student-game-overlay-game-two-active .student-shell-main, #root .student-game-overlay-game-two-active .student-panel, #root .student-game-overlay-game-two-active .student-game-frame-wrap, #root .student-game-overlay-game-two-active .student-game-frame-shell { padding: 0 !important; }
+  #root .student-game-overlay .game-two-fruit-shell { height: calc(100dvh - 8px) !important; min-height: 0 !important; aspect-ratio: auto; border-radius: 8px; }
+  #root .student-game-overlay .game-two-fruit-actions { top: 4px; right: 8px; gap: 6px; }
+  #root .student-game-overlay .game-two-fruit-action-button { min-height: 40px; padding: 5px 7px; font-size: 10px; }
+  #root .student-game-overlay .game-two-fruit-mission { top: 6px; width: 32%; padding: 3px; font-size: 10px; }
+  #root .student-game-overlay .game-two-fruit-left { top: 70px; left: 8px; width: 20%; }
+  #root .student-game-overlay .game-two-fruit-right { top: 70px; right: 8px; width: 20%; }
+  #root .student-game-overlay .game-two-fruit-card { padding: 4px; font-size: 10px; }
+  #root .student-game-overlay .game-four-stage { min-height: 0 !important; height: calc(100dvh - 16px) !important; padding: 4px !important; }
+  #root .student-game-overlay .game-four-layout { display: flex !important; flex-direction: column; width: 100% !important; height: 100% !important; min-height: 0 !important; padding: 4px !important; gap: 4px !important; }
+  #root .student-game-overlay .game-four-layout > div { min-height: 0; gap: 4px; }
+  #root .student-game-overlay .student-game-four-top-controls { position: absolute; right: 8px; top: 6px; z-index: 40; }
+  #root .student-game-overlay .student-game-four-back-chip { width: 60px !important; min-width: 60px !important; min-height: 44px; padding: 4px !important; font-size: 12px !important; }
+  #root .student-game-overlay .game-four-header { flex: 0 0 52px !important; min-height: 52px !important; padding: 4px 68px 4px 8px !important; gap: 5px !important; overflow: visible !important; }
+  #root .student-game-overlay .game-four-header > div:first-child { flex: 0 0 132px !important; min-width: 0 !important; }
+  #root .student-game-overlay .game-four-header h2 { font-size: 15px !important; line-height: 1.05 !important; }
+  #root .student-game-overlay .game-four-header p { font-size: 10px !important; line-height: 1.1 !important; }
+  #root .student-game-overlay .game-four-hud { flex: 1 1 auto !important; display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; padding: 0 !important; gap: 3px !important; min-width: 0 !important; }
+  #root .student-game-overlay .game-four-hud > span { min-width: 0 !important; min-height: 34px !important; padding: 2px 3px !important; overflow: visible !important; }
+  #root .student-game-overlay .game-four-hud-label { font-size: 9px !important; }
+  #root .student-game-overlay .game-four-hud-value { font-size: 13px !important; }
+  #root .student-game-overlay .game-four-catch-layout { grid-template-columns: 160px minmax(0, 1fr) !important; flex: 1; min-height: 0 !important; gap: 6px; }
+  #root .student-game-overlay .game-four-sidebar { max-height: none !important; min-height: 0 !important; height: 100%; overflow-y: auto; padding: 4px !important; gap: 4px; }
+  #root .student-game-overlay .game-four-objective-card { padding: 6px !important; min-height: 0 !important; }
+  #root .student-game-overlay .game-four-objective-card h3 { font-size: 16px !important; line-height: 1.2 !important; }
+  #root .student-game-overlay .game-four-objective-card p { font-size: 12px !important; line-height: 1.4 !important; margin: 4px 0 !important; }
+  #root .student-game-overlay .game-four-play-card { min-width: 0 !important; width: 100% !important; min-height: 0 !important; height: 100% !important; }
+  #root .student-game-overlay .game-four-mobile-controls { position: absolute; bottom: 6px; left: 8px; right: 8px; z-index: 25; justify-content: space-between; pointer-events: none; }
+  #root .student-game-overlay .game-four-mobile-control-button { flex: none; width: 64px; pointer-events: auto; }
+}
+
+/* Game 4 mobile: keep gameplay, guide/story, and result content inside the viewport. */
+@media (max-width: 1024px) {
+  body .student-game-overlay-game-four .student-game-four-panel,
+  body .student-game-overlay-game-four .student-game-frame-wrap,
+  body .student-game-overlay-game-four .student-game-frame-shell,
+  body .student-game-overlay-game-four .game-four-stage { width: 100% !important; max-width: 100% !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; box-sizing: border-box !important; }
+  body .student-game-overlay-game-four .game-four-stage { overflow: visible !important; padding: 8px !important; }
+  body .student-game-overlay-game-four .game-four-layout { display: flex !important; flex-direction: column !important; gap: 8px !important; aspect-ratio: auto !important; }
+  body .student-game-overlay-game-four .game-four-header { gap: 6px !important; }
+  body .student-game-overlay-game-four .game-four-header > h2 { font-size: clamp(18px, 5vw, 28px) !important; line-height: 1.15 !important; }
+  body .student-game-overlay-game-four .game-four-hud { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; width: 100% !important; gap: 5px !important; overflow: visible !important; }
+  body .student-game-overlay-game-four .game-four-hud > * { min-width: 0 !important; padding: 6px 3px !important; font-size: 11px !important; white-space: normal !important; }
+  body .student-game-overlay-game-four .game-four-catch-layout { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+  body .student-game-overlay-game-four .game-four-playfield { width: 100% !important; min-height: 300px !important; height: min(52svh, 420px) !important; }
+  body .student-game-overlay-game-four .game-four-sidebar { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 6px !important; }
+  body .student-game-overlay-game-four .game-four-sidebar > * { min-width: 0 !important; padding: 8px !important; }
+  body .student-game-overlay-game-four .game-four-story-card { width: min(94vw, 620px) !important; max-height: calc(100dvh - 20px) !important; overflow-y: auto !important; padding: 12px !important; }
+  body .student-game-overlay-game-four .game-four-story-image-wrap { max-height: 52dvh !important; overflow: hidden !important; }
+  body .student-game-overlay-game-four .game-four-story-image { display: block !important; width: 100% !important; height: auto !important; max-height: 52dvh !important; object-fit: contain !important; }
+  body .student-game-overlay-game-four .game-four-result-backdrop { position: fixed !important; inset: 0 !important; z-index: 10060 !important; overflow-y: auto !important; padding: 10px !important; }
+  body .student-game-overlay-game-four .game-four-result-card { width: min(94vw, 560px) !important; max-height: calc(100dvh - 20px) !important; overflow-y: auto !important; padding: 16px !important; }
+  body .student-game-overlay-game-four .game-four-result-card h3 { font-size: clamp(20px, 6vw, 30px) !important; }
+  body .student-game-overlay-game-four .game-four-result-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; margin-top: 12px !important; }
+  body .student-game-overlay-game-four .game-four-result-actions { margin-top: 12px !important; }
+}

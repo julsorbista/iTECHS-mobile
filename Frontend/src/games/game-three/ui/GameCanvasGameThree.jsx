@@ -5,9 +5,9 @@ import { createPortal } from 'react-dom';
 import {
   AlertCircle,
   CheckCircle2,
-  Coins,
   Eye,
   Loader2,
+  LogOut,
   RotateCcw,
   Sparkles,
   Target,
@@ -19,10 +19,59 @@ import {
   getGameThreeCardDisplayNameByKey,
 } from '../data/cardArt';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
-import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import GameThreeInteractiveTutorial from './GameThreeInteractiveTutorial';
+import GameThreeCardFaces from './GameThreeCardFaces';
+import useTutorialPauseTimer from '../systems/useTutorialPauseTimer';
 import PlayableTutorialCoach from '../../shared/ui/PlayableTutorialCoach';
 import { buildGameThreeGuideContent } from '../../shared/ui/levelGuideBuilders';
+import { getStudentMusicVolume, getStudentSfxVolume } from '../../../utils/studentMenuAudio';
 import gameThreeBackgroundMusic from '../../../assets/game-arcade/audio/game3-background.mp3';
+import gameThreeCardPickSfx from '../assets/audio/flipping-card-sfx.mp3';
+import gameThreeGameOverSfx from '../assets/audio/game-over-sfx.mp3';
+import levelOneBackground from '../../../assets/game-three/backgrounds/Background 1.png';
+import levelTwoBackground from '../../../assets/game-three/backgrounds/Background 2.png';
+import levelThreeBackground from '../../../assets/game-three/backgrounds/Background 3.png';
+import levelFourBackground from '../../../assets/game-three/backgrounds/Background 4.png';
+import levelFiveBackground from '../../../assets/game-three/backgrounds/Background 5.png';
+
+const GAME_THREE_LEVEL_BACKGROUNDS = Object.freeze({
+  1: levelOneBackground,
+  2: levelTwoBackground,
+  3: levelThreeBackground,
+  4: levelFourBackground,
+  5: levelFiveBackground,
+  6: levelFourBackground,
+  7: levelThreeBackground,
+  8: levelFiveBackground,
+  9: levelOneBackground,
+  10: levelTwoBackground,
+});
+
+const GAME_THREE_LEVEL_SURFACES = Object.freeze({
+  1: 'linear-gradient(180deg, #e7c999 0%, #c99a66 100%)',
+  2: 'linear-gradient(180deg, #b9d86d 0%, #729b49 100%)',
+  3: 'linear-gradient(180deg, #dca067 0%, #a8613d 100%)',
+  4: 'linear-gradient(180deg, #8172c8 0%, #aa6fae 100%)',
+  5: 'linear-gradient(180deg, #496b36 0%, #263f2d 100%)',
+  6: 'linear-gradient(180deg, #8172c8 0%, #aa6fae 100%)',
+  7: 'linear-gradient(180deg, #dca067 0%, #a8613d 100%)',
+  8: 'linear-gradient(180deg, #496b36 0%, #263f2d 100%)',
+  9: 'linear-gradient(180deg, #e7c999 0%, #c99a66 100%)',
+  10: 'linear-gradient(180deg, #b9d86d 0%, #729b49 100%)',
+});
+
+const GAME_THREE_LEVEL_PANEL_COLORS = Object.freeze({
+  1: ['#efd3a4', '#fae8c8'],
+  2: ['#c9df8b', '#e7f1be'],
+  3: ['#e7ac77', '#f5ceb0'],
+  4: ['#a99bd9', '#d5cced'],
+  5: ['#789365', '#b8caa5'],
+  6: ['#a99bd9', '#d5cced'],
+  7: ['#e7ac77', '#f5ceb0'],
+  8: ['#789365', '#b8caa5'],
+  9: ['#efd3a4', '#fae8c8'],
+  10: ['#c9df8b', '#e7f1be'],
+});
 
 const gameThreeCorrectSfx = new URL(
   '../../../../assets/Game/game_two/Game 2_ Hardware/Music & Sound Effects/correct answer sf.mp3',
@@ -42,11 +91,11 @@ const DEFAULT_PAIR_HINT_COUNT = 3;
 const QUESTION_ATTEMPT_LIMIT = 1;
 const DEFAULT_QUESTION_BANK_SIZE = 10;
 const GAME_THREE_TUTORIAL_STEPS = Object.freeze([
-  { title: 'Practice Tutorial', body: 'This tutorial teaches card preview, flipping, matching, and answering before the real Level 1 starts.', buttonLabel: 'Start Practice' },
+  { title: 'Practice Tutorial', body: 'This tutorial teaches card preview, flipping, and matching before the real Level 1 starts.', buttonLabel: 'Start Practice' },
   { title: 'Watch The Preview', body: 'Cards briefly show themselves at the start. Use the preview to remember where matching pairs are.', buttonLabel: 'Flip Cards' },
-  { title: 'Find A Match', body: 'Flip two cards. If they match, you unlock a question for that concept.', buttonLabel: 'Try Match' },
-  { title: 'Answer The Question', body: 'Arrange the jumbled answer tiles, then submit. Correct answers earn stars and coins.', buttonLabel: 'Answer' },
-  { title: 'Finish The Tutorial', body: 'Match the practice pair and answer the check to finish, then start Level 1.', buttonLabel: 'Continue' },
+  { title: 'Find A Match', body: 'Flip two cards. Matching concepts stay revealed and earn a star.', buttonLabel: 'Try Match' },
+  { title: 'Earn The Reward', body: 'Each matching pair immediately adds to your score.', buttonLabel: 'Continue' },
+  { title: 'Finish The Tutorial', body: 'Match the practice pair to finish, then start Level 1.', buttonLabel: 'Continue' },
 ]);
 
 const QUESTION_VARIATION_PROMPTS = Object.freeze([
@@ -530,7 +579,7 @@ const normalizePairs = (pairs, levelNumber = 1) => (
         : String(index + 1).padStart(2, '0');
 
       const sprite = resolveGameThreePairSprite(pair, index, levelNumber);
-      const displayLabel = sprite?.label || safeLabel;
+      const displayLabel = safeLabel;
 
       const questions = normalizeQuestionBank(pair, displayLabel);
 
@@ -642,37 +691,54 @@ const advanceGameThreeRunCount = (levelData) => {
   return nextCount;
 };
 
-const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
+const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOverSrc, active }) => {
   const musicRef = useRef(null);
   const correctRef = useRef(null);
   const wrongRef = useRef(null);
+  const cardPickRef = useRef(null);
+  const gameOverRef = useRef(null);
+  const musicBlockedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.Audio === 'undefined') return undefined;
 
     const music = new Audio(musicSrc);
     music.loop = true;
-    music.volume = 0.24;
+    music.volume = getStudentMusicVolume(1);
     music.preload = 'auto';
     musicRef.current = music;
 
     const correct = new Audio(correctSrc);
-    correct.volume = 0.58;
+    correct.volume = getStudentSfxVolume(1);
     correct.preload = 'auto';
     correctRef.current = correct;
 
     const wrong = new Audio(wrongSrc);
-    wrong.volume = 0.58;
+    wrong.volume = getStudentSfxVolume(1);
     wrong.preload = 'auto';
     wrongRef.current = wrong;
 
+    const cardPick = new Audio(cardPickSrc);
+    cardPick.volume = getStudentSfxVolume(1);
+    cardPick.preload = 'auto';
+    cardPickRef.current = cardPick;
+
+    const gameOver = new Audio(gameOverSrc);
+    gameOver.volume = getStudentSfxVolume(1);
+    gameOver.preload = 'auto';
+    gameOverRef.current = gameOver;
+
     return () => {
       music.pause();
+      music.currentTime = 0;
       musicRef.current = null;
       correctRef.current = null;
       wrongRef.current = null;
+      cardPickRef.current = null;
+      gameOverRef.current = null;
+      musicBlockedRef.current = false;
     };
-  }, [correctSrc, musicSrc, wrongSrc]);
+  }, [cardPickSrc, correctSrc, gameOverSrc, musicSrc, wrongSrc]);
 
   useEffect(() => {
     const music = musicRef.current;
@@ -683,8 +749,40 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
       return;
     }
 
+    const retryMusic = () => {
+      if (!active || !music.paused) return;
+
+      music.volume = getStudentMusicVolume(1);
+      const retryPromise = music.play();
+      if (retryPromise?.then) {
+        retryPromise
+          .then(() => {
+            musicBlockedRef.current = false;
+          })
+          .catch(() => {
+            musicBlockedRef.current = true;
+          });
+      }
+    };
+
     const playPromise = music.play();
-    if (playPromise?.catch) playPromise.catch(() => {});
+    if (playPromise?.then) {
+      playPromise
+        .then(() => {
+          musicBlockedRef.current = false;
+        })
+        .catch(() => {
+          musicBlockedRef.current = true;
+        });
+    }
+
+    window.addEventListener('pointerdown', retryMusic);
+    window.addEventListener('keydown', retryMusic);
+
+    return () => {
+      window.removeEventListener('pointerdown', retryMusic);
+      window.removeEventListener('keydown', retryMusic);
+    };
   }, [active]);
 
   const playCorrect = React.useCallback(() => {
@@ -711,7 +809,51 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     }
   }, []);
 
-  return { playCorrect, playWrong };
+  const playCardPick = React.useCallback(() => {
+    const sound = cardPickRef.current;
+    if (!sound) return;
+    try {
+      sound.currentTime = 0;
+      const playPromise = sound.play();
+      if (playPromise?.catch) playPromise.catch(() => {});
+    } catch (error) {
+      // Ignore browser audio restrictions.
+    }
+  }, []);
+
+  const playGameOver = React.useCallback(() => {
+    const sound = gameOverRef.current;
+    if (!sound) return;
+    try {
+      const music = musicRef.current;
+      if (music) {
+        music.pause();
+      }
+      [wrongRef.current, correctRef.current, cardPickRef.current].forEach((otherSound) => {
+        if (!otherSound) return;
+        otherSound.pause();
+        otherSound.currentTime = 0;
+      });
+      sound.muted = false;
+      sound.volume = getStudentSfxVolume(1);
+      sound.currentTime = 0;
+      const playPromise = sound.play();
+      if (playPromise?.catch) playPromise.catch(() => {});
+    } catch (error) {
+      // Ignore browser audio restrictions.
+    }
+  }, []);
+
+  const stopGameAudio = React.useCallback(() => {
+    [musicRef.current, correctRef.current, wrongRef.current, cardPickRef.current, gameOverRef.current]
+      .forEach((sound) => {
+        if (!sound) return;
+        sound.pause();
+        sound.currentTime = 0;
+      });
+  }, []);
+
+  return { playCorrect, playWrong, playCardPick, playGameOver, stopGameAudio };
 };
 
   const GameCanvasGameThree = ({
@@ -727,15 +869,15 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   onRetry,
   onBack,
   onNextLevel,
-  hintCoinCost = 1,
   freeMistakes = 3,
-  hintStarCost = 1,
   initialCoins,
   suppressIntroTutorial = false,
   showLevelGuideline = false,
   gameTutorialRequested = false,
+  onTutorialRequest,
   continueToTutorialAfterGuide = false,
 }) => {
+  const tutorialRootRef = useRef(null);
   const pairs = useMemo(
     () => normalizePairs(levelData?.pairs, levelData?.levelNumber),
     [levelData],
@@ -754,11 +896,8 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     ? levelData.settings
     : {};
   const guideContent = useMemo(
-    () => buildGameThreeGuideContent(levelData, {
-      freeMistakes,
-      hintStarCost,
-    }),
-    [freeMistakes, hintStarCost, levelData],
+    () => buildGameThreeGuideContent(levelData, { freeMistakes }),
+    [freeMistakes, levelData],
   );
   const isTutorialLevel = Boolean(levelData?.isTutorialLevel);
   const isFirstLevelGuide = Number(levelData?.levelNumber || 1) === 1;
@@ -766,6 +905,10 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   const isLevelThreeLayout = Number(levelData?.levelNumber || 1) === 3;
   const isLevelFourLayout = Number(levelData?.levelNumber || 1) === 4;
   const isLevelFiveLayout = Number(levelData?.levelNumber || 1) === 5;
+  const isFinalLevel = Number(levelData?.levelNumber || 1) >= 10;
+  const levelBackground = GAME_THREE_LEVEL_BACKGROUNDS[Number(levelData?.levelNumber || 1)];
+  const levelSurface = GAME_THREE_LEVEL_SURFACES[Number(levelData?.levelNumber || 1)];
+  const levelPanelColors = GAME_THREE_LEVEL_PANEL_COLORS[Number(levelData?.levelNumber || 1)];
   const columns = clamp(Math.round(Number(settings.columns) || DEFAULT_COLUMNS), 2, 8);
   const flipBackMs = clamp(
     Math.round(Number(settings.flipBackMs) || DEFAULT_FLIP_BACK_MS),
@@ -775,7 +918,7 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   const previewMs = clamp(
     Math.round(Number(settings.previewMs) || DEFAULT_PREVIEW_MS),
     0,
-    8000,
+    10000,
   );
 
   const [selectedCardIds, setSelectedCardIds] = useState([]);
@@ -783,7 +926,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   const [answeredPairIds, setAnsweredPairIds] = useState([]);
   const [points, setPoints] = useState(0);
   const [coins, setCoins] = useState(0);
-  const [hintsUsed, setHintsUsed] = useState(0);
   const [moves, setMoves] = useState(0);
   const [mismatches, setMismatches] = useState(0);
   const [wrongQuestionAnswers, setWrongQuestionAnswers] = useState(0);
@@ -795,7 +937,10 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   const [showGuide, setShowGuide] = useState(
     showLevelGuideline && !isTutorialLevel,
   );
+  const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [tutorialDemo, setTutorialDemo] = useState(null);
+  const activeDemo = showHowToPlay ? tutorialDemo : null;
 
   useEffect(() => {
     if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
@@ -806,16 +951,23 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   const [tutorialCoachOpen, setTutorialCoachOpen] = useState(
     isTutorialLevel,
   );
-  const [revealedHintCount, setRevealedHintCount] = useState(0);
-  const [hintNotice, setHintNotice] = useState('');
   const [flipAttemptsLeft, setFlipAttemptsLeft] = useState(0);
   const [questionAttemptsLeft, setQuestionAttemptsLeft] = useState(QUESTION_ATTEMPT_LIMIT);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [selectedAnswerTileIds, setSelectedAnswerTileIds] = useState([]);
   const [runQuestionOffset, setRunQuestionOffset] = useState(0);
 
-  const compareTimerRef = useRef(null);
-  const previewTimerRef = useRef(null);
+  const compareTimer = useTutorialPauseTimer(showHowToPlay);
+  const previewTimer = useTutorialPauseTimer(showHowToPlay);
+  const handleReturnFromTutorial = () => {
+    // Restart only pending timers, while still paused. The full level-configured
+    // preview/comparison delay begins once the tutorial is actually dismissed.
+    // Already matched cards, selected cards and run counters are left alone.
+    previewTimer.restart();
+    compareTimer.restart();
+    setShowHowToPlay(false);
+  };
+  const previewStartedRef = useRef(false);
   const questionAdvanceTimerRef = useRef(null);
   const shouldPauseForGuide = Boolean(showGuide && !isTutorialLevel);
   const shouldPauseForTutorialCoach = Boolean(
@@ -835,7 +987,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   const answeredPairIdSet = useMemo(() => new Set(answeredPairIds), [answeredPairIds]);
   const totalPairs = pairs.length;
   const totalCards = deck.length;
-  const resolvedHintCoinCost = clamp(Math.round(Number(hintCoinCost) || 0), 0, 9);
   const resolvedStartingCoins = useMemo(() => {
     const explicitStart = Number(initialCoins);
     if (Number.isFinite(explicitStart) && explicitStart >= 0) {
@@ -843,11 +994,11 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     }
 
     if (totalPairs > 0) {
-      return Math.max(resolvedHintCoinCost, totalPairs);
+      return totalPairs;
     }
 
-    return Math.max(0, resolvedHintCoinCost);
-  }, [initialCoins, resolvedHintCoinCost, totalPairs]);
+    return 0;
+  }, [initialCoins, totalPairs]);
   const activePair = activePairId ? pairById.get(activePairId) : null;
   const activePairSpriteUrl = activePair?.spriteUrl || activePair?.sprite?.url || '';
   const activeQuestionBank = Array.isArray(activePair?.questions) && activePair.questions.length > 0
@@ -870,19 +1021,11 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
       .join('')
   ), [answerTiles, selectedAnswerTileIds]);
   const isAnswerComplete = answerTiles.length > 0 && selectedAnswerTileIds.length === answerTiles.length;
-  const activeHints = useMemo(
-    () => (Array.isArray(activeQuestion?.hints) ? activeQuestion.hints : []),
-    [activeQuestion],
-  );
-  const summaryPoints = gameplayData?.points ?? points;
+  const summaryPoints = resultData?.finalScore ?? gameplayData?.points ?? points;
   const summaryMoves = gameplayData?.moves ?? moves;
   const summaryPairs = gameplayData?.matchedPairs ?? matchedPairIds.length;
   const preferredColumns = Math.min(totalCards, Math.max(2, columns));
   const responsiveColumns = useMemo(() => {
-    if (isLevelFiveLayout && viewportWidth < 560) {
-      return 4;
-    }
-
     if (totalCards >= 16) {
       if (viewportWidth < 560) {
         return 2;
@@ -912,51 +1055,60 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     }
 
     return Math.min(preferredColumns, 3);
-  }, [isLevelFiveLayout, preferredColumns, totalCards, viewportWidth]);
+  }, [preferredColumns, totalCards, viewportWidth]);
   const responsiveRows = useMemo(
     () => Math.max(1, Math.ceil(totalCards / responsiveColumns)),
     [responsiveColumns, totalCards],
   );
   const audioEnabled = !shouldPauseForIntroOverlay && !resultData && !isSubmitting;
-  const { playCorrect, playWrong } = useGameThreeAudio({
+  const { playCorrect, playWrong, playCardPick, playGameOver, stopGameAudio } = useGameThreeAudio({
     musicSrc: gameThreeBackgroundMusic,
     correctSrc: gameThreeCorrectSfx,
     wrongSrc: gameThreeWrongSfx,
+    cardPickSrc: gameThreeCardPickSfx,
+    gameOverSrc: gameThreeGameOverSfx,
     active: audioEnabled,
   });
+  const gameOverPlayedRef = useRef(false);
 
   useEffect(() => {
-    if (compareTimerRef.current) {
-      clearTimeout(compareTimerRef.current);
+    if (!resultData || isSubmitting) {
+      return;
     }
 
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
+    if (resultData.result !== 'COMPLETED' && !gameOverPlayedRef.current) {
+      gameOverPlayedRef.current = true;
+      playGameOver();
     }
+  }, [isSubmitting, playGameOver, resultData]);
+
+  useEffect(() => {
+    compareTimer.cancel();
+    previewTimer.cancel();
     if (questionAdvanceTimerRef.current) {
       clearTimeout(questionAdvanceTimerRef.current);
     }
 
     submittedRef.current = false;
+    gameOverPlayedRef.current = false;
     setSelectedCardIds([]);
     setMatchedPairIds([]);
     setAnsweredPairIds([]);
     setPoints(0);
     setCoins(resolvedStartingCoins);
-    setHintsUsed(0);
     setMoves(0);
     setMismatches(0);
     setWrongQuestionAnswers(0);
     setIsResolving(false);
     setActivePairId('');
     setQuestionFeedback(null);
-    setIsPreviewing(previewMs > 0);
+    setIsPreviewing(false);
+    previewStartedRef.current = false;
     setTutorialStepIndex(0);
     setShowGuide(showLevelGuideline && !isTutorialLevel);
+    setGuideOpenedDuringGameplay(false);
     setShowHowToPlay(false);
     setTutorialCoachOpen(isTutorialLevel);
-    setRevealedHintCount(0);
-    setHintNotice('');
     setFlipAttemptsLeft(deck.length);
     setQuestionAttemptsLeft(QUESTION_ATTEMPT_LIMIT);
     setActiveQuestionIndex(0);
@@ -969,30 +1121,28 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
       advanceGameThreeRunCount(levelData);
     }
 
-    if (previewMs > 0) {
-      previewTimerRef.current = window.setTimeout(() => {
-        setIsPreviewing(false);
-      }, previewMs);
+  }, [compareTimer, previewTimer, deck, isFirstLevelGuide, isTutorialLevel, levelData, previewMs, resolvedStartingCoins, showLevelGuideline, suppressIntroTutorial]);
+
+  useEffect(() => {
+    if (previewMs <= 0 || shouldPauseForIntroOverlay || previewStartedRef.current) {
+      return undefined;
     }
-  }, [deck, isFirstLevelGuide, isTutorialLevel, levelData, previewMs, resolvedStartingCoins, showLevelGuideline, suppressIntroTutorial]);
+
+    previewStartedRef.current = true;
+    setIsPreviewing(true);
+    previewTimer.schedule(() => {
+      setIsPreviewing(false);
+    }, previewMs);
+    return undefined;
+  }, [previewMs, previewTimer, shouldPauseForIntroOverlay]);
 
   useEffect(() => () => {
-    if (compareTimerRef.current) {
-      clearTimeout(compareTimerRef.current);
-    }
-
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
-    }
-
     if (questionAdvanceTimerRef.current) {
       clearTimeout(questionAdvanceTimerRef.current);
     }
   }, []);
 
   useEffect(() => {
-    setRevealedHintCount(0);
-    setHintNotice('');
     setSelectedAnswerTileIds([]);
     setQuestionAttemptsLeft(QUESTION_ATTEMPT_LIMIT);
     setActiveQuestionIndex(
@@ -1008,19 +1158,21 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     }
 
     submittedRef.current = true;
+    stopGameAudio();
     onLevelComplete?.({
       outcome: 'COMPLETED',
       points,
       coinsRemaining: coins,
-      hintsUsed,
+      hintsUsed: 0,
       answeredQuestions: answeredPairIds.length,
       totalQuestions: totalPairs,
       matchedPairs: matchedPairIds.length,
       totalPairs,
       moves,
       mismatches,
+      wrongAnswers: wrongQuestionAnswers,
     });
-  }, [answeredPairIds.length, coins, hintsUsed, matchedPairIds.length, mismatches, moves, onLevelComplete, points, totalPairs]);
+  }, [answeredPairIds.length, coins, matchedPairIds.length, mismatches, moves, onLevelComplete, points, stopGameAudio, totalPairs, wrongQuestionAnswers]);
 
   useEffect(() => {
     const hasResolvedQuestion = Boolean(questionFeedback?.isCorrect || questionAttemptsLeft <= 0);
@@ -1037,8 +1189,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     questionAdvanceTimerRef.current = window.setTimeout(() => {
       setActivePairId('');
       setQuestionFeedback(null);
-      setRevealedHintCount(0);
-      setHintNotice('');
       setSelectedAnswerTileIds([]);
       questionAdvanceTimerRef.current = null;
     }, 650);
@@ -1069,11 +1219,15 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     }
 
     submittedRef.current = true;
+    if (!gameOverPlayedRef.current) {
+      gameOverPlayedRef.current = true;
+      playGameOver();
+    }
     onLevelComplete?.({
       outcome: 'FAILED',
       points,
       coinsRemaining: coins,
-      hintsUsed,
+      hintsUsed: 0,
       answeredQuestions: answeredPairIds.length,
       totalQuestions: totalPairs,
       matchedPairs: matchedPairIds.length,
@@ -1088,7 +1242,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     answeredPairIds.length,
     coins,
     flipAttemptsLeft,
-    hintsUsed,
     isResolving,
     isPreviewing,
     isSubmitting,
@@ -1096,6 +1249,7 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     mismatches,
     moves,
     onLevelComplete,
+    playGameOver,
     points,
     resultData,
     shouldPauseForIntroOverlay,
@@ -1123,6 +1277,8 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
       return;
     }
 
+    playCardPick();
+
     if (selectedCardIds.length === 0) {
       if (isTutorialLevel && tutorialStepIndex < 2) {
         setTutorialStepIndex(2);
@@ -1137,9 +1293,7 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
       return;
     }
 
-    if (compareTimerRef.current) {
-      clearTimeout(compareTimerRef.current);
-    }
+    compareTimer.cancel();
 
     setSelectedCardIds([firstCard.cardId, card.cardId]);
     setMoves((value) => value + 1);
@@ -1147,18 +1301,24 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     setIsResolving(true);
 
     const isMatch = firstCard.pairId === card.pairId;
-    compareTimerRef.current = window.setTimeout(() => {
+    compareTimer.schedule(() => {
       if (isMatch) {
-        playCorrect();
-        setMatchedPairIds((previous) => (
+        setMatchedPairIds((previous) => {
+          if (previous.includes(card.pairId)) return previous;
+          const nextMatchedPairs = [...previous, card.pairId];
+          if (nextMatchedPairs.length < totalPairs) {
+            playCorrect();
+          }
+          return nextMatchedPairs;
+        });
+        setAnsweredPairIds((previous) => (
           previous.includes(card.pairId) ? previous : [...previous, card.pairId]
         ));
+        setPoints((value) => value + 100);
         if (isTutorialLevel && tutorialStepIndex < 3) {
-          setTutorialStepIndex(3);
+          setTutorialStepIndex(4);
           setTutorialCoachOpen(true);
         }
-        setActivePairId(card.pairId);
-        setQuestionFeedback(null);
       } else {
         playWrong();
         setMismatches((value) => value + 1);
@@ -1240,25 +1400,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
     }
   };
 
-  const handleRevealHint = () => {
-    if (!activePair || activeHints.length === 0 || revealedHintCount >= activeHints.length) {
-      return;
-    }
-
-    if (resolvedHintCoinCost > 0 && coins < resolvedHintCoinCost) {
-      setHintNotice(`Not enough coins. Need ${resolvedHintCoinCost}, you have ${coins}.`);
-      return;
-    }
-
-    if (resolvedHintCoinCost > 0) {
-      setCoins((value) => Math.max(0, value - resolvedHintCoinCost));
-    }
-
-    setHintsUsed((value) => value + 1);
-    setHintNotice('');
-    setRevealedHintCount((value) => Math.min(activeHints.length, value + 1));
-  };
-
   const handleContinueFromQuestion = () => {
     if (!questionFeedback) {
       return;
@@ -1266,8 +1407,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
 
     setActivePairId('');
     setQuestionFeedback(null);
-    setRevealedHintCount(0);
-    setHintNotice('');
     setSelectedAnswerTileIds([]);
   };
 
@@ -1289,7 +1428,15 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
   }
 
   return (
-    <div className="game-three-shell">
+    <div
+      ref={tutorialRootRef}
+      className="game-three-shell"
+      style={levelSurface ? {
+        background: levelSurface,
+        '--game-three-panel-surface': levelPanelColors?.[0],
+        '--game-three-control-surface': levelPanelColors?.[1],
+      } : undefined}
+    >
       <div
         className={clsx(
           'game-three-layout',
@@ -1305,10 +1452,17 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
             isLevelFourLayout && 'game-three-board-panel-level-four',
             isLevelFiveLayout && 'game-three-board-panel-level-five',
           )}
+          style={levelBackground ? {
+            backgroundImage: `url(${levelBackground})`,
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+          } : undefined}
         >
           <div
             className={clsx(
               'game-three-board-shell',
+              isLevelOneLayout && 'game-three-board-shell-level-one',
               isLevelThreeLayout && 'game-three-board-shell-level-three',
               isLevelFourLayout && 'game-three-board-shell-level-four',
               isLevelFiveLayout && 'game-three-board-shell-level-five',
@@ -1327,6 +1481,7 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
               <div
                 className={clsx(
                   'game-three-board',
+                  levelBackground && 'game-three-board-on-level-background',
                   isLevelOneLayout && 'game-three-board-level-one',
                   isLevelThreeLayout && 'game-three-board-level-three',
                   isLevelFourLayout && 'game-three-board-level-four',
@@ -1339,18 +1494,18 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
                   '--game-three-many-height': `${(responsiveRows * 249) + ((responsiveRows - 1) * 15) + 32}px`,
                 }}
               >
-                {deck.map((card) => {
+                {deck.map((card, cardIndex) => {
                   const linkedCard = card.pairContent || card;
-                  const isFaceUp = isPreviewing
+                  const isFaceUp = activeDemo ? activeDemo.revealed.includes(card.cardId) : isPreviewing
                     || matchedPairIdSet.has(card.pairId)
                     || selectedCardIdSet.has(card.cardId);
-                  const isMatched = matchedPairIdSet.has(card.pairId);
-                  const isAnswered = answeredPairIdSet.has(card.pairId);
+                  const isMatched = activeDemo ? activeDemo.matched.includes(card.pairId) : matchedPairIdSet.has(card.pairId);
                   const accentGlow = toRgba(linkedCard.accent, isMatched ? 0.28 : 0.22);
 
                   return (
                     <motion.button
                       key={card.cardId}
+                      data-demo-card={cardIndex}
                       type="button"
                       className={clsx(
                         'game-three-card',
@@ -1366,35 +1521,11 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
                       whileTap={isFaceUp || isSubmitting || resultData ? undefined : { scale: 0.98 }}
                       aria-label={`Memory card ${linkedCard.label}`}
                     >
-                      <div className="game-three-card-inner">
-                        <div className="game-three-card-face game-three-card-back">
-                          <span className="game-three-card-mark">?</span>
-                          <span className="game-three-card-caption">Flip</span>
-                        </div>
-
-                        <div
-                          className="game-three-card-face game-three-card-front"
-                          style={{
-                            background: `linear-gradient(165deg, ${toRgba(linkedCard.accent, 0.95)} 0%, #0f172a 145%)`,
-                            boxShadow: `0 20px 30px ${accentGlow}`,
-                          }}
-                        >
-                          <div className="game-three-card-copy">
-                            {linkedCard.spriteUrl && (
-                              <span className="game-three-card-art">
-                                <img
-                                  src={linkedCard.spriteUrl}
-                                  alt={`${linkedCard.label} concept card`}
-                                  className="game-three-card-art-image"
-                                  draggable={false}
-                                />
-                              </span>
-                            )}
-                            <span className="game-three-card-title">{linkedCard.label}</span>
-                            <span className="game-three-card-caption">Pair</span>
-                          </div>
-                        </div>
-                      </div>
+                      <GameThreeCardFaces
+                        linkedCard={linkedCard}
+                        accentGlow={accentGlow}
+                        background={`linear-gradient(165deg, ${toRgba(linkedCard.accent, 0.95)} 0%, #0f172a 145%)`}
+                      />
                     </motion.button>
                   );
                 })}
@@ -1404,15 +1535,34 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
 
           <div className="game-three-board-footer">
             <span className="game-three-board-note">
-              Flip two cards at a time. Matching pairs unlock a quiz card.
+              Flip two cards at a time. Matching pairs stay revealed and earn a star.
             </span>
             <span className="game-three-board-note">
-              Each question allows 1 answer. Flip attempts match the number of cards.
+              Flip attempts match the number of cards.
             </span>
           </div>
         </section>
 
         <aside className="game-three-side-panel">
+          <button
+            type="button"
+            className="btn btn-secondary game-three-tutorial-button"
+            onClick={() => {
+              setGuideOpenedDuringGameplay(true);
+              setShowHowToPlay(false);
+              setShowGuide(true);
+            }}
+          >
+            Guidelines
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary game-three-tutorial-button"
+            onClick={onTutorialRequest}
+          >
+            Game Tutorial
+          </button>
+
           <div className="game-three-side-card">
             <p className="student-mini-kicker">Progress</p>
             <div className="game-three-side-metrics">
@@ -1425,24 +1575,8 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
                 Stars {points}
               </span>
               <span className="game-three-metric">
-                <Coins className="h-4 w-4" />
-                Coins {coins}
-              </span>
-              <span className="game-three-metric">
                 <AlertCircle className="h-4 w-4" />
                 Flip Attempts {flipAttemptsLeft}/{totalCards}
-              </span>
-              <span className="game-three-metric">
-                <AlertCircle className="h-4 w-4" />
-                Question Attempts {questionAttemptsLeft}/{QUESTION_ATTEMPT_LIMIT}
-              </span>
-              <span className="game-three-metric">
-                <Eye className="h-4 w-4" />
-                Bank {activePair ? activeQuestionNumber : 0}/{activePair ? activeQuestionBank.length : DEFAULT_QUESTION_BANK_SIZE}
-              </span>
-              <span className="game-three-metric">
-                <Eye className="h-4 w-4" />
-                Questions {answeredPairIds.length}/{totalPairs}
               </span>
             </div>
           </div>
@@ -1474,37 +1608,52 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
             <p className="student-mini-kicker">Session</p>
             <div className="game-three-side-copy-stack">
               <span className="game-three-side-copy">Square board scales with the level size.</span>
-              <span className="game-three-side-copy">Each matched pair opens one scoring question.</span>
+              <span className="game-three-side-copy">Match all pairs to complete the board.</span>
             </div>
             <button type="button" className="btn btn-secondary" onClick={onExitRequest}>
-              Exit Level
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              <span>Back</span>
             </button>
           </div>
         </aside>
       </div>
 
-      {shouldPauseForGuide && renderScreenModal(
+      {shouldPauseForGuide && (
         <GameGuideOverlay
           kicker={guideContent.kicker}
           title={guideContent.title}
           lead={guideContent.lead}
           summary={guideContent.summary}
           sections={guideContent.sections}
-          onExit={onExitRequest}
+          onExit={guideOpenedDuringGameplay ? () => {
+            setGuideOpenedDuringGameplay(false);
+            setShowGuide(false);
+          } : onExitRequest}
           onStart={() => {
+            if (guideOpenedDuringGameplay) {
+              setGuideOpenedDuringGameplay(false);
+              setShowGuide(false);
+              return;
+            }
             setShowGuide(false);
             setShowHowToPlay(continueToTutorialAfterGuide);
           }}
-          startLabel="Next"
+          startLabel={guideOpenedDuringGameplay ? 'Continue' : 'Next'}
+          renderInPortal
         />
       )}
 
       {showHowToPlay && !resultData && !isSubmitting && (
-        <GameTutorialOverlay
-          gameType="GAME_THREE"
+        <GameThreeInteractiveTutorial
+          onDemo={setTutorialDemo}
+          rootRef={tutorialRootRef}
+          deck={deck}
+          background={levelBackground}
+          flipBackMs={flipBackMs}
+          isFirstPlay={continueToTutorialAfterGuide && !gameTutorialRequested}
           levelNumber={levelData?.levelNumber || 1}
           onExit={onExitRequest}
-          onStart={() => setShowHowToPlay(false)}
+          onStart={handleReturnFromTutorial}
         />
       )}
 
@@ -1516,7 +1665,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
           stats={[
             { label: 'Pairs', value: `${matchedPairIds.length}/${totalPairs}` },
             { label: 'Stars', value: `${points}/${totalPairs}` },
-            { label: 'Coins', value: `${coins}` },
             { label: 'Flip Meter', value: `${flipAttemptsLeft}/${totalCards} left` },
           ]}
           onContinue={handleContinueTutorialStep}
@@ -1575,51 +1723,6 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
                     )}
                     <p>{activeQuestion?.prompt}</p>
                   </div>
-                </div>
-
-                <div className="game-three-hint-panel">
-                  <div className="game-three-hint-head">
-                    <span className="student-mini-kicker">Hint System</span>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={handleRevealHint}
-                      disabled={
-                        questionAttemptsLeft <= 0
-                        || questionFeedback?.isCorrect
-                        || activeHints.length === 0
-                        || revealedHintCount >= activeHints.length
-                        || (resolvedHintCoinCost > 0 && coins < resolvedHintCoinCost)
-                      }
-                    >
-                      {revealedHintCount < activeHints.length
-                        ? (resolvedHintCoinCost > 0
-                          ? `Reveal Hint (-${resolvedHintCoinCost} coin${resolvedHintCoinCost === 1 ? '' : 's'})`
-                          : 'Reveal Hint')
-                        : 'All Hints Shown'}
-                    </button>
-                  </div>
-
-                  {hintNotice && (
-                    <p className="game-three-hint-empty text-rose-600">{hintNotice}</p>
-                  )}
-                  {!hintNotice && resolvedHintCoinCost > 0 && coins < resolvedHintCoinCost && activeHints.length > 0 && (
-                    <p className="game-three-hint-empty text-amber-700">
-                      Need {resolvedHintCoinCost} coin{resolvedHintCoinCost === 1 ? '' : 's'} to reveal the next hint.
-                    </p>
-                  )}
-
-                  {revealedHintCount > 0 ? (
-                    <ul className="game-three-hint-list">
-                      {activeHints.slice(0, revealedHintCount).map((hint, index) => (
-                        <li key={`${activePair.id}-hint-${index}`}>{hint}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="game-three-hint-empty">
-                      Need a clue? Reveal a hint before submitting your answer.
-                    </p>
-                  )}
                 </div>
 
                 <form className="game-three-answer-form" onSubmit={handleQuestionSubmit}>
@@ -1775,13 +1878,12 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
                   ) : (
                     <AlertCircle className="h-5 w-5 text-amber-700" />
                   )}
-                  <span>{resultData?.result === 'COMPLETED' ? 'Quiz Run Complete' : 'Run Ended'}</span>
+                  <span>{resultData?.result === 'COMPLETED' ? 'Memory Run Complete' : 'Run Ended'}</span>
                 </div>
 
                 <div className="game-three-result-stats">
-                  <span>Final stars: <strong>{summaryPoints}</strong> / {totalPairs}</span>
+                  <span>Score: <strong>{summaryPoints}</strong></span>
                   <span>Pairs solved: <strong>{summaryPairs}</strong> / {totalPairs}</span>
-                  <span>Coins left: <strong>{coins}</strong></span>
                   <span>Moves used: <strong>{summaryMoves}</strong></span>
                   <span>Stars earned: <strong>{resultData?.starsEarned ?? 0}</strong></span>
                 </div>
@@ -1794,7 +1896,7 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, active }) => {
                   <button type="button" className="btn btn-secondary" onClick={onBack}>
                     Back
                   </button>
-                  {canAdvanceLevel && (
+                  {canAdvanceLevel && !isFinalLevel && (
                     <button type="button" className="btn btn-primary" onClick={onNextLevel}>
                       Next Level
                     </button>

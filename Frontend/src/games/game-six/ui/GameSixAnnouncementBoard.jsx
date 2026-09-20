@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import announcementBoard from '../../../assets/announcement-board.png';
 import beepOne from '../assets/beep-1.mp3';
 import beepTwo from '../assets/beep-2.mp3';
 import beepThree from '../assets/beep-3.mp3';
+import { getStudentSfxVolume } from '../../../utils/studentMenuAudio';
 
 const ANNOUNCEMENT_MS = 5500;
 const COUNTDOWN_SECONDS = 3;
@@ -70,7 +72,7 @@ const GameSixAnnouncementBoard = ({ levelNumber = 1, onStart }) => {
     // when the announcement board begins its exit transition.
     const sound = sourceSound.cloneNode();
     sound.muted = false;
-    sound.volume = 1;
+    sound.volume = getStudentSfxVolume(1);
     sound.currentTime = 0;
     sound.play().catch(() => {});
 
@@ -95,8 +97,17 @@ const GameSixAnnouncementBoard = ({ levelNumber = 1, onStart }) => {
     return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [level]);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    document.body.classList.add('game-six-announcement-open');
+
+    return () => {
+      document.body.classList.remove('game-six-announcement-open');
+    };
+  }, []);
+
   const isCountingDown = countdown !== null;
-  return (
+  const announcement = (
     <div className={`announcement-guide-backdrop${leaving ? ' is-leaving' : ''}`} role="dialog" aria-modal="true" aria-labelledby="announcement-guide-title">
       <section className="announcement-guide-board" style={{ backgroundImage: `url(${announcementBoard})` }}>
         <div className="announcement-guide-paper">
@@ -118,6 +129,10 @@ const GameSixAnnouncementBoard = ({ levelNumber = 1, onStart }) => {
       </section>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(announcement, document.body)
+    : announcement;
 };
 
 export default GameSixAnnouncementBoard;

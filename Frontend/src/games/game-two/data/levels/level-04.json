@@ -20,29 +20,29 @@
     {
       "id": "g2l4-t1",
       "type": "complete",
-      "title": "Method Keyword",
-      "prompt": "Complete the Java method declaration.",
-      "snippet": "public static int add(int a, int b) { ____ a + b; }",
-      "answer": "return",
+      "title": "Set Login Status",
+      "prompt": "Complete the Java statement for a signed-out user.",
+      "snippet": "____",
+      "answer": "boolean loggedIn = false;",
       "acceptedAnswers": [
-        "return"
+        "boolean loggedIn = false;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "send"
+          "label": "boolean loggedIn == false;"
         },
         {
           "id": "b",
-          "label": "return"
+          "label": "boolean loggedIn = false;"
         },
         {
           "id": "c",
-          "label": "print"
+          "label": "bool loggedIn = no;"
         },
         {
           "id": "d",
-          "label": "int"
+          "label": "loggedIn boolean = false;"
         }
       ],
       "points": 130,
@@ -56,30 +56,29 @@
     {
       "id": "g2l4-t2",
       "type": "complete",
-      "title": "Call The Method",
-      "prompt": "Drag the expression that calls add with 2 and 3.",
-      "snippet": "int total = ____;",
-      "answer": "add(2, 3)",
+      "title": "Store A Level",
+      "prompt": "Complete the Java statement that stores the current level.",
+      "snippet": "____",
+      "answer": "int level = 2;",
       "acceptedAnswers": [
-        "add(2, 3)",
-        "add(2,3)"
+        "int level = 2;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "add[2, 3]"
+          "label": "int level == 2;"
         },
         {
           "id": "b",
-          "label": "add(2, 3)"
+          "label": "int level = 2;"
         },
         {
           "id": "c",
-          "label": "add 2, 3"
+          "label": "level int = 2;"
         },
         {
           "id": "d",
-          "label": "add(\"2\", \"3\")"
+          "label": "int level: 2;"
         }
       ],
       "points": 140,
@@ -93,29 +92,29 @@
     {
       "id": "g2l4-t3",
       "type": "debug",
-      "title": "Return The Result",
-      "prompt": "The method uses the wrong keyword. Drag the repaired line into the blank.",
-      "snippet": "public static int getTotal() {\n  int total = 10;\n  ____\n}",
-      "answer": "return total;",
+      "title": "Store A Language",
+      "prompt": "Complete the Java statement that stores the language name.",
+      "snippet": "____",
+      "answer": "String language = \"Java\";",
       "acceptedAnswers": [
-        "return total;"
+        "String language = \"Java\";"
       ],
       "options": [
         {
           "id": "a",
-          "label": "send total;"
+          "label": "String language = Java;"
         },
         {
           "id": "b",
-          "label": "return total;"
+          "label": "String language == \"Java\";"
         },
         {
           "id": "c",
-          "label": "return total"
+          "label": "String language = \"Java\";"
         },
         {
           "id": "d",
-          "label": "print total;"
+          "label": "language String = \"Java\";"
         }
       ],
       "points": 150,
@@ -129,28 +128,28 @@
     {
       "id": "g2l4-t4",
       "type": "choice",
-      "title": "Parameter Meaning",
-      "prompt": "What is a Java method parameter?",
-      "correctOptionId": "a",
+      "title": "Store A Height",
+      "prompt": "Complete the Java statement that stores a height value.",
+      "correctOptionId": "c",
       "points": 130,
       "coinReward": 1,
       "coach": "A parameter is the named input a method receives.",
       "options": [
         {
           "id": "a",
-          "label": "A named value received by a method"
+          "label": "double height == 170;"
         },
         {
           "id": "b",
-          "label": "A loop that never stops"
+          "label": "height double = 170;"
         },
         {
           "id": "c",
-          "label": "A type of syntax error"
+          "label": "double height = 170;"
         },
         {
           "id": "d",
-          "label": "A file extension"
+          "label": "double height: 170;"
         }
       ],
       "hints": [
@@ -161,33 +160,33 @@
     {
       "id": "g2l4-t5",
       "type": "reorder",
-      "title": "Reusable Discount",
-      "prompt": "Drag the Java method and call into the correct order.",
+      "title": "Print A Start Message",
+      "prompt": "Arrange the Java statement pieces into the correct order.",
       "points": 220,
       "coinReward": 2,
       "coach": "Define the method, return the computed value, close it, then call it from main.",
       "blocks": [
         {
           "id": "a",
-          "code": "public static int discount(int price) {"
+          "code": "System.out"
         },
         {
           "id": "b",
-          "code": "  return price - 10;"
+          "code": ".println"
         },
         {
           "id": "c",
-          "code": "}"
+          "code": "(\"Start!\")"
         },
         {
           "id": "d",
-          "code": "System.out.println(discount(100));"
+          "code": ";"
         }
       ],
       "initialOrder": [
-        "d",
-        "a",
         "c",
+        "a",
+        "d",
         "b"
       ],
       "correctOrder": [

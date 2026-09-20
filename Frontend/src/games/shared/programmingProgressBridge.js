@@ -27,9 +27,7 @@ export const buildProgrammingSubmissionPayload = (gameplay) => {
     starsRemaining: completed ? safeStars : 0,
     completedTasks: safeCompletedTasks,
     totalTasks: safeTotalTasks,
-    baseScore: completed
-      ? Math.max(120, safePoints + (safeCompletedTasks * 100) - (safeMistakes * 12))
-      : 0,
+    baseScore: completed ? safePoints : 0,
   };
 };
 

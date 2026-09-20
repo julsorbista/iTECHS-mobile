@@ -7,9 +7,9 @@ const GameOneInstructionsOnly = ({
   <div className="game-guide-backdrop">
     <div className="game-guide-card">
       <p className="student-mini-kicker">Game One Tutorial</p>
-      <h3>Platformer + Quiz: Complete Guide</h3>
+      <h3>Platform Adventure: Complete Guide</h3>
       <p className="game-guide-lead">
-        Review the movement rules, room objectives, and question flow only. Gameplay, level screens, and other frames are intentionally excluded here.
+        Review the movement rules, room objectives, hazards, and portal progression.
       </p>
 
       <div className="game-guide-grid">
@@ -17,8 +17,8 @@ const GameOneInstructionsOnly = ({
           <h4>1. Goal</h4>
           <ul>
             <li>Avoid enemies, traps, and platform obstacles.</li>
-            <li>Reach the Question Statue or Villain.</li>
-            <li>Answer correctly to clear the room and progress through the level.</li>
+            <li>Explore each room and complete its objective.</li>
+            <li>Reach the portal to continue to the next room.</li>
           </ul>
         </section>
 
@@ -32,11 +32,11 @@ const GameOneInstructionsOnly = ({
         </section>
 
         <section className="game-guide-section">
-          <h4>3. Question Rules</h4>
+          <h4>3. Room Progress</h4>
           <ul>
-            <li>Only 1 answer attempt is allowed per question.</li>
-            <li>Wrong answers restart the current room.</li>
-            <li>A new question is generated on each retry.</li>
+            <li>Collect any required keys, scrolls, or power-ups.</li>
+            <li>Defeat or avoid enemies blocking the route.</li>
+            <li>Enter the portal when the room objective is complete.</li>
           </ul>
         </section>
 
@@ -50,11 +50,11 @@ const GameOneInstructionsOnly = ({
         </section>
 
         <section className="game-guide-section">
-          <h4>5. Room Failure</h4>
+          <h4>5. Room Hazards</h4>
           <ul>
-            <li>Players may fail up to 3 questions per room.</li>
-            <li>Excessive mistakes reduce stars and rewards.</li>
-            <li>Exceeding the limit ends the game.</li>
+            <li>Watch for spikes, fire, traps, and moving platforms.</li>
+            <li>Enemy attacks and hazards reduce your Hearts.</li>
+            <li>Use checkpoints and safe platforms to cross each room.</li>
           </ul>
         </section>
 

@@ -1,0 +1,81 @@
+.g4-guide-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  display: grid;
+  place-items: center;
+  background: #142726;
+  padding: 6px;
+}
+.g4-guide-board {
+  position: relative;
+  width: min(94vw, 156dvh, 960px);
+  height: min(94dvh, 56.6vw, 579px);
+  background: url('../../../assets/guidelines-icons/Guidelinesformobile.png') center / 100% 100% no-repeat;
+  font-family: Arial, sans-serif;
+  color: #392812;
+}
+.g4-guide-board .g4-guide-paper {
+  position: absolute;
+  inset: 23% 14% 20%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.g4-guide-paper h2 {
+  flex: none;
+  margin: 0 0 6px;
+  padding: 5px 8px;
+  background: #397e35;
+  border-radius: 8px;
+  color: #fff8da;
+  font: 700 clamp(12px, 3.2dvh, 20px)/1.2 Arial, sans-serif;
+  text-align: center;
+}
+.g4-guide-paper ul {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 5px 0 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #855625 transparent;
+  list-style: none;
+}
+.g4-guide-paper li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px dashed #ad854c;
+  font: 600 clamp(12px, 3dvh, 18px)/1.35 Arial, sans-serif;
+}
+.g4-guide-paper img { width: 26px; height: 26px; object-fit: contain; }
+.g4-guide-board .g4-guide-footer {
+  position: absolute;
+  inset: 82% 20% 10%;
+  display: grid;
+  grid-template-columns: 1fr 70px 1fr;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  color: #fff2ca;
+  font: 700 clamp(12px, 3dvh, 18px)/1 Arial, sans-serif;
+}
+.g4-guide-footer button {
+  width: 100%;
+  height: 100%;
+  min-height: 30px;
+  padding: 2px 8px;
+  border: 2px solid #294e20;
+  border-radius: 6px;
+  background: linear-gradient(#79c34f, #3b842e);
+  color: #fff8de;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.g4-guide-footer button:active { background: #326e27; }

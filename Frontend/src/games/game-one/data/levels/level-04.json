@@ -2,239 +2,1044 @@
   "id": "game-one-level-04",
   "gameType": "GAME_ONE",
   "levelNumber": 4,
-  "title": "Apex Sentinel",
-  "subtitle": "Boss Arena and Final Mission Lock",
-  "congratulatoryMessage": "Masterful finish! You conquered the apex arena and completed the final Game 1 challenge.",
-  "settings": {
-    "requireBossDefeat": true,
-    "timerEnabled": true,
-    "timerSeconds": 210,
-    "coinGoal": 8,
-    "playerHealth": 4
-  },
+  "title": "Citadel of Decisions",
+  "subtitle": "Java Conditional Statements",
+  "congratulatoryMessage": "CITADEL OF DECISIONS AWAKENED! You discovered how Java evaluates conditions and chooses which code should execute.",
+  "treasureHunt": true,
+  "missionTitle": "AWAKEN THE CITADEL OF DECISIONS",
+  "missionText": "Beyond the Operator Fortress lies a citadel of branching paths. Its gates respond only to the correct conditions. Follow the clues, choose wisely, and awaken the Decision Core.",
   "viewport": {
     "width": 1280,
     "height": 720
   },
+  "settings": {
+    "playerHealth": 3,
+    "timerEnabled": false,
+    "allowMidairDash": true,
+    "allowProjectile": true,
+    "allowDoubleJump": false,
+    "coinGoal": 0
+  },
   "questions": [
     {
-      "id": "cache-question",
-      "prompt": "Why is CPU cache memory useful?",
+      "id": "if-condition-gate",
+      "topic": "if statement",
+      "formattedQuestion": "int score = 10;\nscore >= 5\n\nIs the condition true or false?",
+      "prompt": "Is score >= 5 true when score is 10?",
       "choices": [
-        "It stores music files",
-        "It keeps frequently used data close to the CPU",
-        "It replaces the monitor",
-        "It removes the operating system"
+        "TRUE",
+        "FALSE"
       ],
-      "answerIndex": 1,
-      "successText": "Correct. You unlocked the arena gate.",
-      "failureText": "Not quite. Retry the statue to open the gate."
+      "answerIndex": 0,
+      "successText": "Correct! The IF path opens.",
+      "failureText": "Incorrect. Check the condition again.",
+      "damageOnWrongAnswer": 0
     },
     {
-      "id": "protocol-question",
-      "prompt": "Which protocol is commonly used to securely browse websites?",
+      "id": "else-path-gate",
+      "topic": "if-else statement",
+      "formattedQuestion": "int coins = 3;\ncoins >= 5\n\nWhich path will Java execute?",
+      "prompt": "Which path executes when coins is 3 and the condition is coins >= 5?",
       "choices": [
-        "HTTP only",
-        "FTP",
-        "HTTPS",
-        "SMTP"
+        "IF",
+        "ELSE"
+      ],
+      "answerIndex": 1,
+      "successText": "Correct! Java follows the ELSE path.",
+      "failureText": "That condition is false. Choose the path Java would execute.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "else-if-path-gate",
+      "topic": "else-if statement",
+      "formattedQuestion": "int score = 82;\nGate A: score >= 90\nGate B: score >= 75\nGate C: else",
+      "prompt": "For score = 82, which branch is selected first?",
+      "choices": [
+        "Gate A",
+        "Gate B",
+        "Gate C"
+      ],
+      "answerIndex": 1,
+      "successText": "Correct! Gate B is the first true branch.",
+      "failureText": "Incorrect. Evaluate the conditions from top to bottom.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "decision-if",
+      "topic": "Decision Trial: IF",
+      "prompt": "Will the if block execute when health is 8 and health > 5?",
+      "choices": [
+        "YES",
+        "NO"
+      ],
+      "answerIndex": 0,
+      "successText": "Correct! Decision Gate 1 opens.",
+      "failureText": "Incorrect. Evaluate the condition again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "decision-else",
+      "topic": "Decision Trial: IF-ELSE",
+      "prompt": "Which branch executes when keys is 1 and keys >= 2?",
+      "choices": [
+        "IF",
+        "ELSE"
+      ],
+      "answerIndex": 1,
+      "successText": "Correct! Decision Gate 2 opens.",
+      "failureText": "Incorrect. Evaluate the condition again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "decision-elseif",
+      "topic": "Decision Trial: ELSE-IF",
+      "formattedQuestion": "int score = 70;\n>= 90: Gold\n>= 75: Silver\n>= 60: Bronze\nelse: No Reward",
+      "prompt": "For score = 70, which result does Java choose?",
+      "choices": [
+        "Gold",
+        "Silver",
+        "Bronze",
+        "No Reward"
       ],
       "answerIndex": 2,
-      "successText": "Correct. The portal lock condition is now one step closer.",
-      "failureText": "Incorrect. Retry and answer the statue correctly."
+      "successText": "Correct! Decision Gate 3 opens.",
+      "failureText": "Incorrect. Evaluate the condition again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "decision-core-riddle",
+      "topic": "Java conditional statements",
+      "challengeType": "WORD_SCRAMBLE",
+      "maxAttempts": 3,
+      "jumbledWord": "NODIITCON",
+      "answer": "CONDITION",
+      "formattedQuestion": "FINAL TREASURE RIDDLE\nJava checks me before deciding which path to follow. I can be true or false, and the result determines which code will execute. What am I?",
+      "riddleVariants": [
+        "Java checks me before deciding which path to follow. I can be true or false, and the result determines which code will execute. What am I?",
+        "I am evaluated as true or false before an if statement chooses whether its block should run. What am I?",
+        "A decision in Java depends on my truth value before selecting a branch. What am I?",
+        "I am the test written inside parentheses that controls an if, else-if, or loop. What am I?",
+        "When Java reaches a decision point, it evaluates me to choose the next path. What am I?",
+        "Comparisons and logical expressions form me, and my result is either true or false. What am I?"
+      ],
+      "prompt": "Java checks me before deciding which path to follow. I can be true or false. What am I? Jumbled word: NODIITCON",
+      "choices": [
+        "CONDITION",
+        "VARIABLE",
+        "OPERATOR",
+        "METHOD"
+      ],
+      "answerIndex": 0,
+      "hints": [
+        "Review the three conditional scroll clues.",
+        "Think about what Java checks before choosing a path."
+      ],
+      "failureMessages": [
+        "Incorrect. Review the three scroll clues and try again.",
+        "Incorrect. Think about what Java checks before choosing which path to execute.",
+        "The Decision Core remains sealed. Return to the checkpoint and try again."
+      ],
+      "successText": "Correct! The Decision Core awakens.",
+      "damageOnWrongAnswer": 0,
+      "lockAttemptSessionOnClose": true
     }
   ],
   "rooms": [
     {
       "id": "room-1",
-      "backgroundKey": "swampTrail",
-      "objective": "Push through hunter patrols and gather shards before entering the relay chamber.",
-      "spawn": { "x": 140, "y": 560 },
+      "backgroundKey": "ruinsGate",
+      "objective": "The IF Chamber: recover the IF Seal and Scroll #1, then enter the portal.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
       "platforms": [
-        { "id": "floor", "x": 640, "y": 684, "width": 1280, "bodyHeight": 72, "textureKey": "grass" },
-        { "id": "left-step", "x": 320, "y": 552, "width": 220, "bodyHeight": 24, "textureKey": "wood" },
-        { "id": "mid-step", "x": 620, "y": 474, "width": 240, "bodyHeight": 24, "textureKey": "stone" },
-        { "id": "right-step", "x": 950, "y": 386, "width": 220, "bodyHeight": 24, "textureKey": "wood" }
+        {
+          "id": "r1-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-lower-lift",
+          "x": 285,
+          "y": 545,
+          "width": 76,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "y",
+          "moveDistance": -55,
+          "moveDuration": 1800
+        },
+        {
+          "id": "r1-middle-static",
+          "x": 440,
+          "y": 405,
+          "width": 76,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-high-shuttle",
+          "x": 600,
+          "y": 535,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r1-scroll-shuttle",
+          "x": 830,
+          "y": 490,
+          "width": 76,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r1-exit",
+          "x": 1055,
+          "y": 355,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-portal-floor",
+          "x": 1070,
+          "y": 672,
+          "width": 190,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-spikes",
+          "x": 550,
+          "y": 672,
+          "width": 304,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        },
+        {
+          "id": "r1-poison-platform",
+          "x": 895,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 16,
+          "textureKey": "stone"
+        }
       ],
       "coins": [
-        { "id": "coin-1", "x": 320, "y": 502 },
-        { "id": "coin-2", "x": 620, "y": 424 },
-        { "id": "coin-3", "x": 950, "y": 336 }
+        {
+          "id": "level4-hint-coin-1",
+          "collectibleType": "coin",
+          "x": 200,
+          "y": 600,
+          "size": 30
+        },
+        {
+          "id": "if-seal",
+          "collectibleType": "key",
+          "spriteFrame": "key-red",
+          "x": 600,
+          "y": 453,
+          "size": 34
+        },
+        {
+          "id": "r1-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 285,
+          "y": 463,
+          "size": 44
+        },
+        {
+          "id": "scroll-1",
+          "collectibleType": "scroll",
+          "scrollStyle": "red",
+          "spriteFrame": "scroll-red",
+          "scrollId": "scroll-1",
+          "clueText": "IF STATEMENT\n\nAn if statement runs code when its condition is true.\n\nWhen the condition is true, the path ahead will open.",
+          "x": 1055,
+          "y": 273,
+          "size": 50
+        }
       ],
       "ghosts": [
         {
-          "id": "ghost-1",
-          "x": 500,
-          "y": 594,
-          "patrolDistance": 220,
-          "speed": 86
-        }
-      ],
-      "projectileEnemies": [
+          "id": "r1-shadow-spirit",
+          "enemyType": "shadowspirit",
+          "x": 895,
+          "y": 600,
+          "patrolDistance": 55,
+          "speed": 62,
+          "canJump": false
+        },
         {
-          "id": "hunter-1",
-          "enemyType": "hunter",
-          "x": 860,
-          "y": 360,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1550,
-          "projectileSpeed": 315,
-          "projectileLifetimeMs": 2200,
-          "initialDelayMs": 850
+          "id": "r1-ghost",
+          "enemyType": "ghost",
+          "x": 700,
+          "y": 570,
+          "patrolDistance": 70,
+          "speed": 108,
+          "size": 58,
+          "visualOriginY": 0.44,
+          "chasePlayer": true,
+          "chaseDelayMs": 3000
+        },
+        {
+          "id": "r1-orange",
+          "enemyType": "slimeorange",
+          "x": 1050,
+          "y": 600,
+          "patrolDistance": 35,
+          "speed": 115,
+          "size": 58,
+          "canJump": false
         }
       ],
+      "projectileEnemies": [],
       "portal": {
-        "x": 1148,
-        "y": 556,
-        "locked": false,
-        "targetRoomId": "room-2"
+        "x": 1160,
+        "y": 590,
+        "locked": true,
+        "endsLevel": false,
+        "targetRoomId": "room-2",
+        "requiredKeys": 1,
+        "requiredScrollId": "scroll-1",
+        "lockedMessage": "Recover the IF Seal and Scroll #1.",
+        "size": 84
       }
     },
     {
       "id": "room-2",
-      "backgroundKey": "tutorialGrove",
-      "objective": "Answer both statues to stabilize the apex portal lock sequence.",
-      "postUnlockObjective": "Statue locks cleared. Enter the apex arena and defeat the sentinel.",
-      "spawn": { "x": 140, "y": 560 },
+      "backgroundKey": "room_10",
+      "objective": "The ELSE Chamber: recover the ELSE Seal and Scroll #2, then enter the portal.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
       "platforms": [
-        { "id": "floor", "x": 640, "y": 684, "width": 1280, "bodyHeight": 72, "textureKey": "stone" },
-        { "id": "left-statue-ledge", "x": 360, "y": 540, "width": 220, "bodyHeight": 24, "textureKey": "grass" },
-        { "id": "right-statue-ledge", "x": 760, "y": 458, "width": 220, "bodyHeight": 24, "textureKey": "wood" },
-        { "id": "upper-portal-ledge", "x": 1030, "y": 362, "width": 260, "bodyHeight": 24, "textureKey": "stone" }
-      ],
-      "unlockPlatforms": [
         {
-          "id": "bridge-1",
-          "x": 560,
-          "y": 500,
-          "width": 180,
-          "bodyHeight": 24,
-          "textureKey": "wood",
-          "lockedByQuestionId": "cache-question",
-          "startsHidden": true
+          "id": "r2-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "wood"
         },
         {
-          "id": "bridge-2",
-          "x": 885,
-          "y": 420,
-          "width": 180,
-          "bodyHeight": 24,
-          "textureKey": "grass",
-          "lockedByQuestionId": "protocol-question",
-          "startsHidden": true
-        }
-      ],
-      "barriers": [
+          "id": "r2-lower-one",
+          "x": 300,
+          "y": 505,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
         {
-          "id": "arena-gate",
-          "x": 940,
-          "y": 520,
-          "width": 70,
-          "height": 180,
-          "bodyHeight": 170,
+          "id": "r2-lift",
+          "x": 455,
+          "y": 585,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "y",
+          "moveDistance": -105,
+          "moveDuration": 2100
+        },
+        {
+          "id": "r2-upper-seal",
+          "x": 620,
+          "y": 420,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r2-shuttle",
+          "x": 925,
+          "y": 350,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r2-scroll-ledge",
+          "x": 1060,
+          "y": 500,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r2-exit",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r2-spikes",
+          "x": 600,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 16,
           "textureKey": "stone",
-          "lockedByQuestionId": "protocol-question",
-          "unlockBehavior": "drop"
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        },
+        {
+          "id": "r2-fire",
+          "x": 910,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "fire",
+          "hazardSpriteFrame": "fireball",
+          "damage": 1
         }
       ],
       "coins": [
-        { "id": "coin-4", "x": 360, "y": 490 },
-        { "id": "coin-5", "x": 760, "y": 408 },
-        { "id": "coin-6", "x": 1030, "y": 312 }
-      ],
-      "ghosts": [],
-      "projectileEnemies": [
         {
-          "id": "caster-1",
-          "enemyType": "elemental",
-          "x": 980,
-          "y": 544,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1680,
-          "projectileSpeed": 305,
-          "projectileLifetimeMs": 2350,
-          "initialDelayMs": 900
-        }
-      ],
-      "villain": [
-        {
-          "x": 360,
-          "y": 484,
-          "appearance": "STATUE",
-          "interactionLabel": "statue",
-          "questionId": "cache-question"
+          "id": "level4-hint-coin-2",
+          "collectibleType": "coin",
+          "x": 200,
+          "y": 600,
+          "size": 30
         },
         {
-          "x": 760,
-          "y": 402,
-          "appearance": "STATUE",
-          "interactionLabel": "statue",
-          "questionId": "protocol-question"
+          "id": "else-seal",
+          "collectibleType": "key",
+          "spriteFrame": "key-blue",
+          "x": 620,
+          "y": 338,
+          "size": 34
+        },
+        {
+          "id": "r2-jump",
+          "collectibleType": "jump",
+          "spriteFrame": "speed-potion",
+          "x": 300,
+          "y": 423,
+          "size": 44
+        },
+        {
+          "id": "scroll-2",
+          "collectibleType": "scroll",
+          "scrollStyle": "blue",
+          "spriteFrame": "scroll-blue",
+          "scrollId": "scroll-2",
+          "clueText": "ELSE STATEMENT\n\nElse provides another path when the if condition is false.\n\nWhen one path refuses to open, another may be waiting.",
+          "x": 1060,
+          "y": 418,
+          "size": 50
         }
       ],
+      "ghosts": [
+        {
+          "id": "r2-ghost",
+          "enemyType": "ghost",
+          "x": 600,
+          "y": 570,
+          "patrolDistance": 65,
+          "speed": 118,
+          "size": 58,
+          "chasePlayer": true,
+          "chaseDelayMs": 3000
+        },
+        {
+          "id": "r2-green",
+          "enemyType": "slimegreen",
+          "x": 1050,
+          "y": 600,
+          "patrolDistance": 35,
+          "speed": 120,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [],
       "portal": {
-        "x": 1148,
-        "y": 286,
-        "locked": false,
-        "targetRoomId": "room-3"
+        "x": 1160,
+        "y": 590,
+        "locked": true,
+        "endsLevel": false,
+        "targetRoomId": "room-3",
+        "requiredKeys": 2,
+        "requiredScrollId": "scroll-2",
+        "lockedMessage": "Recover the ELSE Seal and Scroll #2.",
+        "size": 84
       }
     },
     {
       "id": "room-3",
-      "backgroundKey": "ruinsGate",
-      "objective": "Destroy the sentinel boss, then use the ending portal.",
-      "spawn": { "x": 140, "y": 560 },
+      "backgroundKey": "swampTrail",
+      "objective": "The ELSE-IF Chamber: recover the final seal and Scroll #3, then enter the portal.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
       "platforms": [
-        { "id": "floor", "x": 640, "y": 684, "width": 1280, "bodyHeight": 72, "textureKey": "wood" },
-        { "id": "left-cover", "x": 360, "y": 598, "width": 180, "bodyHeight": 24, "textureKey": "stone" },
-        { "id": "center-cover", "x": 620, "y": 530, "width": 180, "bodyHeight": 24, "textureKey": "grass" },
-        { "id": "right-boss-stage", "x": 930, "y": 470, "width": 260, "bodyHeight": 24, "textureKey": "stone" }
-      ],
-      "coins": [
-        { "id": "coin-7", "x": 360, "y": 548 },
-        { "id": "coin-8", "x": 620, "y": 480 },
-        { "id": "coin-9", "x": 930, "y": 420 }
-      ],
-      "ghosts": [],
-      "projectileEnemies": [
         {
-          "id": "boss-1",
-          "enemyType": "boss",
-          "x": 930,
-          "y": 338,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1300,
-          "projectileSpeed": 350,
-          "projectileLifetimeMs": 3000,
-          "initialDelayMs": 1200,
-          "hitPoints": 10
+          "id": "r3-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "stone"
         },
         {
-          "id": "hunter-2",
-          "enemyType": "hunter",
-          "x": 760,
-          "y": 346,
-          "fireDirection": "LEFT",
-          "fireIntervalMs": 1700,
-          "projectileSpeed": 315,
-          "projectileLifetimeMs": 2250,
-          "initialDelayMs": 1100
+          "id": "r3-left-lift",
+          "x": 275,
+          "y": 565,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r3-left-rest",
+          "x": 430,
+          "y": 455,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r3-center-shuttle",
+          "x": 590,
+          "y": 325,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "x",
+          "moveDistance": 75,
+          "moveDuration": 1950
+        },
+        {
+          "id": "r3-seal-perch",
+          "x": 750,
+          "y": 470,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r3-right-lift",
+          "x": 905,
+          "y": 355,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r3-scroll-perch",
+          "x": 1055,
+          "y": 505,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r3-exit",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r3-spikes",
+          "x": 650,
+          "y": 672,
+          "width": 304,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        },
+        {
+          "id": "r3-fire",
+          "x": 970,
+          "y": 672,
+          "width": 76,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "fire",
+          "hazardSpriteFrame": "fireball",
+          "damage": 1
         }
       ],
-      "villain": {
-        "x": 620,
-        "y": 474,
-        "appearance": "STATUE",
-        "interactionLabel": "statue",
-        "questionId": "protocol-question"
-      },
+      "coins": [
+        {
+          "id": "level4-hint-coin-3",
+          "collectibleType": "coin",
+          "x": 200,
+          "y": 600,
+          "size": 30
+        },
+        {
+          "id": "elseif-seal",
+          "collectibleType": "key",
+          "spriteFrame": "key-green",
+          "x": 430,
+          "y": 373,
+          "size": 34
+        },
+        {
+          "id": "r3-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 275,
+          "y": 483,
+          "size": 44
+        },
+        {
+          "id": "r3-jump",
+          "collectibleType": "jump",
+          "spriteFrame": "speed-potion",
+          "x": 590,
+          "y": 243,
+          "size": 44
+        },
+        {
+          "id": "r3-health",
+          "collectibleType": "health",
+          "spriteFrame": "health-heart",
+          "x": 905,
+          "y": 273,
+          "size": 44
+        },
+        {
+          "id": "r3-shield",
+          "collectibleType": "shield",
+          "spriteFrame": "shield",
+          "x": 1055,
+          "y": 423,
+          "size": 44
+        },
+        {
+          "id": "scroll-3",
+          "collectibleType": "scroll",
+          "scrollStyle": "green",
+          "spriteFrame": "scroll-green",
+          "scrollId": "scroll-3",
+          "clueText": "ELSE IF\n\nElse-if tests another condition when the previous condition is false.\n\nJava checks conditions in order until one becomes true.",
+          "x": 750,
+          "y": 388,
+          "size": 50
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r3-ghost",
+          "enemyType": "ghost",
+          "x": 560,
+          "y": 565,
+          "patrolDistance": 55,
+          "speed": 128,
+          "size": 58,
+          "chasePlayer": true,
+          "chaseDelayMs": 3000
+        },
+        {
+          "id": "r3-orange",
+          "enemyType": "slimeorange",
+          "x": 780,
+          "y": 600,
+          "patrolDistance": 30,
+          "speed": 126,
+          "size": 58,
+          "canJump": false
+        },
+        {
+          "id": "r3-green",
+          "enemyType": "slimegreen",
+          "x": 1080,
+          "y": 600,
+          "patrolDistance": 25,
+          "speed": 130,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [],
       "portal": {
-        "x": 1148,
-        "y": 556,
+        "x": 1160,
+        "y": 590,
+        "locked": true,
+        "endsLevel": false,
+        "targetRoomId": "room-4",
+        "requiredKeys": 3,
+        "requiredScrollId": "scroll-3",
+        "lockedMessage": "Recover the ELSE-IF Seal and Scroll #3.",
+        "size": 84
+      }
+    },
+    {
+      "id": "room-4",
+      "backgroundKey": "room_1",
+      "objective": "Decision Trial: cross the rising cave arch and reach the Decision Core portal.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
+      "platforms": [
+        {
+          "id": "r4-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r4-low-left",
+          "x": 300,
+          "y": 570,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r4-upper-left",
+          "x": 470,
+          "y": 480,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r4-arch-shuttle",
+          "x": 650,
+          "y": 390,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone",
+          "moveAxis": "x",
+          "moveDistance": 45,
+          "moveDuration": 2200
+        },
+        {
+          "id": "r4-upper-right",
+          "x": 820,
+          "y": 480,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r4-low-right",
+          "x": 990,
+          "y": 570,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r4-exit",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r4-spikes",
+          "x": 630,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        }
+      ],
+      "coins": [
+        {
+          "id": "r4-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 300,
+          "y": 488,
+          "size": 44
+        },
+        {
+          "id": "r4-jump",
+          "collectibleType": "jump",
+          "spriteFrame": "speed-potion",
+          "x": 470,
+          "y": 398,
+          "size": 44
+        },
+        {
+          "id": "r4-health",
+          "collectibleType": "health",
+          "spriteFrame": "health-heart",
+          "x": 820,
+          "y": 398,
+          "size": 44
+        },
+        {
+          "id": "r4-shield",
+          "collectibleType": "shield",
+          "spriteFrame": "shield",
+          "x": 990,
+          "y": 488,
+          "size": 44
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r4-ghost",
+          "enemyType": "ghost",
+          "x": 920,
+          "y": 565,
+          "patrolDistance": 50,
+          "speed": 134,
+          "size": 60,
+          "chasePlayer": true,
+          "chaseDelayMs": 3500
+        },
+        {
+          "id": "r4-orange",
+          "enemyType": "slimeorange",
+          "x": 790,
+          "y": 600,
+          "patrolDistance": 30,
+          "speed": 132,
+          "size": 58,
+          "canJump": false
+        },
+        {
+          "id": "r4-green",
+          "enemyType": "slimegreen",
+          "x": 1080,
+          "y": 600,
+          "patrolDistance": 25,
+          "speed": 136,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [
+        {
+          "id": "r4-elemental",
+          "enemyType": "elemental",
+          "x": 940,
+          "y": 390,
+          "fireDirection": "LEFT",
+          "fireIntervalMs": 2250,
+          "projectileSpeed": 270,
+          "projectileLifetimeMs": 2400,
+          "initialDelayMs": 1800,
+          "size": 60
+        }
+      ],
+      "portal": {
+        "x": 1160,
+        "y": 590,
+        "locked": false,
+        "endsLevel": false,
+        "targetRoomId": "room-5",
+        "size": 84
+      }
+    },
+    {
+      "id": "room-5",
+      "backgroundKey": "tutorialGrove",
+      "objective": "Decision Core: survive the final route and unlock the treasure using all three scroll clues.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
+      "platforms": [
+        {
+          "id": "r5-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r5-lift",
+          "x": 285,
+          "y": 535,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r5-left-rest",
+          "x": 440,
+          "y": 375,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r5-shuttle",
+          "x": 600,
+          "y": 500,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r5-timed-core",
+          "x": 755,
+          "y": 320,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone",
+          "disappearEveryMs": 2600
+        },
+        {
+          "id": "r5-right-rest",
+          "x": 910,
+          "y": 455,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r5-final-lift",
+          "x": 1045,
+          "y": 560,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r5-chest",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r5-spikes",
+          "x": 620,
+          "y": 672,
+          "width": 304,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        }
+      ],
+      "coins": [
+        {
+          "id": "r5-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 285,
+          "y": 453,
+          "size": 44
+        },
+        {
+          "id": "r5-jump",
+          "collectibleType": "jump",
+          "spriteFrame": "speed-potion",
+          "x": 600,
+          "y": 418,
+          "size": 44
+        },
+        {
+          "id": "r5-health",
+          "collectibleType": "health",
+          "spriteFrame": "health-heart",
+          "x": 755,
+          "y": 238,
+          "size": 44
+        },
+        {
+          "id": "r5-shield",
+          "collectibleType": "shield",
+          "spriteFrame": "shield",
+          "x": 910,
+          "y": 373,
+          "size": 44
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r5-ghost",
+          "enemyType": "ghost",
+          "x": 920,
+          "y": 565,
+          "patrolDistance": 55,
+          "speed": 138,
+          "size": 60,
+          "chasePlayer": true,
+          "chaseDelayMs": 5000
+        },
+        {
+          "id": "r5-orange",
+          "enemyType": "slimeorange",
+          "x": 735,
+          "y": 600,
+          "patrolDistance": 30,
+          "speed": 136,
+          "size": 58,
+          "canJump": false
+        },
+        {
+          "id": "r5-green",
+          "enemyType": "slimegreen",
+          "x": 1060,
+          "y": 600,
+          "patrolDistance": 25,
+          "speed": 142,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [
+        {
+          "id": "r5-elemental",
+          "enemyType": "elemental",
+          "x": 900,
+          "y": 320,
+          "fireDirection": "LEFT",
+          "fireIntervalMs": 1850,
+          "projectileSpeed": 300,
+          "projectileLifetimeMs": 2500,
+          "initialDelayMs": 1300,
+          "size": 62
+        }
+      ],
+      "portal": {
+        "id": "decision-core-treasure",
+        "x": 1160,
+        "y": 580,
         "locked": true,
         "endsLevel": true,
-        "questionId": "protocol-question"
+        "appearance": "TREASURE_CHEST",
+        "size": 96,
+        "requiredCoins": 3,
+        "questionId": "decision-core-riddle",
+        "treasureQuestionId": "decision-core-riddle"
       }
     }
-  ]
+  ],
+  "treasureQuestionId": "decision-core-riddle"
 }

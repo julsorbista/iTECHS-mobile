@@ -55,7 +55,7 @@ const StudentGamePlayPage = () => {
         gameType={gameType}
         levelNumber={levelNumber}
         onClose={() => navigate(`/student/games/${gameType}`)}
-        forceFullReloadOnAdvance
+        forceFullReloadOnAdvance={gameType === 'GAME_ONE'}
         onAdvanceToLevel={(nextLevelNumber) => navigate(`/student/games/${gameType}/levels/${nextLevelNumber}/play`, { replace: true })}
         onContinueToGame={(nextGameType) => navigate(`/student/games/${nextGameType}`)}
       />

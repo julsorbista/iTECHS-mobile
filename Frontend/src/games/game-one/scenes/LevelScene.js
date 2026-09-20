@@ -1,19 +1,21 @@
 import Phaser from 'phaser';
+import { getStudentMusicVolume, getStudentSfxVolume } from '../../../utils/studentMenuAudio';
 import Player from '../entities/Player';
 import Coin from '../entities/Coin';
+import TreasurePickup from '../entities/TreasurePickup';
 import Portal from '../entities/Portal';
+import TreasureChest from '../entities/TreasureChest';
 import GhostMinion from '../entities/GhostMinion';
 import SlimeEnemy from '../entities/SlimeEnemy';
-import VillainTrigger from '../entities/VillainTrigger';
 import ProjectileCaster from '../entities/ProjectileCaster';
 import EnemyProjectile from '../entities/EnemyProjectile';
-import { createControls, readMovementIntent, wasPausePressed } from '../systems/controls';
+import { createControls, readMovementIntent, resetControls, wasPausePressed } from '../systems/controls';
 import { normalizePlayerAbilityConfig } from '../systems/playerAbilityConfig';
-import { resolvePortalQuestionId } from '../systems/portalLocks';
 import { getPortalRoomId, isReturnToBlockedRoom } from '../systems/roomBacktrack';
 import {
   getLocalCellSpawn,
   getPortalExitPosition,
+  getRoomWorldPosition,
   resolveLevelRestartPosition,
   resolveQuestionRestartPosition,
   resolveRespawnPosition,
@@ -21,16 +23,19 @@ import {
   resolveTargetRoomEntryPosition,
 } from '../systems/roomEntry';
 import { shouldUsePortalOnlyRoomTraversal } from '../systems/roomTraversal';
+import { configureTreasureSurface } from '../systems/treasureSurfaces';
 import {
   getGameOneSurfaceGeometry,
   shouldProcessSurfaceCollision,
 } from '../systems/surfaceGeometry';
 import { buildWorldGridLayout, getCellCount, getCellRecordAtWorldPoint, getCellWorldBounds, getQuestionById } from '../systems/roomFlow';
 import { buildQuestionRetryVariant, getQuestionTopicLabel } from '../systems/questionRetryVariants';
+import { createTreasureAttemptVariation } from '../systems/jumbledWordRandomizer';
 import { normalizeLevelData } from '../../../features/level-editor/levelEditorUtils';
 import { getLevelEditorSource } from '../../../features/level-editor/levelEditorConfig';
 
 const DANGER_SURGE_DURATION_MS = 7000;
+const LEVEL_ONE_ROOM_FIVE_RETRY_LOCAL_POSITION = Object.freeze({ x: 100, y: 570 });
 const DEFAULT_ROOM_BACKGROUND_COLOR = '#111827';
 const RENDER_LAYER_BACK = 'back';
 const RENDER_LAYER_FRONT = 'front';
@@ -38,6 +43,13 @@ const BACKGROUND_TILE_BACK_DEPTH_BASE = -8;
 const BACKGROUND_TILE_FRONT_DEPTH_BASE = 8;
 const WORLD_OBJECT_BACK_DEPTH_BASE = -2;
 const WORLD_OBJECT_FRONT_DEPTH_BASE = 6;
+const GAME_STATES = Object.freeze({
+  LOADING: 'loading',
+  PLAYING: 'playing',
+  PAUSED: 'paused',
+  GAME_OVER: 'gameOver',
+  COMPLETED: 'completed',
+});
 
 const normalizeLevelSettings = (settings = {}) => {
   const playerHealth = Number(settings.playerHealth);
@@ -116,6 +128,7 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   create() {
+    this.gameState = GAME_STATES.LOADING;
     const bootPayload = this.game.__ITECHS_BOOT__ || {};
     this.runtimeAssets = bootPayload.runtimeAssets;
     this.callbacks = bootPayload.callbacks || {};
@@ -146,9 +159,12 @@ export default class LevelScene extends Phaser.Scene {
     this.questionHintProgress = new Map();
     this.questionRetryCounts = new Map();
     this.completedQuestions = new Set();
-    this.requiredStatueQuestionIds = this.collectRequiredStatueQuestionIds();
+    this.requiredStatueQuestionIds = new Set();
     this.collectedCoinIds = new Set();
-    this.totalCoins = (this.worldObjectsData.coins || []).length;
+    this.collectedKeyIds = new Set();
+    this.collectedScrollIds = new Set();
+    this.shieldCharges = 0;
+    this.totalCoins = (this.worldObjectsData.coins || []).filter((item) => !item.collectibleType || item.collectibleType === 'coin').length;
     this.coinGoal = this.resolveCoinGoal();
     this.levelSettings = normalizeLevelSettings(this.levelData?.settings);
     this.requireBossDefeat = Boolean(this.levelData?.settings?.requireBossDefeat);
@@ -162,9 +178,12 @@ export default class LevelScene extends Phaser.Scene {
     this.hintsUsed = 0;
     this.hintCoinCost = normalizeHintCoinCost(bootPayload.hintCoinCost ?? bootPayload.hintStarCost);
     this.isPaused = false;
+    this.isOverlayPaused = Boolean(bootPayload.initialOverlayPaused);
+    this.hasGameplayStarted = !this.isOverlayPaused;
     this.isInteractionLocked = false;
     this.hasFinished = false;
     this.damageCooldownUntil = 0;
+    this.fallWarningSoundPlayed = false;
     this.damageTween = null;
     this.questionCooldownUntil = 0;
     this.playerProjectileCooldownUntil = 0;
@@ -187,6 +206,13 @@ export default class LevelScene extends Phaser.Scene {
     this.blockedReturnRoomId = null;
     this.portalRoomTraversalOnly = shouldUsePortalOnlyRoomTraversal(this.levelData, this.worldObjectsData);
     this.roomStartPositions = new Map();
+
+    // QuestionScene emits results through the active LevelScene event emitter.
+    // These listeners must exist before any question opens; otherwise the
+    // overlay closes while the player remains frozen and no restart occurs.
+    this.events.on('question:answered', this.handleQuestionAnswered, this);
+    this.events.on('question:closed', this.handleQuestionClosed, this);
+    this.events.on('question:hintPurchased', this.handleQuestionHintPurchased, this);
 
     this.physics.world.setBounds(this.worldLayout.bounds.left, this.worldLayout.bounds.top, this.worldLayout.bounds.width, this.worldLayout.bounds.height);
     this.physics.world.setBoundsCollision(true, true, true, false);
@@ -231,21 +257,22 @@ export default class LevelScene extends Phaser.Scene {
       this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
     });
 
-    this.events.on('question:answered', this.handleQuestionAnswered, this);
-    this.events.on('question:hintPurchased', this.handleQuestionHintPurchased, this);
-    this.events.on('question:closed', this.handleQuestionClosed, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off('question:answered', this.handleQuestionAnswered, this);
-      this.events.off('question:hintPurchased', this.handleQuestionHintPurchased, this);
       this.events.off('question:closed', this.handleQuestionClosed, this);
+      this.events.off('question:hintPurchased', this.handleQuestionHintPurchased, this);
       this.stopBackgroundMusic();
       this.scene.stop('HudScene');
-      this.scene.stop('QuestionScene');
     });
 
     this.registry.set('totalCoins', this.totalCoins);
     this.registry.set('coinsCollected', this.coinsCollected);
     this.registry.set('coinBalance', this.coinBalance);
+    this.registry.set('keysCollected', 0);
+    this.registry.set('keyGoal', (this.worldObjectsData.coins || []).filter((item) => item.collectibleType === 'key').length);
+    this.registry.set('currentRoomKeyGoal', 0);
+    this.registry.set('scrollsCollected', 0);
+    this.registry.set('scrollGoal', (this.worldObjectsData.coins || []).filter((item) => item.collectibleType === 'scroll').length);
     this.registry.set('roomCount', getCellCount(this.levelData));
     this.registry.set('maxHealth', this.maxHealth);
     this.registry.set('health', this.currentHealth);
@@ -263,10 +290,17 @@ export default class LevelScene extends Phaser.Scene {
     this.startBackgroundMusic();
 
     this.buildWorld();
-    this.createInteractionPrompt();
     this.syncCurrentCellFromPlayer(true);
     this.syncMissionRegistry(true);
     this.showMissionBriefing();
+    if (this.isOverlayPaused) {
+      this.player.freeze(true);
+      this.physics.world.pause();
+      this.backgroundMusic?.pause?.();
+      this.gameState = GAME_STATES.PAUSED;
+    } else {
+      this.gameState = GAME_STATES.PLAYING;
+    }
   }
 
   startBackgroundMusic() {
@@ -279,7 +313,7 @@ export default class LevelScene extends Phaser.Scene {
       if (!this.backgroundMusic) {
         this.backgroundMusic = this.sound.add(backgroundMusicKey, {
           loop: true,
-          volume: 0.38,
+          volume: getStudentMusicVolume(0.38),
         });
       }
 
@@ -430,17 +464,24 @@ export default class LevelScene extends Phaser.Scene {
     ]);
 
     mergedPlatformConfigs.forEach((config) => this.createSolidSurface(config));
-    (this.worldObjectsData.unlockPlatforms || []).forEach((config) => this.registerQuestionTarget(this.questionUnlockPlatforms, config.lockedByQuestionId, this.createSolidSurface(config, { startsHidden: Boolean(config.startsHidden) })));
-    (this.worldObjectsData.barriers || []).forEach((config) => this.registerQuestionTarget(this.questionBarriers, config.lockedByQuestionId, this.createSolidSurface(config)));
+    (this.worldObjectsData.unlockPlatforms || []).forEach((config) => this.createSolidSurface(config, { startsHidden: false }));
+    (this.worldObjectsData.barriers || [])
+      .filter((config) => !config.lockedByQuestionId)
+      .forEach((config) => this.createSolidSurface(config));
     (this.worldObjectsData.triggerPlatforms || []).forEach((config) => {
       const record = this.createTriggerPlatform(config);
       if (record) {
         this.triggerPlatformRecords.push(record);
+        if (record.questionId) {
+          this.applyTriggerPlatformOutcome(record.questionId, 'correct');
+        }
       }
     });
 
     (this.worldObjectsData.coins || []).filter((coinConfig) => !this.collectedCoinIds.has(coinConfig.id)).forEach((coinConfig) => {
-      const coin = new Coin(this, coinConfig.x, coinConfig.y, this.manifest.coin, coinConfig);
+      const coin = coinConfig.collectibleType
+        ? new TreasurePickup(this, coinConfig.x, coinConfig.y, this.manifest.coin, coinConfig)
+        : new Coin(this, coinConfig.x, coinConfig.y, this.manifest.coin, coinConfig);
       coin.setDepth(this.resolveRenderLayerDepth(coinConfig.renderLayer));
       coin.coinId = coinConfig.id;
       this.physics.add.overlap(this.player, coin, this.handleCoinPickup, null, this);
@@ -464,8 +505,15 @@ export default class LevelScene extends Phaser.Scene {
         });
 
       ghost.enemyType = enemyType;
+      ghost.assignedRoomId = getCellRecordAtWorldPoint(this.worldLayout, ghostConfig.x, ghostConfig.y)?.cellId || '';
       ghost.setDepth(this.resolveRenderLayerDepth(ghostConfig.renderLayer));
-      this.physics.add.overlap(this.player, ghost, () => this.applyDamage(1, enemyType, { respawn: true }), null, this);
+      this.physics.add.overlap(this.player, ghost, () => {
+        const healthBeforeContact = this.currentHealth;
+        this.applyDamage(1, enemyType, { respawn: true, immediate: true });
+        if (this.currentHealth < healthBeforeContact) {
+          ghost.resetToSpawn?.();
+        }
+      }, null, this);
       this.registerSurfaceCollisionTarget(ghost);
 
       this.ghosts.push(ghost);
@@ -480,7 +528,9 @@ export default class LevelScene extends Phaser.Scene {
         ? 'game-one-boss-projectile-float'
         : enemyType === 'villain1'
           ? 'game-one-villain1-projectile'
-        : 'game-one-projectile-float';
+          : enemyType === 'elemental'
+            ? 'game-one-elemental-fire-projectile'
+            : 'game-one-projectile-float';
       const animationKey = enemyType === 'villain1'
         ? 'game-one-villain1-hover'
         : (enemyType === 'spiritboss' ? 'game-one-spirit-boss-run' : undefined);
@@ -499,7 +549,7 @@ export default class LevelScene extends Phaser.Scene {
       });
       caster.setDepth(this.resolveRenderLayerDepth(projectileConfig.renderLayer));
       if (enemyType === 'elemental') {
-        this.physics.add.overlap(this.player, caster, () => this.applyDamage(1, 'elemental', { respawn: true }), null, this);
+        this.physics.add.overlap(this.player, caster, () => this.applyDamage(1, 'elemental', { respawn: true, immediate: true }), null, this);
       }
       this.registerSurfaceCollisionTarget(caster);
       this.projectileCasters.push(caster);
@@ -509,43 +559,61 @@ export default class LevelScene extends Phaser.Scene {
       this.sceneObjects.push(caster);
     });
 
-    this.getVillainConfigs().forEach((villainConfig) => {
-      const villain = new VillainTrigger(this, villainConfig.x, villainConfig.y, this.manifest.villain, villainConfig);
-      villain.damageOnWrongAnswer = this.normalizeQuestionDamageAmount(villainConfig.damageOnWrongAnswer);
-      villain.setDepth(this.resolveRenderLayerDepth(villainConfig.renderLayer));
-      villain.setQuestionState(this.completedQuestions.has(villainConfig.questionId) ? 'ANSWERED' : 'UNANSWERED', { animate: false });
-      this.physics.add.overlap(this.player, villain, () => this.handleVillainTouch(villain), null, this);
-      this.villains.push(villain);
-      this.sceneObjects.push(villain);
-    });
-
-    const villainConfigs = this.getVillainConfigs();
     this.getPortalConfigs().forEach((portalConfig, index) => {
+      if (portalConfig.appearance === 'TREASURE_CHEST') {
+        const chest = new TreasureChest(this, portalConfig.x, portalConfig.y, portalConfig);
+        chest.portalIndex = index;
+        this.physics.add.overlap(this.player, chest, () => this.handlePortalTouch(chest), null, this);
+        this.portals.push(chest);
+        this.sceneObjects.push(chest);
+        return;
+      }
+
       const variant = typeof portalConfig?.variant === 'string'
         ? portalConfig.variant.trim().toLowerCase()
         : '';
-      const resolvedQuestionId = resolvePortalQuestionId(portalConfig, villainConfigs, this.worldLayout);
+      const hadQuestionLock = Boolean(portalConfig.questionId);
       const portalManifest = this.resolvePortalManifest(variant);
       const portal = new Portal(this, portalConfig.x, portalConfig.y, portalManifest, {
         ...portalConfig,
-        questionId: resolvedQuestionId || null,
+        questionId: null,
+        locked: hadQuestionLock ? false : portalConfig.locked,
         animationKey: this.resolvePortalAnimationKey(variant),
       });
       portal.setDepth(this.resolveRenderLayerDepth(portalConfig.renderLayer));
       portal.portalIndex = index;
       portal.touchCooldownUntil = 0;
-      portal.lockedByConfig = Boolean(portalConfig.locked) && !resolvedQuestionId;
-      if (resolvedQuestionId && !this.completedQuestions.has(resolvedQuestionId)) {
-        portal.setLocked(true);
-      }
+      portal.requiredCoins = Math.max(0, Number(portalConfig.requiredCoins) || 0);
+      portal.requiredKeys = Math.max(0, Number(portalConfig.requiredKeys) || 0);
+      portal.requiredScrollId = typeof portalConfig.requiredScrollId === 'string' ? portalConfig.requiredScrollId : '';
+      portal.requiredQuestionIds = Array.isArray(portalConfig.requiredQuestionIds)
+        ? portalConfig.requiredQuestionIds.filter((questionId) => typeof questionId === 'string' && questionId.trim())
+        : [];
+      portal.lockedMessage = typeof portalConfig.lockedMessage === 'string' ? portalConfig.lockedMessage.trim() : '';
+      portal.lockedByConfig = Boolean(portalConfig.locked) && !hadQuestionLock
+        && portal.requiredCoins === 0 && portal.requiredKeys === 0 && !portal.requiredScrollId
+        && portal.requiredQuestionIds.length === 0;
       this.physics.add.overlap(this.player, portal, () => this.handlePortalTouch(portal), null, this);
-      this.registerQuestionTarget(this.questionPortals, resolvedQuestionId, portal);
       this.registerPortalLink(portal);
       this.portals.push(portal);
       this.sceneObjects.push(portal);
     });
 
+    this.syncProgressionPortalLocks();
     this.syncEndingPortalLocks();
+  }
+
+  syncProgressionPortalLocks() {
+    this.portals.forEach((portal) => {
+      if (portal?.endsLevel === false && (portal.requiredCoins > 0 || portal.requiredKeys > 0 || portal.requiredScrollId || portal.requiredQuestionIds.length > 0)) {
+        portal.setLocked(
+          this.coinsCollected < portal.requiredCoins
+          || this.collectedKeyIds.size < portal.requiredKeys
+          || (portal.requiredScrollId && !this.collectedScrollIds.has(portal.requiredScrollId))
+          || portal.requiredQuestionIds.some((questionId) => !this.completedQuestions.has(questionId)),
+        );
+      }
+    });
   }
 
   getVillainConfigs() {
@@ -626,6 +694,10 @@ export default class LevelScene extends Phaser.Scene {
       return 'slimeorange';
     }
 
+    if (normalized === 'shadowspirit' || normalized === 'shadow-spirit') {
+      return 'shadowspirit';
+    }
+
     if (normalized === 'spiritboss' || normalized === 'spirit-boss' || normalized === 'boss6') {
       return 'spiritboss';
     }
@@ -639,7 +711,7 @@ export default class LevelScene extends Phaser.Scene {
 
   normalizeGhostEnemyType(value) {
     const normalized = this.normalizeEnemyType(value);
-    if (normalized === 'slimegreen' || normalized === 'slimeorange') {
+    if (normalized === 'slimegreen' || normalized === 'slimeorange' || normalized === 'shadowspirit') {
       return normalized;
     }
 
@@ -669,28 +741,11 @@ export default class LevelScene extends Phaser.Scene {
       return this.manifest.slimeOrange || this.manifest.slimePurple || this.manifest.ghost;
     }
 
+    if (enemyType === 'shadowspirit') {
+      return this.manifest.shadowSpirit || this.manifest.ghost;
+    }
+
     return this.manifest.ghost;
-  }
-
-  resolveGhostEnemyAnimationConfig(enemyType) {
-    if (enemyType === 'slimegreen') {
-      return {
-        animationKey: 'game-one-slime-green-move',
-        frameKeys: this.buildManifestImageFrameKeys(this.manifest.slimeGreen),
-      };
-    }
-
-    if (enemyType === 'slimeorange') {
-      return {
-        animationKey: 'game-one-slime-orange-move',
-        frameKeys: this.buildManifestImageFrameKeys(this.manifest.slimeOrange || this.manifest.slimePurple),
-      };
-    }
-
-    return {
-      animationKey: 'game-one-ghost-float',
-      frameKeys: [],
-    };
   }
 
   resolveProjectileEnemyManifest(enemyType) {
@@ -714,6 +769,10 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   resolveProjectileManifest(enemyType) {
+    if (enemyType === 'elemental') {
+      return this.manifest.elementalProjectile || this.manifest.enemyProjectile;
+    }
+
     if (enemyType === 'villain1') {
       return this.manifest.villain1Projectile || this.manifest.enemyProjectile;
     }
@@ -768,11 +827,15 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   resolvePortalManifest(variant = '') {
-    return this.manifest.portal3 || this.manifest.portal;
+    return String(variant).trim().toLowerCase() === 'portal3'
+      ? (this.manifest.portal3 || this.manifest.portal)
+      : this.manifest.portal;
   }
 
   resolvePortalAnimationKey(variant = '') {
-    return this.manifest.portal3 ? 'game-one-portal3-spin' : 'game-one-portal-spin';
+    return String(variant).trim().toLowerCase() === 'portal3' && this.manifest.portal3
+      ? 'game-one-portal3-spin'
+      : 'game-one-portal-spin';
   }
 
   resolveCoinGoal() {
@@ -797,6 +860,131 @@ export default class LevelScene extends Phaser.Scene {
     this.objectiveLockUntil = this.time.now + holdMs;
   }
 
+  showScrollClue(scrollPickup) {
+    const clueText = typeof scrollPickup?.clueText === 'string'
+      ? scrollPickup.clueText.trim()
+      : '';
+    const textureKey = 'game-one-treasure-scroll-template';
+
+    if (!clueText || !this.textures.exists(textureKey)) return;
+
+    this.isInteractionLocked = true;
+    this.player.freeze(true);
+    this.physics.world.pause();
+
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+    const parchmentWidth = Math.min(680, this.scale.width * 0.72);
+    const sourceImage = this.textures.get(textureKey).getSourceImage();
+    const sourceRatio = sourceImage?.height && sourceImage?.width
+      ? sourceImage.height / sourceImage.width
+      : 0.63;
+    const parchmentHeight = parchmentWidth * sourceRatio;
+    const innerTextWidth = parchmentWidth * 0.72;
+    const scrollNumber = String(scrollPickup?.scrollId || '').match(/\d+/)?.[0];
+    const titleText = scrollNumber ? `SCROLL CLUE #${scrollNumber}` : 'TREASURE CLUE';
+
+    const overlay = this.add.rectangle(
+      centerX,
+      centerY,
+      this.scale.width,
+      this.scale.height,
+      0x100b08,
+      0.72,
+    ).setScrollFactor(0).setDepth(10000).setInteractive();
+
+    const parchment = this.add.image(centerX, centerY, textureKey)
+      .setScrollFactor(0)
+      .setDepth(10001)
+      .setDisplaySize(parchmentWidth, parchmentHeight);
+
+    const cluePanelElement = document.createElement('div');
+    cluePanelElement.style.width = `${Math.round(innerTextWidth)}px`;
+    cluePanelElement.style.height = `${Math.round(parchmentHeight * 0.70)}px`;
+    cluePanelElement.style.position = 'relative';
+    cluePanelElement.style.display = 'block';
+    cluePanelElement.style.boxSizing = 'border-box';
+    cluePanelElement.style.padding = '0';
+    cluePanelElement.style.textAlign = 'center';
+    cluePanelElement.style.pointerEvents = 'none';
+    cluePanelElement.style.userSelect = 'none';
+    cluePanelElement.style.textRendering = 'optimizeLegibility';
+    cluePanelElement.style.webkitFontSmoothing = 'antialiased';
+
+    const titleElement = document.createElement('div');
+    titleElement.textContent = titleText;
+    titleElement.style.fontFamily = 'PixelOperator8, monospace';
+    titleElement.style.fontSize = `${Math.round(Math.max(20, Math.min(27, parchmentWidth * 0.04)))}px`;
+    titleElement.style.fontWeight = '700';
+    titleElement.style.lineHeight = '1.15';
+    titleElement.style.color = '#5d321d';
+    titleElement.style.position = 'absolute';
+    // Keep the heading below the parchment's top ornament on every scroll.
+    titleElement.style.top = '45px';
+    titleElement.style.left = '0';
+    titleElement.style.width = '100%';
+
+    const clueElement = document.createElement('div');
+    clueElement.textContent = clueText;
+    clueElement.style.position = 'absolute';
+    clueElement.style.top = '20%';
+    clueElement.style.bottom = '14%';
+    clueElement.style.left = '0';
+    clueElement.style.width = '100%';
+    clueElement.style.display = 'flex';
+    clueElement.style.alignItems = 'center';
+    clueElement.style.justifyContent = 'center';
+    clueElement.style.whiteSpace = 'pre-line';
+    clueElement.style.overflow = 'hidden';
+    clueElement.style.overflowWrap = 'anywhere';
+    clueElement.style.wordBreak = 'normal';
+    clueElement.style.fontFamily = 'Manrope, Arial, sans-serif';
+    clueElement.style.fontSize = `${clueText.length > 280 ? 17 : clueText.length > 180 ? 18 : clueText.length > 120 ? 20 : 22}px`;
+    clueElement.style.fontWeight = '400';
+    clueElement.style.lineHeight = '1.25';
+    clueElement.style.color = '#3f2919';
+
+    const dismissElement = document.createElement('div');
+    dismissElement.textContent = 'CLICK TO CONTINUE';
+    dismissElement.style.fontFamily = 'Manrope, Arial, sans-serif';
+    dismissElement.style.fontSize = '14px';
+    dismissElement.style.fontWeight = '400';
+    dismissElement.style.lineHeight = '1';
+    dismissElement.style.color = '#6b3d24';
+    dismissElement.style.position = 'absolute';
+    dismissElement.style.bottom = '30px';
+    dismissElement.style.left = '0';
+    dismissElement.style.width = '100%';
+
+    cluePanelElement.append(titleElement, clueElement, dismissElement);
+    const cluePanel = this.add.dom(centerX, centerY, cluePanelElement)
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(10002);
+
+    let fitFrame = window.requestAnimationFrame(() => {
+      let currentSize = Number.parseFloat(clueElement.style.fontSize) || 16;
+      while (
+        currentSize > 15
+        && (clueElement.scrollHeight > clueElement.clientHeight || clueElement.scrollWidth > clueElement.clientWidth)
+      ) {
+        currentSize -= 1;
+        clueElement.style.fontSize = `${currentSize}px`;
+      }
+      fitFrame = null;
+    });
+
+    overlay.once('pointerdown', () => {
+      if (fitFrame !== null) window.cancelAnimationFrame(fitFrame);
+      overlay.destroy();
+      parchment.destroy();
+      cluePanel.destroy();
+      this.isInteractionLocked = false;
+      this.player.freeze(false);
+      this.physics.world.resume();
+    });
+  }
+
   getMissionSnapshot() {
     const statues = this.getStatueQuestionProgress();
     const coinsGoalMet = this.coinGoal <= 0 || this.coinsCollected >= this.coinGoal;
@@ -810,7 +998,7 @@ export default class LevelScene extends Phaser.Scene {
         primary: `Collect relic shards (${this.coinsCollected}/${this.coinGoal}).`,
         secondary: dangerActive
           ? 'Enemies are enraged. Stay mobile while collecting.'
-          : 'Search each room for coins before challenging all statues.',
+          : 'Search each area for coins and avoid incoming attacks.',
       };
     }
 
@@ -864,19 +1052,29 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   showMissionBriefing() {
+    const configuredTitle = typeof this.levelData?.missionTitle === 'string'
+      ? this.levelData.missionTitle.trim()
+      : '';
+    const configuredText = typeof this.levelData?.missionText === 'string'
+      ? this.levelData.missionText.trim()
+      : '';
     const mission = this.getMissionSnapshot();
     const bossLine = this.requireBossDefeat
       ? '\nDefeat the sentinel before using the ending portal.'
       : '';
+    const briefingText = configuredText
+      ? `${configuredTitle || 'MISSION'}\n${configuredText}`
+      : `Mission Online\n${mission.primary}\nPress J to fire arc bolts.${bossLine}`;
     const briefing = this.add.text(
       this.cameras.main.width / 2,
       72,
-      `Mission Online\n${mission.primary}\nPress J to fire arc bolts.${bossLine}`,
+      briefingText,
       {
         fontFamily: 'Manrope, Arial, sans-serif',
-        fontSize: '20px',
+        fontSize: configuredText ? '14px' : '20px',
         align: 'center',
         color: '#f8fafc',
+        wordWrap: configuredText ? { width: 500, useAdvancedWrap: true } : undefined,
       },
     );
 
@@ -884,16 +1082,21 @@ export default class LevelScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setDepth(1400)
-      .setPadding(18, 12, 18, 12)
+      .setPadding(12, 8, 12, 8)
       .setBackgroundColor('#0f172acc');
+
+    this.missionBriefing = briefing;
 
     this.tweens.add({
       targets: briefing,
       alpha: 0,
-      delay: 3200,
+      delay: configuredText ? 4800 : 3200,
       duration: 700,
       ease: 'Sine.InOut',
-      onComplete: () => briefing.destroy(),
+      onComplete: () => {
+        briefing.destroy();
+        if (this.missionBriefing === briefing) this.missionBriefing = null;
+      },
     });
   }
 
@@ -996,6 +1199,9 @@ export default class LevelScene extends Phaser.Scene {
       return;
     }
 
+    if (this.cache.audio.exists('gameOneCharacterFiring')) {
+      this.sound.play('gameOneCharacterFiring', { volume: getStudentSfxVolume(0.8) });
+    }
     const abilityConfig = this.playerAbilityConfig || {};
     const direction = this.player?.facing === -1 ? -1 : 1;
     const burstCount = Math.max(1, Math.round(Number(abilityConfig.projectileBurstCount) || 1));
@@ -1049,6 +1255,7 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     this.syncEndingPortalLocks();
+    this.syncProgressionPortalLocks();
     this.setObjectiveMessage(`Great shot! ${this.getEnemyLabel(resolvedEnemyType)} destroyed.`, 1300);
     this.syncMissionRegistry();
   }
@@ -1180,18 +1387,37 @@ export default class LevelScene extends Phaser.Scene {
 
     const requiresStatueUnlock = this.requiredStatueQuestionIds.size > 0;
     const allStatuesAnswered = this.areAllRequiredStatuesAnswered();
+    const lockedByCoins = this.coinGoal > 0 && this.coinsCollected < this.coinGoal;
     const lockedByBoss = this.requireBossDefeat && this.getBossRemaining() > 0;
+    const scrollGoal = Number(this.registry.get('scrollGoal') || 0);
 
     this.portals.forEach((portal) => {
       if (!portal || portal.endsLevel === false) {
         return;
       }
 
-      const lockedByQuestion = Boolean(portal.questionId) && !this.completedQuestions.has(portal.questionId);
+      const lockedByQuestion = !portal.isTreasureChest && Boolean(portal.questionId) && !this.completedQuestions.has(portal.questionId);
       const lockedByStatues = requiresStatueUnlock && !allStatuesAnswered;
       const lockedByConfig = Boolean(portal.lockedByConfig);
-      portal.setLocked(lockedByConfig || lockedByQuestion || lockedByStatues || lockedByBoss);
+      const collectedRequirementCount = this.getCollectedRequirementCount(portal);
+      const lockedByRequiredCoins = Number(portal.requiredCoins) > collectedRequirementCount;
+      const lockedByRequiredKeys = Number(portal.requiredKeys) > this.collectedKeyIds.size;
+      const lockedByRequiredScroll = Boolean(portal.requiredScrollId) && !this.collectedScrollIds.has(portal.requiredScrollId);
+      const lockedByTreasureScrolls = Boolean(
+        portal.isTreasureChest
+        && this.levelData?.treasureHunt
+        && scrollGoal > 0
+        && this.collectedScrollIds.size < scrollGoal
+      );
+      portal.setLocked(lockedByConfig || lockedByQuestion || lockedByStatues || lockedByCoins || lockedByBoss
+        || lockedByRequiredCoins || lockedByRequiredKeys || lockedByRequiredScroll || lockedByTreasureScrolls);
     });
+  }
+
+  getCollectedRequirementCount(portal) {
+    return portal?.isTreasureChest && this.levelData?.treasureHunt
+      ? this.collectedScrollIds.size
+      : this.coinsCollected;
   }
 
   getPortalConfigs() {
@@ -1371,9 +1597,30 @@ export default class LevelScene extends Phaser.Scene {
     const resolvedTextureKey = requestedTextureKey && this.textures.exists(requestedTextureKey)
       ? requestedTextureKey
       : textureMeta.key;
-    const visual = isInvisible
-      ? this.add.rectangle(visualRect.centerX, visualRect.centerY, visualRect.width, visualRect.height, 0xffffff, 0).setOrigin(0.5)
-      : this.add.tileSprite(visualRect.centerX, visualRect.centerY, visualRect.width, visualRect.height, resolvedTextureKey).setOrigin(0.5);
+    let visual;
+    if (isInvisible) {
+      visual = this.add.rectangle(
+        visualRect.centerX,
+        visualRect.centerY,
+        visualRect.width,
+        visualRect.height,
+        0xffffff,
+        0,
+      ).setOrigin(0.5);
+    } else {
+      const requestedTileWidth = Math.max(1, Number(textureMeta.tileWidth) || visualRect.height);
+      const tileCount = Math.max(1, Math.round(visualRect.width / requestedTileWidth));
+      const renderedTileWidth = visualRect.width / tileCount;
+      visual = this.add.container(visualRect.centerX, visualRect.centerY);
+
+      for (let tileIndex = 0; tileIndex < tileCount; tileIndex += 1) {
+        const tileX = (-visualRect.width / 2) + (renderedTileWidth * (tileIndex + 0.5));
+        visual.add(
+          this.add.image(tileX, 0, resolvedTextureKey)
+            .setDisplaySize(renderedTileWidth, visualRect.height),
+        );
+      }
+    }
     visual.setDepth(this.resolveRenderLayerDepth(config.renderLayer));
     const body = this.physics.add.staticBody(bodyRect.left, bodyRect.top, bodyRect.width, bodyRect.height);
     const debugCollisionGuide = null;
@@ -1408,6 +1655,7 @@ export default class LevelScene extends Phaser.Scene {
     if (debugCollisionGuide) {
       this.sceneObjects.push(debugCollisionGuide);
     }
+    configureTreasureSurface(this, entry, config);
     return entry;
   }
 
@@ -1635,7 +1883,11 @@ export default class LevelScene extends Phaser.Scene {
       boundsRight: this.worldLayout.bounds.right,
       animationKey: caster.projectileAnimationKey,
     });
-    this.physics.add.overlap(this.player, projectile, () => { projectile.destroyProjectile(); this.applyDamage(1, 'projectile', { respawn: true }); }, null, this);
+    this.physics.add.overlap(this.player, projectile, () => {
+      projectile.destroyProjectile();
+      const damageReason = caster.enemyType === 'elemental' ? 'elemental' : 'projectile';
+      this.applyDamage(1, damageReason, { respawn: true, immediate: true });
+    }, null, this);
     this.registerProjectileSurfaceColliders(projectile);
     this.projectiles.push(projectile);
     caster.consumeShot(time);
@@ -1681,7 +1933,10 @@ export default class LevelScene extends Phaser.Scene {
       return `Defeat the sentinel boss before the ending portal can stabilize (${this.getBossRemaining()} remaining).`;
     }
 
-    return cell.objective || (portalInCell ? 'Reach the final portal to finish the level.' : 'Explore the connected map and push into the next area.');
+    const configuredObjective = typeof cell.objective === 'string' ? cell.objective.trim() : '';
+    const referencesRemovedQuestionFeature = /question|statue|riddle/i.test(configuredObjective);
+    return (!referencesRemovedQuestionFeature && configuredObjective)
+      || (portalInCell ? 'Reach the final portal to finish the level.' : 'Explore the connected map and push into the next area.');
   }
 
   syncHealthRegistry() {
@@ -1800,8 +2055,15 @@ export default class LevelScene extends Phaser.Scene {
 
   respawnPlayer({ roomRecord = this.currentCellRecord, position = null, resetBlockedReturnRoomId = true } = {}) {
     const spawnPoint = resolveRespawnPosition(position, this.getCellSpawnPoint(roomRecord));
-    this.player.setPosition(spawnPoint.x, spawnPoint.y);
-    this.player.setVelocity(0, 0);
+    this.fallWarningSoundPlayed = false;
+    // Keep the sprite and its Arcade Physics body on the same authored spawn.
+    // This avoids a one-frame stale body position on slower production frames.
+    if (this.player.body?.reset) {
+      this.player.body.reset(spawnPoint.x, spawnPoint.y);
+    } else {
+      this.player.setPosition(spawnPoint.x, spawnPoint.y);
+      this.player.setVelocity(0, 0);
+    }
     if (resetBlockedReturnRoomId) {
       this.blockedReturnRoomId = null;
     }
@@ -1842,21 +2104,51 @@ export default class LevelScene extends Phaser.Scene {
     }
     if (reason === 'elemental') return 'The fire hit you. One heart lost. You were returned to the area start.';
     if (reason === 'projectile') return 'The projectile hit you. One heart lost. You were returned to the area start.';
+    if (reason === 'poison') return 'That potion was poison. One heart lost. You were returned to the room start.';
     if (reason === 'fall') return 'You fell. One heart lost. You were returned to the area start.';
     return 'You took damage. Keep moving and protect your remaining health.';
   }
 
-  applyDamage(amount, reason, { respawn = false, bypassInvulnerability = false, respawnRoomRecord = null } = {}) {
+  applyDamage(amount, reason, {
+    respawn = false,
+    bypassInvulnerability = false,
+    immediate = false,
+    respawnRoomRecord = null,
+  } = {}) {
     if (this.hasFinished) return;
-    if (!bypassInvulnerability && this.time.now < this.damageCooldownUntil) return;
-    this.currentHealth = Math.max(0, (Math.round((this.currentHealth - amount) * 2) / 2));
+    if (!bypassInvulnerability && !immediate && this.time.now < this.damageCooldownUntil) return;
+    if (!bypassInvulnerability && this.shieldCharges > 0) {
+      this.shieldCharges -= 1;
+      if (this.cache.audio.exists('gameOneShieldHit')) {
+        this.sound.play('gameOneShieldHit', { volume: getStudentSfxVolume(0.9) });
+      }
+      if (this.shieldCharges <= 0) this.player.clearPowerUpAura?.('shield');
+      this.damageCooldownUntil = this.time.now + 650;
+      this.setObjectiveMessage('Shield absorbed the hit.', 1200);
+      return;
+    }
+    const isFireDamage = reason === 'fire' || reason === 'elemental';
+    if (isFireDamage) {
+      this.player.clearSpeedAndJumpBoosts?.();
+    }
+    if ((reason === 'spikes' || reason === 'spike') && this.cache.audio.exists('gameOneSpikeHit')) {
+      this.sound.play('gameOneSpikeHit', { volume: getStudentSfxVolume(0.9) });
+    }
+    if (reason === 'ghost' && this.cache.audio.exists(this.manifest.sounds.hurt.key)) {
+      this.sound.play(this.manifest.sounds.hurt.key, { volume: getStudentSfxVolume(0.85) });
+    }
+    if ((reason === 'projectile' || reason === 'elemental') && this.cache.audio.exists('gameOneEnemyProjectileHit')) {
+      this.sound.play('gameOneEnemyProjectileHit', { volume: getStudentSfxVolume(1) });
+    }
+    const resolvedDamage = Math.max(0, Number(amount) || 0);
+    this.currentHealth = Math.max(0, (Math.round((this.currentHealth - resolvedDamage) * 2) / 2));
+    this.player.clearPowerUpAura?.();
     this.syncHealthRegistry();
     if (this.currentHealth <= 0) { this.failLevel(reason); return; }
     this.damageCooldownUntil = this.time.now + (respawn ? 1100 : 400);
     this.playDamageFeedback();
     if (respawn) {
-      const firstRoomRecord = this.worldLayout.cells[0] || null;
-      const restartRoomRecord = firstRoomRecord || respawnRoomRecord || this.currentCellRecord;
+      const restartRoomRecord = respawnRoomRecord || this.currentCellRecord || this.worldLayout.cells[0] || null;
       const restartPosition = resolveLevelRestartPosition({
         firstRoomStartPosition: this.getSavedRoomStartPosition(restartRoomRecord),
         firstRoomSpawnPosition: restartRoomRecord ? getLocalCellSpawn(restartRoomRecord) : this.getSpawnPoint(),
@@ -1871,6 +2163,34 @@ export default class LevelScene extends Phaser.Scene {
     this.syncMissionRegistry();
   }
 
+  resolveGhostEnemyAnimationConfig(enemyType) {
+    if (enemyType === 'shadowspirit') {
+      return {
+        animationKey: 'game-one-shadow-spirit-move',
+        frameKeys: [],
+      };
+    }
+
+    if (enemyType === 'slimegreen') {
+      return {
+        animationKey: 'game-one-slime-green-move',
+        frameKeys: this.buildManifestImageFrameKeys(this.manifest.slimeGreen),
+      };
+    }
+
+    if (enemyType === 'slimeorange') {
+      return {
+        animationKey: 'game-one-slime-orange-move',
+        frameKeys: this.buildManifestImageFrameKeys(this.manifest.slimeOrange || this.manifest.slimePurple),
+      };
+    }
+
+    return {
+      animationKey: 'game-one-ghost-float',
+      frameKeys: [],
+    };
+  }
+
   syncCurrentCellFromPlayer(force = false) {
     if (this.portalRoomTraversalOnly && !force) {
       return;
@@ -1881,23 +2201,97 @@ export default class LevelScene extends Phaser.Scene {
     if (!force && !cellChanged) return;
     this.currentCellRecord = nextRecord;
     this.updateCameraBoundsForCell(nextRecord, { snap: force });
+    this.ghosts.forEach((enemy) => {
+      const belongsToCurrentRoom = !enemy.assignedRoomId || enemy.assignedRoomId === nextRecord.cellId;
+      enemy.setRoomActive?.(belongsToCurrentRoom, this.time.now);
+      enemy.setVisible(belongsToCurrentRoom);
+      if (enemy.body) enemy.body.enable = belongsToCurrentRoom;
+    });
     this.registry.set('roomLabel', 'Area');
     this.registry.set('roomIndex', nextRecord.index + 1);
+    const currentRoomKeyGoal = (this.worldObjectsData?.coins || []).filter((pickup) => (
+      pickup.collectibleType === 'key'
+      && pickup.x >= nextRecord.bounds.left
+      && pickup.x <= nextRecord.bounds.right
+      && pickup.y >= nextRecord.bounds.top
+      && pickup.y <= nextRecord.bounds.bottom
+    )).length;
+    this.registry.set('currentRoomKeyGoal', currentRoomKeyGoal);
     this.syncMissionRegistry(force);
   }
 
   handleCoinPickup(player, coin) {
     if (this.collectedCoinIds.has(coin.coinId)) return;
+    const pickupType = coin.pickupType || 'coin';
+    const scrollClue = {
+      clueText: coin.clueText,
+      scrollId: coin.scrollId,
+    };
     this.collectedCoinIds.add(coin.coinId);
-    this.coinsCollected += 1;
-    this.coinBalance += 1;
+    const pickupSoundKey = {
+      coin: 'gameOnePickupCoin',
+      key: 'gameOnePickupKey',
+      poison: 'gameOnePickupPoison',
+      shield: 'gameOnePickupShield',
+      health: 'gameOnePickupHeart',
+      scroll: 'gameOnePickupScroll',
+      jump: this.manifest.sounds.powerUp.key,
+      speed: this.manifest.sounds.powerUp.key,
+    }[pickupType];
+    if (pickupSoundKey && this.cache.audio.exists(pickupSoundKey)) {
+      this.sound.play(pickupSoundKey, {
+        volume: getStudentSfxVolume(0.85),
+      });
+    }
+    if (pickupType === 'poison') {
+      coin.destroy();
+      this.applyDamage(1, 'poison', { respawn: true, bypassInvulnerability: true });
+      return;
+    }
+    if (pickupType === 'key') {
+      this.collectedKeyIds.add(coin.coinId);
+      this.registry.set('keysCollected', this.collectedKeyIds.size);
+      const keyGoal = Number(this.registry.get('keyGoal') || 0);
+      this.setObjectiveMessage(`Seal collected! ${this.collectedKeyIds.size}/${keyGoal}`, 1400);
+    } else if (pickupType === 'coin') {
+      this.coinsCollected += 1;
+      this.coinBalance += 1;
+      this.setObjectiveMessage(`Coin collected! ${this.coinBalance} available for hints.`, 1400);
+    } else if (pickupType === 'health') {
+      this.currentHealth = Math.min(this.maxHealth, this.currentHealth + 1);
+      this.syncHealthRegistry();
+      this.setObjectiveMessage('Health restored.', 1100);
+    } else if (pickupType === 'shield') {
+      // The visible shield is one protection charge; pickups must not create
+      // hidden stacked charges that survive several fire hits.
+      this.shieldCharges = 1;
+      this.player.activateShieldAura?.();
+      this.setObjectiveMessage('Shield ready for the next hit.', 1300);
+    } else if (pickupType === 'speed') {
+      this.player.activateSpeedBoost(9000);
+      this.setObjectiveMessage('Speed Boost active: movement speed increased by 75% for 9 seconds.', 1800);
+    } else if (pickupType === 'jump') {
+      this.player.activateJumpBoost?.(10000);
+      this.setObjectiveMessage('Jump Boost active for 10 seconds.', 1300);
+    } else if (pickupType === 'doubleJump') {
+      this.player.doubleJumpBoostUntil = this.time.now + 12000;
+      this.setObjectiveMessage('Double Jump active for 12 seconds.', 1300);
+    } else if (pickupType === 'scroll') {
+      this.collectedScrollIds.add(coin.scrollId || coin.coinId);
+      this.registry.set('scrollsCollected', this.collectedScrollIds.size);
+    }
     this.registry.set('coinsCollected', this.coinsCollected);
     this.registry.set('coinBalance', this.coinBalance);
-    if (this.coinGoal > 0) {
-      this.setObjectiveMessage(`Relic shard collected (${this.coinsCollected}/${this.coinGoal}).`, 1000);
+    if (pickupType === 'scroll' && this.coinGoal > 0) {
+      this.setObjectiveMessage(`Scroll Found! ${this.coinsCollected}/${this.coinGoal} — clue saved.`, 1800);
     }
+    this.syncEndingPortalLocks();
+    this.syncProgressionPortalLocks();
     this.syncMissionRegistry();
     coin.destroy();
+    if (pickupType === 'scroll') {
+      this.showScrollClue(scrollClue);
+    }
   }
 
   handleVillainTouch(villain) {
@@ -1966,7 +2360,14 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     const nextRetryIndex = (this.questionRetryCounts.get(questionId) || 0) + 1;
-    const nextQuestion = buildQuestionRetryVariant(currentQuestion, nextRetryIndex);
+    const configuredRetryQuestion = buildQuestionRetryVariant(currentQuestion, nextRetryIndex);
+    const nextQuestion = currentQuestion.challengeType === 'WORD_SCRAMBLE'
+      ? createTreasureAttemptVariation(
+        configuredRetryQuestion || currentQuestion,
+        `${currentQuestion.attemptVariationSeed || questionId}:retry:${nextRetryIndex}`,
+        currentQuestion,
+      )
+      : configuredRetryQuestion;
     if (!nextQuestion) {
       return null;
     }
@@ -1979,14 +2380,27 @@ export default class LevelScene extends Phaser.Scene {
 
   restartQuestionRoom(questionId) {
     const questionContext = this.activeQuestionContext || {};
-    const roomRecord = questionContext.roomId
-      ? this.worldLayout.byId.get(questionContext.roomId)
-      : (this.currentCellRecord || null);
-    const restartPosition = resolveQuestionRestartPosition({
-      checkpointPosition: questionContext.checkpointPosition,
-      triggerPosition: questionContext.triggerPosition,
-      fallbackPosition: this.getCellSpawnPoint(roomRecord),
-    });
+    const isTreasureQuestion = questionId === this.levelData?.treasureQuestionId;
+    const treasureChest = isTreasureQuestion
+      ? this.portals.find((portal) => portal?.isTreasureChest)
+      : null;
+    const treasureRoomId = treasureChest
+      ? getPortalRoomId(this.worldLayout, treasureChest)
+      : '';
+    const roomRecord = (treasureRoomId ? this.worldLayout.byId.get(treasureRoomId) : null)
+      || (isTreasureQuestion ? this.worldLayout.byId.get('room-5') : null)
+      || (questionContext.roomId
+        ? this.worldLayout.byId.get(questionContext.roomId)
+        : null)
+      || this.currentCellRecord
+      || null;
+    const restartPosition = isTreasureQuestion && roomRecord?.bounds
+      ? getRoomWorldPosition(roomRecord, LEVEL_ONE_ROOM_FIVE_RETRY_LOCAL_POSITION)
+      : resolveQuestionRestartPosition({
+        checkpointPosition: questionContext.checkpointPosition,
+        triggerPosition: questionContext.triggerPosition,
+        fallbackPosition: this.getCellSpawnPoint(roomRecord),
+      });
     const nextQuestion = this.resolveQuestionRetryVariant(questionId);
     const topicLabel = getQuestionTopicLabel(nextQuestion || getQuestionById(this.levelData, questionId));
 
@@ -1996,8 +2410,13 @@ export default class LevelScene extends Phaser.Scene {
       position: restartPosition,
       resetBlockedReturnRoomId: false,
     });
+    const treasureDamage = isTreasureQuestion ? this.getQuestionDamageAmount(questionId) : 0;
     this.setObjectiveMessage(
-      nextQuestion
+      isTreasureQuestion
+        ? (treasureDamage > 0
+          ? 'Third attempt failed. One heart lost. Returned to the Room 5 start.'
+          : 'Third attempt failed. Returned to the Room 5 checkpoint.')
+        : nextQuestion
         ? `Wrong answer. This room restarted, and the statue now has a new question about ${topicLabel}.`
         : 'Wrong answer. This room restarted. Return to the statue for the next challenge.',
       2400,
@@ -2030,6 +2449,7 @@ export default class LevelScene extends Phaser.Scene {
   handleQuestionAnswered({ questionId, correct }) {
     this.questionCooldownUntil = this.time.now + 600;
     this.isInteractionLocked = false;
+    resetControls(this.controls);
     this.player.freeze(false);
     this.physics.world.resume();
     this.callbacks.onQuestionVisibilityChange?.(false);
@@ -2039,15 +2459,35 @@ export default class LevelScene extends Phaser.Scene {
       this.villains.filter((villain) => villain.questionId === questionId).forEach((villain) => villain.setQuestionState('ANSWERED', { animate: true }));
       this.applyTriggerPlatformOutcome(questionId, 'correct');
       this.unlockQuestionTargets(questionId);
+      this.syncProgressionPortalLocks();
       this.syncEndingPortalLocks();
       this.syncCurrentCellFromPlayer(true);
       this.setObjectiveMessage('Riddle solved. New paths are opening.', 1600);
       this.syncMissionRegistry();
+      if (questionId === this.levelData?.treasureQuestionId) {
+        this.portals.filter((portal) => portal.isTreasureChest && portal.questionId === questionId)
+          .forEach((portal) => portal.chestSprite?.setTexture('game-one-treasure-chest-open'));
+        this.time.delayedCall(700, () => this.finishLevel());
+      }
       return;
     }
     this.wrongAnswers += 1;
-    this.triggerDangerSurge();
-    this.restartQuestionRoom(questionId);
+    const isTreasureQuestion = questionId === this.levelData?.treasureQuestionId;
+    if (isTreasureQuestion) {
+      // QuestionScene only emits an incorrect treasure result after the third
+      // failed attempt. Charge exactly one heart before returning to Room 5's
+      // saved checkpoint, even when older saved level data still says zero.
+      const treasureDamage = this.getQuestionDamageAmount(questionId);
+      if (treasureDamage > 0) {
+        this.applyDamage(treasureDamage, 'question', { bypassInvulnerability: true });
+      }
+    } else {
+      this.triggerDangerSurge();
+      this.applyDamage(this.getQuestionDamageAmount(questionId), 'question', { bypassInvulnerability: true });
+    }
+    if (!this.hasFinished) {
+      this.restartQuestionRoom(questionId);
+    }
     this.syncMissionRegistry();
   }
 
@@ -2058,9 +2498,15 @@ export default class LevelScene extends Phaser.Scene {
     const nextQuestion = questionId ? this.resolveQuestionRetryVariant(questionId) : null;
     const topicLabel = getQuestionTopicLabel(nextQuestion || (questionId ? getQuestionById(this.levelData, questionId) : null));
 
-    this.questionCooldownUntil = this.time.now + 700;
+    const checkpointPosition = this.activeQuestionContext?.checkpointPosition;
+    this.questionCooldownUntil = this.time.now + 1000;
+    if (checkpointPosition && this.player) {
+      this.player.setPosition(checkpointPosition.x, checkpointPosition.y);
+      this.player.body?.reset?.(checkpointPosition.x, checkpointPosition.y);
+    }
     this.activeQuestionContext = null;
     this.isInteractionLocked = false;
+    resetControls(this.controls);
     this.player.freeze(false);
     this.physics.world.resume();
     this.callbacks.onQuestionVisibilityChange?.(false);
@@ -2075,16 +2521,68 @@ export default class LevelScene extends Phaser.Scene {
 
   handlePortalTouch(portal) {
     if (this.hasFinished || this.isPaused || this.isInteractionLocked || !portal) return;
-    if (this.time.now < Number(portal.touchCooldownUntil || 0)) return;
-    portal.touchCooldownUntil = this.time.now + 350;
+    // Treasure questions should open on the first contact, just like scroll clues.
+    // Ordinary room portals retain their small debounce window.
+    if (!portal.isTreasureChest) {
+      if (this.time.now < Number(portal.touchCooldownUntil || 0)) return;
+      portal.touchCooldownUntil = this.time.now + 350;
+    }
     if (!portal.isUnlocked()) {
-      if (portal.endsLevel !== false && this.requiredStatueQuestionIds.size > 0 && !this.areAllRequiredStatuesAnswered()) {
+      if (portal.requiredKeys > this.collectedKeyIds.size) {
+        if (portal.lockedMessage) {
+          this.setObjectiveMessage(portal.lockedMessage, 2200);
+          return;
+        }
+        const missing = portal.requiredKeys - this.collectedKeyIds.size;
+        this.setObjectiveMessage(`The portal is sealed. Recover ${missing} more ${missing === 1 ? 'key' : 'keys'}.`, 2000);
+      } else if (portal.requiredScrollId && !this.collectedScrollIds.has(portal.requiredScrollId)) {
+        if (portal.lockedMessage) {
+          this.setObjectiveMessage(portal.lockedMessage, 2200);
+          return;
+        }
+        this.setObjectiveMessage('The portal is sealed. Recover this room\'s scroll clue first.', 2000);
+      } else if (portal.requiredCoins > this.getCollectedRequirementCount(portal)) {
+        if (portal.isTreasureChest) {
+          const collectedRequirementCount = this.getCollectedRequirementCount(portal);
+          this.setObjectiveMessage(
+            `The treasure is sealed. Collect all scroll clues first (${collectedRequirementCount}/${portal.requiredCoins}).`,
+            2200,
+          );
+        } else {
+          this.setObjectiveMessage('The portal is sealed. Recover this room\'s scroll clue first.', 2000);
+        }
+      } else if (
+        portal.isTreasureChest
+        && this.levelData?.treasureHunt
+        && this.collectedScrollIds.size < Number(this.registry.get('scrollGoal') || 0)
+      ) {
+        const scrollGoal = Number(this.registry.get('scrollGoal') || 0);
+        this.setObjectiveMessage(
+          `The treasure is sealed. Collect all scroll clues first (${this.collectedScrollIds.size}/${scrollGoal}).`,
+          2200,
+        );
+      } else if (portal.endsLevel !== false && this.coinGoal > 0 && this.coinsCollected < this.coinGoal) {
+        this.setObjectiveMessage(`The ending portal is sealed. Collect the required relic shards first (${this.coinsCollected}/${this.coinGoal}).`, 2200);
+      } else if (portal.endsLevel !== false && this.requiredStatueQuestionIds.size > 0 && !this.areAllRequiredStatuesAnswered()) {
         const { answered, total } = this.getStatueQuestionProgress();
         this.setObjectiveMessage(`The ending portal is sealed. Complete all statue questions first (${answered}/${total}).`, 2200);
       } else if (portal.endsLevel !== false && this.requireBossDefeat && this.getBossRemaining() > 0) {
         this.setObjectiveMessage(`The ending portal is unstable. Defeat the sentinel boss first (${this.getBossRemaining()} remaining).`, 2200);
       } else {
         this.setObjectiveMessage(`The portal is sealed. Answer the ${this.getQuestionTriggerLabel()} question first.`, 2200);
+      }
+      return;
+    }
+
+    if (portal.isTreasureChest && portal.questionId) {
+      const question = getQuestionById(this.levelData, portal.questionId);
+      if (question) {
+        this.openQuestionScene({
+          question,
+          questionId: portal.questionId,
+          villainId: portal.id || 'treasure-chest',
+          roomRecord: this.currentCellRecord,
+        });
       }
       return;
     }
@@ -2124,6 +2622,18 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     this.setObjectiveMessage('Name this portal and place exactly one matching portal to enable teleporting.', 2200);
+  }
+
+  openNearbyTreasureQuestion() {
+    if (!this.player || this.hasFinished || this.isPaused || this.isInteractionLocked) return;
+    const treasure = this.portals.find((portal) => (
+      portal?.isTreasureChest
+      && portal?.questionId
+      && portal.isUnlocked?.()
+      && Math.abs(Number(portal.x) - Number(this.player.x)) <= 72
+      && Math.abs(Number(portal.y) - Number(this.player.y)) <= 175
+    ));
+    if (treasure) this.handlePortalTouch(treasure);
   }
 
   resolvePortalPair(portal) {
@@ -2178,6 +2688,9 @@ export default class LevelScene extends Phaser.Scene {
       entryPosition: destinationPosition,
       fallbackPosition: destinationPosition,
     });
+    if (this.cache.audio.exists('gameOneTeleport')) {
+      this.sound.play('gameOneTeleport', { volume: getStudentSfxVolume(0.85) });
+    }
     this.player.setPosition(roomStartPosition.x, roomStartPosition.y);
     this.player.setVelocity(0, 0);
     this.saveRoomStartPosition(destinationRoomRecord, roomStartPosition);
@@ -2215,6 +2728,9 @@ export default class LevelScene extends Phaser.Scene {
       fallbackPosition: destinationPosition,
     });
 
+    if (this.cache.audio.exists('gameOneTeleport')) {
+      this.sound.play('gameOneTeleport', { volume: getStudentSfxVolume(0.85) });
+    }
     this.player.setPosition(roomStartPosition.x, roomStartPosition.y);
     this.player.setVelocity(0, 0);
     this.saveRoomStartPosition(targetRecord, roomStartPosition);
@@ -2248,9 +2764,31 @@ export default class LevelScene extends Phaser.Scene {
     if (this.hasFinished || this.isInteractionLocked) return;
     if (this.isPaused === nextState) return;
     this.isPaused = nextState;
+    this.gameState = nextState ? GAME_STATES.PAUSED : GAME_STATES.PLAYING;
     this.player.freeze(nextState);
     nextState ? this.physics.world.pause() : this.physics.world.resume();
     this.callbacks.onPauseChange?.(nextState);
+  }
+
+  setOverlayPaused(nextState) {
+    this.isOverlayPaused = Boolean(nextState);
+    if (this.hasFinished || this.isInteractionLocked || this.isPaused) return;
+    if (!this.isOverlayPaused && !this.hasGameplayStarted) {
+      this.hasGameplayStarted = true;
+      this.levelStartedAt = Date.now();
+    }
+    // React can update the guide/tutorial overlay while this scene is still
+    // booting. Preserve the requested state and let create() apply it after
+    // the player and physics world are ready.
+    if (!this.player || !this.physics?.world) return;
+    this.player.freeze(this.isOverlayPaused);
+    this.isOverlayPaused ? this.physics.world.pause() : this.physics.world.resume();
+    if (this.isOverlayPaused) {
+      this.backgroundMusic?.pause?.();
+    } else {
+      this.backgroundMusic?.resume?.();
+    }
+    this.gameState = this.isOverlayPaused ? GAME_STATES.PAUSED : GAME_STATES.PLAYING;
   }
 
   resumeFromOverlay() { this.togglePause(false); }
@@ -2259,6 +2797,7 @@ export default class LevelScene extends Phaser.Scene {
   failLevel(reason) {
     if (this.hasFinished) return;
     this.hasFinished = true;
+    this.gameState = GAME_STATES.GAME_OVER;
     this.resetDamageFeedback();
     this.player.freeze(true);
     this.physics.world.pause();
@@ -2271,6 +2810,8 @@ export default class LevelScene extends Phaser.Scene {
       coinBalance: this.coinBalance,
       totalCoins: this.totalCoins,
       coinGoal: this.coinGoal,
+      scrollsCollected: this.collectedScrollIds.size,
+      scrollGoal: Number(this.registry.get('scrollGoal') || 0),
       wrongAnswers: this.wrongAnswers,
       hintsUsed: this.hintsUsed,
       statuesAnswered: statues.answered,
@@ -2285,7 +2826,11 @@ export default class LevelScene extends Phaser.Scene {
   finishLevel() {
     if (this.hasFinished) return;
     this.hasFinished = true;
+    this.gameState = GAME_STATES.COMPLETED;
     this.resetDamageFeedback();
+    if (this.cache.audio.exists('gameOneCelebration')) {
+      this.sound.play('gameOneCelebration', { volume: getStudentSfxVolume(1) });
+    }
     this.player.freeze(true);
     this.physics.world.pause();
     this.callbacks.onPauseChange?.(false);
@@ -2296,6 +2841,8 @@ export default class LevelScene extends Phaser.Scene {
       coinBalance: this.coinBalance,
       totalCoins: this.totalCoins,
       coinGoal: this.coinGoal,
+      scrollsCollected: this.collectedScrollIds.size,
+      scrollGoal: Number(this.registry.get('scrollGoal') || 0),
       wrongAnswers: this.wrongAnswers,
       hintsUsed: this.hintsUsed,
       statuesAnswered: statues.answered,
@@ -2308,15 +2855,20 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   update() {
-    if (this.hasFinished) {
+    if (this.gameState === GAME_STATES.GAME_OVER || this.gameState === GAME_STATES.COMPLETED) {
       this.updateInteractionPrompt(null);
       return;
     }
     if (wasPausePressed(this.controls)) { this.togglePause(); return; }
-    if (this.isPaused || this.isInteractionLocked) {
+    if (this.gameState === GAME_STATES.PAUSED || this.isInteractionLocked) {
       this.updateInteractionPrompt(null);
       return;
     }
+
+    // The grounded chest can be opened by approaching it; jumping into the
+    // physics body is no longer required.
+    this.openNearbyTreasureQuestion();
+    if (this.isInteractionLocked) return;
 
     if (this.timerEnabled) {
       this.remainingTimeMs = Math.max(0, this.remainingTimeMs - Number(this.game.loop?.delta || 0));
@@ -2337,6 +2889,12 @@ export default class LevelScene extends Phaser.Scene {
     const now = this.time.now;
     this.updateDangerState(now);
 
+    if (this.missionBriefing && (intent.left || intent.right || intent.jumpPressed)) {
+      this.tweens.killTweensOf(this.missionBriefing);
+      this.missionBriefing.destroy();
+      this.missionBriefing = null;
+    }
+
     if (playerIntent.attackPressed) {
       this.firePlayerProjectile();
     }
@@ -2356,11 +2914,16 @@ export default class LevelScene extends Phaser.Scene {
       return projectile.active;
     });
 
-    this.updateInteractionPrompt(this.findNearbyInteractableVillain());
-
-    this.updateStatueGuidance(now);
     const roomRecordBeforeSync = this.currentCellRecord;
     this.syncCurrentCellFromPlayer();
+    const isBeginningDangerousFall = this.player.y > this.worldLayout.bounds.bottom - 24
+      && Number(this.player.body?.velocity?.y || 0) > 0;
+    if (isBeginningDangerousFall && !this.fallWarningSoundPlayed) {
+      this.fallWarningSoundPlayed = true;
+      if (this.cache.audio.exists('gameOneFallFromPlatform')) {
+        this.sound.play('gameOneFallFromPlatform', { volume: getStudentSfxVolume(0.9) });
+      }
+    }
     if (this.player.y > this.worldLayout.bounds.bottom + 80) {
       this.applyDamage(1, 'fall', {
         respawn: true,

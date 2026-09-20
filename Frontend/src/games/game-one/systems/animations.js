@@ -1,4 +1,58 @@
+export const ensureNumericTextureFrames = (scene, manifestEntry = {}) => {
+  const textureKey = typeof manifestEntry?.key === 'string' ? manifestEntry.key.trim() : '';
+  const frameWidth = Number(manifestEntry?.frameWidth);
+  const frameHeight = Number(manifestEntry?.frameHeight);
+  const frameCount = Math.max(1, Number(manifestEntry?.frameCount || 1));
+
+  if (!textureKey || !scene?.textures?.exists?.(textureKey)) return false;
+  if (!Number.isFinite(frameWidth) || frameWidth <= 0 || !Number.isFinite(frameHeight) || frameHeight <= 0) return false;
+
+  const texture = scene.textures.get(textureKey);
+  const existingNumericFrames = new Set(
+    texture.getFrameNames().map(Number).filter(Number.isInteger),
+  );
+  if (existingNumericFrames.size >= frameCount) return true;
+
+  const baseFrame = texture.get?.('__BASE');
+  const sourceWidth = Number(baseFrame?.realWidth || baseFrame?.width || texture.source?.[0]?.width || 0);
+  const sourceHeight = Number(baseFrame?.realHeight || baseFrame?.height || texture.source?.[0]?.height || 0);
+  // Production image responses can briefly report a zero/partial base size
+  // even though the preloaded source is ready. These player sheets are
+  // authored as horizontal strips, so the manifest frame count is a safe
+  // fallback instead of leaving Phaser on the full __BASE texture.
+  const measuredColumns = Math.floor(sourceWidth / frameWidth);
+  const measuredRows = Math.floor(sourceHeight / frameHeight);
+  const hasUsableMeasuredGrid = measuredColumns > 0
+    && measuredRows > 0
+    && measuredColumns * measuredRows >= frameCount;
+  const columns = hasUsableMeasuredGrid ? measuredColumns : frameCount;
+  if (typeof texture.add !== 'function') return false;
+
+  for (let index = 0; index < frameCount; index += 1) {
+    if (existingNumericFrames.has(index)) continue;
+    texture.add(
+      index,
+      0,
+      (index % columns) * frameWidth,
+      Math.floor(index / columns) * frameHeight,
+      frameWidth,
+      frameHeight,
+    );
+  }
+
+  return true;
+};
+
 export const registerGameOneAnimations = (scene, manifest) => {
+  const hasPlayerImageFrames = (entry) => {
+    const count = Math.max(1, Number(entry?.frameCount) || 1);
+    return Array.from({ length: count }, (_, index) => (
+      `${entry?.key}-frame-${String(index).padStart(2, '0')}`
+    )).every((key) => scene.textures.exists(key));
+  };
+  const playerIdleFramesReady = hasPlayerImageFrames(manifest.player);
+  const playerRunFramesReady = hasPlayerImageFrames(manifest.playerRun);
+  const playerJumpFramesReady = hasPlayerImageFrames(manifest.playerJump);
   const playerIdleEndFrame = Math.max(0, Number(manifest.player?.frameCount || 1) - 1);
   const playerRunEndFrame = Math.max(0, Number(manifest.playerRun?.frameCount || 1) - 1);
   const playerJumpEndFrame = Math.max(0, Number(manifest.playerJump?.frameCount || 1) - 1);
@@ -6,6 +60,7 @@ export const registerGameOneAnimations = (scene, manifest) => {
   const portalThreeEndFrame = Math.max(0, Number(manifest.portal3?.frameCount || 4) - 1);
   const villain1EndFrame = Math.max(0, Number(manifest.villain1Enemy?.frameCount || 1) - 1);
   const villain1ProjectileEndFrame = Math.max(0, Number(manifest.villain1Projectile?.frameCount || 1) - 1);
+  const elementalProjectileEndFrame = Math.max(0, Number(manifest.elementalProjectile?.frameCount || 1) - 1);
   const spiritBossEndFrame = Math.max(0, Number(manifest.spiritBossEnemy?.frameCount || 32) - 1);
   const spiritBossRunStart = Math.min(4, spiritBossEndFrame);
   const spiritBossRunEnd = Math.min(7, spiritBossEndFrame);
@@ -13,6 +68,31 @@ export const registerGameOneAnimations = (scene, manifest) => {
   const spiritBossAttackEnd = Math.min(15, spiritBossEndFrame);
   const slimeGreenFrameCount = Math.max(1, Number(manifest.slimeGreen?.frameCount || 1));
   const slimeOrangeFrameCount = Math.max(1, Number(manifest.slimeOrange?.frameCount || 1));
+  const shadowSpiritEndFrame = Math.max(0, Number(manifest.shadowSpirit?.frameCount || 8) - 1);
+
+  const getAvailableNumericFrames = (textureKey, start, end) => {
+    if (!textureKey || !scene.textures.exists(textureKey)) return [];
+
+    const texture = scene.textures.get(textureKey);
+    return texture.getFrameNames()
+      .map((frameName) => Number(frameName))
+      .filter((frameNumber) => (
+        Number.isInteger(frameNumber)
+        && frameNumber >= start
+        && frameNumber <= end
+      ))
+      .sort((left, right) => left - right)
+      .map((frameNumber) => ({ key: textureKey, frame: frameNumber }));
+  };
+
+  const createNumericAnimation = ({ key, textureKey, start = 0, end, frameRate, repeat = -1 }) => {
+    if (scene.anims.exists(key)) return true;
+    const frames = getAvailableNumericFrames(textureKey, start, end);
+    if (frames.length === 0) return false;
+
+    scene.anims.create({ key, frames, frameRate, repeat });
+    return true;
+  };
 
   const toImageSequenceFrames = (textureKey, frameCount) => {
     const safeTextureKey = typeof textureKey === 'string' ? textureKey.trim() : '';
@@ -30,32 +110,37 @@ export const registerGameOneAnimations = (scene, manifest) => {
     }));
   };
 
-  if (!scene.anims.exists('game-one-player-idle')) {
-    scene.anims.create({
-      key: 'game-one-player-idle',
-      frames: scene.anims.generateFrameNumbers(manifest.player.key, { start: 0, end: playerIdleEndFrame }),
-      frameRate: 12,
-      repeat: -1,
-    });
-  }
+  const createPlayerAnimation = ({ key, manifestEntry, imageFramesReady, end, frameRate }) => {
+    if (scene.anims.exists(key)) return true;
+    const frames = imageFramesReady
+      ? toImageSequenceFrames(manifestEntry?.key, manifestEntry?.frameCount)
+      : getAvailableNumericFrames(manifestEntry?.key, 0, end);
+    if (frames.length === 0) return false;
+    scene.anims.create({ key, frames, frameRate, repeat: -1 });
+    return true;
+  };
 
-  if (!scene.anims.exists('game-one-player-run')) {
-    scene.anims.create({
-      key: 'game-one-player-run',
-      frames: scene.anims.generateFrameNumbers(manifest.playerRun.key, { start: 0, end: playerRunEndFrame }),
-      frameRate: 16,
-      repeat: -1,
-    });
-  }
-
-  if (!scene.anims.exists('game-one-player-jump')) {
-    scene.anims.create({
-      key: 'game-one-player-jump',
-      frames: scene.anims.generateFrameNumbers(manifest.playerJump.key, { start: 0, end: playerJumpEndFrame }),
-      frameRate: 10,
-      repeat: -1,
-    });
-  }
+  createPlayerAnimation({
+    key: 'game-one-player-idle',
+    manifestEntry: manifest.player,
+    imageFramesReady: playerIdleFramesReady,
+    end: playerIdleEndFrame,
+    frameRate: 12,
+  });
+  createPlayerAnimation({
+    key: 'game-one-player-run',
+    manifestEntry: manifest.playerRun,
+    imageFramesReady: playerRunFramesReady,
+    end: playerRunEndFrame,
+    frameRate: 16,
+  });
+  createPlayerAnimation({
+    key: 'game-one-player-jump',
+    manifestEntry: manifest.playerJump,
+    imageFramesReady: playerJumpFramesReady,
+    end: playerJumpEndFrame,
+    frameRate: 10,
+  });
 
   if (!scene.anims.exists('game-one-ghost-float')) {
     scene.anims.create({
@@ -97,6 +182,24 @@ export const registerGameOneAnimations = (scene, manifest) => {
     scene.anims.create({
       key: 'game-one-projectile-float',
       frames: scene.anims.generateFrameNumbers(manifest.enemyProjectile.key, { start: 0, end: 7 }),
+      frameRate: 12,
+      repeat: -1,
+    });
+  }
+
+  if (manifest.shadowSpirit?.key && !scene.anims.exists('game-one-shadow-spirit-move')) {
+    scene.anims.create({
+      key: 'game-one-shadow-spirit-move',
+      frames: scene.anims.generateFrameNumbers(manifest.shadowSpirit.key, { start: 0, end: shadowSpiritEndFrame }),
+      frameRate: 7,
+      repeat: -1,
+    });
+  }
+
+  if (manifest.elementalProjectile?.key && !scene.anims.exists('game-one-elemental-fire-projectile')) {
+    scene.anims.create({
+      key: 'game-one-elemental-fire-projectile',
+      frames: scene.anims.generateFrameNumbers(manifest.elementalProjectile.key, { start: 0, end: elementalProjectileEndFrame }),
       frameRate: 12,
       repeat: -1,
     });

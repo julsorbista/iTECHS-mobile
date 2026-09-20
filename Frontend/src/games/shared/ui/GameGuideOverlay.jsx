@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Capacitor } from '@capacitor/core';
+import { ScreenOrientation } from '@capacitor/screen-orientation';
 import iconCards from '../../../assets/guidelines-icons/icon-cards.png';
 import iconCheck from '../../../assets/guidelines-icons/icon-check.png';
 import iconClock from '../../../assets/guidelines-icons/icon-clock.png';
@@ -19,9 +21,7 @@ import iconScore from '../../../assets/guidelines-icons/icon-score.png';
 import iconStar from '../../../assets/guidelines-icons/icon-star.png';
 import iconTrophy from '../../../assets/guidelines-icons/icon-trophy.png';
 import iconWrong from '../../../assets/guidelines-icons/icon-wrong.png';
-import guidelinesMobileBackground from '../../../assets/guidelines-icons/Guidelinesformobile.png';
-import { Capacitor } from '@capacitor/core';
-import { ScreenOrientation } from '@capacitor/screen-orientation';
+import './GameFourGuide.css';
 
 const GUIDE_ICON_IMAGES = {
   cards: iconCards,
@@ -46,7 +46,7 @@ const GUIDE_ICON_IMAGES = {
 };
 
 const getGuideThemeClass = (kicker = '', title = '') => {
-  const source = `${kicker} ${title}`.toLowerCase();
+  const source = `${kicker} ${title}`.toLowerCase().replace(/[_-]+/g, ' ');
   if (source.includes('game one') || source.includes('game 1')) return 'game-guide-theme-one';
   if (source.includes('game two') || source.includes('game 2')) return 'game-guide-theme-two';
   if (source.includes('game three') || source.includes('game 3')) return 'game-guide-theme-three';
@@ -59,7 +59,7 @@ const getGuideThemeClass = (kicker = '', title = '') => {
 const getGuideIconType = (item = '') => {
   const text = String(item).toLowerCase();
   if (text.includes('time') || text.includes('timer') || text.includes('ms') || text.includes('second') || text.includes('spawn') || text.includes('speed')) return 'clock';
-  if (text.includes('fruit') || text.includes('banana') || text.includes('carrot') || text.includes('orange') || text.includes('restore')) return 'fruit';
+  if (text.includes('gear') || text.includes('gears') || text.includes('carrot') || text.includes('orange') || text.includes('restore')) return 'fruit';
   if (text.includes('bomb') || text.includes('hazard') || text.includes('trap') || text.includes('enemy')) return 'hazard';
   if (text.includes('lock')) return 'lock';
   if (text.includes('coin')) return 'coin';
@@ -94,7 +94,7 @@ const GameGuideOverlay = ({
   sections = [],
   onExit,
   onStart,
-  exitLabel = 'Exit Level',
+  exitLabel = 'Exit',
   startLabel = 'Start Level',
 }) => {
   const pagedSections = [
@@ -116,17 +116,17 @@ const GameGuideOverlay = ({
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return undefined;
 
-    const locationText = `${window.location.pathname} ${window.location.hash}`.toUpperCase();
-    const shouldRestoreLandscape = locationText.includes('GAME_TWO') || locationText.includes('GAME_FOUR');
-
-    ScreenOrientation.lock({ orientation: 'portrait-primary' }).catch(() => undefined);
+    const restoresLandscape = ['game-guide-theme-one', 'game-guide-theme-two', 'game-guide-theme-four'].includes(themeClass);
+    ScreenOrientation.lock({
+      orientation: restoresLandscape ? 'landscape-primary' : 'portrait-primary',
+    }).catch(() => undefined);
 
     return () => {
-      ScreenOrientation.lock({
-        orientation: shouldRestoreLandscape ? 'landscape-primary' : 'portrait-primary',
-      }).catch(() => undefined);
+      if (restoresLandscape) {
+        ScreenOrientation.lock({ orientation: 'landscape-primary' }).catch(() => undefined);
+      }
     };
-  }, []);
+  }, [themeClass]);
 
   const handleBack = () => {
     if (!isFirstPage) {
@@ -144,12 +144,34 @@ const GameGuideOverlay = ({
     onStart?.();
   };
 
-  const overlay = (
+  if (['game-guide-theme-one', 'game-guide-theme-four'].includes(themeClass)) {
+    return createPortal(
+      <div className={`g4-guide-screen ${themeClass}`} role="dialog" aria-modal="true" aria-label={`${title || 'Game'} guidelines`}>
+        <div className="g4-guide-board">
+          <section className="g4-guide-paper">
+            <h2>{currentSection.title}</h2>
+            <ul key={currentPage} tabIndex={0} aria-label="Guideline instructions">
+              {(currentSection.items || []).map((item, index) => (
+                <li key={index}>
+                  <img src={GUIDE_ICON_IMAGES[getGuideIconType(item)] || iconDot} alt="" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <nav className="g4-guide-footer" aria-label="Guideline pages">
+            <button type="button" className="game-guide-nav-back" onClick={handleBack}>{isFirstPage ? exitLabel : 'Back'}</button>
+            <span aria-live="polite">{currentPage + 1} / {safeSections.length}</span>
+            {(!isLastPage || onStart) ? <button type="button" className="game-guide-nav-next" onClick={handleNext}>{isLastPage ? 'Start' : 'Next'}</button> : <span />}
+          </nav>
+        </div>
+      </div>, document.body,
+    );
+  }
+
+  return createPortal(
     <div className={`game-guide-backdrop game-guide-wood ${themeClass}`}>
-      <div
-        className="game-guide-card game-guide-card--wood"
-        style={{ '--game-guide-mobile-bg': `url(${guidelinesMobileBackground})` }}
-      >
+      <div className="game-guide-card game-guide-card--wood">
         <div className="game-guide-vine game-guide-vine-left" aria-hidden="true" />
         <div className="game-guide-vine game-guide-vine-right" aria-hidden="true" />
         <h3 className="game-guide-main-title">GUIDELINES</h3>
@@ -174,7 +196,7 @@ const GameGuideOverlay = ({
         </div>
         <div className="game-guide-actions">
           <button type="button" className="game-guide-nav-button game-guide-nav-back" onClick={handleBack}>
-            ← BACK
+            ← {isFirstPage ? exitLabel : 'Back'}
           </button>
           <div className="game-guide-page-status" aria-label={`Page ${currentPage + 1} of ${safeSections.length}`}>
             <div className="game-guide-page-dots" aria-hidden="true">
@@ -186,15 +208,13 @@ const GameGuideOverlay = ({
           </div>
           {(!isLastPage || onStart) ? (
             <button type="button" className="game-guide-nav-button game-guide-nav-next" onClick={handleNext}>
-              {isLastPage ? 'START →' : 'NEXT →'}
+              {isLastPage ? 'Start' : 'NEXT →'}
             </button>
           ) : <span className="game-guide-nav-spacer" aria-hidden="true" />}
         </div>
       </div>
-    </div>
+    </div>, document.body
   );
-
-  return typeof document !== 'undefined' ? createPortal(overlay, document.body) : overlay;
 };
 
 export default GameGuideOverlay;

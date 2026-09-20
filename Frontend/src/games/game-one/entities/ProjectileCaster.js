@@ -162,8 +162,8 @@ export default class ProjectileCaster extends Phaser.Physics.Arcade.Sprite {
       const halfHeight = Math.max(0, (Number(this.displayHeight) || 0) * 0.5);
 
       return {
-        x: this.spawnX + (this.fireDirection * Math.max(34, halfWidth * 1.2)),
-        y: this.spawnY - Math.max(24, halfHeight * 0.55),
+        x: this.x + (this.fireDirection * Math.max(34, halfWidth * 1.2)),
+        y: this.y - Math.max(24, halfHeight * 0.55),
       };
     }
 

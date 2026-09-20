@@ -627,41 +627,51 @@
 }
 
 @media (max-width: 640px) {
-  .game-six-emerald {
-    width: 100%;
-    min-width: 0;
-    padding: 6px;
-    border-radius: 0;
-    box-shadow: 3px 3px 0 var(--pixel-dark);
-  }
-  .game-six-header { padding: 8px; gap: 6px; }
-  .game-six-header h2 { font-size: 1.1rem; line-height: 1.15; }
-  .game-six-header > div:last-child {
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5px;
-    font-size: 0.72rem;
-  }
-  .game-six-top-stat { min-width: 0; padding: 6px; }
-  .game-six-sidebar { padding: 6px; }
-  .game-six-answer-form { bottom: 12px; width: calc(100% - 12px); gap: 5px; }
+  .game-six-emerald { padding: 10px; border-radius: 0; }
+  .game-six-header { padding: 14px; }
+  .game-six-answer-form { bottom: 18px; width: calc(100% - 24px); }
   .game-six-variable-prefix { display: none; }
-  .game-six-answer-input { padding: 9px; font-size: 0.9rem; }
-  .game-six-enter-button { padding: 9px 12px; font-size: 0.85rem; }
-  .game-six-falling-word {
-    left: clamp(25%, var(--game-six-drop-x), 75%) !important;
-    min-width: 0;
-    max-width: 46%;
-    padding: 8px 10px;
-    font-size: 0.9rem;
-    overflow-wrap: anywhere;
-  }
-  .game-six-instruction {
-    width: calc(100% - 12px);
-    padding: 7px;
-    font-size: 0.72rem;
-    white-space: normal !important;
-  }
-  .game-six-playfield { min-height: 58dvh; }
+  .game-six-enter-button { padding-inline: 18px; }
+  .game-six-falling-word { min-width: 150px; max-width: 76%; }
+  .game-six-playfield { min-height: 410px; }
 }
+
+/* Game 6 owns its scroll area and portal styling, including standalone mobile entry. */
+body .student-game-overlay-game-six {
+  height: 100dvh !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  touch-action: pan-y;
+}
+body .student-game-overlay-game-six .student-shell-overlay {
+  height: auto !important;
+  min-height: 100%;
+  overflow: visible !important;
+}
+#root .student-game-overlay-game-six .student-game-six-frame-wrap,
+#root .student-game-overlay-game-six .student-game-frame-shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+}
+#root .student-game-overlay-game-six .game-six-falling-word {
+  width: min(210px, calc(100% - 24px));
+  min-width: 0 !important;
+  max-width: calc(100% - 24px) !important;
+  left: clamp(12px, calc(var(--word-x) - 105px), max(12px, calc(100% - 222px))) !important;
+  transform: none !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#root .student-game-overlay-game-six .game-six-answer-input { font-size: 16px !important; }
+@media (max-width: 1024px) {
+  #root .student-game-overlay-game-six .game-six-playfield {
+    height: clamp(410px, 58svh, 520px) !important;
+    min-height: 410px !important;
+  }
+}
+.student-game-overlay-game-six .student-loading-viewport { position: fixed; inset: 0; z-index: 10030; display: grid; place-items: center; padding: 12px; background: #172322e8; }
+.student-game-overlay-game-six .student-level-loading-reference { position: relative; width: min(94vw, 560px, calc(90dvh * 1.289)); aspect-ratio: 553 / 429; background-size: 100% 100%; background-repeat: no-repeat; }
+.student-game-overlay-game-six .student-level-loading-copy { position: absolute; inset: 25% 16% 16%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #4b2816; text-align: center; font-size: clamp(11px, 3vw, 16px); }
+.student-game-overlay-game-six .student-level-loading-copy h2 { font-size: 20px; font-weight: 800; }

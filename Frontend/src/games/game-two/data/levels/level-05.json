@@ -20,29 +20,29 @@
     {
       "id": "g2l5-t1",
       "type": "debug",
-      "title": "Fix The Method Header",
-      "prompt": "The method header is missing parameter parentheses. Drag the repaired header into the blank.",
-      "snippet": "____\n  System.out.println(\"Hello \" + name);\n}",
-      "answer": "public static void greet(String name) {",
+      "title": "Store A Level",
+      "prompt": "Complete the Java statement that stores the current level.",
+      "snippet": "____",
+      "answer": "int level = 5;",
       "acceptedAnswers": [
-        "public static void greet(String name) {"
+        "int level = 5;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "public static void greet String name) {"
+          "label": "int level == 5;"
         },
         {
           "id": "b",
-          "label": "public static void greet(String name) {"
+          "label": "int level = 5;"
         },
         {
           "id": "c",
-          "label": "public static greet(String name) {"
+          "label": "level int = 5;"
         },
         {
           "id": "d",
-          "label": "public static void greet[String name] {"
+          "label": "int level: 5;"
         }
       ],
       "points": 160,
@@ -56,29 +56,29 @@
     {
       "id": "g2l5-t2",
       "type": "complete",
-      "title": "Text Output",
-      "prompt": "Complete the missing expression to print the player name.",
-      "snippet": "System.out.println(\"Player: \" + ____);",
-      "answer": "name",
+      "title": "Store A Player",
+      "prompt": "Complete the Java statement that stores the player's name.",
+      "snippet": "____",
+      "answer": "String player = \"Alex\";",
       "acceptedAnswers": [
-        "name"
+        "String player = \"Alex\";"
       ],
       "options": [
         {
           "id": "a",
-          "label": "\"name\""
+          "label": "String player = Alex;"
         },
         {
           "id": "b",
-          "label": "player"
+          "label": "String player == \"Alex\";"
         },
         {
           "id": "c",
-          "label": "name"
+          "label": "String player = \"Alex\";"
         },
         {
           "id": "d",
-          "label": "String name"
+          "label": "player String = \"Alex\";"
         }
       ],
       "points": 150,
@@ -92,8 +92,8 @@
     {
       "id": "g2l5-t3",
       "type": "choice",
-      "title": "Best Debug Step",
-      "prompt": "A Java loop is skipping the first array item. What should you inspect first?",
+      "title": "Set The Door",
+      "prompt": "Complete the Java statement so the door starts open.",
       "correctOptionId": "b",
       "points": 150,
       "coinReward": 1,
@@ -101,19 +101,19 @@
       "options": [
         {
           "id": "a",
-          "label": "The CSS color"
+          "label": "boolean open == true;"
         },
         {
           "id": "b",
-          "label": "The loop starting index"
+          "label": "boolean open = true;"
         },
         {
           "id": "c",
-          "label": "The file name only"
+          "label": "bool open = yes;"
         },
         {
           "id": "d",
-          "label": "The image size"
+          "label": "boolean = open true;"
         }
       ],
       "hints": [
@@ -124,30 +124,29 @@
     {
       "id": "g2l5-t4",
       "type": "complete",
-      "title": "Guard Condition",
-      "prompt": "Drag the condition that checks lives is greater than 0 and score is at least 100.",
-      "snippet": "if (____) {\n  System.out.println(\"Bonus round\");\n}",
-      "answer": "lives > 0 && score >= 100",
+      "title": "Store Coins",
+      "prompt": "Complete the Java statement that stores the coin count.",
+      "snippet": "____",
+      "answer": "int coins = 25;",
       "acceptedAnswers": [
-        "lives > 0 && score >= 100",
-        "score >= 100 && lives > 0"
+        "int coins = 25;"
       ],
       "options": [
         {
           "id": "a",
-          "label": "lives > 0 || score >= 100"
+          "label": "int coins == 25;"
         },
         {
           "id": "b",
-          "label": "lives > 0 && score >= 100"
+          "label": "int coins = 25;"
         },
         {
           "id": "c",
-          "label": "lives >= 0 && score > 100"
+          "label": "coins int = 25;"
         },
         {
           "id": "d",
-          "label": "lives = 0 && score = 100"
+          "label": "int coins: 25;"
         }
       ],
       "points": 180,
@@ -161,38 +160,38 @@
     {
       "id": "g2l5-t5",
       "type": "reorder",
-      "title": "Final Compile",
-      "prompt": "Drag the Java mini-program so it computes and prints the total.",
+      "title": "Store A Score",
+      "prompt": "Arrange the Java statement pieces into the correct order.",
       "points": 260,
       "coinReward": 2,
       "coach": "Declare values, create total, test it, print the result, then close the block.",
       "blocks": [
         {
           "id": "a",
-          "code": "int[] coins = {5, 10, 15};"
+          "code": "double"
         },
         {
           "id": "b",
-          "code": "int total = coins[0] + coins[1] + coins[2];"
+          "code": "score"
         },
         {
           "id": "c",
-          "code": "if (total >= 30) {"
+          "code": "="
         },
         {
           "id": "d",
-          "code": "  System.out.println(\"Bonus unlocked\");"
+          "code": "100"
         },
         {
           "id": "e",
-          "code": "}"
+          "code": ";"
         }
       ],
       "initialOrder": [
-        "c",
-        "a",
-        "d",
         "b",
+        "a",
+        "c",
+        "d",
         "e"
       ],
       "correctOrder": [
@@ -205,6 +204,29 @@
       "hints": [
         "The array must exist before total uses it.",
         "The print line belongs inside the if block."
+      ]
+    },
+    {
+      "id": "g2l5-t6",
+      "type": "complete",
+      "title": "Print Completion",
+      "prompt": "Complete the Java statement that prints the completion message.",
+      "snippet": "____",
+      "answer": "System.out.println(\"Complete!\");",
+      "acceptedAnswers": [
+        "System.out.println(\"Complete!\");"
+      ],
+      "options": [
+        { "id": "a", "label": "System.out.print(\"Complete!\");" },
+        { "id": "b", "label": "System.out.println(\"Complete!\");" },
+        { "id": "c", "label": "System.println(\"Complete!\");" },
+        { "id": "d", "label": "println(Complete!);" }
+      ],
+      "points": 210,
+      "coinReward": 2,
+      "hints": [
+        "Use System.out.println.",
+        "Use double quotes around the message."
       ]
     }
   ]

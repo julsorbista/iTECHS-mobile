@@ -5,10 +5,19 @@ const StudentShell = ({
   children,
   backgroundImage,
   className = '',
+  style: customStyle,
+  bare = false,
 }) => {
-  const style = backgroundImage
-    ? { '--student-shell-image': `url(${backgroundImage})` }
-    : undefined;
+  const style = {
+    ...customStyle,
+    ...(backgroundImage
+      ? { '--student-shell-image': `url(${backgroundImage})` }
+      : {}),
+  };
+
+  if (bare) {
+    return <>{children}</>;
+  }
 
   return (
     <div className={clsx('student-shell page-enter', className)} style={style}>

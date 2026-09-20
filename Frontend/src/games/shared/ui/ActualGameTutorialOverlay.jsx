@@ -1,13 +1,13 @@
 import React from 'react';
 import './ActualGameTutorialOverlay.css';
-import cursorImage from './cursor.png';
+import cursorImage from './tutorial-hand.png';
 import platformImage from '../../game-one/assets/processed/platforms/platform-grass.png';
-import playerImage from '../../game-one/assets/processed/player/blue-wizard-idle-sheet.png';
+import playerImage from '../../game-one/assets/processed/player/frames/idle/idle-frame-00.png';
 import portalImage from '../../game-one/assets/processed/sprites/portal-sheet.png';
 import cpuImage from '../../game-two/assets/processed/game-two-cpu.png';
 import motherboardImage from '../../game-two/assets/processed/game-two-motherboard.png';
-import variableCardImage from '../../../assets/game-three/Variable.png';
-import booleanCardImage from '../../../assets/game-three/Boolean.png';
+import variableCardImage from '../../../assets/game-three/new-cards/Variable.png';
+import booleanCardImage from '../../../assets/game-three/new-cards/Boolean.png';
 import boxImage from '../../game-four/assets/processed/box.png';
 import bombImage from '../../game-four/assets/processed/bomb.png';
 
@@ -57,14 +57,14 @@ const TUTORIAL_OVERLAY_CONFIG = Object.freeze({
   },
   catch: {
     title: 'Tutorial level: catch code, avoid bombs',
-    body: 'Watch the basket move under the Java token. Catch the needed code pieces, avoid bombs, and collect fruit for extra lives.',
-    controls: ['A / D or Arrows: move basket', 'Code tokens: catch', 'Bombs: lose 1 life', '3 fruits: +1 life'],
+    body: 'Watch the basket move under the Java token. Catch the needed code pieces, avoid bombs, and collect gears for extra lives.',
+    controls: ['A / D or Arrows: move basket', 'Code tokens: catch', 'Bombs: lose 1 life', '3 gears: +1 life'],
     cursorClass: 'actual-tutorial-cursor-catch',
     showArc: false,
     guidelines: [
       'Move under the correct Java token before it falls past you.',
       'Avoid bombs; they remove one life.',
-      'Collect three fruits to restore one missing life.',
+      'Collect three gears to restore one missing life.',
     ],
     highlights: [
       { className: 'actual-tutorial-highlight actual-tutorial-highlight-fall', label: 'Token' },
@@ -120,7 +120,9 @@ const ActualGameTutorialOverlay = ({
           <>
             <img className="actual-tutorial-platform platform-a" src={platformImage} alt="" />
             <img className="actual-tutorial-platform platform-b" src={platformImage} alt="" />
-            <img className="actual-tutorial-player" src={playerImage} alt="" />
+            <span className="actual-tutorial-player" aria-hidden="true">
+              <img src={playerImage} alt="" />
+            </span>
             <img className="actual-tutorial-portal" src={portalImage} alt="" />
           </>
         )}

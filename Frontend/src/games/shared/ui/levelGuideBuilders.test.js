@@ -7,7 +7,16 @@ import {
   buildGameSixGuideContent,
 } from './levelGuideBuilders';
 
-const getSection = (guide, title) => guide.sections.find((section) => section.title === title);
+const allGuideItems = (guide) => [
+  ...guide.summary,
+  ...guide.sections.flatMap((section) => section.items),
+];
+
+const expectTwoGuidePages = (guide) => {
+  expect(guide.sections).toHaveLength(1);
+  expect(guide.summary.length).toBeGreaterThan(0);
+  expect(guide.sections[0].items.length).toBeGreaterThan(0);
+};
 
 describe('per-level game guide builders', () => {
   it('derives Game 2 task count, raw score, and policy from the selected level', () => {
@@ -22,12 +31,13 @@ describe('per-level game guide builders', () => {
     }, { freeMistakes: 2, hintCoinCost: 2, hintStarCost: 1 });
 
     expect(guide.kicker).toBe('Game 2 · Level 3');
-    expect(guide.summary).toContain('2 required coding tasks.');
-    expect(getSection(guide, 'Level 3 Score').items)
+    const content = allGuideItems(guide);
+    expect(content).toContain('2 required coding tasks.');
+    expect(content)
       .toContain('Each correct task submits 1 base point (maximum submitted base score: 2).');
-    expect(getSection(guide, 'Level 3 Score').items)
-      .toContain('The task content contains 300 configured raw points, but these are not used by the current submission scoring path.');
-    expect(getSection(guide, 'Platform Stars').items[0]).toContain('first 2 mistakes');
+    expect(content)
+      .toContain('The task data contains 300 reference points; the recorded base score uses the number of correct tasks instead.');
+    expectTwoGuidePages(guide);
   });
 
   it.each([
@@ -46,15 +56,15 @@ describe('per-level game guide builders', () => {
         coinReward: index === 4 ? 2 : 1,
       })),
     });
-    const setup = getSection(guide, 'Level Setup').items.join(' ');
-    const score = getSection(guide, `Level ${levelNumber} Score`).items.join(' ');
+    const content = allGuideItems(guide).join(' ');
 
-    expect(setup).toContain(`${seconds} seconds`);
-    expect(setup).toContain(`mistake target: ${maxMistakes}`);
-    expect(setup).toContain(`Configured target: ${targetPoints} points`);
-    expect(setup).toContain(`configured time bonus: ${bonusPerSecond} points per second`);
-    expect(score).toContain(`${rawPoints} configured raw points`);
-    expect(score).toContain('up to 6 configured coins');
+    expect(content).toContain(`${seconds} seconds`);
+    expect(content).toContain(`Mistake target: stay at or below ${maxMistakes}`);
+    expect(content).toContain(`Reference target: ${targetPoints} points`);
+    expect(content).toContain(`${bonusPerSecond} reference bonus points per second`);
+    expect(content).toContain(`${rawPoints} reference points`);
+    expect(content).toContain('up to 6 configured coins');
+    expectTwoGuidePages(guide);
   });
 
   it('shows Game 2 attempt rules for every code-lab level', () => {
@@ -64,11 +74,10 @@ describe('per-level game guide builders', () => {
         levelNumber,
         tasks: Array.from({ length: taskCount }, (_, index) => ({ id: `task-${index + 1}` })),
       });
-      const attempts = getSection(guide, 'Attempt Rules');
+      const content = allGuideItems(guide).join(' ');
 
-      expect(attempts.items).toContain('Every coding task starts with 3 compile checks.');
-      expect(attempts.items).toContain('A wrong compilation uses 1 check and adds 1 mistake.');
-      expect(attempts.items.some((item) => item.includes('loads a different code variation'))).toBe(true);
+      expect(content).toContain('You have 3 Compile checks for each task. Change a wrong answer before trying again.');
+      expect(content).toContain(`up to ${taskCount * 3} Compile checks`);
     });
   });
 
@@ -79,10 +88,12 @@ describe('per-level game guide builders', () => {
       settings: { columns: 3, flipBackMs: 750 },
     });
 
-    expect(guide.summary).toContain('3 pairs (6 cards) must be resolved.');
-    expect(getSection(guide, 'Attempts & Questions').items)
-      .toContain('The level begins with 6 flip attempts.');
-    expect(getSection(guide, 'Level 4 Score').items[0]).toContain('maximum 3 points');
+    const content = allGuideItems(guide);
+    expect(content).toContain('3 pairs (6 cards) must be resolved.');
+    expect(content)
+      .toContain('This level begins with 6 flip attempts for 6 cards.');
+    expect(content).toContain('Each matched pair: +1 point (maximum 3 points).');
+    expectTwoGuidePages(guide);
   });
 
   it('derives Game 4 rounds and the submitted score formula', () => {
@@ -92,9 +103,11 @@ describe('per-level game guide builders', () => {
       rounds: [{ id: 'a' }, { id: 'b' }],
     });
 
-    expect(guide.summary).toContain('2 declaration rounds must be completed.');
-    expect(getSection(guide, 'Level 2 Score').items)
-      .toContain('With no mistakes or fruit bonus, the submitted base score is 440 points.');
+    const content = allGuideItems(guide);
+    expect(content).toContain('2 declaration rounds must be completed.');
+    expect(content)
+      .toContain('With no gear bonus, completing all rounds earns 300 base points.');
+    expectTwoGuidePages(guide);
   });
 
   it('uses each Game 5 level target, timer, lives, and reward', () => {
@@ -103,9 +116,11 @@ describe('per-level game guide builders', () => {
       settings: { targetWords: 7, seconds: 150, lives: 5 },
     });
 
-    expect(guide.summary).toContain('Solve 7 words within 150 seconds.');
-    expect(getSection(guide, 'Level 3 Score').items)
+    const content = allGuideItems(guide);
+    expect(content).toContain('Solve 7 words within 150 seconds.');
+    expect(content)
       .toContain('Level reward per solved word: +16 points and +16 coins.');
+    expectTwoGuidePages(guide);
   });
 
   it('uses each Game 6 level target, timer, streak, and coin reward', () => {
@@ -114,8 +129,32 @@ describe('per-level game guide builders', () => {
       settings: { targetWords: 25, seconds: 480, lives: 5, rewardEvery: 4 },
     });
 
-    expect(guide.summary).toContain('Clear 25 terms within 480 seconds.');
-    expect(getSection(guide, 'Level 5 Score').items)
-      .toContain('Every 4-term reward streak adds 40 coins and the same amount to score.');
+    const content = allGuideItems(guide);
+    expect(content).toContain('Clear 25 Java types within 480 seconds.');
+    expect(content)
+      .toContain('Every 4-term reward streak awards 40 coins separately; coins are not added to the game score.');
+    expectTwoGuidePages(guide);
+  });
+
+  it('keeps each game completion rule in the condensed two-page guides', () => {
+    const guides = [
+      buildGameTwoGuideContent({ tasks: [{ id: 'a' }] }),
+      buildGameThreeGuideContent({ pairs: [{ id: 'a' }] }),
+      buildGameFourGuideContent({ rounds: [{ id: 'a' }] }),
+      buildGameFiveGuideContent({ settings: { targetWords: 1 } }),
+      buildGameSixGuideContent({ settings: { targetWords: 1 } }),
+    ];
+
+    const requirements = [
+      'To pass, answer at least 1 of 1 tasks correctly and earn at least 2 task Stars.',
+      'Resolving every pair earns 3 game Stars.',
+      '1 declaration round must be completed.',
+      'Solve 1 words within 180 seconds.',
+      'Completing every required term reports 3 Stars.',
+    ];
+    guides.forEach((guide, index) => {
+      expect(allGuideItems(guide)).toContain(requirements[index]);
+      expectTwoGuidePages(guide);
+    });
   });
 });

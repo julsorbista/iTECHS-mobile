@@ -1,47 +1,1046 @@
 {
-  "id": "game_one-level-05",
+  "id": "game-one-level-05",
   "gameType": "GAME_ONE",
   "levelNumber": 5,
-  "title": "Level 05",
-  "subtitle": "",
+  "title": "Labyrinth of Loops",
+  "subtitle": "Java Loops",
+  "congratulatoryMessage": "THE ENDLESS CYCLE IS BROKEN! You mastered Java's loops and discovered how programs can repeat instructions efficiently.",
+  "treasureHunt": true,
+  "missionTitle": "BREAK THE ENDLESS LOOP",
+  "missionText": "The path has led to an ancient labyrinth trapped in an endless cycle. Its mechanisms repeat again and again. Master Java's loops, recover the Loop Seals, and break the cycle.",
   "viewport": {
     "width": 1280,
     "height": 720
   },
-  "questions": [],
+  "settings": {
+    "playerHealth": 3,
+    "timerEnabled": false,
+    "allowMidairDash": true,
+    "allowProjectile": true,
+    "allowDoubleJump": false,
+    "coinGoal": 0
+  },
+  "questions": [
+    {
+      "id": "for-loop-gate",
+      "topic": "for loop",
+      "formattedQuestion": "for (int i = 0; i < 4; i++)\n\nHow many times will this loop run?",
+      "prompt": "How many times does for (int i = 0; i < 4; i++) run?",
+      "choices": [
+        "3",
+        "4",
+        "5"
+      ],
+      "answerIndex": 1,
+      "successText": "Correct! The FOR Loop Gate opens.",
+      "failureText": "Incorrect. Count the values of i and try again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "while-loop-gate",
+      "topic": "while loop",
+      "formattedQuestion": "int health = 3;\nwhile (health > 0) { health--; }\n\nWhen will the loop stop?",
+      "prompt": "When will the loop stop?",
+      "choices": [
+        "When health becomes 0",
+        "When health becomes 2",
+        "It never stops"
+      ],
+      "answerIndex": 0,
+      "successText": "Correct! The WHILE Gate opens.",
+      "failureText": "Incorrect. Trace the loop and try again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "do-while-loop-gate",
+      "topic": "do-while loop",
+      "formattedQuestion": "int x = 10;\ndo { x++; } while (x < 5);\n\nWill the loop body execute?",
+      "prompt": "Will this do-while loop body execute?",
+      "choices": [
+        "YES",
+        "NO"
+      ],
+      "answerIndex": 0,
+      "successText": "Correct! A do-while body executes before checking.",
+      "failureText": "Incorrect. Remember when a do-while checks its condition.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "trial-for",
+      "topic": "Loop Trial: FOR",
+      "prompt": "How many times does for (int i = 1; i <= 3; i++) execute?",
+      "choices": [
+        "2",
+        "3",
+        "4"
+      ],
+      "answerIndex": 1,
+      "successText": "Correct! Loop Gate 1 opens.",
+      "failureText": "Incorrect. Trace the loop and try again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "trial-while",
+      "topic": "Loop Trial: WHILE",
+      "formattedQuestion": "int x = 2;\nwhile (x < 5) { x++; }",
+      "prompt": "What is the final value of x?",
+      "choices": [
+        "4",
+        "5",
+        "6"
+      ],
+      "answerIndex": 1,
+      "successText": "Correct! Loop Gate 2 opens.",
+      "failureText": "Incorrect. Trace the loop and try again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "trial-do-while",
+      "topic": "Loop Trial: DO-WHILE",
+      "formattedQuestion": "int x = 5;\ndo { x++; } while (x < 5);",
+      "prompt": "How many times does the loop body execute?",
+      "choices": [
+        "0",
+        "1",
+        "5"
+      ],
+      "answerIndex": 1,
+      "successText": "Correct! Loop Gate 3 opens.",
+      "failureText": "Incorrect. Trace the loop and try again.",
+      "damageOnWrongAnswer": 0
+    },
+    {
+      "id": "loop-core-riddle",
+      "topic": "Java loops",
+      "challengeType": "WORD_SCRAMBLE",
+      "maxAttempts": 3,
+      "jumbledWord": "OPOL",
+      "answer": "LOOP",
+      "formattedQuestion": "FINAL TREASURE RIDDLE\nI make Java repeat instructions without writing the same code again and again. I may repeat a set number of times or continue while a condition is true. What am I?",
+      "riddleVariants": [
+        "I make Java repeat instructions without writing the same code again and again. I may repeat a set number of times or continue while a condition is true. What am I?",
+        "I run a block of code repeatedly, either for a known count or while a test remains true. What am I?",
+        "For, while, and do-while are three forms of me in Java. What am I?",
+        "I save programmers from copying the same instructions whenever an action must repeat. What am I?",
+        "My cycle continues according to a counter or condition until it is time to stop. What am I?",
+        "Java enters me to execute the same block across multiple iterations. What am I?"
+      ],
+      "prompt": "What makes Java repeat instructions? Jumbled word: OPOL",
+      "choices": [
+        "LOOP",
+        "METHOD",
+        "VARIABLE",
+        "CONDITION"
+      ],
+      "answerIndex": 0,
+      "hints": [
+        "Review the three loop scroll clues.",
+        "Think about what Java uses to repeat instructions."
+      ],
+      "failureMessages": [
+        "Incorrect. Review the three scroll clues and try again.",
+        "Incorrect. Think about what Java uses to repeat instructions.",
+        "The Endless Core remains sealed. Return to the checkpoint and try again."
+      ],
+      "successText": "Correct! The Endless Core cycle is broken.",
+      "damageOnWrongAnswer": 0,
+      "lockAttemptSessionOnClose": true
+    }
+  ],
   "rooms": [
     {
       "id": "room-1",
-      "backgroundKey": "tutorialGrove",
-      "objective": "Configure this level in the admin editor.",
-      "postUnlockObjective": "",
+      "backgroundKey": "room_10",
+      "objective": "The FOR Loop Chamber: recover the FOR Seal and Scroll #1, then enter the portal.",
       "spawn": {
-        "x": 160,
-        "y": 560
+        "x": 100,
+        "y": 570
       },
       "platforms": [
         {
-          "id": "floor",
-          "x": 640,
-          "y": 684,
-          "width": 1280,
-          "bodyHeight": 72,
-          "textureKey": "grass"
+          "id": "r1-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-lower-lift",
+          "x": 280,
+          "y": 540,
+          "width": 76,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "y",
+          "moveDistance": -55,
+          "moveDuration": 1800
+        },
+        {
+          "id": "r1-middle-static",
+          "x": 430,
+          "y": 420,
+          "width": 76,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-high-shuttle",
+          "x": 585,
+          "y": 310,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r1-scroll-shuttle",
+          "x": 815,
+          "y": 480,
+          "width": 76,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r1-exit",
+          "x": 1045,
+          "y": 400,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-portal-floor",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r1-spikes",
+          "x": 550,
+          "y": 672,
+          "width": 304,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        },
+        {
+          "id": "r1-poison-platform",
+          "x": 895,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 16,
+          "textureKey": "stone"
         }
       ],
-      "unlockPlatforms": [],
-      "barriers": [],
-      "coins": [],
-      "ghosts": [],
+      "coins": [
+        {
+          "id": "level5-hint-coin-1",
+          "collectibleType": "coin",
+          "x": 200,
+          "y": 600,
+          "size": 30
+        },
+        {
+          "id": "for-seal",
+          "collectibleType": "key",
+          "spriteFrame": "key-red",
+          "x": 585,
+          "y": 228,
+          "size": 34
+        },
+        {
+          "id": "r1-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 280,
+          "y": 458,
+          "size": 44
+        },
+        {
+          "id": "scroll-1",
+          "collectibleType": "scroll",
+          "scrollStyle": "red",
+          "spriteFrame": "scroll-red",
+          "scrollId": "scroll-1",
+          "clueText": "FOR LOOP\n\nA for loop repeats code using a starting value, condition, and update.\n\nWhen repetitions are known, the path can be counted from beginning to end.",
+          "x": 1045,
+          "y": 318,
+          "size": 50
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r1-shadow-spirit",
+          "enemyType": "shadowspirit",
+          "x": 895,
+          "y": 600,
+          "patrolDistance": 55,
+          "speed": 62,
+          "canJump": false
+        },
+        {
+          "id": "r1-ghost",
+          "enemyType": "ghost",
+          "x": 700,
+          "y": 570,
+          "patrolDistance": 70,
+          "speed": 112,
+          "size": 58,
+          "chasePlayer": true,
+          "chaseDelayMs": 3000
+        },
+        {
+          "id": "r1-orange",
+          "enemyType": "slimeorange",
+          "x": 1050,
+          "y": 600,
+          "patrolDistance": 35,
+          "speed": 118,
+          "size": 58,
+          "canJump": false
+        }
+      ],
       "projectileEnemies": [],
-      "villain": null,
       "portal": {
-        "x": 1135,
-        "y": 556,
+        "x": 1160,
+        "y": 590,
+        "locked": true,
+        "endsLevel": false,
+        "targetRoomId": "room-2",
+        "requiredKeys": 1,
+        "requiredScrollId": "scroll-1",
+        "lockedMessage": "Recover the FOR Seal and Scroll #1.",
+        "size": 84
+      }
+    },
+    {
+      "id": "room-2",
+      "backgroundKey": "ruinsGate",
+      "objective": "The WHILE Chamber: recover the WHILE Seal and Scroll #2, then enter the portal.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
+      "platforms": [
+        {
+          "id": "r2-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r2-lower-one",
+          "x": 285,
+          "y": 575,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone",
+          "moveAxis": "x",
+          "moveDistance": 60,
+          "moveDuration": 2050
+        },
+        {
+          "id": "r2-upper-seal",
+          "x": 595,
+          "y": 480,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r2-shuttle",
+          "x": 910,
+          "y": 485,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r2-scroll-ledge",
+          "x": 1055,
+          "y": 390,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r2-exit",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r2-spikes",
+          "x": 600,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        },
+        {
+          "id": "r2-fire",
+          "x": 910,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "fire",
+          "hazardSpriteFrame": "fireball",
+          "damage": 1
+        }
+      ],
+      "coins": [
+        {
+          "id": "level5-hint-coin-2",
+          "collectibleType": "coin",
+          "x": 200,
+          "y": 600,
+          "size": 30
+        },
+        {
+          "id": "while-seal",
+          "collectibleType": "key",
+          "spriteFrame": "key-blue",
+          "x": 595,
+          "y": 398,
+          "size": 34
+        },
+        {
+          "id": "r2-jump",
+          "collectibleType": "jump",
+          "spriteFrame": "speed-potion",
+          "x": 285,
+          "y": 493,
+          "size": 44
+        },
+        {
+          "id": "scroll-2",
+          "collectibleType": "scroll",
+          "scrollStyle": "blue",
+          "spriteFrame": "scroll-blue",
+          "scrollId": "scroll-2",
+          "clueText": "WHILE LOOP\n\nA while loop repeats as long as its condition remains true.\n\nThe cycle continues while the condition remains true.",
+          "x": 1055,
+          "y": 308,
+          "size": 50
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r2-ghost",
+          "enemyType": "ghost",
+          "x": 600,
+          "y": 570,
+          "patrolDistance": 65,
+          "speed": 122,
+          "size": 58,
+          "chasePlayer": true,
+          "chaseDelayMs": 3000
+        },
+        {
+          "id": "r2-green",
+          "enemyType": "slimegreen",
+          "x": 1050,
+          "y": 600,
+          "patrolDistance": 35,
+          "speed": 124,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [],
+      "portal": {
+        "x": 1160,
+        "y": 590,
+        "locked": true,
+        "endsLevel": false,
+        "targetRoomId": "room-3",
+        "requiredKeys": 2,
+        "requiredScrollId": "scroll-2",
+        "lockedMessage": "Recover the WHILE Seal and Scroll #2.",
+        "size": 84
+      }
+    },
+    {
+      "id": "room-3",
+      "backgroundKey": "tutorialGrove",
+      "objective": "The DO-WHILE Chamber: recover the final seal and Scroll #3, then enter the portal.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
+      "platforms": [
+        {
+          "id": "r3-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r3-left-lift",
+          "x": 280,
+          "y": 565,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "y",
+          "moveDistance": -85,
+          "moveDuration": 2050
+        },
+        {
+          "id": "r3-left-rest",
+          "x": 430,
+          "y": 430,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r3-seal-perch",
+          "x": 740,
+          "y": 390,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r3-right-lift",
+          "x": 895,
+          "y": 285,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "y",
+          "moveDistance": -85,
+          "moveDuration": 1950
+        },
+        {
+          "id": "r3-scroll-perch",
+          "x": 1045,
+          "y": 440,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r3-exit",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r3-spikes",
+          "x": 650,
+          "y": 672,
+          "width": 304,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        },
+        {
+          "id": "r3-fire",
+          "x": 970,
+          "y": 672,
+          "width": 76,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "fire",
+          "hazardSpriteFrame": "fireball",
+          "damage": 1
+        }
+      ],
+      "coins": [
+        {
+          "id": "level5-hint-coin-3",
+          "collectibleType": "coin",
+          "x": 200,
+          "y": 600,
+          "size": 30
+        },
+        {
+          "id": "do-while-seal",
+          "collectibleType": "key",
+          "spriteFrame": "key-green",
+          "x": 430,
+          "y": 348,
+          "size": 34
+        },
+        {
+          "id": "r3-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 280,
+          "y": 483,
+          "size": 44
+        },
+        {
+          "id": "r3-health",
+          "collectibleType": "health",
+          "spriteFrame": "health-heart",
+          "x": 895,
+          "y": 203,
+          "size": 44
+        },
+        {
+          "id": "r3-shield",
+          "collectibleType": "shield",
+          "spriteFrame": "shield",
+          "x": 1045,
+          "y": 358,
+          "size": 44
+        },
+        {
+          "id": "scroll-3",
+          "collectibleType": "scroll",
+          "scrollStyle": "green",
+          "spriteFrame": "scroll-green",
+          "scrollId": "scroll-3",
+          "clueText": "DO-WHILE LOOP\n\nA do-while loop executes first and checks its condition afterward.\n\nSome cycles begin before asking whether they should continue.",
+          "x": 740,
+          "y": 308,
+          "size": 50
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r3-ghost",
+          "enemyType": "ghost",
+          "x": 560,
+          "y": 565,
+          "patrolDistance": 55,
+          "speed": 132,
+          "size": 58,
+          "chasePlayer": true,
+          "chaseDelayMs": 3000
+        },
+        {
+          "id": "r3-orange",
+          "enemyType": "slimeorange",
+          "x": 780,
+          "y": 600,
+          "patrolDistance": 30,
+          "speed": 130,
+          "size": 58,
+          "canJump": false
+        },
+        {
+          "id": "r3-green",
+          "enemyType": "slimegreen",
+          "x": 1080,
+          "y": 600,
+          "patrolDistance": 25,
+          "speed": 134,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [],
+      "portal": {
+        "x": 1160,
+        "y": 590,
+        "locked": true,
+        "endsLevel": false,
+        "targetRoomId": "room-4",
+        "requiredKeys": 3,
+        "requiredScrollId": "scroll-3",
+        "lockedMessage": "Recover the DO-WHILE Seal and Scroll #3.",
+        "size": 84
+      }
+    },
+    {
+      "id": "room-4",
+      "backgroundKey": "swampTrail",
+      "objective": "Loop Trial: cross the repeating platform pattern and reach the Endless Core.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
+      "platforms": [
+        {
+          "id": "r4-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r4-gate-one",
+          "x": 285,
+          "y": 525,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r4-rise",
+          "x": 440,
+          "y": 385,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "y",
+          "moveDistance": -105,
+          "moveDuration": 2050
+        },
+        {
+          "id": "r4-rest",
+          "x": 760,
+          "y": 385,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r4-timed-step",
+          "x": 920,
+          "y": 525,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone",
+          "disappearEveryMs": 2800
+        },
+        {
+          "id": "r4-gate-three",
+          "x": 1060,
+          "y": 385,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r4-exit",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r4-spikes",
+          "x": 630,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        },
+        {
+          "id": "r4-fire",
+          "x": 940,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "fire",
+          "hazardSpriteFrame": "fireball",
+          "damage": 1
+        }
+      ],
+      "coins": [
+        {
+          "id": "r4-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 285,
+          "y": 443,
+          "size": 44
+        },
+        {
+          "id": "r4-jump",
+          "collectibleType": "jump",
+          "spriteFrame": "speed-potion",
+          "x": 440,
+          "y": 303,
+          "size": 44
+        },
+        {
+          "id": "r4-health",
+          "collectibleType": "health",
+          "spriteFrame": "health-heart",
+          "x": 920,
+          "y": 443,
+          "size": 44
+        },
+        {
+          "id": "r4-shield",
+          "collectibleType": "shield",
+          "spriteFrame": "shield",
+          "x": 1060,
+          "y": 303,
+          "size": 44
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r4-ghost",
+          "enemyType": "ghost",
+          "x": 600,
+          "y": 565,
+          "patrolDistance": 50,
+          "speed": 134,
+          "size": 60,
+          "chasePlayer": true,
+          "chaseDelayMs": 3500
+        },
+        {
+          "id": "r4-orange",
+          "enemyType": "slimeorange",
+          "x": 790,
+          "y": 600,
+          "patrolDistance": 30,
+          "speed": 132,
+          "size": 58,
+          "canJump": false
+        },
+        {
+          "id": "r4-green",
+          "enemyType": "slimegreen",
+          "x": 1080,
+          "y": 600,
+          "patrolDistance": 25,
+          "speed": 136,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [
+        {
+          "id": "r4-elemental",
+          "enemyType": "elemental",
+          "x": 940,
+          "y": 330,
+          "fireDirection": "LEFT",
+          "fireIntervalMs": 2250,
+          "projectileSpeed": 270,
+          "projectileLifetimeMs": 2400,
+          "initialDelayMs": 1800,
+          "size": 60
+        }
+      ],
+      "portal": {
+        "x": 1160,
+        "y": 590,
         "locked": false,
-        "targetRoomId": null,
-        "endsLevel": true
+        "endsLevel": false,
+        "targetRoomId": "room-5",
+        "size": 84
+      }
+    },
+    {
+      "id": "room-5",
+      "backgroundKey": "room_1",
+      "objective": "The Endless Core: time the repeating platforms and hazards, then unlock the Loop Core Treasure.",
+      "spawn": {
+        "x": 100,
+        "y": 570
+      },
+      "platforms": [
+        {
+          "id": "r5-start",
+          "x": 130,
+          "y": 672,
+          "width": 228,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r5-lift",
+          "x": 280,
+          "y": 520,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood",
+          "moveAxis": "y",
+          "moveDistance": -95,
+          "moveDuration": 1950
+        },
+        {
+          "id": "r5-left-rest",
+          "x": 430,
+          "y": 350,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone",
+          "disappearEveryMs": 3100
+        },
+        {
+          "id": "r5-shuttle",
+          "x": 585,
+          "y": 500,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r5-timed-core",
+          "x": 740,
+          "y": 300,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone",
+          "disappearEveryMs": 2600
+        },
+        {
+          "id": "r5-right-rest",
+          "x": 895,
+          "y": 450,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "wood"
+        },
+        {
+          "id": "r5-final-lift",
+          "x": 1040,
+          "y": 560,
+          "width": 114,
+          "bodyHeight": 34,
+          "textureKey": "stone",
+          "moveAxis": "y",
+          "moveDistance": -85,
+          "moveDuration": 1800
+        },
+        {
+          "id": "r5-chest",
+          "x": 1160,
+          "y": 672,
+          "width": 152,
+          "bodyHeight": 34,
+          "textureKey": "stone"
+        },
+        {
+          "id": "r5-spikes",
+          "x": 620,
+          "y": 672,
+          "width": 304,
+          "bodyHeight": 16,
+          "textureKey": "stone",
+          "hazard": true,
+          "hazardType": "spikes",
+          "hazardSpriteFrame": "floor-spikes",
+          "damage": 1
+        }
+      ],
+      "coins": [
+        {
+          "id": "r5-speed",
+          "collectibleType": "speed",
+          "spriteFrame": "speed-potion",
+          "x": 280,
+          "y": 438,
+          "size": 44
+        },
+        {
+          "id": "r5-jump",
+          "collectibleType": "jump",
+          "spriteFrame": "speed-potion",
+          "x": 585,
+          "y": 418,
+          "size": 44
+        },
+        {
+          "id": "r5-health",
+          "collectibleType": "health",
+          "spriteFrame": "health-heart",
+          "x": 740,
+          "y": 218,
+          "size": 44
+        },
+        {
+          "id": "r5-shield",
+          "collectibleType": "shield",
+          "spriteFrame": "shield",
+          "x": 895,
+          "y": 368,
+          "size": 44
+        }
+      ],
+      "ghosts": [
+        {
+          "id": "r5-ghost",
+          "enemyType": "ghost",
+          "x": 540,
+          "y": 565,
+          "patrolDistance": 55,
+          "speed": 138,
+          "size": 60,
+          "chasePlayer": true,
+          "chaseDelayMs": 5000
+        },
+        {
+          "id": "r5-orange",
+          "enemyType": "slimeorange",
+          "x": 735,
+          "y": 600,
+          "patrolDistance": 30,
+          "speed": 136,
+          "size": 58,
+          "canJump": false
+        },
+        {
+          "id": "r5-green",
+          "enemyType": "slimegreen",
+          "x": 1060,
+          "y": 600,
+          "patrolDistance": 25,
+          "speed": 142,
+          "size": 58,
+          "canJump": false
+        }
+      ],
+      "projectileEnemies": [
+        {
+          "id": "r5-elemental",
+          "enemyType": "elemental",
+          "x": 900,
+          "y": 320,
+          "fireDirection": "LEFT",
+          "fireIntervalMs": 1850,
+          "projectileSpeed": 300,
+          "projectileLifetimeMs": 2500,
+          "initialDelayMs": 1300,
+          "size": 62
+        }
+      ],
+      "portal": {
+        "id": "loop-core-treasure",
+        "x": 1160,
+        "y": 580,
+        "locked": true,
+        "endsLevel": true,
+        "appearance": "TREASURE_CHEST",
+        "size": 96,
+        "requiredCoins": 3,
+        "questionId": "loop-core-riddle",
+        "treasureQuestionId": "loop-core-riddle"
       }
     }
-  ]
+  ],
+  "treasureQuestionId": "loop-core-riddle"
 }

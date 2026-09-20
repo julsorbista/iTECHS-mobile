@@ -21,10 +21,19 @@ export default class GhostMinion extends Phaser.Physics.Arcade.Sprite {
       : 'LEFT';
     this.axis = ['UP', 'DOWN'].includes(this.movementDirection) ? 'y' : 'x';
     this.direction = ['RIGHT', 'DOWN'].includes(this.movementDirection) ? 1 : -1;
+    this.spawnDirection = this.direction;
+    this.chasePlayer = Boolean(config.chasePlayer);
+    this.chaseDelayMs = Math.max(0, Number(config.chaseDelayMs) || 0);
+    this.chaseEnabledAt = this.chaseDelayMs > 0 ? Number.POSITIVE_INFINITY : 0;
+    this.roomActive = false;
     this.maxHitPoints = Math.max(1, Math.round(Number(config.hitPoints || manifest.hitPoints || 1)));
     this.hitPoints = this.maxHitPoints;
 
     applyConfiguredSpriteScale(this, manifest, config);
+    const visualOriginY = Number(config.visualOriginY);
+    if (Number.isFinite(visualOriginY)) {
+      this.setOrigin(0.5, Phaser.Math.Clamp(visualOriginY, 0.35, 0.65));
+    }
 
     this.body.setAllowGravity(false);
     this.body.setImmovable(true);
@@ -35,6 +44,18 @@ export default class GhostMinion extends Phaser.Physics.Arcade.Sprite {
       offsetY: 0,
     });
     this.anims.play('game-one-ghost-float', true);
+  }
+
+  resetToSpawn() {
+    if (!this.active) return;
+
+    this.setPosition(this.spawnX, this.spawnY);
+    this.body?.reset?.(this.spawnX, this.spawnY);
+    this.setVelocity(0, 0);
+    this.direction = this.spawnDirection;
+    this.setFlipX(this.direction < 0);
+    const resetGraceMs = Math.max(900, this.chaseDelayMs);
+    this.chaseEnabledAt = this.scene.time.now + resetGraceMs;
   }
 
   applyProjectileHit(damage = 1) {
@@ -60,7 +81,25 @@ export default class GhostMinion extends Phaser.Physics.Arcade.Sprite {
     return false;
   }
 
-  update() {
+  setRoomActive(active, now = this.scene.time.now) {
+    const nextActive = Boolean(active);
+    if (nextActive && !this.roomActive) {
+      this.chaseEnabledAt = now + this.chaseDelayMs;
+    } else if (!nextActive) {
+      this.chaseEnabledAt = this.chaseDelayMs > 0 ? Number.POSITIVE_INFINITY : 0;
+    }
+    this.roomActive = nextActive;
+  }
+
+  update(now = this.scene.time.now) {
+    if (this.chasePlayer && now >= this.chaseEnabledAt && this.scene.player?.active) {
+      const deltaX = this.scene.player.x - this.x;
+      const deltaY = this.scene.player.y - this.y;
+      const length = Math.max(1, Math.hypot(deltaX, deltaY));
+      this.setVelocity((deltaX / length) * this.speed, (deltaY / length) * this.speed);
+      this.setFlipX(deltaX < 0);
+      return;
+    }
     if (this.axis === 'y') {
       this.setVelocityX(0);
       this.setVelocityY(this.speed * this.direction);

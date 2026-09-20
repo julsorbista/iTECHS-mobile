@@ -14,11 +14,13 @@ import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import BootScene from '../scenes/BootScene';
 import PreloadScene from '../scenes/PreloadScene';
 import LevelScene from '../scenes/LevelScene';
+import TutorialScene from '../scenes/TutorialScene';
+import { pauseForTutorial } from '../systems/tutorialSession';
 import HudScene from '../scenes/HudScene';
 import QuestionScene from '../scenes/QuestionScene';
 import MenuScene from '../scenes/MenuScene';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
-import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import GameOneInteractiveTutorial from './GameOneInteractiveTutorial';
 import { buildGameOneGuideContent } from '../../shared/ui/gameGuideContent';
 import ResultOverlay from './ResultOverlay';
 
@@ -26,6 +28,12 @@ const renderScreenModal = (content) => (
   typeof document !== 'undefined'
     ? createPortal(content, document.body)
     : null
+);
+
+const shouldShowGameOneHitboxes = () => (
+  import.meta.env.DEV
+  && typeof window !== 'undefined'
+  && new URLSearchParams(window.location.search).get('gameOneDebugHitboxes') === '1'
 );
 
 const GameCanvas = forwardRef(({
@@ -51,12 +59,16 @@ const GameCanvas = forwardRef(({
   initialShowTutorial = true,
   showLevelGuideline = false,
   gameTutorialRequested = false,
+  gameGuidelinesRequested = false,
   continueToTutorialAfterGuide = false,
   showTutorialButton = false,
 }, ref) => {
   const containerRef = useRef(null);
   const gameRef = useRef(null);
   const mobileControlsRef = useRef({ left: false, right: false, jumpQueued: false });
+  const isFinalLevel = Number(levelData?.levelNumber || 1) >= 5;
+  const [tutorialState, setTutorialState] = useState(null);
+  const getTutorialScene = useCallback(() => gameRef.current?.scene?.keys?.GameOneTutorialScene, []);
   const callbackRef = useRef({
     onLevelComplete,
     onLevelFail,
@@ -70,10 +82,11 @@ const GameCanvas = forwardRef(({
   const [tutorialView, setTutorialView] = useState(
     showLevelGuideline ? 'guide' : null,
   );
+  const [isAutomaticFirstPlayTutorial, setIsAutomaticFirstPlayTutorial] = useState(false);
+  const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const showGuide = tutorialView === 'guide';
   const showTutorial = tutorialView === 'practice';
-  const showMobileControls = !showGuide
-    && !showTutorial
+  const showMobileControls = !showTutorial
     && !isPaused
     && !isQuestionOpen
     && !resultData
@@ -82,6 +95,11 @@ const GameCanvas = forwardRef(({
     () => buildGameOneGuideContent(levelData),
     [levelData],
   );
+  const viewportAspectRatio = useMemo(() => {
+    const width = Math.max(1, Number(levelData?.viewport?.width) || 1280);
+    const height = Math.max(1, Number(levelData?.viewport?.height) || 720);
+    return `${width} / ${height}`;
+  }, [levelData]);
 
   useEffect(() => {
     callbackRef.current = {
@@ -95,26 +113,45 @@ const GameCanvas = forwardRef(({
 
   useEffect(() => {
     setTutorialView(showLevelGuideline ? 'guide' : null);
+    setGuideOpenedDuringGameplay(false);
   }, [levelData, showLevelGuideline]);
 
   useEffect(() => {
     if (Number(gameTutorialRequested) > 0) {
+      setIsAutomaticFirstPlayTutorial(false);
       setTutorialView('practice');
     }
   }, [gameTutorialRequested]);
+
+  useEffect(() => {
+    if (Number(gameGuidelinesRequested) > 0) {
+      setGuideOpenedDuringGameplay(true);
+      setIsAutomaticFirstPlayTutorial(false);
+      setTutorialView('guide');
+    }
+  }, [gameGuidelinesRequested]);
 
   useEffect(() => {
     if (!showMobileControls) {
       mobileControlsRef.current.left = false;
       mobileControlsRef.current.right = false;
       mobileControlsRef.current.jumpQueued = false;
+      mobileControlsRef.current.dashQueued = false;
+      mobileControlsRef.current.attackQueued = false;
+      mobileControlsRef.current.interactQueued = false;
     }
   }, [showMobileControls]);
 
   useImperativeHandle(ref, () => ({
     openTutorial: () => {
       if (!shouldAllowTutorial) return;
+      setIsAutomaticFirstPlayTutorial(false);
       setTutorialView('practice');
+    },
+    openGuidelines: () => {
+      setGuideOpenedDuringGameplay(true);
+      setIsAutomaticFirstPlayTutorial(false);
+      setTutorialView('guide');
     },
   }), [shouldAllowTutorial]);
 
@@ -128,10 +165,11 @@ const GameCanvas = forwardRef(({
       : Number(hintStarCost);
 
     const bootPayload = {
+      mobileControls: mobileControlsRef.current,
       levelData,
       runtimeAssets,
-      mobileControls: mobileControlsRef.current,
       suppressPreloadUi: Boolean(suppressPreloadUi),
+      initialOverlayPaused: Boolean(showLevelGuideline),
       hintCoinCost: resolvedHintCoinCost,
       hintStarCost: resolvedHintCoinCost,
       callbacks: {
@@ -148,6 +186,7 @@ const GameCanvas = forwardRef(({
       type: Phaser.AUTO,
       width: levelData.viewport.width,
       height: levelData.viewport.height,
+      resolution: Math.min(window.devicePixelRatio || 1, 2),
       parent: containerRef.current,
       pixelArt: true,
       roundPixels: true,
@@ -156,7 +195,7 @@ const GameCanvas = forwardRef(({
         default: 'arcade',
         arcade: {
           gravity: { y: 1500 },
-          debug: false,
+          debug: shouldShowGameOneHitboxes(),
         },
       },
       scale: {
@@ -182,7 +221,7 @@ const GameCanvas = forwardRef(({
           }
         ]
       },
-      scene: [BootScene, PreloadScene, LevelScene, HudScene, QuestionScene, MenuScene],
+      scene: [BootScene, PreloadScene, LevelScene, HudScene, QuestionScene, MenuScene, TutorialScene],
       callbacks: {
         preBoot: (instance) => {
           instance.__ITECHS_BOOT__ = bootPayload;
@@ -200,7 +239,7 @@ const GameCanvas = forwardRef(({
         gameRef.current = null;
       }
     };
-  }, [hintCoinCost, hintStarCost, levelData, runtimeAssets, suppressPreloadUi]);
+  }, [hintCoinCost, hintStarCost, levelData, runtimeAssets, showLevelGuideline, suppressPreloadUi]);
 
   const handleResume = useCallback(() => {
     const levelScene = gameRef.current?.scene?.keys?.LevelScene;
@@ -219,6 +258,24 @@ const GameCanvas = forwardRef(({
     onExitRequest?.();
   }, [onExitRequest]);
 
+  const handleRestart = useCallback(() => {
+    const levelScene = gameRef.current?.scene?.keys?.LevelScene;
+    levelScene?.togglePause?.(false);
+    onRetry?.();
+  }, [onRetry]);
+
+  const handleHowToPlay = useCallback(() => {
+    const levelScene = gameRef.current?.scene?.keys?.LevelScene;
+    levelScene?.togglePause?.(false);
+    setIsAutomaticFirstPlayTutorial(false);
+    setTutorialView('practice');
+  }, []);
+
+  const closeGameplayGuidelines = useCallback(() => {
+    setGuideOpenedDuringGameplay(false);
+    setTutorialView(null);
+  }, []);
+
   useEffect(() => {
     const menuScene = gameRef.current?.scene?.keys?.MenuScene;
     const levelScene = gameRef.current?.scene?.keys?.LevelScene;
@@ -230,6 +287,8 @@ const GameCanvas = forwardRef(({
       const pauseSnapshot = levelScene?.getPauseMenuSnapshot?.() || {};
       menuScene.showPauseMenu({
         onResume: handleResume,
+        onRestart: handleRestart,
+        onHowToPlay: handleHowToPlay,
         onExit: handleExit,
         ...pauseSnapshot,
       });
@@ -237,7 +296,7 @@ const GameCanvas = forwardRef(({
     }
 
     menuScene.hideMenu('pause');
-  }, [handleExit, handleResume, isPaused, isSubmitting, resultData]);
+  }, [handleExit, handleHowToPlay, handleRestart, handleResume, isPaused, isSubmitting, resultData]);
 
   useEffect(() => {
     const menuScene = gameRef.current?.scene?.keys?.MenuScene;
@@ -259,22 +318,53 @@ const GameCanvas = forwardRef(({
       return;
     }
 
-    if ((showGuide && !gameTutorialRequested) || showTutorial) {
-      sceneManager.pause('LevelScene');
-      sceneManager.pause('HudScene');
-      sceneManager.pause('QuestionScene');
-      sceneManager.keys?.MenuScene?.hideMenu?.('pause');
-      return;
-    }
-
-    sceneManager.resume('LevelScene');
-    sceneManager.resume('HudScene');
-  }, [gameTutorialRequested, isSubmitting, resultData, showGuide, showTutorial]);
+    const game = gameRef.current;
+    let restore;
+    let applied = false;
+    const synchronize = () => {
+      const levelScene = sceneManager.keys?.LevelScene;
+      if (applied || !levelScene?.player?.scene || levelScene.gameState === 'loading') return;
+      applied = true;
+      if (showTutorial) {
+        setTutorialState(null);
+        restore = pauseForTutorial(levelScene, sceneManager);
+        sceneManager.keys?.MenuScene?.hideMenu?.('pause');
+        sceneManager.start('GameOneTutorialScene', { source: levelScene, onUpdate: setTutorialState });
+        return;
+      }
+      const guideOpen = showGuide && (!gameTutorialRequested || guideOpenedDuringGameplay);
+      levelScene.setOverlayPaused(guideOpen);
+      if (guideOpen) {
+        sceneManager.pause('LevelScene');
+        sceneManager.pause('HudScene');
+        sceneManager.pause('QuestionScene');
+        sceneManager.keys?.MenuScene?.hideMenu?.('pause');
+      } else {
+        sceneManager.resume('LevelScene');
+        sceneManager.resume('HudScene');
+      }
+    };
+    synchronize();
+    game.events.on('poststep', synchronize);
+    return () => {
+      game.events.off('poststep', synchronize);
+      if (restore) {
+        sceneManager.stop('GameOneTutorialScene');
+        restore();
+      }
+    };
+  }, [gameTutorialRequested, guideOpenedDuringGameplay, isSubmitting, resultData, showGuide, showTutorial, hintCoinCost, hintStarCost, levelData, runtimeAssets, showLevelGuideline, suppressPreloadUi]);
 
   return (
-    <div className={`game-one-frame-shell relative box-border w-full ${isQuestionOpen ? 'game-one-question-open' : ''} ${frameClassName}`}>
-      <div className="overflow-hidden rounded-[28px] border border-slate-200/70 bg-slate-950 shadow-[0_28px_60px_rgba(15,23,42,0.24)]">
-        <div ref={containerRef} className={`w-full [&>canvas]:w-full! [&>canvas]:h-auto! ${canvasHostClassName}`} />
+    <div className={`game-one-frame-shell relative box-border w-full ${frameClassName}`}>
+      <div
+        className="game-one-canvas-viewport relative w-full overflow-hidden rounded-[16px] border-2 border-slate-600 bg-slate-950 shadow-[0_10px_24px_rgba(2,6,23,0.28)]"
+        style={{ aspectRatio: viewportAspectRatio }}
+      >
+        <div
+          ref={containerRef}
+          className={`absolute inset-0 h-full w-full [&>canvas]:block! [&>canvas]:h-full! [&>canvas]:w-full! [&>canvas]:cursor-default ${canvasHostClassName}`}
+        />
       </div>
       {showMobileControls && <div className="game-one-mobile-controls" aria-label="Game controls">
         <div className="game-one-mobile-direction-controls">
@@ -291,7 +381,7 @@ const GameCanvas = forwardRef(({
             onPointerCancel={() => { mobileControlsRef.current.left = false; }}
             onLostPointerCapture={() => { mobileControlsRef.current.left = false; }}
           >
-            &#9664;
+            ←
           </button>
           <button
             type="button"
@@ -306,9 +396,19 @@ const GameCanvas = forwardRef(({
             onPointerCancel={() => { mobileControlsRef.current.right = false; }}
             onLostPointerCapture={() => { mobileControlsRef.current.right = false; }}
           >
-            &#9654;
+            →
           </button>
         </div>
+        <div className="game-one-mobile-actions">
+          {['Attack', 'Dash'].map((action) => (
+            <button key={action} type="button" className="game-one-mobile-control-button"
+              aria-label={action}
+              onPointerDown={(event) => {
+                event.preventDefault();
+                mobileControlsRef.current[`${action.toLowerCase()}Queued`] = true;
+              }}
+            >{action}</button>
+          ))}
         <button
           type="button"
           className="game-one-mobile-control-button game-one-mobile-jump-button"
@@ -320,13 +420,14 @@ const GameCanvas = forwardRef(({
         >
           Jump
         </button>
+        </div>
       </div>}
       {!hideResultOverlay ? (
         <ResultOverlay
           result={resultData}
           gameplay={gameplayData}
           isSubmitting={isSubmitting}
-          canAdvanceLevel={canAdvanceLevel}
+          canAdvanceLevel={canAdvanceLevel && !isFinalLevel}
           onRetry={onRetry}
           onBack={onBack}
           onNextLevel={onNextLevel}
@@ -347,9 +448,20 @@ const GameCanvas = forwardRef(({
                 lead={gameOneGuideContent.lead}
                 summary={gameOneGuideContent.summary}
                 sections={gameOneGuideContent.sections}
-                onExit={onExitRequest}
-                onStart={() => setTutorialView(continueToTutorialAfterGuide ? 'practice' : null)}
-                startLabel="Next"
+                onExit={guideOpenedDuringGameplay ? closeGameplayGuidelines : onExitRequest}
+                onStart={() => {
+                  if (guideOpenedDuringGameplay) {
+                    closeGameplayGuidelines();
+                    return;
+                  }
+                  if (continueToTutorialAfterGuide) {
+                    setIsAutomaticFirstPlayTutorial(true);
+                    setTutorialView('practice');
+                    return;
+                  }
+                  setTutorialView(null);
+                }}
+                startLabel={guideOpenedDuringGameplay ? 'Continue' : 'Next'}
               />
             </motion.div>
           )}
@@ -360,11 +472,18 @@ const GameCanvas = forwardRef(({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <GameTutorialOverlay
-                gameType="GAME_ONE"
+              <GameOneInteractiveTutorial
+                state={tutorialState}
+                canvasRef={containerRef}
                 levelNumber={levelData?.levelNumber || 1}
+                isReplay={!isAutomaticFirstPlayTutorial}
+                onPageChange={(page) => getTutorialScene()?.goToPage(page)}
+                onAcknowledge={() => getTutorialScene()?.acknowledge()}
                 onExit={onExitRequest}
-                onStart={() => setTutorialView(null)}
+                onFinish={() => {
+                  setIsAutomaticFirstPlayTutorial(false);
+                  setTutorialView(null);
+                }}
               />
             </motion.div>
           )}

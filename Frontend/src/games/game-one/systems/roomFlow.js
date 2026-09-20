@@ -68,6 +68,7 @@ export const buildWorldGridLayout = (levelData) => {
           backgroundKey: room?.backgroundKey,
           objective: room?.objective || '',
           postUnlockObjective: room?.postUnlockObjective || '',
+          spawn: room?.spawn,
         }))
       : []);
   const records = [];

@@ -322,3 +322,7 @@ export const syncStudentMenuLoopToPreference = async () => {
   stopStudentMenuLoop({ rewind: false });
   return { started: false, blocked: false };
 };
+
+const scaleStudentVolume = (baseVolume, preferencePercent) => Math.max(0, Math.min(1, Number(baseVolume) || 0)) * (clampVolumePercent(preferencePercent) / 100);
+export const getStudentMusicVolume = (baseVolume = 1) => scaleStudentVolume(baseVolume, getStudentAudioVolumePreference());
+export const getStudentSfxVolume = (baseVolume = 1) => scaleStudentVolume(baseVolume, getStudentSfxVolumePreference());

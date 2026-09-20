@@ -1,5 +1,5 @@
 import React from 'react';
-import cursorImage from './cursor.png';
+import cursorImage from './tutorial-hand.png';
 
 const DEMO_COPY = Object.freeze({
   platform: {

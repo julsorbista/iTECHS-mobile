@@ -25,9 +25,10 @@ import levelFiveBackground from '../assets/backgrounds/syntax bg 5.png';
 import './GameCanvasGameSix.css';
 import GameSixAnnouncementBoard from './GameSixAnnouncementBoard';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
-import GameTutorialOverlay from '../../shared/ui/GameTutorialOverlay';
+import GameSixInteractiveTutorial from './GameSixInteractiveTutorial';
 import PlayableTutorialCoach from '../../shared/ui/PlayableTutorialCoach';
 import { buildGameSixGuideContent } from '../../shared/ui/levelGuideBuilders';
+import { getStudentMusicVolume, getStudentSfxVolume } from '../../../utils/studentMenuAudio';
 import { addUserCoins } from '../../shared/gameSessionPersistence';
 import { handleAPIError, levelAPI } from '../../../utils/api';
 
@@ -140,7 +141,7 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
       ? persistentGameSixMusic
       : new Audio(musicSrc);
     music.loop = true;
-    music.volume = 0.28;
+    music.volume = getStudentMusicVolume(0.28);
     music.preload = 'auto';
     persistentGameSixMusic = music;
     persistentGameSixMusicSrc = musicSrc;
@@ -149,7 +150,7 @@ const useArcadeAudio = (musicSrc, sfxSrc, active) => {
     const sfx = persistentGameSixSfx && persistentGameSixSfxSrc === sfxSrc
       ? persistentGameSixSfx
       : new Audio(sfxSrc);
-    sfx.volume = 0.52;
+    sfx.volume = getStudentSfxVolume(0.52);
     sfx.preload = 'auto';
     persistentGameSixSfx = sfx;
     persistentGameSixSfxSrc = sfxSrc;
@@ -212,13 +213,13 @@ const useAnswerSounds = (active = true) => {
 
     const correct = new Audio(CORRECT_ANSWER_SOUND_SRC);
     correct.preload = 'auto';
-    correct.volume = 0.7;
+    correct.volume = getStudentSfxVolume(0.7);
     correct.load();
     correctRef.current = correct;
 
     const incorrect = new Audio(INCORRECT_ANSWER_SOUND_SRC);
     incorrect.preload = 'auto';
-    incorrect.volume = 0.7;
+    incorrect.volume = getStudentSfxVolume(0.7);
     incorrect.load();
     incorrectRef.current = incorrect;
 
@@ -288,7 +289,7 @@ const useComboMilestoneSounds = (active = true) => {
     ]);
     sounds.forEach((audio) => {
       audio.preload = 'auto';
-      audio.volume = 1;
+      audio.volume = getStudentSfxVolume(1);
       audio.load();
     });
     soundsRef.current = sounds;
@@ -349,6 +350,7 @@ const GameCanvasGameSix = ({
   onCoinBalanceChange,
 }) => {
   const settings = useMemo(() => getSettings(levelData), [levelData]);
+  const isFinalLevel = settings.level >= 5;
   const guideContent = useMemo(
     () => buildGameSixGuideContent(levelData),
     [levelData],
@@ -382,13 +384,18 @@ const GameCanvasGameSix = ({
   const [tutorialView, setTutorialView] = useState(
     showLevelGuideline ? 'guide' : null,
   );
+  const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
   const [tutorialCoachOpen, setTutorialCoachOpen] = useState(isTutorialLevel);
   const shouldPauseForTutorialCoach = Boolean(isTutorialLevel && tutorialCoachOpen);
   const showGuide = showTutorial && tutorialView === 'guide';
+  const [tutorialDemo, setTutorialDemo] = useState(null);
+  const activeDemo = showTutorial && ['tutorial', 'first-play-tutorial'].includes(tutorialView) ? tutorialDemo : null;
+  const displayAnswerState = activeDemo || answerState;
 
   useEffect(() => {
     if (Number(gameTutorialRequested) > 0 && !isTutorialLevel) {
+      setGuideOpenedDuringGameplay(false);
       setTutorialView('tutorial');
       setShowTutorial(true);
     }
@@ -402,7 +409,7 @@ const GameCanvasGameSix = ({
 
     const audio = new Audio(gameOverSound);
     audio.preload = 'auto';
-    audio.volume = 1;
+    audio.volume = getStudentSfxVolume(1);
     const playPromise = audio.play();
     if (playPromise?.catch) playPromise.catch(() => {});
 
@@ -412,6 +419,7 @@ const GameCanvasGameSix = ({
     };
   }, [hideResultOverlay, resultData]);
   const inputRef = useRef(null);
+  const tutorialRootRef = useRef(null);
   const resolvingMissesRef = useRef(new Set());
   const answerPendingRef = useRef(false);
   const healthRef = useRef(settings.lives);
@@ -552,7 +560,7 @@ const GameCanvasGameSix = ({
       setTutorialStepIndex(1);
     }
     setTutorialCoachOpen(false);
-    inputRef.current?.focus();
+    if (!window.matchMedia?.('(pointer: coarse)').matches) inputRef.current?.focus({ preventScroll: true });
   };
 
   const finish = useCallback((outcome, finalCleared = cleared, finalScore = score, finalMistakes = mistakes) => {
@@ -571,6 +579,8 @@ const GameCanvasGameSix = ({
 
   useEffect(() => {
     if (showTutorial || shouldPauseForTutorialCoach || finished || resultData) return undefined;
+    // Mobile players control the keyboard; drops must not reopen it after dismissal.
+    if (window.matchMedia?.('(pointer: coarse)').matches) return undefined;
     const focusInput = () => inputRef.current?.focus({ preventScroll: true });
     const frameId = window.requestAnimationFrame(focusInput);
     return () => window.cancelAnimationFrame(frameId);
@@ -623,7 +633,7 @@ const GameCanvasGameSix = ({
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
-    const answer = typed.trim().toLowerCase();
+    const answer = typed.trim();
     if (!answer || answerPendingRef.current || showTutorial || shouldPauseForTutorialCoach || finished || resultData) return;
     answerPendingRef.current = true;
     setAnswerState({ pending: true, message: 'Checking answer...', type: 'pending' });
@@ -740,7 +750,7 @@ const GameCanvasGameSix = ({
   const seconds = String(timeLeft % 60).padStart(2, '0');
 
   return (
-    <div className={`game-six-shell game-six-emerald game-six-level-${settings.level} w-full overflow-hidden p-4 text-[#172033]`}>
+    <div ref={tutorialRootRef} className={`game-six-shell game-six-emerald game-six-level-${settings.level} w-full overflow-hidden p-4 text-[#172033]`}>
       <div className="game-six-header mb-3 flex flex-wrap items-center justify-between gap-3 px-4 py-2">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.14em] text-[#16876d]">Game 6</p>
@@ -749,6 +759,17 @@ const GameCanvasGameSix = ({
         <div className="flex flex-wrap gap-3 text-lg font-semibold">
           <PixelPanel className="game-six-top-stat px-3 py-2">Level: {settings.level} <Star className="inline h-5 w-5 fill-amber-300 text-amber-500" /></PixelPanel>
           <PixelPanel className="game-six-top-stat game-six-coins-status px-3 py-2"><Coins className="inline h-5 w-5 text-amber-500" /> Coins: {coins}</PixelPanel>
+          <button
+            type="button"
+            className="game-six-card game-six-top-stat cursor-pointer px-3 py-2 font-semibold transition hover:brightness-95"
+            onClick={() => {
+              setGuideOpenedDuringGameplay(true);
+              setTutorialView('guide');
+              setShowTutorial(true);
+            }}
+          >
+            Guidelines
+          </button>
           <button type="button" className="game-six-card game-six-top-stat cursor-pointer px-3 py-2 font-semibold transition hover:brightness-95" onClick={onGameTutorial}>Game Tutorial</button>
           <PixelPanel className="game-six-top-stat px-3 py-2">Round: {cleared}/{settings.targetWords}</PixelPanel>
         </div>
@@ -766,7 +787,7 @@ const GameCanvasGameSix = ({
               {settings.level === 5 && 'Discover the hidden relationship and type both matching Java terms. The category is not shown.'}
             </p>
             <div className="mt-3 grid grid-cols-4 gap-2">
-              <PixelPanel className="game-six-mini-stat p-2 text-center"><Clock3 className="mx-auto h-5 w-5 text-emerald-600" /><strong className="block text-lg font-semibold">{minutes}:{seconds}</strong><span className="text-xs font-semibold">Timer</span></PixelPanel>
+              <PixelPanel className="game-six-mini-stat game-six-timer-status p-2 text-center"><Clock3 className="mx-auto h-5 w-5 text-emerald-600" /><strong className="block text-lg font-semibold">{minutes}:{seconds}</strong><span className="text-xs font-semibold">Timer</span></PixelPanel>
               <PixelPanel className="game-six-mini-stat p-2 text-center"><Zap className="mx-auto h-5 w-5 text-amber-500" /><strong className="block text-lg font-semibold">{speedLevel}</strong><span className="text-xs font-semibold">Speed</span></PixelPanel>
               <PixelPanel className="game-six-score-status p-2 text-center"><Star className="mx-auto h-5 w-5 fill-yellow-300 text-yellow-500" /><strong className="block text-lg font-semibold">{score}</strong><span className="text-xs font-semibold">Score</span></PixelPanel>
               <PixelPanel className="game-six-health-status p-2 text-center"><Heart className="mx-auto h-5 w-5 fill-red-500 text-red-600" /><strong className="block text-lg font-semibold">{health}</strong><span className="text-xs font-semibold">Health</span></PixelPanel>
@@ -827,21 +848,17 @@ const GameCanvasGameSix = ({
             </div>
           )}
           {targetFeedback && <div className="game-six-target-feedback" role="status">{targetFeedback}</div>}
-          {drops.map((drop) => (
-            <div
-              key={drop.id}
-              className="game-six-falling-word absolute z-10 px-4 py-3 text-center text-xl font-black"
-              style={{ '--game-six-drop-x': `${drop.x}%`, left: `${drop.x}%`, top: `${drop.y}%` }}
-            >
+          {(activeDemo?.drops || drops).map((drop, index) => (
+            <div key={drop.id} data-demo-term={index} data-demo-motion={activeDemo ? '': undefined} className="game-six-falling-word absolute z-10 px-4 py-3 text-center text-xl font-black" style={{ left: `${drop.x}%`, '--word-x': `${drop.x}%`, top: `${drop.y}%` }}>
               <span className="game-six-variable-declaration"><span>{settings.level === 4 ? drop.scrambled : drop.scrambled.replaceAll(' ', '')}</span></span>
             </div>
           ))}
           <form onSubmit={handleSubmit} className="game-six-answer-form absolute bottom-5 left-1/2 z-20 flex w-[min(540px,82%)] -translate-x-1/2 items-stretch gap-2">
             <span className="game-six-variable-prefix" aria-hidden="true">&gt;_</span>
-            <input ref={inputRef} autoFocus className="game-six-answer-input min-w-0 flex-1 px-3 py-3 text-lg font-semibold outline-none" value={typed} onKeyDown={primeAnswerSounds} onChange={(event) => { setTyped(event.target.value); if (answerState.type === 'incorrect') setAnswerState({ pending: false, message: '', type: '' }); }} placeholder={settings.level === 5 ? 'type a related Java term...' : 'type a Java term...'} disabled={Boolean(resultData)} readOnly={answerState.pending} />
+            <input ref={inputRef} className="game-six-answer-input min-w-0 flex-1 px-3 py-3 text-lg font-semibold outline-none" value={activeDemo ? activeDemo.typed : typed} autoCapitalize="none" autoCorrect="off" spellCheck={false} onKeyDown={primeAnswerSounds} onChange={(event) => { setTyped(event.target.value); if (answerState.type === 'incorrect') setAnswerState({ pending: false, message: '', type: '' }); }} placeholder={settings.level === 5 ? 'type a related Java term...' : 'type a Java term (case-sensitive)...'} disabled={Boolean(resultData)} readOnly={Boolean(activeDemo) || answerState.pending} />
             <button type="submit" className="game-six-enter-button px-6 py-3 text-lg font-bold text-white transition hover:brightness-105 disabled:cursor-wait disabled:opacity-70" disabled={answerState.pending}>{answerState.pending ? 'Checking...' : 'Enter'}</button>
-            {answerState.message && (
-              <p role="status" className={`game-six-answer-feedback game-six-answer-feedback--${answerState.type}`}>{answerState.message}</p>
+            {displayAnswerState.message && (
+              <p role="status" className={`game-six-answer-feedback game-six-answer-feedback--${displayAnswerState.type}`}>{displayAnswerState.message}</p>
             )}
           </form>
         </main>
@@ -856,9 +873,21 @@ const GameCanvasGameSix = ({
             summary={guideContent.summary}
             sections={guideContent.sections}
             renderInPortal
-            onExit={onExitRequest}
-            onStart={() => setTutorialView(continueToTutorialAfterGuide ? 'first-play-tutorial' : 'announcement')}
-            startLabel="Next"
+            onExit={guideOpenedDuringGameplay ? () => {
+              setGuideOpenedDuringGameplay(false);
+              setTutorialView(null);
+              setShowTutorial(false);
+            } : onExitRequest}
+            onStart={() => {
+              if (guideOpenedDuringGameplay) {
+                setGuideOpenedDuringGameplay(false);
+                setTutorialView(null);
+                setShowTutorial(false);
+                return;
+              }
+              setTutorialView(continueToTutorialAfterGuide ? 'first-play-tutorial' : 'announcement');
+            }}
+            startLabel={guideOpenedDuringGameplay ? 'Continue' : 'Next'}
           />,
           document.body,
         ) : tutorialView === 'announcement' ? (
@@ -870,8 +899,13 @@ const GameCanvasGameSix = ({
             }}
           />
         ) : (
-          <GameTutorialOverlay
-            gameType="GAME_SIX"
+          <GameSixInteractiveTutorial
+            onDemo={setTutorialDemo}
+            rootRef={tutorialRootRef}
+            activeTerms={drops}
+            background={levelBackground}
+            settings={settings}
+            isFirstPlay={tutorialView === 'first-play-tutorial'}
             levelNumber={levelData?.levelNumber || 1}
             onExit={onExitRequest}
             onStart={() => {
@@ -906,7 +940,7 @@ const GameCanvasGameSix = ({
             <div className="game-two-result-actions">
               <button type="button" className="btn btn-secondary" onClick={onBack}>Back</button>
               <button type="button" className="btn btn-primary" onClick={onRetry}><RotateCcw className="h-4 w-4" /> Retry</button>
-              {canAdvanceLevel && <button type="button" className="btn btn-primary" onClick={onNextLevel}>Next Level</button>}
+              {canAdvanceLevel && !isFinalLevel && <button type="button" className="btn btn-primary" onClick={onNextLevel}>Next Level</button>}
             </div>
           </div>
         </div>
