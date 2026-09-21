@@ -116,14 +116,16 @@ const GameGuideOverlay = ({
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return undefined;
 
-    const restoresLandscape = ['game-guide-theme-one', 'game-guide-theme-two', 'game-guide-theme-four'].includes(themeClass);
+    const usesLandscapeGuide = ['game-guide-theme-one', 'game-guide-theme-two', 'game-guide-theme-four'].includes(themeClass);
     ScreenOrientation.lock({
-      orientation: restoresLandscape ? 'landscape-primary' : 'portrait-primary',
+      orientation: usesLandscapeGuide ? 'landscape-primary' : 'portrait-primary',
     }).catch(() => undefined);
 
     return () => {
-      if (restoresLandscape) {
-        ScreenOrientation.lock({ orientation: 'landscape-primary' }).catch(() => undefined);
+      if (usesLandscapeGuide) {
+        ScreenOrientation.lock({
+          orientation: themeClass === 'game-guide-theme-two' ? 'portrait-primary' : 'landscape-primary',
+        }).catch(() => undefined);
       }
     };
   }, [themeClass]);
@@ -144,7 +146,7 @@ const GameGuideOverlay = ({
     onStart?.();
   };
 
-  if (['game-guide-theme-one', 'game-guide-theme-four'].includes(themeClass)) {
+  if (['game-guide-theme-one', 'game-guide-theme-two', 'game-guide-theme-four'].includes(themeClass)) {
     return createPortal(
       <div className={`g4-guide-screen ${themeClass}`} role="dialog" aria-modal="true" aria-label={`${title || 'Game'} guidelines`}>
         <div className="g4-guide-board">

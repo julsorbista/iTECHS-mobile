@@ -77,6 +77,7 @@ const GameCanvas = forwardRef(({
   });
   const [isPaused, setIsPaused] = useState(false);
   const [isQuestionOpen, setIsQuestionOpen] = useState(false);
+  const [runtimeReady, setRuntimeReady] = useState(false);
   const isFirstLevelGuide = Number(levelData?.levelNumber || 1) === 1;
   const shouldAllowTutorial = true;
   const [tutorialView, setTutorialView] = useState(
@@ -84,8 +85,8 @@ const GameCanvas = forwardRef(({
   );
   const [isAutomaticFirstPlayTutorial, setIsAutomaticFirstPlayTutorial] = useState(false);
   const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
-  const showGuide = tutorialView === 'guide';
-  const showTutorial = tutorialView === 'practice';
+  const showGuide = runtimeReady && tutorialView === 'guide';
+  const showTutorial = runtimeReady && tutorialView === 'practice';
   const showMobileControls = !showTutorial
     && !isPaused
     && !isQuestionOpen
@@ -160,6 +161,8 @@ const GameCanvas = forwardRef(({
       return undefined;
     }
 
+    setRuntimeReady(false);
+
     const resolvedHintCoinCost = Number.isFinite(Number(hintCoinCost))
       ? Number(hintCoinCost)
       : Number(hintStarCost);
@@ -177,7 +180,10 @@ const GameCanvas = forwardRef(({
         onLevelComplete: (...args) => callbackRef.current.onLevelComplete?.(...args),
         onLevelFail: (...args) => callbackRef.current.onLevelFail?.(...args),
         onExitRequest: (...args) => callbackRef.current.onExitRequest?.(...args),
-        onPreloadComplete: (...args) => callbackRef.current.onRuntimeBootReady?.(...args),
+        onRuntimeReady: (...args) => {
+          setRuntimeReady(true);
+          callbackRef.current.onRuntimeBootReady?.(...args);
+        },
         onQuestionVisibilityChange: (...args) => callbackRef.current.onQuestionVisibilityChange?.(...args),
       },
     };

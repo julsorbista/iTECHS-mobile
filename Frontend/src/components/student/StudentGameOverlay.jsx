@@ -931,7 +931,7 @@ const StudentGameOverlay = ({
           activeLevelData &&
           !isGameThree &&
           !isGameSix && !isGameFive ? (
-            isGameFour ? (
+            isGameOne ? null : isGameFour ? (
               <div className="student-game-four-top-controls" aria-label="Game 4 controls">
                 <button
                   type="button"
@@ -1203,7 +1203,7 @@ const StudentGameOverlay = ({
                 className={`student-panel student-game-one-panel flex flex-col gap-4 ${isArcadeCanvas ? "student-game-four-panel" : ""} ${isGameFive ? "student-game-five-panel" : ""} ${isGameSix ? "student-game-six-panel" : ""} ${!(runtimeBootReady || isArcadeCanvas) ? "student-game-one-preload-panel" : ""}`}
               >
                 {(runtimeBootReady || isArcadeCanvas) && !isGameFive && !isGameSix && (
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className={`flex flex-wrap items-center justify-between gap-3 ${isGameOne ? "student-game-one-header" : ""}`}>
                     <div className="text-left">
                       <p className="student-eyebrow">
                         {sessionInfo.gameType} • {activeLevelLabel}
@@ -1211,6 +1211,24 @@ const StudentGameOverlay = ({
                       <h2 className="student-section-title">{activeLevelTitle}</h2>
                     </div>
                     <div className="flex flex-wrap gap-2">
+                      {isGameOne && (
+                        <>
+                          <button
+                            type="button"
+                            className="student-preview-chip student-game-one-header-button transition hover:brightness-95"
+                            onClick={() => setGameGuidelinesRequest((request) => request + 1)}
+                          >
+                            Guidelines
+                          </button>
+                          <button
+                            type="button"
+                            className="student-preview-chip student-game-one-header-button transition hover:brightness-95"
+                            onClick={() => setGameTutorialRequest((request) => request + 1)}
+                          >
+                            Game Tutorial
+                          </button>
+                        </>
+                      )}
                       {isArcadeCanvas ? (
                         isGameFour ? null : (
                           <button

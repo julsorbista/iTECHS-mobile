@@ -129,8 +129,6 @@ export default class PreloadScene extends Phaser.Scene {
     const bootPayload = this.game.__ITECHS_BOOT__ || {};
     const { manifest } = bootPayload.runtimeAssets;
     registerGameOneAnimations(this, manifest);
-    bootPayload.callbacks?.onPreloadComplete?.();
-
     this.scene.launch('HudScene');
     this.scene.launch('MenuScene');
     this.scene.start('LevelScene');

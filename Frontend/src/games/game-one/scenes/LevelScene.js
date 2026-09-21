@@ -301,6 +301,10 @@ export default class LevelScene extends Phaser.Scene {
     } else {
       this.gameState = GAME_STATES.PLAYING;
     }
+
+    // The React loading screen and first-level guideline must not advance
+    // until the playable scene, HUD, player, physics, and pause state exist.
+    this.callbacks.onRuntimeReady?.();
   }
 
   startBackgroundMusic() {
