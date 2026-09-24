@@ -8010,6 +8010,39 @@
   display: none;
 }
 
+.game-one-mobile-hud-menu {
+  display: none;
+}
+
+@media (pointer: coarse), (orientation: landscape) and (max-height: 640px) {
+  .student-game-overlay-game-one .game-one-mobile-hud-menu {
+    position: absolute;
+    top: 2.64%;
+    right: 1.56%;
+    z-index: 100;
+    display: grid;
+    width: 9.1%;
+    min-width: 52px;
+    height: 4.2%;
+    min-height: 24px;
+    place-items: center;
+    padding: 0;
+    border: 2px solid rgba(103, 232, 249, 0.95);
+    border-radius: 2px;
+    background: rgba(30, 41, 59, 0.98);
+    color: #cffafe;
+    font: 700 clamp(8px, 1.35vw, 12px)/1 Manrope, Arial, sans-serif;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .student-game-overlay-game-one .game-one-mobile-hud-menu:active {
+    background: rgba(51, 65, 85, 1);
+  }
+}
+
 @media (orientation: landscape) and (max-height: 640px) {
   body > .game-guide-backdrop.game-guide-wood.game-guide-theme-one {
     align-items: center !important;
@@ -10534,81 +10567,106 @@ body > .game-guide-backdrop.game-guide-wood > .game-guide-card--wood .game-guide
   .student-game-overlay-game-two-scroll .game-two-fruit-score {
     left: clamp(0.55rem, 1.5vw, 1rem) !important;
     top: clamp(0.5rem, 1.3vw, 0.9rem) !important;
-    transform: scale(0.78);
+    transform: scale(0.64);
     transform-origin: top left;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-mission {
     top: clamp(0.4rem, 1.3vw, 0.85rem) !important;
-    width: clamp(8.5rem, 20vw, 13rem) !important;
-    padding: 0.35rem 0.65rem !important;
+    width: clamp(7.5rem, 17vw, 11rem) !important;
+    padding: 0.25rem 0.5rem !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-mission strong {
-    font-size: clamp(0.9rem, 2.9dvh, 1.25rem) !important;
+    font-size: clamp(0.75rem, 2.4dvh, 1rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-actions {
     top: clamp(0.45rem, 1.4vw, 0.8rem) !important;
     right: clamp(0.55rem, 1.5vw, 1rem) !important;
-    gap: clamp(0.35rem, 1vw, 0.65rem) !important;
+    gap: clamp(0.25rem, 0.7vw, 0.45rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-action-button {
-    height: clamp(1.85rem, 7.4dvh, 2.35rem) !important;
+    height: clamp(1.55rem, 6.2dvh, 2rem) !important;
     min-height: 0 !important;
-    padding: 0.32rem 0.65rem !important;
-    font-size: clamp(0.58rem, 1.85dvh, 0.78rem) !important;
+    padding: 0.22rem 0.5rem !important;
+    font-size: clamp(0.5rem, 1.55dvh, 0.68rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-tutorial-button {
-    min-width: clamp(6.7rem, 16vw, 9rem) !important;
+    min-width: clamp(5.6rem, 13vw, 7.5rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-back-button {
-    min-width: clamp(3.4rem, 7.5vw, 4.8rem) !important;
+    min-width: clamp(3rem, 6.4vw, 4rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-lives {
     top: clamp(3.15rem, 10.5dvh, 4.2rem) !important;
     right: clamp(1.4rem, 3vw, 2.1rem) !important;
-    transform: scale(0.76);
+    transform: scale(0.62);
     transform-origin: top right;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-left {
     left: clamp(0.7rem, 1.8vw, 1.25rem) !important;
     top: clamp(4.85rem, 16dvh, 6.2rem) !important;
-    width: clamp(12rem, 23vw, 16rem) !important;
+    width: clamp(10rem, 19vw, 13.5rem) !important;
     gap: clamp(0.45rem, 1.1dvh, 0.7rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-right {
     right: clamp(0.7rem, 1.8vw, 1.25rem) !important;
     top: clamp(7.1rem, 22dvh, 8.8rem) !important;
-    width: clamp(11.5rem, 22vw, 15.5rem) !important;
+    width: clamp(9.5rem, 18vw, 13rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-card {
-    padding: clamp(0.48rem, 1.5dvh, 0.7rem) clamp(0.55rem, 1.3vw, 0.85rem) !important;
+    padding: clamp(0.35rem, 1.15dvh, 0.55rem) clamp(0.42rem, 1vw, 0.65rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-combo > span,
+  .student-game-overlay-game-two-scroll .game-two-fruit-code > span,
+  .student-game-overlay-game-two-scroll .game-two-fruit-output > span {
+    font-size: clamp(0.58rem, 1.75dvh, 0.76rem) !important;
+    letter-spacing: 0.06em !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-combo {
-    min-height: clamp(4rem, 15dvh, 5.1rem) !important;
+    min-height: clamp(3.3rem, 12dvh, 4.25rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-code {
-    max-height: clamp(8.8rem, 42dvh, 12.8rem) !important;
+    max-height: clamp(7.2rem, 35dvh, 10.5rem) !important;
+    padding: clamp(0.45rem, 1.5dvh, 0.7rem) clamp(0.55rem, 1.2vw, 0.8rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output {
+    min-height: clamp(7.5rem, 38dvh, 10rem) !important;
+    grid-template-rows: auto minmax(2.8rem, 1fr) minmax(2.8rem, auto) !important;
+    gap: clamp(0.3rem, 1dvh, 0.5rem) !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-code code,
   .student-game-overlay-game-two-scroll .game-two-fruit-output code {
-    font-size: clamp(0.66rem, 2.15dvh, 0.88rem) !important;
+    font-size: clamp(0.56rem, 1.8dvh, 0.75rem) !important;
     line-height: 1.34 !important;
   }
 
   .student-game-overlay-game-two-scroll .game-two-fruit-output strong {
-    font-size: clamp(1.55rem, 6.5dvh, 2.35rem) !important;
+    font-size: clamp(1.25rem, 5.2dvh, 1.9rem) !important;
+    min-height: clamp(2.8rem, 11dvh, 4rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-output code {
+    min-height: clamp(2.8rem, 11dvh, 4rem) !important;
+    max-height: clamp(4rem, 18dvh, 6rem) !important;
+  }
+
+  .student-game-overlay-game-two-scroll .game-two-fruit-code-preview strong,
+  .student-game-overlay-game-two-scroll .game-two-fruit-combo strong {
+    font-size: clamp(0.8rem, 2.6dvh, 1.05rem) !important;
   }
 
   .student-game-overlay-game-four .student-shell-overlay.student-shell {

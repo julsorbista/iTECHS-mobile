@@ -121,13 +121,11 @@ const GameGuideOverlay = ({
       orientation: usesLandscapeGuide ? 'landscape-primary' : 'portrait-primary',
     }).catch(() => undefined);
 
-    return () => {
-      if (usesLandscapeGuide) {
-        ScreenOrientation.lock({
-          orientation: themeClass === 'game-guide-theme-two' ? 'portrait-primary' : 'landscape-primary',
-        }).catch(() => undefined);
-      }
-    };
+    // Do not apply another orientation lock while unmounting. The owning game
+    // page decides whether the destination is gameplay (landscape) or the
+    // level list (portrait). Re-locking landscape here races with Back/Exit
+    // and leaves the portrait screen rendered sideways on Android.
+    return undefined;
   }, [themeClass]);
 
   const handleBack = () => {

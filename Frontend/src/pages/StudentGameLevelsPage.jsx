@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
+import { restoreNativePortrait } from '../utils/nativeOrientation';
 import { StatusBar } from '@capacitor/status-bar';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
@@ -228,8 +229,21 @@ const StudentGameLevelsPage = () => {
       StatusBar.show().catch(() => undefined);
     }
 
-    return undefined;
+    return () => {
+      if (activeLevelNumber) {
+        ScreenOrientation.lock({ orientation: 'portrait-primary' }).catch(() => undefined);
+        StatusBar.show().catch(() => undefined);
+      }
+    };
   }, [activeLevelNumber, gameType]);
+
+  const closeActiveGame = useCallback(async () => {
+    if (Capacitor.isNativePlatform()) {
+      await restoreNativePortrait();
+      StatusBar.show().catch(() => undefined);
+    }
+    setActiveLevelNumber(null);
+  }, []);
 
   const loadLevels = useCallback(async () => {
     setLoading(true);
@@ -700,7 +714,7 @@ const StudentGameLevelsPage = () => {
             levelNumber={activeLevelNumber}
             forceFullReloadOnAdvance={gameType === 'GAME_ONE'}
             showPlayableTutorial={shouldShowPlayableTutorial}
-            onClose={() => setActiveLevelNumber(null)}
+            onClose={closeActiveGame}
             onAdvanceToLevel={(nextLevelNumber) => {
               setActiveLevelNumber(nextLevelNumber);
             }}

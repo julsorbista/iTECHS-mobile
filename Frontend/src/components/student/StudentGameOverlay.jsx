@@ -712,7 +712,8 @@ const StudentGameOverlay = ({
       // congratulations -> results sequence immediately, then replace this
       // snapshot with the authoritative server result when submission returns.
       const shouldShowImmediateCompletion =
-        (isGameOne || isGameFour || isGameSix) && gameplay?.outcome === "COMPLETED";
+        (isGameOne || isGameTwo || isGameFour || isGameSix) &&
+        gameplay?.outcome === "COMPLETED";
       if (shouldShowImmediateCompletion) {
         setHasDismissedCongrats(false);
         setShowCompletionStory(false);
@@ -1440,7 +1441,7 @@ const StudentGameOverlay = ({
             !hasDismissedCongrats &&
             resultData?.result === "COMPLETED" &&
             !showCompletionStory &&
-            (isGameOne || isGameFour || isGameFive || isGameSix ? (
+            (isGameOne || isGameTwo || isGameFour || isGameFive || isGameSix ? (
               <CongratulatoryOverlay
                 key={`${normalizedGameType}-congrats`}
                 kicker={completionPopupKicker}

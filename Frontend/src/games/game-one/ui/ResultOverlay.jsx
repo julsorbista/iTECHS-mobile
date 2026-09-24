@@ -159,7 +159,7 @@ const ResultOverlay = ({
   const metrics = gameMetrics[normalizedGameType] || gameMetrics.GAME_ONE;
 
   const overlay = (
-    <div className={`game-one-results-overlay${['GAME_ONE', 'GAME_FOUR', 'GAME_FIVE', 'GAME_SIX'].includes(normalizedGameType) ? ' game-illustrated-results' : ''} absolute inset-0 z-30 flex items-center justify-center bg-slate-950/80 p-4`}>
+    <div className={`game-one-results-overlay${['GAME_ONE', 'GAME_TWO', 'GAME_FOUR', 'GAME_FIVE', 'GAME_SIX'].includes(normalizedGameType) ? ' game-illustrated-results' : ''} absolute inset-0 z-30 flex items-center justify-center bg-slate-950/80 p-4`}>
       <div
         className={`game-one-results-card${isGameComplete ? ' game-one-game-complete-card' : ''}`}
         style={{

@@ -79,7 +79,10 @@ const StudentStoryFrame = ({
 
       {isImageOnly ? (
         <section key={activePage.id || pageNumber} className="student-story-rpg-scene student-story-image-scene">
-          <div className="student-story-image-frame-shell">
+          <div
+            className="student-story-image-frame-shell"
+            style={{ '--story-page-image': `url("${activePage.image || activePage.background}")` }}
+          >
             <img
               className="student-story-page-image"
               src={activePage.image || activePage.background}

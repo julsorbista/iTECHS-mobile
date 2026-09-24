@@ -53,6 +53,22 @@ export default class HudScene extends Phaser.Scene {
     this.attackKeycaps = createKeycap(247, 'J');
     this.attackControlLabel = createControlLabel(264, 'ATTACK');
 
+    // The keyboard legend is useful on desktop, but duplicates the on-screen
+    // touch controls and takes up gameplay space on phones and tablets.
+    const usesMobileControls = typeof window !== 'undefined'
+      && window.matchMedia?.('(pointer: coarse), (max-width: 1024px)').matches;
+    if (usesMobileControls) {
+      [
+        this.controlsPanel,
+        ...this.moveKeycaps,
+        this.moveControlLabel,
+        ...this.jumpKeycaps,
+        this.jumpControlLabel,
+        ...this.attackKeycaps,
+        this.attackControlLabel,
+      ].forEach((item) => item?.setVisible(false));
+    }
+
     this.timerText = this.add.text(24, 100, '', {
       fontFamily: 'Manrope, Arial, sans-serif',
       fontSize: '16px',
@@ -87,7 +103,12 @@ export default class HudScene extends Phaser.Scene {
       fontFamily: 'Manrope, Arial, sans-serif',
       fontSize: '12px',
       color: '#cffafe',
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    const openPauseMenu = () => {
+      const levelScene = this.scene.get('LevelScene');
+      levelScene?.togglePause?.(true);
+    };
 
     this.menuButton.on('pointerover', () => {
       this.menuButton.setFillStyle(0x334155, 0.95);
@@ -95,10 +116,17 @@ export default class HudScene extends Phaser.Scene {
     this.menuButton.on('pointerout', () => {
       this.menuButton.setFillStyle(0x1e293b, 0.9);
     });
-    this.menuButton.on('pointerup', () => {
-      const levelScene = this.scene.get('LevelScene');
-      levelScene?.togglePause?.(true);
-    });
+    // Use pointerdown for touch screens: pointerup can be cancelled when the
+    // finger moves slightly and the WebView interprets it as a canvas gesture.
+    this.menuButton.on('pointerdown', openPauseMenu);
+    this.menuButtonLabel.on('pointerdown', openPauseMenu);
+
+    // Mobile uses the larger HTML Menu button beside the canvas. Hide only
+    // this compact desktop/keyboard button to avoid showing it twice.
+    if (usesMobileControls) {
+      this.menuButton.setVisible(false).disableInteractive();
+      this.menuButtonLabel.setVisible(false).disableInteractive();
+    }
 
     this.footerText = this.add.text(1248, 692, 'Move: WASD / Arrows  |  Jump: Space  |  Menu: Esc', {
       fontFamily: 'Manrope, Arial, sans-serif',

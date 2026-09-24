@@ -3,6 +3,12 @@ import { describe, expect, it } from 'vitest';
 import levelOne from './level-01.json';
 
 describe('Game 1 Level 1 treasure hunt', () => {
+  it('starts from the authored Room 1 spawn', () => {
+    expect(levelOne.startRoomId).toBeUndefined();
+    expect(levelOne.rooms[0].id).toBe('room-1');
+    expect(levelOne.rooms[0].spawn).toEqual({ x: 100, y: 570 });
+  });
+
   it('defines the complete five-room mission flow', () => {
     expect(levelOne.treasureHunt).toBe(true);
     expect(levelOne.rooms).toHaveLength(5);

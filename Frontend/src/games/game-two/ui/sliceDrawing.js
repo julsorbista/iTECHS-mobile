@@ -1,13 +1,15 @@
 // Shared by actual gameplay and isolated practice: identical room objects.
 export const drawSyntaxCard = (ctx, item, textColor) => {
-  const ww = item.width;
-  const hh = item.height;
+  const renderScale = item.renderScale || 1;
+  const ww = item.baseWidth || item.width;
+  const hh = item.baseHeight || item.height;
   const l = -ww / 2;
   const t = -hh / 2;
   const r = ww / 2;
   const b = hh / 2;
   ctx.save();
   ctx.translate(item.x, item.y);
+  ctx.scale(renderScale, renderScale);
   ctx.rotate(Math.sin(performance.now() / 720 + item.phase) * 0.06 + item.spin);
   ctx.shadowColor = textColor;
   ctx.shadowBlur = 16;
@@ -99,8 +101,10 @@ export const drawSyntaxCard = (ctx, item, textColor) => {
 };
 
 export const drawBomb = (ctx, item) => {
+  const renderScale = item.renderScale || 1;
   ctx.save();
-  ctx.translate(item.x, item.y + 14);
+  ctx.translate(item.x, item.y + 14 * renderScale);
+  ctx.scale(renderScale, renderScale);
   ctx.rotate(Math.sin(performance.now() / 720 + item.phase) * 0.045 + item.spin);
   ctx.shadowColor = '#ff526b';
   ctx.shadowBlur = 22;

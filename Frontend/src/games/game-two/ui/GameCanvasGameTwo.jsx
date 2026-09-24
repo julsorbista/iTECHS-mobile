@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import '../gameTwoCodeLab.css';
+import '../../shared/ui/AnnouncementBoard.css';
 import { AlertCircle, CheckCircle2, Loader2, LogOut, RotateCcw } from 'lucide-react';
 import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
 import GameTwoInteractiveTutorial, { drawGameTwoDemo } from './GameTwoInteractiveTutorial';
@@ -57,12 +58,13 @@ const FALLBACK_DECOYS = Object.freeze([
   'new Scaner(System.in)',
 ]);
 
-const GameTwoAnnouncementBoard = ({ levelNumber = 1, targetCodes = [], onStart }) => {
+const GameTwoAnnouncementBoard = ({ levelNumber = 1, challengeNumber = 1, challengeTotal = 1, targetCodes = [], onStart }) => {
   const level = clamp(Math.round(Number(levelNumber) || 1), 1, 5);
   const displayTargetCodes = Array.isArray(targetCodes) ? targetCodes.filter(Boolean).join(' & ') : '';
   const [countdown, setCountdown] = useState(null);
   const [leaving, setLeaving] = useState(false);
   const onStartRef = useRef(onStart);
+  const hasStartedRef = useRef(false);
   const countdownAudioRef = useRef({});
   onStartRef.current = onStart;
 
@@ -106,6 +108,7 @@ const GameTwoAnnouncementBoard = ({ levelNumber = 1, targetCodes = [], onStart }
   }, [countdown]);
 
   useEffect(() => {
+    hasStartedRef.current = false;
     setCountdown(null);
     setLeaving(false);
     const timers = [
@@ -113,10 +116,14 @@ const GameTwoAnnouncementBoard = ({ levelNumber = 1, targetCodes = [], onStart }
       window.setTimeout(() => setCountdown(2), ANNOUNCEMENT_MS + 1000),
       window.setTimeout(() => setCountdown(1), ANNOUNCEMENT_MS + 2000),
       window.setTimeout(() => setLeaving(true), ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000) - FADE_MS),
-      window.setTimeout(() => onStartRef.current?.(), ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000)),
+      window.setTimeout(() => {
+        if (hasStartedRef.current) return;
+        hasStartedRef.current = true;
+        onStartRef.current?.();
+      }, ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000)),
     ];
     return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [level]);
+  }, [challengeNumber, level]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
@@ -142,7 +149,7 @@ const GameTwoAnnouncementBoard = ({ levelNumber = 1, targetCodes = [], onStart }
               <p className="announcement-guide-level">CHALLENGE ANNOUNCEMENT</p>
               <h2 id="game-two-announcement-title">READY?</h2>
               <div className="announcement-guide-divider" aria-hidden="true" />
-              <h3 className="announcement-guide-challenge-title">LEVEL {level}: SLASH THE CORRECT CODE</h3>
+              <h3 className="announcement-guide-challenge-title">LEVEL {level} · CHALLENGE {challengeNumber}/{challengeTotal}: SLASH THE CORRECT CODE</h3>
               <p className="announcement-guide-instruction">TARGET CODES</p>
               <p className="announcement-guide-instruction">{displayTargetCodes}</p>
             </>
@@ -443,8 +450,8 @@ const GameCanvasGameTwo = ({
   const config = useMemo(() => getLevelConfig(levelNumber), [levelNumber]);
   const challenges = useMemo(() => buildChallenges(levelData, config.target), [config.target, levelData]);
   const guideContent = useMemo(() => buildGuideContent(levelData, config), [config, levelData]);
-  const [showTutorial, setShowTutorial] = useState(Boolean(showLevelGuideline));
-  const [tutorialView, setTutorialView] = useState(showLevelGuideline ? 'guide' : null);
+  const [showTutorial, setShowTutorial] = useState(true);
+  const [tutorialView, setTutorialView] = useState(showLevelGuideline ? 'guide' : 'announcement');
   const [tutorialLaunchedFromIntro, setTutorialLaunchedFromIntro] = useState(false);
   const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const showGuide = showTutorial && tutorialView === 'guide';
@@ -656,8 +663,8 @@ const resetRun = useCallback(() => {
   }, []);
 
   useEffect(() => {
-    setShowTutorial(Boolean(showLevelGuideline));
-    setTutorialView(showLevelGuideline ? 'guide' : null);
+    setShowTutorial(true);
+    setTutorialView(showLevelGuideline ? 'guide' : 'announcement');
     setTutorialLaunchedFromIntro(false);
     setGuideOpenedDuringGameplay(false);
   }, [levelNumber, shouldAutoOpenFirstHandGuide, showLevelGuideline]);
@@ -736,6 +743,14 @@ const resetRun = useCallback(() => {
       height = 108;
       ctx.restore();
     }
+    const mobileItemScale = typeof window !== 'undefined'
+      && window.matchMedia?.('(pointer: coarse)').matches
+      ? 0.68
+      : 1;
+    const baseWidth = width;
+    const baseHeight = height;
+    width = Math.round(baseWidth * mobileItemScale);
+    height = Math.round(baseHeight * mobileItemScale);
     const isWide = state.width >= 820;
     const playLeft = isWide ? Math.max(360, state.width * 0.28) : state.width * 0.22;
     const playRight = isWide ? Math.min(state.width - 360, state.width * 0.72) : state.width * 0.78;
@@ -750,6 +765,9 @@ const resetRun = useCallback(() => {
       y: state.height + height + rand(22, 86),
       width,
       height,
+      baseWidth,
+      baseHeight,
+      renderScale: mobileItemScale,
       vx: launchDirection * rand(22, 82),
       vy: -(560 + config.speed * 1.45 + rand(-30, 70)),
       gravity: 330 + config.speed,
@@ -900,7 +918,9 @@ const resetRun = useCallback(() => {
   }, [completeChallenge, finishRun, playSound, syncHud, triggerSliceFeedback]);
 
   const hit = (item, a, b) => {
-    const radius = item.kind === 'bomb' ? 58 : Math.max(item.width * 0.45, item.height * 0.55);
+    const radius = item.kind === 'bomb'
+      ? 58 * (item.renderScale || 1)
+      : Math.max(item.width * 0.45, item.height * 0.55);
     const vx = b.x - a.x;
     const vy = b.y - a.y;
     const wx = item.x - a.x;
@@ -1258,6 +1278,8 @@ const resetRun = useCallback(() => {
       {showAnnouncement && (
         <GameTwoAnnouncementBoard
           levelNumber={levelNumber}
+          challengeNumber={Math.min(outputs + 1, config.target)}
+          challengeTotal={config.target}
           targetCodes={announcementTargetCodes}
           onStart={() => {
             setTutorialView(null);

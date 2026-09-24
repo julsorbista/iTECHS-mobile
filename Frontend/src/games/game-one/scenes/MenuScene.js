@@ -453,14 +453,17 @@ export default class MenuScene extends Phaser.Scene {
     });
 
     button.layout();
-    background.setInteractive({ useHandCursor: true });
-    background.on('pointerover', () => {
+    // Bind input to the complete RexUI label instead of its inner background.
+    // The background can have a shifted hit area after the canvas is scaled on
+    // mobile, which made Exit Level trigger the neighboring Controls action.
+    button.setInteractive({ useHandCursor: true });
+    button.on('pointerover', () => {
       background.setFillStyle(palette.hoverFill, 1);
     });
-    background.on('pointerout', () => {
+    button.on('pointerout', () => {
       background.setFillStyle(palette.fill, 1);
     });
-    background.on('pointerup', () => {
+    button.on('pointerdown', () => {
       onClick?.();
     });
 

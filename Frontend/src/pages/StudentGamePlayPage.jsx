@@ -1,7 +1,8 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
+import { restoreNativePortrait } from '../utils/nativeOrientation';
 import { normalizeGameType } from '../utils/gameTracks';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { stopStudentMenuLoop, playStudentClickSound } from '../utils/studentMenuAudio';
@@ -16,6 +17,13 @@ const StudentGamePlayPage = () => {
   useEffect(() => {
     stopStudentMenuLoop({ rewind: false });
   }, []);
+
+  const closeGame = useCallback(async () => {
+    if (Capacitor.isNativePlatform()) {
+      await restoreNativePortrait();
+    }
+    navigate(`/student/games/${gameType}`);
+  }, [gameType, navigate]);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || !['GAME_ONE', 'GAME_TWO', 'GAME_FOUR'].includes(gameType)) {
@@ -54,7 +62,7 @@ const StudentGamePlayPage = () => {
         key={`${gameType}-${levelNumber}`}
         gameType={gameType}
         levelNumber={levelNumber}
-        onClose={() => navigate(`/student/games/${gameType}`)}
+        onClose={closeGame}
         forceFullReloadOnAdvance={gameType === 'GAME_ONE'}
         onAdvanceToLevel={(nextLevelNumber) => navigate(`/student/games/${gameType}/levels/${nextLevelNumber}/play`, { replace: true })}
         onContinueToGame={(nextGameType) => navigate(`/student/games/${nextGameType}`)}

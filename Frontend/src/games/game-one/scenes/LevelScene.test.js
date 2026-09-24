@@ -16,14 +16,14 @@ import { buildWorldGridLayout } from '../systems/roomFlow';
 import { shouldUsePortalOnlyRoomTraversal } from '../systems/roomTraversal';
 
 describe('shouldUsePortalOnlyRoomTraversal', () => {
-  it('auto-fits long scroll clues instead of clipping hidden overflow', () => {
+  it('renders scroll clue copy in the Phaser canvas so it remains visible on mobile', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/games/game-one/scenes/LevelScene.js'), 'utf8');
 
-    expect(source).toContain('clueElement.scrollHeight > clueElement.clientHeight');
-    expect(source).toContain('clueElement.scrollWidth > clueElement.clientWidth');
-    expect(source).toContain("cluePanelElement.style.height = `${Math.round(parchmentHeight * 0.70)}px`");
-    expect(source).toContain("titleElement.style.top = '45px'");
-    expect(source).toContain("dismissElement.style.bottom = '30px'");
+    expect(source).toContain('const title = this.add.text');
+    expect(source).toContain('const clue = this.add.text');
+    expect(source).toContain("wordWrap: { width: innerTextWidth, useAdvancedWrap: true }");
+    expect(source).toContain("const dismiss = this.add.text");
+    expect(source).not.toContain('this.add.dom(centerX, centerY, cluePanelElement)');
   });
 
   it('routes hazards through immediate damage while respecting configured fire damage', () => {
@@ -45,6 +45,20 @@ describe('shouldUsePortalOnlyRoomTraversal', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/games/game-one/scenes/LevelScene.js'), 'utf8');
 
     expect(source).toContain('this.player.body.reset(spawnPoint.x, spawnPoint.y)');
+  });
+
+  it('uses the authored world spawn so Level 1 begins in Room 1', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/games/game-one/scenes/LevelScene.js'), 'utf8');
+    const method = source.split('  getSpawnPoint() {')[1].split('\n  getQuestionTriggerLabel()')[0];
+    const getSpawnPoint = new Function('getLocalCellSpawn', `return function() {${method}`)(getLocalCellSpawn);
+    const worldLayout = buildWorldGridLayout({
+      viewport: { width: 1280, height: 720 },
+      rooms: Array.from({ length: 5 }, (_, index) => ({
+        id: `room-${index + 1}`, spawn: { x: 100, y: 570 },
+      })),
+    });
+    const scene = { levelData: { levelNumber: 1 }, worldLayout, worldObjectsData: { spawn: { x: 120, y: 560 } } };
+    expect(getSpawnPoint.call(scene)).toEqual({ x: 120, y: 560 });
   });
 
   it('returns a ghost to its authored spawn after it damages the player', () => {

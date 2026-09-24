@@ -30,6 +30,10 @@ it.each([true,false])('preserves first-play and countdown condition %s',(first)=
   expect(!!document.querySelector('.in-game-tutorial')).toBe(first);
   if(first)for(let i=0;i<6;i++)next();
   expect(document.querySelector('.announcement-guide-backdrop')).not.toBeNull();
+  tick(8500);
+  expect(document.querySelector('.announcement-guide-backdrop')).toBeNull();
+  tick(8500);
+  expect(document.querySelector('.announcement-guide-backdrop')).toBeNull();
 });
 it('automatically types and clears a display term, then restores real input and drops without requests',()=>{
   const props={levelData:level,sessionInfo}, {rerender}=render(<GameCanvasGameSix {...props}/>);
@@ -49,6 +53,8 @@ it('automatically types and clears a display term, then restores real input and 
 it.each(['String','STRING','int'])('sends capitalization unchanged to the backend: %s',async(answer)=>{
   levelAPI.resolveGameSixTerm.mockResolvedValue({data:{correct:false,activeTerms:terms}});
   render(<GameCanvasGameSix levelData={level} sessionInfo={sessionInfo}/>);
+  expect(document.querySelector('.announcement-guide-backdrop')).not.toBeNull();
+  tick(8500);
   fireEvent.change(document.querySelector('.game-six-answer-input'),{target:{value:' '+answer+' '}});
   await act(async()=>fireEvent.submit(document.querySelector('.game-six-answer-form')));
   expect(JSON.stringify(levelAPI.resolveGameSixTerm.mock.calls)).toContain('"answer":"'+answer+'"');

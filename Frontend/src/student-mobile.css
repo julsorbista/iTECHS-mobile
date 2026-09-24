@@ -260,6 +260,7 @@
 .game-one-mobile-controls,
 .game-four-mobile-controls { display: none; }
 
+
 @media (max-width: 820px) {
   .student-shell { min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
   .student-shell-main-compact, .student-shell-layout, .student-shell-content,

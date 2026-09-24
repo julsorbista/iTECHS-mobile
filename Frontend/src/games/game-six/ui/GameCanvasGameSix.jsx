@@ -380,9 +380,9 @@ const GameCanvasGameSix = ({
   const [answerState, setAnswerState] = useState({ pending: false, message: '', type: '' });
   const [finished, setFinished] = useState(false);
   const isFirstLevelGuide = settings.level === 1;
-  const [showTutorial, setShowTutorial] = useState(showLevelGuideline);
+  const [showTutorial, setShowTutorial] = useState(true);
   const [tutorialView, setTutorialView] = useState(
-    showLevelGuideline ? 'guide' : null,
+    showLevelGuideline ? 'guide' : 'announcement',
   );
   const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);

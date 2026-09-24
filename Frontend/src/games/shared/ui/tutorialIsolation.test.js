@@ -99,6 +99,25 @@ describe('guideline and How to Play isolation', () => {
     expect(source).not.toContain('[activeRound, canInitializeGameplay,');
   });
 
+  it('starts Game 6 once and shows Game 2 announcements before every challenge', () => {
+    const gameTwoSource = readSource('src/games/game-two/ui/GameCanvasGameTwo.jsx');
+    const gameSixSource = readSource('src/games/game-six/ui/GameCanvasGameSix.jsx');
+
+    expect(gameTwoSource).toContain("useState(showLevelGuideline ? 'guide' : 'announcement')");
+    expect(gameTwoSource).toContain("setTutorialView(showLevelGuideline ? 'guide' : 'announcement')");
+    expect(gameSixSource).toContain("showLevelGuideline ? 'guide' : 'announcement'");
+    expect(gameTwoSource).toContain('hasStartedRef.current = true');
+    expect(gameSixSource).toContain('<GameSixAnnouncementBoard');
+
+    const completedChallengeFlow = gameTwoSource.slice(
+      gameTwoSource.indexOf('const completeChallenge'),
+      gameTwoSource.indexOf('const cutItem'),
+    );
+    expect(completedChallengeFlow).toContain("setTutorialView('announcement')");
+    expect(completedChallengeFlow).toContain('state.running = false');
+    expect(gameTwoSource).toContain('challengeNumber={Math.min(outputs + 1, config.target)}');
+  });
+
   it('preserves the updated gameplay Back buttons in Games 2, 3 and 4', () => {
     ['two', 'three', 'four'].forEach((number) => {
       const name = number[0].toUpperCase() + number.slice(1);

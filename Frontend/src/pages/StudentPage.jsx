@@ -28,6 +28,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { ScreenOrientation } from '@capacitor/screen-orientation';
 import { authAPI, handleAPIError, userAPI } from '../utils/api';
+import { restoreNativePortrait } from '../utils/nativeOrientation';
 import { useAuth } from '../context/AuthContext';
 import StudentActionButton from '../components/student/StudentActionButton';
 import StudentShell from '../components/student/StudentShell';
@@ -252,11 +253,13 @@ const StudentPage = () => {
     if (!Capacitor.isNativePlatform()) return undefined;
 
     ScreenOrientation.lock({
-      orientation: activePanel === 'progress' ? 'landscape-primary' : 'portrait-primary',
+      orientation: activePanel === 'progress' && !isMobileMenuVisible
+        ? 'landscape-primary'
+        : 'portrait-primary',
     }).catch(() => undefined);
 
     return undefined;
-  }, [activePanel]);
+  }, [activePanel, isMobileMenuVisible]);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
@@ -1603,7 +1606,8 @@ const StudentPage = () => {
               variant="slate"
               size="compact"
               className="student-mobile-panel-back"
-              onClick={() => {
+              onClick={async () => {
+                await restoreNativePortrait();
                 setIsMobileMenuVisible(true);
                 setIsMobileGameDetailVisible(false);
                 window.scrollTo({ top: 0, behavior: 'instant' });

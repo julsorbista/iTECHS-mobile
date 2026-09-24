@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import '../../shared/ui/AnnouncementBoard.css';
 import { createPortal } from 'react-dom';
 import announcementBoard from '../../../assets/announcement-board.png';
 import beepOne from '../assets/beep-1.mp3';
@@ -40,6 +41,7 @@ const GameSixAnnouncementBoard = ({ levelNumber = 1, onStart }) => {
   const [countdown, setCountdown] = useState(null);
   const [leaving, setLeaving] = useState(false);
   const onStartRef = useRef(onStart);
+  const hasStartedRef = useRef(false);
   const countdownAudioRef = useRef({});
   onStartRef.current = onStart;
 
@@ -85,6 +87,7 @@ const GameSixAnnouncementBoard = ({ levelNumber = 1, onStart }) => {
   }, [countdown]);
 
   useEffect(() => {
+    hasStartedRef.current = false;
     setCountdown(null);
     setLeaving(false);
     const timers = [
@@ -92,7 +95,11 @@ const GameSixAnnouncementBoard = ({ levelNumber = 1, onStart }) => {
       window.setTimeout(() => setCountdown(2), ANNOUNCEMENT_MS + 1000),
       window.setTimeout(() => setCountdown(1), ANNOUNCEMENT_MS + 2000),
       window.setTimeout(() => setLeaving(true), ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000) - FADE_MS),
-      window.setTimeout(() => onStartRef.current?.(), ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000)),
+      window.setTimeout(() => {
+        if (hasStartedRef.current) return;
+        hasStartedRef.current = true;
+        onStartRef.current?.();
+      }, ANNOUNCEMENT_MS + (COUNTDOWN_SECONDS * 1000)),
     ];
     return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [level]);

@@ -254,6 +254,10 @@ const GameCanvas = forwardRef(({
     }
   }, []);
 
+  const handleOpenPauseMenu = useCallback(() => {
+    gameRef.current?.scene?.keys?.LevelScene?.togglePause?.(true);
+  }, []);
+
   const handleExit = useCallback(() => {
     const levelScene = gameRef.current?.scene?.keys?.LevelScene;
     if (levelScene) {
@@ -371,6 +375,20 @@ const GameCanvas = forwardRef(({
           ref={containerRef}
           className={`absolute inset-0 h-full w-full [&>canvas]:block! [&>canvas]:h-full! [&>canvas]:w-full! [&>canvas]:cursor-default ${canvasHostClassName}`}
         />
+        {showMobileControls && (
+          <button
+            type="button"
+            className="game-one-mobile-hud-menu"
+            aria-label="Open game menu"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              handleOpenPauseMenu();
+            }}
+          >
+            Menu Esc
+          </button>
+        )}
       </div>
       {showMobileControls && <div className="game-one-mobile-controls" aria-label="Game controls">
         <div className="game-one-mobile-direction-controls">

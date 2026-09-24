@@ -902,87 +902,39 @@ export default class LevelScene extends Phaser.Scene {
       .setDepth(10001)
       .setDisplaySize(parchmentWidth, parchmentHeight);
 
-    const cluePanelElement = document.createElement('div');
-    cluePanelElement.style.width = `${Math.round(innerTextWidth)}px`;
-    cluePanelElement.style.height = `${Math.round(parchmentHeight * 0.70)}px`;
-    cluePanelElement.style.position = 'relative';
-    cluePanelElement.style.display = 'block';
-    cluePanelElement.style.boxSizing = 'border-box';
-    cluePanelElement.style.padding = '0';
-    cluePanelElement.style.textAlign = 'center';
-    cluePanelElement.style.pointerEvents = 'none';
-    cluePanelElement.style.userSelect = 'none';
-    cluePanelElement.style.textRendering = 'optimizeLegibility';
-    cluePanelElement.style.webkitFontSmoothing = 'antialiased';
+    // Render the copy inside Phaser's canvas. Android WebView can omit Phaser DOM
+    // nodes while the canvas is scaled, which left only the parchment visible.
+    const title = this.add.text(centerX, centerY - (parchmentHeight * 0.25), titleText, {
+      fontFamily: 'PixelOperator8, monospace',
+      fontSize: `${Math.round(Math.max(20, Math.min(27, parchmentWidth * 0.04)))}px`,
+      fontStyle: 'bold',
+      color: '#5d321d',
+      align: 'center',
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(10002);
 
-    const titleElement = document.createElement('div');
-    titleElement.textContent = titleText;
-    titleElement.style.fontFamily = 'PixelOperator8, monospace';
-    titleElement.style.fontSize = `${Math.round(Math.max(20, Math.min(27, parchmentWidth * 0.04)))}px`;
-    titleElement.style.fontWeight = '700';
-    titleElement.style.lineHeight = '1.15';
-    titleElement.style.color = '#5d321d';
-    titleElement.style.position = 'absolute';
-    // Keep the heading below the parchment's top ornament on every scroll.
-    titleElement.style.top = '45px';
-    titleElement.style.left = '0';
-    titleElement.style.width = '100%';
+    const clueFontSize = clueText.length > 280 ? 17 : clueText.length > 180 ? 18 : clueText.length > 120 ? 20 : 22;
+    const clue = this.add.text(centerX, centerY + (parchmentHeight * 0.015), clueText, {
+      fontFamily: 'Manrope, Arial, sans-serif',
+      fontSize: `${clueFontSize}px`,
+      color: '#3f2919',
+      align: 'center',
+      lineSpacing: 3,
+      wordWrap: { width: innerTextWidth, useAdvancedWrap: true },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(10002);
 
-    const clueElement = document.createElement('div');
-    clueElement.textContent = clueText;
-    clueElement.style.position = 'absolute';
-    clueElement.style.top = '20%';
-    clueElement.style.bottom = '14%';
-    clueElement.style.left = '0';
-    clueElement.style.width = '100%';
-    clueElement.style.display = 'flex';
-    clueElement.style.alignItems = 'center';
-    clueElement.style.justifyContent = 'center';
-    clueElement.style.whiteSpace = 'pre-line';
-    clueElement.style.overflow = 'hidden';
-    clueElement.style.overflowWrap = 'anywhere';
-    clueElement.style.wordBreak = 'normal';
-    clueElement.style.fontFamily = 'Manrope, Arial, sans-serif';
-    clueElement.style.fontSize = `${clueText.length > 280 ? 17 : clueText.length > 180 ? 18 : clueText.length > 120 ? 20 : 22}px`;
-    clueElement.style.fontWeight = '400';
-    clueElement.style.lineHeight = '1.25';
-    clueElement.style.color = '#3f2919';
-
-    const dismissElement = document.createElement('div');
-    dismissElement.textContent = 'CLICK TO CONTINUE';
-    dismissElement.style.fontFamily = 'Manrope, Arial, sans-serif';
-    dismissElement.style.fontSize = '14px';
-    dismissElement.style.fontWeight = '400';
-    dismissElement.style.lineHeight = '1';
-    dismissElement.style.color = '#6b3d24';
-    dismissElement.style.position = 'absolute';
-    dismissElement.style.bottom = '30px';
-    dismissElement.style.left = '0';
-    dismissElement.style.width = '100%';
-
-    cluePanelElement.append(titleElement, clueElement, dismissElement);
-    const cluePanel = this.add.dom(centerX, centerY, cluePanelElement)
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(10002);
-
-    let fitFrame = window.requestAnimationFrame(() => {
-      let currentSize = Number.parseFloat(clueElement.style.fontSize) || 16;
-      while (
-        currentSize > 15
-        && (clueElement.scrollHeight > clueElement.clientHeight || clueElement.scrollWidth > clueElement.clientWidth)
-      ) {
-        currentSize -= 1;
-        clueElement.style.fontSize = `${currentSize}px`;
-      }
-      fitFrame = null;
-    });
+    const dismiss = this.add.text(centerX, centerY + (parchmentHeight * 0.29), 'CLICK TO CONTINUE', {
+      fontFamily: 'Manrope, Arial, sans-serif',
+      fontSize: '14px',
+      color: '#6b3d24',
+      align: 'center',
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(10002);
 
     overlay.once('pointerdown', () => {
-      if (fitFrame !== null) window.cancelAnimationFrame(fitFrame);
       overlay.destroy();
       parchment.destroy();
-      cluePanel.destroy();
+      title.destroy();
+      clue.destroy();
+      dismiss.destroy();
       this.isInteractionLocked = false;
       this.player.freeze(false);
       this.physics.world.resume();
