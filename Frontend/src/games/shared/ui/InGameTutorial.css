@@ -45,20 +45,33 @@
 
 /* Game 3 only: keep every tutorial page stable and fully inside an iPhone viewport. */
 @media (max-width: 540px) and (orientation: portrait) {
+  .in-game-tutorial[data-game="3"]::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: rgba(22, 16, 12, 0.38);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+  }
+
   .in-game-tutorial[data-game="3"] .in-game-tutorial__panel {
     left: 50% !important;
     right: auto !important;
     top: auto !important;
-    bottom: max(12px, env(safe-area-inset-bottom)) !important;
-    width: min(420px, calc(100vw - 24px)) !important;
-    height: min(340px, calc(100dvh - 32px)) !important;
-    max-height: calc(100dvh - 32px) !important;
+    bottom: max(20px, env(safe-area-inset-bottom)) !important;
+    z-index: 4;
+    width: min(390px, calc(100vw - 32px)) !important;
+    height: min(clamp(245px, 66vw, 285px), calc(100dvh - 40px)) !important;
+    max-height: calc(100dvh - 40px) !important;
     transform: translateX(-50%);
-    gap: 8px;
-    padding: 92px 30px 28px;
+    gap: 6px;
+    padding: 76px 28px 22px;
+    filter: drop-shadow(0 12px 18px rgba(28, 15, 6, 0.42));
   }
 
   .in-game-tutorial[data-game="3"] .in-game-tutorial__content {
+    padding: 2px 3px 0;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
@@ -68,20 +81,40 @@
   }
 
   .in-game-tutorial[data-game="3"] .in-game-tutorial__content h3 {
-    font-size: 17px;
+    font-size: 16px;
+    line-height: 1.2;
   }
 
   .in-game-tutorial[data-game="3"] .in-game-tutorial__content p {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .in-game-tutorial[data-game="3"] .in-game-tutorial__content small {
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.35;
   }
 
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content small {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__safe {
+    font-size: 9px;
+  }
+
   .in-game-tutorial[data-game="3"] nav {
-    margin-bottom: 8px;
+    z-index: 1;
+    margin: 0 2px 5px;
+  }
+
+  .in-game-tutorial[data-game="3"] nav button {
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__highlight {
+    z-index: 1;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__hand {
+    z-index: 2;
   }
 }
