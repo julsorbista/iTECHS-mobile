@@ -42,3 +42,46 @@
   .in-game-tutorial__content p { font-size: 14px; }
   .in-game-tutorial__content h3 { font-size: 18px; }
 }
+
+/* Game 3 only: keep every tutorial page stable and fully inside an iPhone viewport. */
+@media (max-width: 540px) and (orientation: portrait) {
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__panel {
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    width: min(420px, calc(100vw - 24px)) !important;
+    height: min(340px, calc(100dvh - 32px)) !important;
+    max-height: calc(100dvh - 32px) !important;
+    transform: translateX(-50%);
+    gap: 8px;
+    padding: 92px 30px 28px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__copy {
+    gap: 7px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content h3 {
+    font-size: 17px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content p {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content small {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .in-game-tutorial[data-game="3"] nav {
+    margin-bottom: 8px;
+  }
+}
