@@ -9948,6 +9948,14 @@ textarea {
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
   }
+
+  .student-game-overlay-game-three-scroll .game-three-shell {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Final phone overrides for the shared Games 1-6 level-select screen.
