@@ -897,6 +897,8 @@ const StudentGameOverlay = ({
       } ${
         isGameTwo || isGameThree ? "student-game-overlay-game-two-scroll" : ""
       } ${isGameTwo ? "student-game-overlay-game-two-active" : ""} ${
+        isGameThree ? "student-game-overlay-game-three-scroll" : ""
+      } ${
         showCongratsOverlay ? "student-game-overlay-congrats-open" : ""
       } ${isGameFour ? "student-game-overlay-game-four-scroll" : ""} ${
         isGameFiveGameplay ? "student-game-overlay-game-five" : ""
@@ -1472,6 +1474,7 @@ const StudentGameOverlay = ({
                     title={completionPopupTitle}
                     message={completionPopupMessage}
                     onNext={handleDismissCongrats}
+                    variant="game-congrats-game-six"
                   />
                 </motion.div>
               </motion.div>

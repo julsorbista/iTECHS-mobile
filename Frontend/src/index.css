@@ -9939,6 +9939,17 @@ textarea {
   touch-action: manipulation;
 }
 
+/* Game 3 keeps its existing card layout; only its full-screen container scrolls on phones. */
+@media (max-width: 760px) and (orientation: portrait) {
+  .student-game-overlay-game-three-scroll {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Final phone overrides for the shared Games 1-6 level-select screen.
    Keep this at the end so the pixel redesign cannot override it. */
 @media (max-width: 640px) {
