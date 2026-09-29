@@ -9939,6 +9939,25 @@ textarea {
   touch-action: manipulation;
 }
 
+/* Keep the module audio controls fully inside narrow mobile viewports. */
+@media (max-width: 640px) {
+  body .student-module-audio-popover {
+    position: fixed !important;
+    top: max(88px, calc(env(safe-area-inset-top) + 64px)) !important;
+    right: 16px !important;
+    left: 16px !important;
+    z-index: 20000 !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: calc(100dvh - 112px) !important;
+    margin: 0 !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Game 3 keeps its existing card layout; only its full-screen container scrolls on phones. */
 @media (max-width: 760px) and (orientation: portrait) {
   .student-game-overlay-game-three-scroll {
