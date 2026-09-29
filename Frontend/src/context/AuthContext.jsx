@@ -184,7 +184,25 @@ export const AuthProvider = ({ children }) => {
       
       if (response.status === 'success') {
         if (response.data.requiresOTP) {
-          throw new Error('This mobile application is for student accounts only.');
+          // Older deployments did not include role on OTP challenges. In that
+          // case verification still enforces the student-only rule below.
+          if (response.data.role && response.data.role !== 'STUDENT') {
+            throw new Error('This mobile application is for student accounts only.');
+          }
+
+          dispatch({
+            type: authActionTypes.LOGIN_REQUIRES_OTP,
+            payload: {
+              email: response.data.email,
+              userId: response.data.userId,
+            },
+          });
+
+          return {
+            success: false,
+            requiresOTP: true,
+            activationRequired: Boolean(response.data.activationRequired),
+          };
         } else {
           // Direct login successful (student/super admin)
           const { token, user } = response.data;

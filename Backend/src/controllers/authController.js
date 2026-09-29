@@ -325,6 +325,7 @@ const login = async (req, res, next) => {
           {
             requiresOTP: true,
             activationRequired: true,
+            role: user.role,
             email: user.email,
             maskedEmail: otpMeta.maskedEmail,
             userId: user.id,
@@ -360,6 +361,7 @@ const login = async (req, res, next) => {
           {
             requiresOTP: true,
             activationRequired: false,
+            role: user.role,
             email: user.email,
             maskedEmail: otpMeta.maskedEmail,
             userId: user.id,
