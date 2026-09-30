@@ -1026,10 +1026,11 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
   const summaryPairs = gameplayData?.matchedPairs ?? matchedPairIds.length;
   const preferredColumns = Math.min(totalCards, Math.max(2, columns));
   const responsiveColumns = useMemo(() => {
-    if (viewportWidth < 560 && totalCards >= 32) {
-      // Five columns gives dense phone boards substantially larger cards while
-      // keeping every card in one continuous, scrollable gameplay board.
-      return 5;
+    if (viewportWidth < 560 && totalCards >= 16) {
+      // Keep every dense Game 3 level readable on phones, not only Level 10.
+      // Four columns gives Levels 5-10 one consistent card size while the
+      // existing gameplay scroll keeps the complete board accessible.
+      return 4;
     }
 
     if (totalCards >= 16) {
