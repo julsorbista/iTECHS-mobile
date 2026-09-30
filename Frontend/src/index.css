@@ -9987,6 +9987,51 @@ textarea {
     background: rgba(255, 255, 255, 0.96) !important;
   }
 
+  /* The shell is the viewport-height element in Game 3, so it must own the
+     real scroll range in both normal gameplay and the tutorial. */
+  .student-game-overlay-game-three-scroll .student-shell-overlay {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: scroll !important;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: auto !important;
+    scrollbar-color: rgba(255, 255, 255, 0.96) rgba(15, 23, 42, 0.38) !important;
+  }
+
+  .student-game-overlay-game-three-scroll .student-shell-overlay::-webkit-scrollbar {
+    width: 8px !important;
+  }
+
+  .student-game-overlay-game-three-scroll .student-shell-overlay::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.38) !important;
+  }
+
+  .student-game-overlay-game-three-scroll .student-shell-overlay::-webkit-scrollbar-thumb {
+    min-height: 48px;
+    border: 1px solid rgba(15, 23, 42, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96) !important;
+  }
+
+  .student-game-overlay-game-three-scroll .student-shell-main,
+  .student-game-overlay-game-three-scroll .student-game-three-overlay-layout,
+  .student-game-overlay-game-three-scroll .student-game-three-frame-panel {
+    box-sizing: border-box;
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
   .student-game-overlay-game-three-scroll .game-three-shell {
     width: 100% !important;
     height: auto !important;
