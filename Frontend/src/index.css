@@ -10098,6 +10098,57 @@ textarea {
     width: 100% !important;
     min-width: 0 !important;
   }
+
+  /* Dense Game 3 boards use the full phone width and the card artwork's
+     portrait ratio. This removes the old desktop 249px-row sizing that made
+     4x4 and 6x6 boards look like tiny tiles inside a large colored area. */
+  .student-game-overlay-game-three-scroll .game-three-board-shell:has(.game-three-board-many-cards),
+  .student-game-overlay-game-three-scroll .in-game-demo-open.game-three-shell .game-three-board-shell:has(.game-three-board-many-cards) {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 477 / 625 !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-board-many-cards {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-template-rows: repeat(var(--game-three-rows, 4), minmax(0, 1fr)) !important;
+    gap: clamp(2px, 1vw, 5px) !important;
+    padding: clamp(3px, 1vw, 6px) !important;
+    align-content: stretch !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-board-many-cards .game-three-card,
+  .student-game-overlay-game-three-scroll .game-three-board-many-cards .game-three-card-inner {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-board-many-cards .game-three-card-face {
+    inset: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-board-many-cards .game-three-card-back-new-art-image,
+  .student-game-overlay-game-three-scroll .game-three-board-many-cards .game-three-card-front-new-art-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
 }
 
 /* Final phone overrides for the shared Games 1-6 level-select screen.
