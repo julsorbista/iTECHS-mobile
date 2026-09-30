@@ -34,6 +34,13 @@ workflows:
           cd "$CM_BUILD_DIR/Frontend"
           npx cap sync ios
 
+      - name: Set unique iOS build number
+        script: |
+          cd "$CM_BUILD_DIR/Frontend/ios/App"
+          IOS_BUILD_NUMBER=$((PROJECT_BUILD_NUMBER + 100))
+          echo "Using iOS build number: $IOS_BUILD_NUMBER"
+          agvtool new-version -all "$IOS_BUILD_NUMBER"
+
       - name: Apply App Store signing
         script: |
           cd "$CM_BUILD_DIR/Frontend/ios/App"
