@@ -1027,11 +1027,10 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
   const preferredColumns = Math.min(totalCards, Math.max(2, columns));
   const responsiveColumns = useMemo(() => {
     if (totalCards >= 16) {
-      if (viewportWidth < 560) {
-        return 2;
-      }
-
-      return totalCards >= 20 && viewportWidth >= 760 ? 5 : 4;
+      // Dense memory boards must remain fully visible without creating the
+      // narrow 2-column strips seen on phones. Square decks become 4x4 and
+      // 6x6 while other dense decks use the nearest complete square width.
+      return Math.ceil(Math.sqrt(totalCards));
     }
 
     if (viewportWidth >= 1400) {
