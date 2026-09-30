@@ -90,7 +90,7 @@ describe('guideline and How to Play isolation', () => {
   it('does not reset Game 4 when the manual tutorial is requested', () => {
     const source = readSource('src/games/game-four/ui/GameCanvasGameFour.jsx');
     const resetEffectDependency = source.match(
-      /\}, \[hasStoryline, isFirstLevelGuide, isTutorialLevel, levelData, showLevelGuideline, startingLives, suppressIntroTutorial, viewport\.width\]\);/,
+      /\}, \[isFirstLevelGuide, isTutorialLevel, levelData, showLevelGuideline, startingLives, viewport\.width\]\);/,
     );
 
     expect(resetEffectDependency).not.toBeNull();

@@ -1594,25 +1594,6 @@ const ITEM_IMAGE_BY_TYPE = Object.freeze({
   orange: ORANGE_IMAGE,
 });
 
-const GAME_FOUR_STORY_PAGE_MODULES = import.meta.glob(
-  '../../../assets/story/world4/*.{png,jpg,jpeg,webp,svg}',
-  {
-    eager: true,
-    import: 'default',
-    query: '?url',
-  },
-);
-
-const GAME_FOUR_STORY_PAGES = Object.entries(GAME_FOUR_STORY_PAGE_MODULES)
-  .map(([path, src]) => {
-    const fileName = path.split('/').pop() || '';
-    const pageNumber = Number.parseInt(fileName, 10);
-    return { pageNumber, src };
-  })
-  .filter((page) => Number.isFinite(page.pageNumber) && page.pageNumber >= 1 && page.pageNumber <= 8)
-  .sort((first, second) => first.pageNumber - second.pageNumber)
-  .map((page) => page.src);
-
 const renderScreenModal = (content) => (
   typeof document !== 'undefined'
     ? createPortal(content, document.body)
@@ -1962,7 +1943,6 @@ const GameCanvasGameFour = ({
   hintCoinCost = 1,
   freeMistakes = 3,
   hintStarCost = 1,
-  suppressIntroTutorial = false,
   showLevelGuideline = false,
   gameTutorialRequested = false,
   onTutorialRequest,
@@ -2001,14 +1981,8 @@ const GameCanvasGameFour = ({
   const statementReward = clamp(Math.round(Number(settings.statementReward) || 120), 40, 400);
   const normalizedInitialCoins = Math.max(0, Math.round(Number(initialCoins || 0)));
 
-  const [showTutorial, setShowTutorial] = useState(
-    gameTutorialRequested || (showLevelGuideline && (!isFirstLevelGuide || GAME_FOUR_STORY_PAGES.length === 0)),
-  );
-  const [tutorialView, setTutorialView] = useState(
-    gameTutorialRequested || (showLevelGuideline && (!isFirstLevelGuide || GAME_FOUR_STORY_PAGES.length === 0))
-      ? 'guide'
-      : null,
-  );
+  const [showTutorial, setShowTutorial] = useState(gameTutorialRequested || showLevelGuideline);
+  const [tutorialView, setTutorialView] = useState(gameTutorialRequested || showLevelGuideline ? 'guide' : null);
   const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const [roundIndex, setRoundIndex] = useState(0);
   const [mode, setMode] = useState('catch');
@@ -2036,13 +2010,7 @@ const GameCanvasGameFour = ({
   const [screenShake, setScreenShake] = useState(false);
   const [catchEffects, setCatchEffects] = useState([]);
   const [comboFeedback, setComboFeedback] = useState(null);
-  const [showStoryline, setShowStoryline] = useState(
-    !gameTutorialRequested
-    && isFirstLevelGuide
-    && !suppressIntroTutorial
-    && GAME_FOUR_STORY_PAGES.length > 0,
-  );
-  const [storyPageIndex, setStoryPageIndex] = useState(0);
+  const [showStoryline, setShowStoryline] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
   const [tutorialCoachOpen, setTutorialCoachOpen] = useState(isTutorialLevel);
   const [playfieldScale, setPlayfieldScale] = useState({
@@ -2056,6 +2024,7 @@ const GameCanvasGameFour = ({
   const spawnAccumulatorRef = useRef(0);
   const keyStateRef = useRef({ left: false, right: false });
   const playerXRef = useRef(PLAYER_START_X);
+  const robotDragRef = useRef(null);
   const itemIdRef = useRef(0);
   const effectIdRef = useRef(0);
   const effectTimersRef = useRef([]);
@@ -2155,9 +2124,6 @@ const GameCanvasGameFour = ({
     () => getRemainingChoiceTokens(assemblyChoices, assembledTokens),
     [assembledTokens, assemblyChoices],
   );
-  const currentStoryPage = GAME_FOUR_STORY_PAGES[storyPageIndex] || null;
-  const hasStoryline = isFirstLevelGuide && !suppressIntroTutorial && GAME_FOUR_STORY_PAGES.length > 0;
-  const isLastStoryPage = storyPageIndex >= GAME_FOUR_STORY_PAGES.length - 1;
   const currentTutorialStep = isTutorialLevel
     ? GAME_FOUR_TUTORIAL_STEPS[Math.min(tutorialStepIndex, GAME_FOUR_TUTORIAL_STEPS.length - 1)]
     : null;
@@ -2179,6 +2145,44 @@ const GameCanvasGameFour = ({
     && !resultData
     && !isSubmitting
   );
+  // Map screen-space gestures into the existing game coordinates; physics stays unchanged.
+  const handleRobotPointerDown = (event) => {
+    if (!isGameplayActive || event.button !== 0 || robotDragRef.current) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    robotDragRef.current = { pointerId: event.pointerId, clientX: event.clientX };
+  };
+
+  const handleRobotPointerMove = (event) => {
+    const drag = robotDragRef.current;
+    if (!isGameplayActive || !drag || drag.pointerId !== event.pointerId) return;
+    const width = event.currentTarget.getBoundingClientRect().width;
+    if (!width) return;
+    event.preventDefault();
+    const delta = (event.clientX - drag.clientX) * ZIP_GAME_AREA_WIDTH / width;
+    drag.clientX = event.clientX;
+    const next = clamp(playerXRef.current + delta, 0, PLAYER_MAX_X);
+    playerXRef.current = next;
+    setPlayerX(next);
+  };
+
+  const stopRobotDrag = (event) => {
+    if (robotDragRef.current?.pointerId === event.pointerId) robotDragRef.current = null;
+  };
+
+  useEffect(() => {
+    if (!isGameplayActive) robotDragRef.current = null;
+  }, [isGameplayActive]);
+
+  useEffect(() => {
+    const stopInput = () => {
+      robotDragRef.current = null;
+      keyStateRef.current = { left: false, right: false };
+    };
+    window.addEventListener('blur', stopInput);
+    return () => window.removeEventListener('blur', stopInput);
+  }, []);
+
   const isGameplayPaused = showStoryline || showTutorial || shouldPauseForTutorialCoach;
   gameplayPausedRef.current = isGameplayPaused;
   useEffect(() => {
@@ -2235,17 +2239,6 @@ const GameCanvasGameFour = ({
     effectTimersRef.current.push(timerId);
   }, []);
 
-  const handleAdvanceStoryline = () => {
-    if (!isLastStoryPage) {
-      setStoryPageIndex((current) => Math.min(current + 1, GAME_FOUR_STORY_PAGES.length - 1));
-      return;
-    }
-
-    setShowStoryline(false);
-    setShowTutorial(showLevelGuideline);
-    setTutorialView(showLevelGuideline ? 'guide' : null);
-  };
-
   const handleContinueTutorialStep = () => {
     keyStateRef.current = { left: false, right: false };
     previousTsRef.current = null;
@@ -2254,13 +2247,12 @@ const GameCanvasGameFour = ({
   };
 
   useEffect(() => {
-    const shouldShowIntroTutorial = showLevelGuideline && !hasStoryline;
+    const shouldShowIntroTutorial = showLevelGuideline;
 
     setShowTutorial(shouldShowIntroTutorial);
     setTutorialView(shouldShowIntroTutorial ? 'guide' : null);
     setGuideOpenedDuringGameplay(false);
-    setShowStoryline(hasStoryline);
-    setStoryPageIndex(0);
+    setShowStoryline(false);
     setRoundIndex(0);
     setMode('catch');
     setInventory([]);
@@ -2295,7 +2287,7 @@ const GameCanvasGameFour = ({
     effectIdRef.current = 0;
     coinsSpawnedThisRoundRef.current = 0;
     submittedRef.current = false;
-  }, [hasStoryline, isFirstLevelGuide, isTutorialLevel, levelData, showLevelGuideline, startingLives, suppressIntroTutorial, viewport.width]);
+  }, [isFirstLevelGuide, isTutorialLevel, levelData, showLevelGuideline, startingLives, viewport.width]);
 
   useEffect(() => (
     () => {
@@ -2745,7 +2737,7 @@ const GameCanvasGameFour = ({
                   simulatedLives = Math.min(startingLives, simulatedLives + 1);
                   nextFeedbackMessage = `Extra life gained! Lives: ${simulatedLives}/${startingLives}.`;
                 } else {
-                  nextFeedbackMessage = 'Fruit bonus ready, but lives are already full.';
+                  nextFeedbackMessage = 'Gear bonus ready, but lives are already full.';
                 }
               } else {
                 const remainingFruitCount = FRUITS_PER_EXTRA_LIFE - nextFruitCatchCount;
@@ -3377,7 +3369,7 @@ const GameCanvasGameFour = ({
 
                 <section className="game-four-sidebar-movement-card">
                   <span className="game-four-sidebar-keyboard-icon" aria-hidden="true">⌨</span>
-                  <p>Move with <span>A / D</span> or Arrow Keys.</p>
+                  <p>Move with <span>A / D</span> or Arrow Keys. Swipe or drag across the play area.</p>
                 </section>
 
                 <section className="game-four-sidebar-gear-card" title={fruitProgressText}>
@@ -3444,11 +3436,11 @@ const GameCanvasGameFour = ({
               </aside>
 
               <section
-                ref={playfieldViewportRef}
                 className={clsx('game-four-play-card relative overflow-hidden border-[4px] border-[#70415f] bg-[#fff3c8] p-2 shadow-[8px_8px_0_rgba(67,38,68,0.8)]', screenShake && 'screen-shake')}
               >
                 <div
-                  className="absolute inset-0 overflow-hidden"
+                  ref={playfieldViewportRef}
+                  className="game-four-playfield-viewport absolute inset-0 overflow-hidden"
                 >
                   <img
                     src={GAME_FOUR_BACKGROUND_IMAGE}
@@ -3457,8 +3449,17 @@ const GameCanvasGameFour = ({
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                   <div
-                    className="relative origin-top-left overflow-hidden border-[3px] border-black bg-transparent"
+                    className="game-four-touch-surface relative origin-top-left overflow-hidden border-[3px] border-black bg-transparent"
+                    onPointerDown={handleRobotPointerDown}
+                    onPointerMove={handleRobotPointerMove}
+                    onPointerUp={stopRobotDrag}
+                    onPointerCancel={stopRobotDrag}
+                    onLostPointerCapture={stopRobotDrag}
+                    onDragStart={(event) => event.preventDefault()}
                     style={{
+                      touchAction: 'none',
+                      userSelect: 'none',
+                      '--game-four-scale-x': playfieldScale.x,
                       width: `${ZIP_GAME_AREA_WIDTH}px`,
                       height: `${ZIP_GAME_AREA_HEIGHT}px`,
                       transform: `scale(${playfieldScale.x}, ${playfieldScale.y})`,
@@ -3576,6 +3577,7 @@ const GameCanvasGameFour = ({
                     className="game-four-mobile-control-button"
                     aria-label="Move left"
                     onPointerDown={(event) => {
+                      if (!isGameplayActive) return;
                       event.preventDefault();
                       event.currentTarget.setPointerCapture?.(event.pointerId);
                       keyStateRef.current.left = true;
@@ -3591,6 +3593,7 @@ const GameCanvasGameFour = ({
                     className="game-four-mobile-control-button"
                     aria-label="Move right"
                     onPointerDown={(event) => {
+                      if (!isGameplayActive) return;
                       event.preventDefault();
                       event.currentTarget.setPointerCapture?.(event.pointerId);
                       keyStateRef.current.right = true;
@@ -3792,70 +3795,7 @@ const GameCanvasGameFour = ({
 
         {renderScreenModal(
           <AnimatePresence>
-            {showStoryline && currentStoryPage && (
-              <motion.div
-                className="game-guide-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className="game-four-story-card"
-                  initial={{ opacity: 0, y: 14, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.97 }}
-                >
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="student-mini-kicker">Catch The Code Story</p>
-                      <h3 className="text-2xl font-black text-[#24192a]">
-                        Page {storyPageIndex + 1} of {GAME_FOUR_STORY_PAGES.length}
-                      </h3>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={onExitRequest}
-                    >
-                      <LogOut className="h-4 w-4" aria-hidden="true" />
-                      <span>Back</span>
-                    </button>
-                  </div>
-
-                  <div className="game-four-story-image-wrap">
-                    <img
-                      src={currentStoryPage}
-                      alt={`Catch the Code story page ${storyPageIndex + 1}`}
-                      className="game-four-story-image"
-                    />
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex gap-2">
-                      {GAME_FOUR_STORY_PAGES.map((_, index) => (
-                        <span
-                          key={`story-dot-${index}`}
-                          className={clsx(
-                            'h-3 w-3 border-2 border-[#432644]',
-                            index === storyPageIndex ? 'bg-[#2563eb]' : 'bg-white',
-                          )}
-                          aria-hidden="true"
-                        />
-                      ))}
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={handleAdvanceStoryline}
-                    >
-                      {isLastStoryPage ? 'Start Level' : 'Next'}
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-
-            {!showStoryline && showTutorial && (
+            {showTutorial && (
               <motion.div
                 className="actual-game-tutorial-motion"
                 initial={{ opacity: 0 }}
@@ -3869,6 +3809,7 @@ const GameCanvasGameFour = ({
                     lead={guideContent.lead}
                     summary={guideContent.summary}
                     sections={guideContent.sections}
+                    useGameSixMobileLayout
                     onExit={guideOpenedDuringGameplay ? () => {
                       setGuideOpenedDuringGameplay(false);
                       setTutorialView(null);

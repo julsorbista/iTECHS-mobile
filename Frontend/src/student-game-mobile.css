@@ -71,7 +71,7 @@
   body .g1-parchment .g1-parchment__movements { grid-template-columns: 76px minmax(0,1fr); }
   body .g1-parchment .g1-parchment__control-list li { font: 12px/1.5 Manrope,sans-serif; }
   body .g1-parchment .g1-parchment__control-list b { min-width: 44px; }
-  #root .student-game-overlay .game-four-mode-assemble .game-four-layout { height: calc(100dvh - 20px) !important; }
+  #root .student-game-overlay .game-four-mode-assemble .game-four-layout { height: auto !important; }
   #root .student-game-overlay .game-four-arrange-shell { padding: 4px !important; min-height: 0 !important; overflow: visible !important; }
   #root .student-game-overlay .game-four-arrange-card { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(40px,1fr) auto auto; gap: 4px 8px; min-height: 0 !important; padding: 6px !important; }
   #root .student-game-overlay .game-four-arrange-header { grid-column: 1 / -1; }
@@ -198,8 +198,8 @@
   #root .student-game-overlay .game-two-fruit-left { top: 70px; left: 8px; width: 20%; }
   #root .student-game-overlay .game-two-fruit-right { top: 70px; right: 8px; width: 20%; }
   #root .student-game-overlay .game-two-fruit-card { padding: 4px; font-size: 10px; }
-  #root .student-game-overlay .game-four-stage { min-height: 0 !important; height: calc(100dvh - 16px) !important; padding: 4px !important; }
-  #root .student-game-overlay .game-four-layout { display: flex !important; flex-direction: column; width: 100% !important; height: 100% !important; min-height: 0 !important; padding: 4px !important; gap: 4px !important; }
+  #root .student-game-overlay .game-four-stage { min-height: 0 !important; height: auto !important; padding: 4px !important; }
+  #root .student-game-overlay .game-four-layout { display: flex !important; flex-direction: column; width: 100% !important; height: auto !important; min-height: 0 !important; padding: 4px !important; gap: 4px !important; }
   #root .student-game-overlay .game-four-layout > div { min-height: 0; gap: 4px; }
   #root .student-game-overlay .student-game-four-top-controls { position: absolute; right: 8px; top: 6px; z-index: 40; }
   #root .student-game-overlay .student-game-four-back-chip { width: 60px !important; min-width: 60px !important; min-height: 44px; padding: 4px !important; font-size: 12px !important; }
@@ -212,11 +212,11 @@
   #root .student-game-overlay .game-four-hud-label { font-size: 9px !important; }
   #root .student-game-overlay .game-four-hud-value { font-size: 13px !important; }
   #root .student-game-overlay .game-four-catch-layout { grid-template-columns: 160px minmax(0, 1fr) !important; flex: 1; min-height: 0 !important; gap: 6px; }
-  #root .student-game-overlay .game-four-sidebar { max-height: none !important; min-height: 0 !important; height: 100%; overflow-y: auto; padding: 4px !important; gap: 4px; }
+  #root .student-game-overlay .game-four-sidebar { max-height: none !important; min-height: 0 !important; height: auto; overflow-y: auto; padding: 4px !important; gap: 4px; }
   #root .student-game-overlay .game-four-objective-card { padding: 6px !important; min-height: 0 !important; }
   #root .student-game-overlay .game-four-objective-card h3 { font-size: 16px !important; line-height: 1.2 !important; }
   #root .student-game-overlay .game-four-objective-card p { font-size: 12px !important; line-height: 1.4 !important; margin: 4px 0 !important; }
-  #root .student-game-overlay .game-four-play-card { min-width: 0 !important; width: 100% !important; min-height: 0 !important; height: 100% !important; }
+  #root .student-game-overlay .game-four-play-card { min-width: 0 !important; width: 100% !important; min-height: 0 !important; height: auto !important; }
   #root .student-game-overlay .game-four-mobile-controls { position: absolute; bottom: 6px; left: 8px; right: 8px; z-index: 25; justify-content: space-between; pointer-events: none; }
   #root .student-game-overlay .game-four-mobile-control-button { flex: none; width: 64px; pointer-events: auto; }
 }

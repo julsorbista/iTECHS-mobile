@@ -30,7 +30,7 @@ const StudentGamePlayPage = () => {
       return undefined;
     }
 
-    ScreenOrientation.lock({ orientation: 'landscape-primary' }).catch(() => undefined);
+    ScreenOrientation.lock({ orientation: gameType === 'GAME_FOUR' ? 'portrait-primary' : 'landscape-primary' }).catch(() => undefined);
 
     return () => {
       ScreenOrientation.lock({ orientation: 'portrait-primary' }).catch(() => undefined);

@@ -221,7 +221,7 @@ const StudentGameLevelsPage = () => {
     }
 
     ScreenOrientation.lock({
-      orientation: activeLevelNumber ? 'landscape-primary' : 'portrait-primary',
+      orientation: activeLevelNumber && gameType !== 'GAME_FOUR' ? 'landscape-primary' : 'portrait-primary',
     }).catch(() => undefined);
     if (activeLevelNumber) {
       StatusBar.hide().catch(() => undefined);

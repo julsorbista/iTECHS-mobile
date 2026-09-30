@@ -81,3 +81,64 @@
   touch-action: manipulation;
 }
 .g4-guide-footer button:active { transform: translateY(2px); }
+
+/* Only Game 4's existing guide gets portrait sizing; content and paging are unchanged. */
+@media (orientation: portrait) and (max-width: 1024px) {
+  .g4-guide-screen.game-guide-theme-four { padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); }
+  .game-guide-theme-four .g4-guide-board {
+    width: min(94vw, 500px, calc((100dvh - 24px) * 0.925));
+    height: auto;
+    aspect-ratio: 1206 / 1304;
+  }
+  .game-guide-theme-four .g4-guide-paper {
+    inset: 23% 11% 22%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .game-guide-theme-four .g4-guide-paper h2 {
+    flex: none;
+    margin: 0 0 8px;
+    font-size: clamp(14px, 4.2vw, 19px);
+    line-height: 1.25;
+    padding: 7px 8px;
+  }
+  .game-guide-theme-four .g4-guide-paper ul {
+    flex: none;
+    overflow: visible;
+    padding-right: 5px;
+  }
+  .game-guide-theme-four .g4-guide-paper li { font-size: clamp(13px, 3.7vw, 16px); line-height: 1.4; padding: 8px 0; align-items: start; overflow-wrap: anywhere; }
+  .game-guide-theme-four .g4-guide-footer { inset: auto 11% 11%; height: 10%; grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr); gap: 8px; font-size: clamp(12px, 3.6vw, 15px); }
+  .game-guide-theme-four .g4-guide-footer button { min-height: 42px; padding: 8px 8px 9px; }
+}
+
+/* Game 4 mobile uses the Game 6 guide frame. Keep the heading inside the same
+   scroll surface as its instruction rows so the label and content move together. */
+@media (max-width: 700px) {
+  body .game-guide-card--wood.game-guide-card--game-four .game-guide-section {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #b87936 #ffe4a9 !important;
+  }
+
+  body .game-guide-card--wood.game-guide-card--game-four .game-guide-section::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  body .game-guide-card--wood.game-guide-card--game-four .game-guide-section::-webkit-scrollbar-track {
+    background: rgba(160, 97, 38, 0.16);
+  }
+
+  body .game-guide-card--wood.game-guide-card--game-four .game-guide-section::-webkit-scrollbar-thumb {
+    background: #b87936;
+    border: 2px solid #ffe4a9;
+  }
+
+  body .game-guide-card--wood.game-guide-card--game-four .game-guide-section ul {
+    flex: 0 0 auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+}

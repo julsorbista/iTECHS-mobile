@@ -96,6 +96,7 @@ const GameGuideOverlay = ({
   onStart,
   exitLabel = 'Exit',
   startLabel = 'Start Level',
+  useGameSixMobileLayout = false,
 }) => {
   const pagedSections = [
     ...(summary.length ? [{ title: title || 'Overview', items: summary }] : []),
@@ -106,8 +107,18 @@ const GameGuideOverlay = ({
   const currentPage = Math.min(page, safeSections.length - 1);
   const currentSection = safeSections[currentPage] || safeSections[0];
   const themeClass = useMemo(() => getGuideThemeClass(kicker, title), [kicker, title]);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage >= safeSections.length - 1;
+
+  useEffect(() => {
+    if (!useGameSixMobileLayout || typeof window === 'undefined') return undefined;
+    const mediaQuery = window.matchMedia('(max-width: 700px)');
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+    updateViewport();
+    mediaQuery.addEventListener?.('change', updateViewport);
+    return () => mediaQuery.removeEventListener?.('change', updateViewport);
+  }, [useGameSixMobileLayout]);
 
   useEffect(() => {
     setPage(0);
@@ -116,7 +127,7 @@ const GameGuideOverlay = ({
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return undefined;
 
-    const usesLandscapeGuide = ['game-guide-theme-one', 'game-guide-theme-two', 'game-guide-theme-four'].includes(themeClass);
+    const usesLandscapeGuide = ['game-guide-theme-one', 'game-guide-theme-two'].includes(themeClass);
     ScreenOrientation.lock({
       orientation: usesLandscapeGuide ? 'landscape-primary' : 'portrait-primary',
     }).catch(() => undefined);
@@ -144,7 +155,10 @@ const GameGuideOverlay = ({
     onStart?.();
   };
 
-  if (['game-guide-theme-one', 'game-guide-theme-two', 'game-guide-theme-four'].includes(themeClass)) {
+  const usesLegacyLayout = ['game-guide-theme-one', 'game-guide-theme-two', 'game-guide-theme-four'].includes(themeClass)
+    && !(useGameSixMobileLayout && isMobileViewport);
+
+  if (usesLegacyLayout) {
     return createPortal(
       <div className={`g4-guide-screen ${themeClass}`} role="dialog" aria-modal="true" aria-label={`${title || 'Game'} guidelines`}>
         <div className="g4-guide-board">
@@ -171,13 +185,13 @@ const GameGuideOverlay = ({
 
   return createPortal(
     <div className={`game-guide-backdrop game-guide-wood ${themeClass}`}>
-      <div className="game-guide-card game-guide-card--wood">
+      <div className={`game-guide-card game-guide-card--wood${useGameSixMobileLayout ? ' game-guide-card--game-four' : ''}`}>
         <div className="game-guide-vine game-guide-vine-left" aria-hidden="true" />
         <div className="game-guide-vine game-guide-vine-right" aria-hidden="true" />
         <h3 className="game-guide-main-title">GUIDELINES</h3>
         <div className="game-guide-grid">
           <section className="game-guide-section">
-            <h4>{currentSection.title}</h4>
+            <h4>{useGameSixMobileLayout ? title : currentSection.title}</h4>
             <ul>
               {(currentSection.items || []).map((item, index) => {
                 const iconType = getGuideIconType(item);
