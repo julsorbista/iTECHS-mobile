@@ -38,6 +38,13 @@
    during normal play. The wider tutorial rule above must not squeeze the
    board beside the status panel. */
 @media (max-width: 760px) and (orientation: portrait) {
+  .in-game-demo-open.game-three-shell button,
+  .in-game-demo-open.game-three-shell a,
+  .in-game-demo-open.game-three-shell input,
+  .in-game-demo-open.game-three-shell select,
+  .in-game-demo-open.game-three-shell textarea {
+    pointer-events: none !important;
+  }
   .in-game-demo-open.game-three-shell .game-three-layout {
     grid-template-columns: minmax(0, 1fr) !important;
     align-items: start !important;
