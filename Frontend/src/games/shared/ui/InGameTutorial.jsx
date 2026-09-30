@@ -36,20 +36,14 @@ export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finish
     const root = rootRef.current, focus = document.activeElement;
     const inert = root?.inert;
     const scrollers = root ? [root, ...root.querySelectorAll('*')].filter((el) => el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth).map((el) => [el, el.scrollTop, el.scrollLeft]) : [];
-    // Game 3's tutorial follows targets down a document-style mobile screen.
-    // Keep that screen scrollable while the tutorial is open; its controls are
-    // disabled with CSS instead of making the whole scroll container inert.
-    if (root) {
-      if (game !== 3) root.inert = true;
-      root.classList.add('in-game-demo-open');
-    }
+    if (root) { root.inert = true; root.classList.add('in-game-demo-open'); }
     panelRef.current?.focus({ preventScroll: true });
     return () => {
       if (root) { root.inert = inert; root.classList.remove('in-game-demo-open'); }
       scrollers.forEach(([el, top, left]) => { el.scrollTop = top; el.scrollLeft = left; });
       if (focus?.isConnected) focus.focus({ preventScroll: true });
     };
-  }, [rootRef, game]);
+  }, [rootRef]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;

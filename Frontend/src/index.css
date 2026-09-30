@@ -10017,6 +10017,17 @@ textarea {
     background: rgba(255, 255, 255, 0.96) !important;
   }
 
+  /* Tutorial navigation scrolls to each target automatically. Keep the
+     gameplay scrollbar for normal play, but hide it during the guided demo. */
+  .student-game-overlay-game-three-scroll .student-shell-overlay:has(.in-game-demo-open) {
+    scrollbar-width: none !important;
+  }
+
+  .student-game-overlay-game-three-scroll .student-shell-overlay:has(.in-game-demo-open)::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+  }
+
   .student-game-overlay-game-three-scroll .student-shell-main,
   .student-game-overlay-game-three-scroll .student-game-three-overlay-layout,
   .student-game-overlay-game-three-scroll .student-game-three-frame-panel {
