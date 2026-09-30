@@ -1026,11 +1026,10 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
   const summaryPairs = gameplayData?.matchedPairs ?? matchedPairIds.length;
   const preferredColumns = Math.min(totalCards, Math.max(2, columns));
   const responsiveColumns = useMemo(() => {
-    if (viewportWidth < 560) {
-      // On phones, preserve each level's designed grid width so every card is
-      // visible together. This avoids long boards that force students to
-      // scroll away from cards they need to remember.
-      return preferredColumns;
+    if (viewportWidth < 560 && totalCards >= 16) {
+      // Preserve the approved large-card phone presentation for dense levels.
+      // The page remains vertically scrollable so every card stays accessible.
+      return 4;
     }
 
     if (totalCards >= 16) {
