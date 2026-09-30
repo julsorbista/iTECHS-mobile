@@ -10067,6 +10067,7 @@ textarea {
   .student-game-overlay-game-three-scroll .game-three-board-panel {
     width: 100% !important;
     min-width: 0 !important;
+    padding: 2px !important;
   }
 
   .student-game-overlay-game-three-scroll .game-three-board-shell,
@@ -10077,7 +10078,7 @@ textarea {
     max-width: none !important;
     /* Give every mobile board more vertical room so each card keeps a clear,
        readable portrait shape instead of being compressed into a square. */
-    aspect-ratio: 7 / 10 !important;
+    aspect-ratio: var(--game-three-mobile-board-aspect, 7 / 10) !important;
     flex-shrink: 1 !important;
   }
 
@@ -10108,7 +10109,7 @@ textarea {
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
-    aspect-ratio: 7 / 10 !important;
+    aspect-ratio: var(--game-three-mobile-board-aspect, 7 / 10) !important;
   }
 
   .student-game-overlay-game-three-scroll .game-three-board-many-cards {
@@ -10116,8 +10117,8 @@ textarea {
     height: 100% !important;
     min-height: 0 !important;
     grid-template-rows: repeat(var(--game-three-rows, 4), minmax(0, 1fr)) !important;
-    gap: clamp(2px, 1vw, 5px) !important;
-    padding: clamp(3px, 1vw, 6px) !important;
+    gap: 2px !important;
+    padding: 2px !important;
     align-content: stretch !important;
   }
 
@@ -10143,15 +10144,20 @@ textarea {
     inset: 0 !important;
     padding: 0 !important;
     border: 0 !important;
+    border-radius: clamp(3px, 1.4vw, 9px) !important;
     background: transparent !important;
     box-shadow: none !important;
+    overflow: hidden !important;
   }
 
   .student-game-overlay-game-three-scroll .game-three-card-back-new-art-image,
   .student-game-overlay-game-three-scroll .game-three-card-front-new-art-image {
     width: 100% !important;
     height: 100% !important;
-    object-fit: fill !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    transform: scale(1.035) !important;
+    transform-origin: center !important;
   }
 }
 

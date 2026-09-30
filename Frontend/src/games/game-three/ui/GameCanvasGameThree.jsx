@@ -1026,6 +1026,12 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
   const summaryPairs = gameplayData?.matchedPairs ?? matchedPairIds.length;
   const preferredColumns = Math.min(totalCards, Math.max(2, columns));
   const responsiveColumns = useMemo(() => {
+    if (viewportWidth < 560 && totalCards >= 32) {
+      // Five columns gives dense phone boards substantially larger cards while
+      // keeping every card in one continuous, scrollable gameplay board.
+      return 5;
+    }
+
     if (totalCards >= 16) {
       // Dense memory boards must remain fully visible without creating the
       // narrow 2-column strips seen on phones. Square decks become 4x4 and
@@ -1469,6 +1475,7 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
             style={totalCards >= 16
               ? {
                   '--game-three-many-height': `${(responsiveRows * 249) + ((responsiveRows - 1) * 15) + 32}px`,
+                  '--game-three-mobile-board-aspect': `${responsiveColumns * 477} / ${responsiveRows * 625}`,
                 }
               : isLevelOneLayout
                 ? undefined
@@ -1490,6 +1497,7 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
                 style={{
                   '--game-three-columns': String(responsiveColumns),
                   '--game-three-rows': String(responsiveRows),
+                  '--game-three-mobile-board-aspect': `${responsiveColumns * 477} / ${responsiveRows * 625}`,
                   '--game-three-many-height': `${(responsiveRows * 249) + ((responsiveRows - 1) * 15) + 32}px`,
                 }}
               >
