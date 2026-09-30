@@ -9958,9 +9958,11 @@ textarea {
   }
 }
 
-/* Game 3 keeps its existing card layout; only its full-screen container scrolls on phones. */
+/* Game 3 phone portrait layout mirrors the Android gameplay presentation. */
 @media (max-width: 760px) and (orientation: portrait) {
   .student-game-overlay-game-three-scroll {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
     overscroll-behavior-y: contain;
@@ -9969,11 +9971,59 @@ textarea {
   }
 
   .student-game-overlay-game-three-scroll .game-three-shell {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
     overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     overscroll-behavior-y: contain;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-layout,
+  .student-game-overlay-game-three-scroll .in-game-demo-open.game-three-shell .game-three-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-board-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-board-shell,
+  .student-game-overlay-game-three-scroll .in-game-demo-open.game-three-shell .game-three-board-shell {
+    width: 100% !important;
+    height: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    aspect-ratio: 1 !important;
+    flex-shrink: 1 !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-side-panel,
+  .student-game-overlay-game-three-scroll .in-game-demo-open.game-three-shell .game-three-side-panel {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-side-card {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .student-game-overlay-game-three-scroll .game-three-tutorial-button {
+    width: 100% !important;
+    min-width: 0 !important;
   }
 }
 

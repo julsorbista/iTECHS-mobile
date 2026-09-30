@@ -34,6 +34,28 @@
   .in-game-demo-open .game-three-side-panel { display: flex; flex-direction: column; }
   .in-game-demo-open .game-three-board-shell { height: min(440px, 72dvh) !important; flex-shrink: 0; }
 }
+/* On portrait phones, keep Game 3 in the same stacked document layout used
+   during normal play. The wider tutorial rule above must not squeeze the
+   board beside the status panel. */
+@media (max-width: 760px) and (orientation: portrait) {
+  .in-game-demo-open.game-three-shell .game-three-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: start !important;
+  }
+  .in-game-demo-open.game-three-shell .game-three-side-panel {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .in-game-demo-open.game-three-shell .game-three-side-card {
+    grid-column: 1 / -1;
+  }
+  .in-game-demo-open.game-three-shell .game-three-board-shell {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 !important;
+    flex-shrink: 1;
+  }
+}
 .in-game-demo-open [data-tutorial-highlight="true"][data-g5-target^="letter-"] { background: #d9eab1; color: #354b21; opacity: 1; }
 .in-game-tutorial__copy { display: grid; gap: 10px; }
 @media (max-width: 540px), (max-height: 540px) {
