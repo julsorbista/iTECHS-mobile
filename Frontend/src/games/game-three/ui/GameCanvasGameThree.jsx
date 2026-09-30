@@ -1026,11 +1026,11 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
   const summaryPairs = gameplayData?.matchedPairs ?? matchedPairIds.length;
   const preferredColumns = Math.min(totalCards, Math.max(2, columns));
   const responsiveColumns = useMemo(() => {
-    if (viewportWidth < 560 && totalCards >= 16) {
-      // Keep every dense Game 3 level readable on phones, not only Level 10.
-      // Four columns gives Levels 5-10 one consistent card size while the
-      // existing gameplay scroll keeps the complete board accessible.
-      return 4;
+    if (viewportWidth < 560) {
+      // On phones, preserve each level's designed grid width so every card is
+      // visible together. This avoids long boards that force students to
+      // scroll away from cards they need to remember.
+      return preferredColumns;
     }
 
     if (totalCards >= 16) {
@@ -1473,16 +1473,18 @@ const useGameThreeAudio = ({ musicSrc, correctSrc, wrongSrc, cardPickSrc, gameOv
               isLevelFourLayout && 'game-three-board-shell-level-four',
               isLevelFiveLayout && 'game-three-board-shell-level-five',
             )}
-            style={totalCards >= 16
-              ? {
-                  '--game-three-many-height': `${(responsiveRows * 249) + ((responsiveRows - 1) * 15) + 32}px`,
-                  '--game-three-mobile-board-aspect': `${responsiveColumns * 477} / ${responsiveRows * 625}`,
-                }
-              : isLevelOneLayout
-                ? undefined
-                : {
-                  aspectRatio: `${responsiveColumns * 477} / ${responsiveRows * 625}`,
-                }}
+            style={{
+              '--game-three-mobile-board-aspect': `${responsiveColumns * 477} / ${responsiveRows * 625}`,
+              ...(totalCards >= 16
+                ? {
+                    '--game-three-many-height': `${(responsiveRows * 249) + ((responsiveRows - 1) * 15) + 32}px`,
+                  }
+                : isLevelOneLayout
+                  ? {}
+                  : {
+                    aspectRatio: `${responsiveColumns * 477} / ${responsiveRows * 625}`,
+                  }),
+            }}
           >
             <div className="game-three-board-wrap">
               <div

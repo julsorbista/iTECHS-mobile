@@ -10067,7 +10067,7 @@ textarea {
   .student-game-overlay-game-three-scroll .game-three-board-panel {
     width: 100% !important;
     min-width: 0 !important;
-    padding: 2px !important;
+    padding: max(28px, env(safe-area-inset-top)) 2px 2px !important;
   }
 
   .student-game-overlay-game-three-scroll .game-three-board-shell,
@@ -10102,8 +10102,8 @@ textarea {
     min-width: 0 !important;
   }
 
-  /* Dense Game 3 boards use the same taller mobile stage. This removes the
-     old desktop 249px-row sizing that compressed 4x4 and 6x6 card artwork. */
+  /* Dense Game 3 boards use the level's complete grid aspect ratio so all
+     cards remain visible together instead of extending below the viewport. */
   .student-game-overlay-game-three-scroll .game-three-board-shell:has(.game-three-board-many-cards),
   .student-game-overlay-game-three-scroll .in-game-demo-open.game-three-shell .game-three-board-shell:has(.game-three-board-many-cards) {
     width: 100% !important;
@@ -10122,9 +10122,7 @@ textarea {
     align-content: stretch !important;
   }
 
-  /* All Game 3 levels use one edge-to-edge card slot. Some source PNG files
-     have slightly different canvas sizes, so fill the common frame to keep
-     every visible card the same size and remove the colored wrapper behind it. */
+  /* All Game 3 levels use one edge-to-edge card slot. */
   .student-game-overlay-game-three-scroll .game-three-card,
   .student-game-overlay-game-three-scroll .game-three-card-inner {
     width: 100% !important;
@@ -10154,9 +10152,9 @@ textarea {
   .student-game-overlay-game-three-scroll .game-three-card-front-new-art-image {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important;
+    object-fit: contain !important;
     object-position: center !important;
-    transform: scale(1.035) !important;
+    transform: none !important;
     transform-origin: center !important;
   }
 }
