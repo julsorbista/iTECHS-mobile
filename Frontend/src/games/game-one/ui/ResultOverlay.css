@@ -23,3 +23,29 @@ body .game-illustrated-results {
 .game-illustrated-results .game-one-results-list p { margin: 0; text-transform: uppercase; font-weight: 700; }
 .game-illustrated-results .game-one-results-actions { position: absolute; inset: 77% 12% auto; display: flex; gap: 4px; }
 .game-illustrated-results .game-one-results-actions button { height: 44px; min-width: 0; padding: 4px; border-width: 2px; border-radius: 8px; font-size: clamp(8px, 2.5vw, 11px); }
+
+/* Game 3 trial placement: keep both two- and three-button result actions
+   completely inside the light parchment, above the wooden footer. */
+.game-three-illustrated-results .game-one-results-actions {
+  inset: 71.5% 15% auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(3px, 1vw, 6px);
+  width: auto;
+  max-width: none;
+}
+
+.game-three-illustrated-results .game-one-results-actions button {
+  flex: 1 1 0;
+  width: 0;
+  height: clamp(36px, 9.5vw, 42px);
+  min-width: 0;
+  min-height: 0;
+  padding: 4px 3px;
+  border-width: 2px;
+  border-radius: 7px;
+  font-size: clamp(7px, 2.15vw, 10px);
+  line-height: 1.1;
+  white-space: normal;
+}
