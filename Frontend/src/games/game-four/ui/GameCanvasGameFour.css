@@ -1,4 +1,30 @@
 /* Scoped Game 4 phone layout: it does not affect other games or dialogs. */
+.game-four-stage:not(.game-four-mode-assemble) .game-four-hud-tutorial-button {
+  border: 3px solid #70415f !important;
+  border-radius: 0 !important;
+  background: #fff7dc !important;
+  color: #24192a !important;
+  box-shadow: 4px 4px 0 #432644 !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  text-align: center !important;
+}
+
+@media (orientation: landscape) and (min-width: 700px) {
+  .game-four-stage:not(.game-four-mode-assemble) .game-four-hud {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+  }
+
+  .game-four-stage:not(.game-four-mode-assemble) .game-four-hud > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+  }
+}
+
 @media (max-width: 1280px), (pointer: coarse) {
   .student-game-four-panel,
   .student-game-four-panel .student-game-frame-wrap,
