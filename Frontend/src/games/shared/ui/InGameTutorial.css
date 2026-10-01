@@ -64,3 +64,76 @@
   .in-game-tutorial__content p { font-size: 14px; }
   .in-game-tutorial__content h3 { font-size: 18px; }
 }
+
+/* Keep tutorial copy inside the shared parchment on both iOS and Android.
+   Long copy scrolls only inside the paper content area. */
+.in-game-tutorial .in-game-tutorial__content,
+.in-game-tutorial .in-game-tutorial__copy,
+.in-game-tutorial .in-game-tutorial__copy > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.in-game-tutorial .in-game-tutorial__content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.in-game-tutorial .in-game-tutorial__copy > * {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.in-game-tutorial nav button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  text-align: center;
+}
+
+@media (max-width: 540px), (max-height: 540px) {
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__panel {
+    gap: 8px;
+    padding: 94px 32px 34px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__copy {
+    gap: 7px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content h3 {
+    font-size: clamp(16px, 4.7vw, 18px);
+    line-height: 1.15;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content p {
+    font-size: clamp(12px, 3.7vw, 14px);
+    line-height: 1.35;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content small {
+    font-size: clamp(10px, 3vw, 12px);
+    line-height: 1.35;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__safe {
+    font-size: 9px;
+    line-height: 1.25;
+  }
+
+  .in-game-tutorial[data-game="3"] nav {
+    margin: 0 0 9px;
+  }
+
+  .in-game-tutorial[data-game="3"] nav button,
+  .in-game-tutorial[data-game="3"] nav .in-game-tutorial__finish {
+    width: auto;
+    min-width: 70px;
+    max-width: 48%;
+    padding: 6px 7px;
+    font-size: 12px;
+  }
+}

@@ -162,17 +162,17 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
           {!step?.control && <p className="g1-parchment__note">{state?.objectVisible === false
             ? ({ booster: 'Examples above: collect them when you see them in a room.', coin: 'Check your coins in the highlighted counter.', scroll: 'No scroll is visible here yet. Check your clue counter.', hazard: 'No monster is visible here yet. Stay alert as you explore.', ready: 'Follow the room destination. The Treasure awaits in the final stage.' })[step?.id]
             : step?.tip}</p>}
-          <footer className="g1-parchment__footer">
-            {page > 1 ? <button type="button" className="g1-parchment__back" onClick={() => onPageChange(page - 1)}><ArrowLeft size={12} /> Back</button>
-              : <span><ShieldCheck size={11} /> Auto demo · no input needed</span>}
-            {step?.id !== 'ready' && <button type="button" className="g1-coach__continue" ref={actionRef} onClick={onAcknowledge}>
-              Next <ArrowRight size={13} />
-            </button>}
-            {step?.id === 'ready' && <button type="button" ref={actionRef} className="g1-coach__continue g1-coach__continue--return" onClick={onFinish}>
-              {isReplay ? 'Return to game' : `Start Level ${levelNumber}`} <ArrowRight size={13} />
-            </button>}
-          </footer>
         </div>
+        <footer className="g1-parchment__footer">
+          {page > 1 ? <button type="button" className="g1-parchment__back" onClick={() => onPageChange(page - 1)}><ArrowLeft size={12} /> Back</button>
+            : <span><ShieldCheck size={11} /> Auto demo · no input needed</span>}
+          {step?.id !== 'ready' && <button type="button" className="g1-coach__continue" ref={actionRef} onClick={onAcknowledge}>
+            Next <ArrowRight size={13} />
+          </button>}
+          {step?.id === 'ready' && <button type="button" ref={actionRef} className="g1-coach__continue g1-coach__continue--return" onClick={onFinish}>
+            {isReplay ? 'Return to game' : `Start Level ${levelNumber}`} <ArrowRight size={13} />
+          </button>}
+        </footer>
       </section>
       {hand && target && pointingAtRoom && hand.y > target.y + target.height + 16 && <svg className="g1-coach__connector" aria-hidden="true">
         <line x1={target.x + target.width} y1={target.y + target.height / 2} x2={hand.x} y2={hand.y} />
