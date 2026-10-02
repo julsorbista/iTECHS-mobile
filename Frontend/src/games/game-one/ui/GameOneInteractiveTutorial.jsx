@@ -72,6 +72,8 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
       + overlaps({ ...point, ...panelSize }, practiceSpace) * 1000
       + (state?.obstacles || []).reduce((sum, rect) => sum + overlaps({ ...point, ...panelSize }, toPixels(rect, stage)), 0);
     Object.assign(panel, candidates.reduce((best, point) => score(point) < score(best) ? point : best, candidates[0]));
+    if ([1, 2].includes(page)) panel.x = right;
+    if ([3, 5].includes(page)) panel.x = 14;
   }
   const jumpingForDash = step?.id === 'dash' && !state.completed && step.jumpKeys?.length > 0 && (state.grounded || state.demoPressed && state.demoControl === 'jump');
   const primaryKeys = jumpingForDash ? step.jumpKeys : step?.id === 'jump' ? ['W'] : step?.keys || [];
@@ -80,6 +82,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
   const hasVisibleObjectTarget = state?.objectVisible !== false;
   const pointingAtRoom = infoStep || (step?.id === 'ready' && hasVisibleObjectTarget) || waitingForLanding;
   const warning = ['health', 'hazard'].includes(step?.id);
+  const targetPadding = step?.id === 'scroll' ? 2 : 7;
 
   useLayoutEffect(() => {
     if (!stage) return;
@@ -119,7 +122,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
       {target && !step?.control && <div className="g1-coach__focus-shade" aria-hidden="true" style={{ left: target.x - 8, top: target.y - 8, width: target.width + 16, height: target.height + 16 }} />}
       {target && infoStep && <button type="button" className={`g1-coach__target ${step.id === 'hazard' ? 'g1-coach__target--warning' : ''}`}
         aria-label={`Inspect ${step.target}`} onClick={onAcknowledge} disabled={state.completed}
-        style={{ left: target.x - 7, top: target.y - 7, width: Math.max(36, target.width + 14), height: Math.max(30, target.height + 14) }}>
+        style={{ left: target.x - targetPadding, top: target.y - targetPadding, width: Math.max(step.id === 'scroll' ? 24 : 36, target.width + targetPadding * 2), height: Math.max(step.id === 'scroll' ? 24 : 30, target.height + targetPadding * 2) }}>
         {target.y > 90 && <span>{state.completed ? '✓' : step.id === 'hazard' ? 'Watch out!' : 'Look here'}</span>}
       </button>}
       {target && step?.id === 'ready' && hasVisibleObjectTarget && <div className="g1-coach__target" aria-hidden="true" style={{ pointerEvents: 'none', left: target.x - 7, top: target.y - 7, width: target.width + 14, height: target.height + 14 }}><span>Treasure destination</span></div>}

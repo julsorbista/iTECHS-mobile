@@ -144,22 +144,54 @@ export default class TutorialScene extends Phaser.Scene {
       height: (Math.min(viewport.bottom, top + height) - Math.max(0, top)) / this.scale.height };
   }
 
+  getHudGlyphTarget(textObject, glyph) {
+    if (!textObject?.visible || !glyph) return null;
+    const value = String(textObject.text || '');
+    const glyphIndex = value.lastIndexOf(glyph);
+    if (glyphIndex < 0) return null;
+    const bounds = textObject.getBounds();
+    const measure = (text) => textObject.context?.measureText?.(text)?.width || 0;
+    const scaleX = Math.abs(Number(textObject.scaleX) || 1);
+    const prefixWidth = measure(value.slice(0, glyphIndex)) * scaleX;
+    const glyphWidth = Math.max(measure(glyph) * scaleX, Number(textObject.style?.fontSize) || 18);
+    return this.rectFor({
+      left: bounds.left + prefixWidth - 2,
+      top: bounds.top - 2,
+      width: glyphWidth + 4,
+      height: bounds.height + 4,
+    }, true);
+  }
+
   getTarget(kind) {
     const hud = this.source.scene.get('HudScene');
     if (kind === 'health') return this.rectFor(hud.healthText, true);
     if (kind === 'counters') return this.rectFor(hud.coinText, true);
     if (kind === 'objective') return this.rectFor(hud.objectiveText, true);
+    if (kind === 'scroll') return this.getHudGlyphTarget(hud.coinText, '\u{1F4DC}');
     if (kind === 'platform') return this.safe && this.rectFor(this.safe.body);
     if (kind === 'player') return this.rectFor(this.player);
     let objects = [];
     if (kind === 'hazard') objects = [...this.source.projectileCasters, ...this.source.ghosts,
       ...this.source.surfaceEntries.filter((e) => e.config.hazard).map((e) => e.geometry.visualRect)];
     if (kind === 'collectible') objects = this.source.sceneObjects.filter((object) => object.coinId);
-    if (kind === 'monster') objects = [...this.source.projectileCasters, ...this.source.ghosts];
+    if (kind === 'monster') {
+      const fireEnemy = this.source.projectileCasters
+        .filter((object) => object?.enemyType === 'elemental')
+        .map((object) => this.rectFor(object))
+        .find(Boolean);
+      if (fireEnemy) return fireEnemy;
+      objects = [...this.source.projectileCasters, ...this.source.ghosts];
+    }
     if (kind === 'booster') objects = this.source.sceneObjects.filter((object) => ['shield', 'health', 'speed', 'jump', 'doubleJump'].includes(object.pickupType));
     if (kind === 'coin') objects = this.source.sceneObjects.filter((object) => object.coinId && (!object.pickupType || object.pickupType === 'coin'));
-    if (kind === 'scroll') objects = this.source.sceneObjects.filter((object) => object.pickupType === 'scroll');
-    if (kind === 'treasure') objects = this.source.portals.filter((object) => object.isTreasureChest);
+    if (kind === 'treasure') {
+      const treasure = this.source.portals
+        .filter((object) => object.isTreasureChest)
+        .map((object) => this.rectFor(object))
+        .find(Boolean);
+      if (treasure) return treasure;
+      objects = this.source.portals;
+    }
     if (kind === 'portal') objects = this.source.portals;
     return objects.map((object) => this.rectFor(object)).find(Boolean) || null;
   }
@@ -168,17 +200,11 @@ export default class TutorialScene extends Phaser.Scene {
     if (!this.onUpdate) return;
     const step = this.steps[this.index];
     const measuredTarget = this.getTarget(step.target);
-    // A monster clipped at the extreme edge is technically measurable but is
-    // not useful to a student. Treat it as unavailable and point to health.
-    const targetCenter = measuredTarget ? measuredTarget.x + measuredTarget.width / 2 : 0;
-    const objectTarget = step.target === 'monster'
-      && (targetCenter < 0.08 || targetCenter > 0.92 || measuredTarget.width < 0.035)
-      ? null
-      : measuredTarget;
+    const objectTarget = measuredTarget;
     // A missing object gets a truthful route/counter cue, never a fabricated pickup.
     const target = objectTarget || (['coin', 'scroll'].includes(step.target) ? this.getTarget('counters')
       : step.target === 'monster' ? this.getTarget('health')
-      : step.target === 'treasure' ? this.getTarget('portal') || this.getTarget('objective') : null);
+      : step.target === 'treasure' ? this.getTarget('portal') : null);
     const hud = this.source.scene.get('HudScene');
     this.onUpdate({ step, index: this.index, total: this.steps.length, page: step.page, pages: 6, objectVisible: Boolean(objectTarget),
       automatic: true, demoControl: this.demoControl, demoPressed: this.time.now < this.demoPressedUntil,
