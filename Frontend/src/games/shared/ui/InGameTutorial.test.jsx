@@ -88,3 +88,14 @@ it('grows for longer information instead of squeezing it into a fixed-height box
  expect(parseFloat(panel.style.height)).toBeLessThanOrEqual(584);
  view.unmount(); root.remove();
 });
+
+it('smoothly centers an off-screen target when target auto-scroll is enabled', () => {
+ const root = document.createElement('div'), target = document.createElement('div');
+ target.className = 'below-the-fold'; root.append(target); document.body.append(root);
+ target.getBoundingClientRect = () => ({left:20,top:900,right:220,bottom:980,width:200,height:80});
+ const scrollIntoView = vi.fn(); target.scrollIntoView = scrollIntoView;
+ const view = render(<InGameTutorial rootRef={{current:root}} game={3} autoScrollTargets steps={[{title:'Look below',text:'Follow the hand',target:'.below-the-fold'}]} onStart={()=>{}}/>);
+ act(() => vi.advanceTimersByTime(150));
+ expect(scrollIntoView).toHaveBeenCalledWith({behavior:'smooth',block:'center',inline:'nearest'});
+ view.unmount(); root.remove();
+});

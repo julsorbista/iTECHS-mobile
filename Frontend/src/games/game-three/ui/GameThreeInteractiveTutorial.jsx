@@ -18,5 +18,5 @@ export default function GameThreeInteractiveTutorial({ rootRef, onDemo, deck, le
       { title: 'Your board is ready', text: 'Flip two, remember positions, and match every pair. Game Tutorial is available any time.', tip: 'Your original card positions, timer and progress will be restored.', target: '.game-three-board-footer', frame: () => ({ display: model() }) },
     ];
   }, [deck, flipBackMs]);
-  return <InGameTutorial game={3} rootRef={rootRef} steps={steps} onDemo={onDemo} onStart={onStart} anchor=".game-three-side-panel" avoid=".game-three-card-flipped" finishLabel={isFirstPlay ? `Start Level ${levelNumber}` : 'Return to game'} />;
+  return <InGameTutorial game={3} rootRef={rootRef} steps={steps} onDemo={onDemo} onStart={onStart} anchor=".game-three-side-panel" avoid=".game-three-card-flipped" autoScrollTargets finishLabel={isFirstPlay ? `Start Level ${levelNumber}` : 'Return to game'} />;
 }

@@ -39,5 +39,5 @@ export default function GameSixInteractiveTutorial({ rootRef, onDemo, activeTerm
       { title: 'Ready for Syntax Rain?', text: 'Complete ' + settings.targetWords + ' ' + (levelNumber === 5 ? 'pairs' : 'required terms') + ' before health or time runs out. You can replay Game Tutorial anytime.', target: '.game-six-answer-input', frame: () => ({ display: model() }) },
     ];
   }, [sample, settings.lives, settings.seconds, settings.rewardEvery, settings.targetWords, levelNumber]);
-  return <InGameTutorial rootRef={rootRef} game={6} steps={steps} onDemo={onDemo} onStart={onStart} anchor=".game-six-sidebar" avoid=".game-six-header, .game-six-instruction" finishLabel={isFirstPlay ? 'Continue to countdown' : 'Return to game'} />;
+  return <InGameTutorial rootRef={rootRef} game={6} steps={steps} onDemo={onDemo} onStart={onStart} anchor=".game-six-sidebar" avoid=".game-six-header, .game-six-instruction" autoScrollTargets finishLabel={isFirstPlay ? 'Continue to countdown' : 'Return to game'} />;
 }

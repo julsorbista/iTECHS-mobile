@@ -53,6 +53,54 @@
   body:has(.game-four-stage) .game-guide-card--wood .game-guide-section ul li > span:last-child { display: block !important; max-height: none !important; overflow: visible !important; overflow-wrap: anywhere !important; white-space: normal !important; line-height: 1.35 !important; }
 }
 
+/* Final Game 4 arrangement readability override. Placement is unchanged. */
+.student-game-overlay-game-four .game-four-stage.game-four-mode-assemble .game-four-hud > .game-four-hud-status {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  padding-inline: 10px !important;
+}
+
+.student-game-overlay-game-four .game-four-stage.game-four-mode-assemble .game-four-hud-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+}
+
+.student-game-overlay-game-four .game-four-stage.game-four-mode-assemble .game-four-hud-value {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  white-space: nowrap !important;
+}
+
+.student-game-overlay-game-four .game-four-stage.game-four-mode-assemble .game-four-hud-icon,
+.student-game-overlay-game-four .game-four-stage.game-four-mode-assemble .game-four-hud-image-icon {
+  width: clamp(22px, 2.4vw, 30px) !important;
+  height: clamp(22px, 2.4vw, 30px) !important;
+  flex: 0 0 auto !important;
+  object-fit: contain !important;
+}
+
+.student-game-overlay-game-four .game-four-stage.game-four-mode-assemble .game-four-arrange-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+}
+
+.student-game-overlay-game-four .game-four-stage.game-four-mode-assemble .game-four-arrange-coins {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 7px !important;
+  white-space: nowrap !important;
+}
+
 /* Capacitor can keep the device's portrait CSS viewport after Android rotates the
    Activity. Target touch devices directly so Game 4 never falls back to the
    narrow two-column desktop board shown sideways on a phone. */

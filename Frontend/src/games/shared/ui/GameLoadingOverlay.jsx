@@ -12,10 +12,12 @@ export default function GameLoadingOverlay({ levelLabel, title, description, pro
           <p className="game-loading-kicker">{levelLabel}</p>
           <h2>{title}</h2>
           <p className="game-loading-description">{description}</p>
-          <div className="game-loading-track" role="progressbar" aria-label="Level preparation" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
-            <span style={{ width: `${percent}%` }} />
+          <div className="game-loading-progress">
+            <div className="game-loading-track" role="progressbar" aria-label="Level preparation" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}>
+              <span style={{ width: `${percent}%` }} />
+            </div>
+            <strong className="game-loading-percent">{percent}%</strong>
           </div>
-          <strong className="game-loading-percent">{percent}%</strong>
         </div>
       </section>
     </div>,

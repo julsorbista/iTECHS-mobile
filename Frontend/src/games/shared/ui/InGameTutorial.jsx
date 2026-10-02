@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import panelAsset from './tutorial4.png';
 import handAsset from './tutorial-hand.png';
 import './InGameTutorial.css';
@@ -9,7 +10,7 @@ const empty = {};
 
 // Presentation only. The host publishes a temporary display model to its own
 // renderer; this component never invokes gameplay handlers, APIs or storage.
-export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finishLabel = 'Return to game', game, anchor, avoid = '', panelImage = panelAsset, panelWidth = 520, panelMinHeight = 300 }) {
+export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finishLabel = 'Return to game', game, anchor, avoid = '', panelImage = panelAsset, panelWidth = 520, panelMinHeight = 300, autoScrollTargets = false }) {
   const [page, setPage] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [layout, setLayout] = useState(null);
@@ -33,6 +34,32 @@ export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finish
   useLayoutEffect(() => { onDemo?.(frame.display || null); }, [frame, onDemo]);
   useLayoutEffect(() => () => onDemo?.(null), [onDemo]);
   useLayoutEffect(() => {
+    if (!autoScrollTargets || typeof target !== 'string') return undefined;
+    let cancelled = false;
+    let scrollRequested = false;
+    const bringTargetIntoView = () => {
+      if (cancelled || scrollRequested) return;
+      const element = rootRef.current?.querySelector(target);
+      if (!element) return;
+      const rect = element.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const viewportTop = viewport?.offsetTop || 0;
+      const viewportBottom = viewportTop + (viewport?.height || window.innerHeight);
+      const margin = 28;
+      if (rect.top < viewportTop + margin || rect.bottom > viewportBottom - margin) {
+        scrollRequested = true;
+        element.scrollIntoView?.({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      }
+    };
+    const animation = requestAnimationFrame(bringTargetIntoView);
+    const timers = [120, 360, 700].map((delay) => setTimeout(bringTargetIntoView, delay));
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(animation);
+      timers.forEach(clearTimeout);
+    };
+  }, [autoScrollTargets, page, rootRef, target]);
+  useLayoutEffect(() => {
     const root = rootRef.current, focus = document.activeElement;
     const inert = root?.inert;
     const scrollers = root ? [root, ...root.querySelectorAll('*')].filter((el) => el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth).map((el) => [el, el.scrollTop, el.scrollLeft]) : [];
@@ -50,7 +77,7 @@ export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finish
     let element = null;
     // Scroll the actual display, not a second practice board, to a target if needed.
     const initialElement = typeof target === 'string' ? root?.querySelector(target) : null;
-    if (initialElement) {
+    if (initialElement && !autoScrollTargets) {
       const r = initialElement.getBoundingClientRect();
       if (r.top < 0 || r.bottom > innerHeight) initialElement.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     }
@@ -123,7 +150,7 @@ export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finish
     if (copy) observer.observe(copy);
     window.addEventListener('resize', measure); window.addEventListener('scroll', measure, true);
     return () => { cancelAnimationFrame(animation); element?.removeAttribute('data-tutorial-highlight'); observer.disconnect(); window.removeEventListener('resize', measure); window.removeEventListener('scroll', measure, true); };
-  }, [rootRef, target, anchor, avoid, frame, game, panelMinHeight, panelWidth, step.panelPlacement]);
+  }, [rootRef, target, anchor, avoid, autoScrollTargets, frame, game, panelMinHeight, panelWidth, step.panelPlacement]);
 
   const navigate = (next) => { stablePanelRef.current = null; setElapsed(0); setPage(next); };
   return createPortal(<div className={`in-game-tutorial in-game-tutorial--${gesture}`} style={layout?.bounds} data-game={game} data-page={page + 1}>
@@ -149,7 +176,12 @@ export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finish
         <span className="in-game-tutorial__safe">Auto demo · real progress unchanged</span>
         </div>
       </div>
-      <nav><button disabled={!page} onClick={() => navigate(page - 1)}>← Back</button><button className={page === steps.length - 1 ? 'in-game-tutorial__finish' : ''} onClick={() => page === steps.length - 1 ? onStart() : navigate(page + 1)}>{page === steps.length - 1 ? finishLabel : 'Next →'}</button></nav>
+      <nav>
+        <button disabled={!page} onClick={() => navigate(page - 1)}><ArrowLeft size={15} strokeWidth={3} aria-hidden="true" /> Back</button>
+        <button className={page === steps.length - 1 ? 'in-game-tutorial__finish' : ''} onClick={() => page === steps.length - 1 ? onStart() : navigate(page + 1)}>
+          {page === steps.length - 1 ? finishLabel : 'Next'} <ArrowRight size={15} strokeWidth={3} aria-hidden="true" />
+        </button>
+      </nav>
     </section>
     {layout?.hand && <div className={`in-game-tutorial__hand ${frame.pressed ? 'is-pressed' : ''}`} style={layout.hand} aria-hidden="true"><i /><img src={handAsset} alt="" draggable="false" /></div>}
   </div>, document.body);

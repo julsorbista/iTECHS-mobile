@@ -9939,6 +9939,32 @@ textarea {
   touch-action: manipulation;
 }
 
+/* Game 4 only: place Back in the open upper-right level-header area. */
+.student-game-overlay-game-four-scroll .student-game-four-top-controls {
+  position: fixed !important;
+  top: calc(48px + env(safe-area-inset-top, 0px)) !important;
+  right: max(12px, env(safe-area-inset-right, 0px)) !important;
+  left: auto !important;
+  z-index: 2147482000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+.student-game-overlay-game-four-scroll .student-game-four-top-controls .student-game-four-back-chip {
+  position: static !important;
+  width: 140px !important;
+  min-width: 140px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
 /* Keep the module audio controls fully inside narrow mobile viewports. */
 @media (max-width: 640px) {
   body .student-module-audio-popover {

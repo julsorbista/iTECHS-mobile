@@ -1,18 +1,18 @@
 /* Game 1 only: other games share g1-coach, so every override is scoped. */
 .g1-parchment { --ink: #512f1c; --accent: #426c29; --muted: #795b3d; }
 .g1-parchment .g1-parchment__panel {
-  width: min(520px, calc(100% - 28px)); height: auto; min-height: 310px;
+  width: min(520px, calc(100% - 28px)); height: min(360px, calc(100% - 64px)); min-height: 310px;
   max-height: calc(100% - 84px); padding: 110px 48px 44px; display: flex; border: 0; border-radius: 0;
-  background: transparent; box-shadow: none; overflow: visible;
+  background: transparent; box-shadow: none; overflow: hidden;
   filter: drop-shadow(0 5px 5px #25160055);
 }
-.g1-parchment .g1-parchment__panel--movement { height: auto; min-height: 360px; }
+.g1-parchment .g1-parchment__panel--movement { height: min(390px, calc(100% - 64px)); min-height: 360px; }
 .g1-parchment__background { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
 .g1-parchment .g1-parchment__header { position: absolute; inset: 0; pointer-events: none; }
 .g1-parchment .g1-parchment__page { position: absolute; right: 13%; top: 21%; color: #fff4d9; font-size: 11px; font-weight: 850; letter-spacing: .06em; }
 .g1-parchment .g1-parchment__close { position: absolute; right: 3%; top: 14%; width: 8%; height: 12%; padding: 0; border-radius: 30%; pointer-events: auto; }
 .g1-parchment .g1-parchment__close:hover { background: #ffffff25; }
-.g1-parchment__body { position: relative; flex: 1; min-width: 0; max-width: 100%; min-height: 0; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.g1-parchment__body { position: relative; flex: 1 1 0; min-width: 0; max-width: 100%; min-height: 0; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column; padding: 0 4px 4px 0; overscroll-behavior: contain; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
 .g1-parchment__body > *,
 .g1-parchment .g1-coach__instruction,
 .g1-parchment__note { min-width: 0; max-width: 100%; overflow-wrap: anywhere; word-break: normal; }
@@ -53,8 +53,8 @@
 .g1-parchment--automatic.g1-coach--success .g1-coach__hand { opacity: 1; }
 .g1-parchment .g1-parchment__back:hover { filter: brightness(1.06); }
 @media (max-height: 540px), (max-width: 650px) {
-  .g1-parchment .g1-parchment__panel { width: min(520px, calc(100% - 28px)); min-height: 0; padding: 96px 38px 34px; }
-  .g1-parchment .g1-parchment__panel--movement { height: auto; min-height: 0; }
+  .g1-parchment .g1-parchment__panel { width: min(520px, calc(100% - 28px)); height: min(360px, calc(100% - 24px)); min-height: 0; max-height: calc(100% - 24px); padding: 96px 38px 34px; }
+  .g1-parchment .g1-parchment__panel--movement { height: min(390px, calc(100% - 24px)); min-height: 0; }
   .g1-parchment .g1-parchment__body h3 { font-size: 15px; }
   .g1-parchment .g1-coach__instruction { font-size: 13px; }
   .g1-parchment__movements { margin-top: 5px; min-height: 86px; }

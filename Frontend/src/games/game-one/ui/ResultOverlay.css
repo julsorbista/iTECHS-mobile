@@ -37,15 +37,16 @@ body .game-illustrated-results {
 }
 
 .game-illustrated-results .game-one-results-actions button {
-  flex: 1 1 0;
-  width: 0;
-  height: clamp(36px, 9.5vw, 42px);
+  flex: 1 1 88px;
+  width: auto;
+  max-width: 112px;
+  height: clamp(32px, 8.5vw, 37px);
   min-width: 0;
   min-height: 0;
-  padding: 4px 3px;
+  padding: 3px 2px;
   border-width: 2px;
-  border-radius: 7px;
-  font-size: clamp(7px, 2.15vw, 10px);
+  border-radius: 6px;
+  font-size: clamp(6.5px, 1.95vw, 9px);
   line-height: 1.1;
   white-space: normal;
 }

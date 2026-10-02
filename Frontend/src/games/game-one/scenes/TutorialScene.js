@@ -167,9 +167,17 @@ export default class TutorialScene extends Phaser.Scene {
   publish() {
     if (!this.onUpdate) return;
     const step = this.steps[this.index];
-    const objectTarget = this.getTarget(step.target);
+    const measuredTarget = this.getTarget(step.target);
+    // A monster clipped at the extreme edge is technically measurable but is
+    // not useful to a student. Treat it as unavailable and point to health.
+    const targetCenter = measuredTarget ? measuredTarget.x + measuredTarget.width / 2 : 0;
+    const objectTarget = step.target === 'monster'
+      && (targetCenter < 0.08 || targetCenter > 0.92 || measuredTarget.width < 0.035)
+      ? null
+      : measuredTarget;
     // A missing object gets a truthful route/counter cue, never a fabricated pickup.
     const target = objectTarget || (['coin', 'scroll'].includes(step.target) ? this.getTarget('counters')
+      : step.target === 'monster' ? this.getTarget('health')
       : step.target === 'treasure' ? this.getTarget('portal') || this.getTarget('objective') : null);
     const hud = this.source.scene.get('HudScene');
     this.onUpdate({ step, index: this.index, total: this.steps.length, page: step.page, pages: 6, objectVisible: Boolean(objectTarget),
