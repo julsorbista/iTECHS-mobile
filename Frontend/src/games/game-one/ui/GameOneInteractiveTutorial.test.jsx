@@ -94,7 +94,7 @@ describe('GameOneInteractiveTutorial', () => {
     );
 
     const target = screen.getByRole('button', { name: 'Inspect scroll' });
-    expect(Number.parseFloat(target.style.left)).toBeCloseTo(213.56, 1);
-    expect(Number.parseFloat(target.style.width)).toBeCloseTo(75.11, 1);
+    expect(Number.parseFloat(target.style.left)).toBeCloseTo(212.13, 1);
+    expect(Number.parseFloat(target.style.width)).toBeCloseTo(55.2, 1);
   });
 });

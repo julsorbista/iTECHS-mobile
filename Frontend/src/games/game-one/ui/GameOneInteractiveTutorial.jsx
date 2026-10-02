@@ -72,7 +72,14 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
   }, [Boolean(stage)]);
 
 
-  const target = stage && toPixels(state?.target, stage);
+  const measuredTarget = stage && toPixels(state?.target, stage);
+  const target = measuredTarget && step?.id === 'scroll'
+    ? {
+      ...measuredTarget,
+      x: measuredTarget.x - (getGameContentBounds(stage).width * 0.002),
+      width: measuredTarget.width * 0.72,
+    }
+    : measuredTarget;
   const player = stage && toPixels(state?.player, stage);
   const marker = stage && toPixels(state?.movement, stage);
   const infoStep = step && !step.control && step.id !== 'ready';
