@@ -52,6 +52,50 @@
 .g1-parchment--pressed .g1-coach__touch { opacity: .9; }
 .g1-parchment--automatic.g1-coach--success .g1-coach__hand { opacity: 1; }
 .g1-parchment .g1-parchment__back:hover { filter: brightness(1.06); }
+
+/* Keep the live room, character, and highlighted target visible beside the
+   coach on landscape phones. The parchment remains scrollable when needed. */
+@media (orientation: landscape), (max-height: 650px) {
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel,
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel--movement {
+    width: min(430px, 48%);
+    height: min(330px, calc(100% - 20px));
+    min-width: 300px;
+    min-height: 0;
+    max-height: calc(100% - 20px);
+    padding: clamp(78px, 20%, 100px) clamp(28px, 7%, 40px) clamp(25px, 7%, 36px);
+  }
+
+  .g1-parchment .g1-parchment__body h3 { font-size: clamp(15px, 2.4vw, 19px); }
+  .g1-parchment .g1-coach__instruction,
+  .g1-parchment .g1-parchment__panel--movement .g1-coach__instruction {
+    margin-top: 6px;
+    font-size: clamp(12px, 1.7vw, 15px);
+    line-height: 1.35;
+  }
+  .g1-parchment__note { font-size: clamp(11px, 1.5vw, 13px); line-height: 1.35; }
+  .g1-parchment__movements { grid-template-columns: 70px 1fr; min-height: 0; margin-top: 5px; }
+  .g1-parchment__control-list li { padding-block: 0; font-size: clamp(10px, 1.35vw, 12px); line-height: 1.35; }
+  .g1-parchment__footer { margin-top: 5px; margin-bottom: 4px; }
+  .g1-parchment .g1-coach__continue,
+  .g1-parchment .g1-parchment__back {
+    width: auto;
+    min-width: 82px;
+    min-height: 36px;
+    padding: 7px 11px;
+    font-size: 12px !important;
+  }
+  .g1-parchment .g1-coach__continue--return { min-width: 126px; }
+}
+
+@media (orientation: landscape) and (max-width: 700px) {
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel,
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel--movement {
+    width: min(320px, 52%);
+    min-width: 270px;
+    padding: 72px 25px 24px;
+  }
+}
 @media (max-height: 540px), (max-width: 650px) {
   .g1-parchment .g1-parchment__panel { width: min(520px, calc(100% - 28px)); height: min(360px, calc(100% - 24px)); min-height: 0; max-height: calc(100% - 24px); padding: 96px 38px 34px; }
   .g1-parchment .g1-parchment__panel--movement { height: min(390px, calc(100% - 24px)); min-height: 0; }

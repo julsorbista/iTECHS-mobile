@@ -25,6 +25,76 @@
   }
 }
 
+/* Final focused Game 4 fixes. These rules use the live overlay class and are scoped so
+   other games and the catch-phase Back control keep their existing behavior. */
+#root .student-game-overlay-game-four-scroll:has(.game-four-stage.game-four-mode-assemble) .student-game-four-top-controls {
+  display: none !important;
+}
+
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui.game-four-mode-assemble .game-four-hud {
+  height: auto !important;
+  min-height: 52px !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui.game-four-mode-assemble .game-four-hud > .game-four-hud-status {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  padding: 5px 10px !important;
+  overflow: visible !important;
+  line-height: 1 !important;
+}
+
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui.game-four-mode-assemble .game-four-hud-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui.game-four-mode-assemble .game-four-hud-value {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui.game-four-mode-assemble .game-four-hud-icon,
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui.game-four-mode-assemble .game-four-hud-image-icon {
+  width: clamp(24px, 3vw, 32px) !important;
+  height: clamp(24px, 3vw, 32px) !important;
+  flex: 0 0 auto !important;
+  object-fit: contain !important;
+}
+
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui .game-four-assembled-token.is-wrong-position {
+  border-color: #991b1b !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 4px 4px 0 rgba(127, 29, 29, 0.55) !important;
+  animation: game-four-wrong-token 420ms ease !important;
+}
+
+#root .student-game-overlay-game-four-scroll .game-four-readable-ui .game-four-mobile-control-button {
+  opacity: 1 !important;
+  border: 3px solid #ffffff !important;
+  background: #1769aa !important;
+  color: #ffffff !important;
+  font-family: Arial, sans-serif !important;
+  font-size: clamp(30px, 5vw, 48px) !important;
+  font-weight: 900 !important;
+  text-shadow: 0 2px 0 #0d2f50 !important;
+  box-shadow: 0 4px 0 #0d2f50, 0 5px 12px rgba(13, 47, 80, 0.4) !important;
+}
+
 @media (max-width: 1280px), (pointer: coarse) {
   .student-game-four-panel,
   .student-game-four-panel .student-game-frame-wrap,

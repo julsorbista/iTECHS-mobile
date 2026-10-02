@@ -77,7 +77,8 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
   const primaryKeys = jumpingForDash ? step.jumpKeys : step?.id === 'jump' ? ['W'] : step?.keys || [];
   const primaryControl = jumpingForDash ? 'jump' : step?.control;
   const waitingForLanding = step?.id === 'jump' && state.jumped && !state.completed && !state.demoPressed;
-  const pointingAtRoom = infoStep || step?.id === 'ready' || waitingForLanding;
+  const hasVisibleObjectTarget = state?.objectVisible !== false;
+  const pointingAtRoom = infoStep || (step?.id === 'ready' && hasVisibleObjectTarget) || waitingForLanding;
   const warning = ['health', 'hazard'].includes(step?.id);
 
   useLayoutEffect(() => {
@@ -121,7 +122,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
         style={{ left: target.x - 7, top: target.y - 7, width: Math.max(36, target.width + 14), height: Math.max(30, target.height + 14) }}>
         {target.y > 90 && <span>{state.completed ? '✓' : step.id === 'hazard' ? 'Watch out!' : 'Look here'}</span>}
       </button>}
-      {target && step?.id === 'ready' && <div className="g1-coach__target" aria-hidden="true" style={{ pointerEvents: 'none', left: target.x - 7, top: target.y - 7, width: target.width + 14, height: target.height + 14 }} />}
+      {target && step?.id === 'ready' && hasVisibleObjectTarget && <div className="g1-coach__target" aria-hidden="true" style={{ pointerEvents: 'none', left: target.x - 7, top: target.y - 7, width: target.width + 14, height: target.height + 14 }}><span>Treasure destination</span></div>}
       {target && step?.id === 'jump' && <div className={`g1-coach__landing ${waitingForLanding ? 'g1-coach__landing--active' : ''}`} style={{ left: target.x, top: target.y - 3, width: target.width }} aria-hidden="true"><span>{state.completed ? '✓ Safe landing' : 'Land here'}</span></div>}
       {marker && !state?.completed && <div className="g1-coach__marker" style={{ left: marker.x, top: marker.y, '--direction': step?.id === 'left' ? '-3px' : '3px' }} aria-hidden="true">{step?.id === 'left' ? <ArrowLeft /> : <ArrowRight />}</div>}
       {player && step?.control && <div className="g1-coach__player-label" style={{ left: player.x + player.width / 2, top: player.y - 24 }} aria-hidden="true">
