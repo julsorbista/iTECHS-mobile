@@ -176,6 +176,24 @@ const getGameFiveDisplayTitle = (title) => {
 
 const createRunToken = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+const getAutomaticTutorialStorageKey = (userId, gameType) =>
+  `itechs:auto-tutorial-seen:${String(userId || "guest")}:${String(gameType || "UNKNOWN")}`;
+const hasSeenAutomaticTutorial = (userId, gameType) => {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(getAutomaticTutorialStorageKey(userId, gameType)) === "1";
+  } catch {
+    return false;
+  }
+};
+const rememberAutomaticTutorial = (userId, gameType) => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(getAutomaticTutorialStorageKey(userId, gameType), "1");
+  } catch {
+    // Backend first-play state still protects the normal flow when storage is unavailable.
+  }
+};
 const GAME_ONE_NEXT_LEVEL_MIN_STARS = 2;
 
 const getNextGameType = (normalizedGameType) => {
@@ -236,6 +254,7 @@ const StudentGameOverlay = ({
   const gameOneCanvasRef = useRef(null);
   const gameOverlayRef = useRef(null);
   const runStartedAtRef = useRef(Date.now());
+  const automaticTutorialConsumedRef = useRef(false);
 
   const isGameOne = normalizedGameType === "GAME_ONE";
   const isGameTwo = normalizedGameType === "GAME_TWO";
@@ -256,11 +275,15 @@ const StudentGameOverlay = ({
   const isGameSix = normalizedGameType === "GAME_SIX";
 
   useEffect(() => {
+    automaticTutorialConsumedRef.current = hasSeenAutomaticTutorial(
+      user?.id,
+      normalizedGameType,
+    );
     setAutoShowGameTutorial(false);
     setContinueToTutorialAfterGuide(false);
     setGameTutorialRequest(0);
     setGameGuidelinesRequest(0);
-  }, [numericLevelNumber, normalizedGameType]);
+  }, [numericLevelNumber, normalizedGameType, user?.id]);
 
   useEffect(() => {
     runStartedAtRef.current = Date.now();
@@ -625,8 +648,14 @@ const StudentGameOverlay = ({
           setSessionInfo(sessionResponse.data);
           setLoadingProgress(85);
           const shouldShowFirstPlayTutorial = Boolean(
-            numericLevelNumber === 1 && sessionResponse.data?.isFirstGamePlay,
+            numericLevelNumber === 1 && sessionResponse.data?.isFirstGamePlay
+              && !automaticTutorialConsumedRef.current
+              && !hasSeenAutomaticTutorial(user?.id, normalizedGameType),
           );
+          if (shouldShowFirstPlayTutorial) {
+            automaticTutorialConsumedRef.current = true;
+            rememberAutomaticTutorial(user?.id, normalizedGameType);
+          }
           setAutoShowGameTutorial(shouldShowFirstPlayTutorial);
           setContinueToTutorialAfterGuide(shouldShowFirstPlayTutorial);
         }
@@ -648,7 +677,7 @@ const StudentGameOverlay = ({
     return () => {
       cancelled = true;
     };
-  }, [normalizedGameType, numericLevelNumber, runToken]);
+  }, [normalizedGameType, numericLevelNumber, runToken, user?.id]);
 
   const frameSize = useMemo(() => {
     if (!activeLevelData) {
@@ -783,6 +812,11 @@ const StudentGameOverlay = ({
   );
 
   const handleRetry = useCallback(() => {
+    // Retry starts a fresh gameplay session, not a first-time experience.
+    // Keep automatic tutorials closed; the manual Game Tutorial button still
+    // opens them when the player explicitly asks for help.
+    setAutoShowGameTutorial(false);
+    setContinueToTutorialAfterGuide(false);
     setGameplayData(null);
     setResultData(null);
     setShowCongratsOverlay(false);

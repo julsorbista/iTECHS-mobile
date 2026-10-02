@@ -18,7 +18,8 @@ describe('Room 5 treasure question flow', () => {
     expect(source).toContain("levelScene.events.emit('question:closed'");
     expect(source).toContain("levelScene.events.emit('question:answered'");
     expect(source).toContain("typeof pendingAnswerResult === 'boolean'");
-    expect(source).toContain("this.input.on('pointerdown', handleTopControlTap)");
+    expect(source).toContain("document.addEventListener('pointerdown', handleDocumentTreasureTap, true)");
+    expect(source).toContain("document.removeEventListener('pointerdown', handleDocumentTreasureTap, true)");
     expect(source).toContain('containsPointer(closeQuestionButton, pointer)');
     expect(source).toContain('panelLeft + (575 * treasureFrameScale)');
     expect(source).toContain('blurAnswerInput();');
@@ -50,7 +51,6 @@ describe('Room 5 treasure question flow', () => {
     expect(source).toContain('? Math.round(238 * treasureFrameScale)');
     expect(source).toContain("wordWrap: { width: feedbackWidth, useAdvancedWrap: true }");
     expect(source).toContain('panelLeft + Math.round(309 * treasureFrameScale)');
-    expect(source).toContain("submitButton.on('pointerdown', submitWordAnswer)");
     expect(source).toContain('submitHotspot && containsPointer(submitHotspot, pointer)');
     expect(source).toContain('activateSubmit = submitWordAnswer');
     expect(source).toContain('containsPointer(hintHotspot, pointer)');

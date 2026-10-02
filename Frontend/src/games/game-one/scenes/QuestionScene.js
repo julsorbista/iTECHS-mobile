@@ -997,30 +997,47 @@ export default class QuestionScene extends Phaser.Scene {
     // Use one scene-level listener for the two artwork buttons. Android/iOS
     // WebViews can miss a GameObject event when the canvas itself is scaled,
     // while the scene pointer still reports the correct game coordinate.
-    const handleTopControlTap = (pointer) => {
+    const handleTreasureControlTap = (pointer) => {
       if (containsPointer(closeQuestionButton, pointer)) {
         blurAnswerInput();
         closeQuestionScene();
-        return;
+        return true;
       }
       if (containsPointer(hintHotspot, pointer)) {
         blurAnswerInput();
         activateHintHotspot();
-        return;
+        return true;
       }
       if (answerFocusHotspot && containsPointer(answerFocusHotspot, pointer)) {
         focusAnswerInput();
-        return;
+        return true;
       }
       if (submitHotspot && containsPointer(submitHotspot, pointer)) {
         blurAnswerInput();
         activateSubmit?.();
-        return;
+        return true;
       }
       blurAnswerInput();
+      return false;
     };
-    this.input.on('pointerdown', handleTopControlTap);
-    cleanupHandlers.push(() => this.input.off('pointerdown', handleTopControlTap));
+    // Phaser's DOM container sits above the canvas in Capacitor/WebView. Listen
+    // at document capture level so Hint, Close, answer slots, and Unlock still
+    // receive the original user gesture even when that layer intercepts it.
+    const handleDocumentTreasureTap = (event) => {
+      const canvasBounds = this.game.canvas?.getBoundingClientRect?.();
+      if (!canvasBounds?.width || !canvasBounds?.height) return;
+      if (event.clientX < canvasBounds.left || event.clientX > canvasBounds.right
+        || event.clientY < canvasBounds.top || event.clientY > canvasBounds.bottom) return;
+      const pointer = {
+        worldX: ((event.clientX - canvasBounds.left) / canvasBounds.width) * sceneWidth,
+        worldY: ((event.clientY - canvasBounds.top) / canvasBounds.height) * sceneHeight,
+      };
+      const handled = handleTreasureControlTap(pointer);
+      const tappedAnswer = answerFocusHotspot && containsPointer(answerFocusHotspot, pointer);
+      if (handled && !tappedAnswer) event.preventDefault();
+    };
+    document.addEventListener('pointerdown', handleDocumentTreasureTap, true);
+    cleanupHandlers.push(() => document.removeEventListener('pointerdown', handleDocumentTreasureTap, true));
 
     const optionButtons = [];
     const optionWidth = innerWidth;
@@ -1231,7 +1248,6 @@ export default class QuestionScene extends Phaser.Scene {
       submitButton.on('pointerout', () => {
         if (!this.hasAnswered) submitButton.setFillStyle(challengeHeaderColor, 1);
       });
-      submitButton.on('pointerdown', submitWordAnswer);
       const handleAnswerKeyDown = (event) => {
         event.stopPropagation();
         if (event.key === 'Enter') {

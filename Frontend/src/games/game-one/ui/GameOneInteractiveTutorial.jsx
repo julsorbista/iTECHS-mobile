@@ -10,6 +10,30 @@ const clamp = (n, min, max) => Math.min(Math.max(min, max), Math.max(min, n));
 const overlaps = (a, b) => b ? Math.max(0, Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x))
   * Math.max(0, Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y)) : 0;
 const toPixels = (rect, stage) => rect && ({ x: rect.x * stage.width, y: rect.y * stage.height, width: rect.width * stage.width, height: rect.height * stage.height });
+const alignTargetToArtwork = (target, stepId, stage) => {
+  if (!target || !stage) return target;
+  if (stepId === 'coin') return { ...target, x: target.x + (stage.width * 0.008) };
+  if (stepId === 'scroll') return {
+    ...target,
+    x: target.x - (stage.width * 0.01),
+    width: target.width + (stage.width * 0.014),
+  };
+  if (stepId === 'hazard') return {
+    ...target,
+    x: target.x - (stage.width * 0.05),
+    y: target.y + (stage.height * 0.02),
+    width: Math.max(36, target.width * 0.6),
+    height: Math.max(40, target.height * 0.7),
+  };
+  if (stepId === 'ready') return {
+    ...target,
+    x: target.x - (stage.width * 0.08),
+    y: target.y + (stage.height * 0.02),
+    width: Math.max(34, target.width * 0.38),
+    height: Math.max(48, target.height * 0.7),
+  };
+  return target;
+};
 const displayKey = (key) => ({ A: '←', D: '→', W: 'Jump', SPACE: 'Jump', SHIFT: 'Dash', J: 'Attack' })[key] || key;
 
 export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumber = 1, isReplay, onPageChange, onAcknowledge, onFinish }) {
@@ -53,7 +77,8 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
   }, [Boolean(stage)]);
 
 
-  const target = stage && toPixels(state?.target, stage);
+  const measuredTarget = stage && toPixels(state?.target, stage);
+  const target = alignTargetToArtwork(measuredTarget, step?.id, stage);
   const player = stage && toPixels(state?.player, stage);
   const marker = stage && toPixels(state?.movement, stage);
   const infoStep = step && !step.control && step.id !== 'ready';

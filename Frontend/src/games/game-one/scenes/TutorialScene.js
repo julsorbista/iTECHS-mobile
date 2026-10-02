@@ -157,14 +157,13 @@ export default class TutorialScene extends Phaser.Scene {
     if (kind === 'counters') return this.rectFor(hud.coinText, true);
     if (kind === 'objective') return this.rectFor(hud.objectiveText, true);
     if (kind === 'scroll') {
-      const counters = this.rectFor(hud.coinText, true);
-      return counters && {
-        // The scroll count is the final segment of the combined coin/key/scroll
-        // HUD label. Highlight that segment instead of the hearts or margin.
-        x: counters.x + (counters.width * 0.68),
-        y: counters.y,
-        width: counters.width * 0.32,
-        height: counters.height,
+      const hearts = this.rectFor(hud.healthText, true);
+      return hearts && {
+        ...hearts,
+        // Keep all three hearts inside the tutorial outline even if Phaser's
+        // text bounds briefly lag behind the current heart string.
+        width: Math.max(hearts.width, 0.075),
+        height: Math.max(hearts.height, 0.05),
       };
     }
     if (kind === 'platform') return this.safe && this.rectFor(this.safe.body);

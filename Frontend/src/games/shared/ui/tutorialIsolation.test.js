@@ -23,6 +23,9 @@ describe('guideline and How to Play isolation', () => {
     expect(source).toContain('numericLevelNumber === 1 && sessionResponse.data?.isFirstGamePlay');
     expect(source).toContain('setAutoShowGameTutorial(shouldShowFirstPlayTutorial)');
     expect(source).toContain('setContinueToTutorialAfterGuide(shouldShowFirstPlayTutorial)');
+    expect(source).toContain('!automaticTutorialConsumedRef.current');
+    expect(source).toContain('rememberAutomaticTutorial(user?.id, normalizedGameType)');
+    expect(source).toContain('setAutoShowGameTutorial(false);');
   });
 
   it('exposes the temporary Game Tutorial verification control', () => {
