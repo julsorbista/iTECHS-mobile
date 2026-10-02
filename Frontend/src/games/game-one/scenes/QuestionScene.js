@@ -530,61 +530,37 @@ export default class QuestionScene extends Phaser.Scene {
         panelBottom - (feedbackHeight / 2) - Math.round(8 * uiScale),
         optionsBottom + Math.round(12 * uiScale) + (feedbackHeight / 2),
       );
-    const feedbackWrapper = document.createElement('div');
-    feedbackWrapper.style.width = `${feedbackWidth}px`;
-    feedbackWrapper.style.height = `${feedbackHeight}px`;
-    feedbackWrapper.style.display = 'flex';
-    feedbackWrapper.style.alignItems = 'center';
-    feedbackWrapper.style.justifyContent = 'center';
-    feedbackWrapper.style.overflowY = 'hidden';
-    feedbackWrapper.style.overflowX = 'hidden';
-    feedbackWrapper.style.pointerEvents = 'auto';
-    feedbackWrapper.style.background = 'transparent';
-    feedbackWrapper.style.boxSizing = 'border-box';
-    feedbackWrapper.style.padding = `0 ${Math.round(4 * treasureFrameScale)}px`;
-    feedbackWrapper.style.visibility = 'hidden';
-
-    const feedbackContent = document.createElement('div');
-    feedbackContent.style.width = '100%';
-    feedbackContent.style.fontFamily = 'Manrope, Arial, sans-serif';
-    feedbackContent.style.fontSize = `${Math.round(isWordScramble && hasQuestionFrame
-      ? 8.5 * treasureFrameScale
-      : 16 * uiScale)}px`;
-    feedbackContent.style.fontWeight = '400';
-    feedbackContent.style.lineHeight = '1.15';
-    feedbackContent.style.textAlign = 'center';
-    feedbackContent.style.wordBreak = 'break-word';
-    feedbackContent.style.overflowWrap = 'anywhere';
-    feedbackContent.style.whiteSpace = isWordScramble && hasQuestionFrame ? 'nowrap' : 'pre-wrap';
-    feedbackContent.style.color = PALETTE.textDark;
-    feedbackContent.style.boxSizing = 'border-box';
-    feedbackContent.textContent = '';
-
-    feedbackWrapper.appendChild(feedbackContent);
-
     // The reference footer starts every status line immediately after the
     // bulb. A fixed left edge keeps Hint, Correct, and Incorrect aligned.
     const feedbackX = isWordScramble && hasQuestionFrame
       ? panelLeft + Math.round(309 * treasureFrameScale)
       : centerX;
-    this.feedbackText = this.add.dom(feedbackX, footerY, feedbackWrapper).setOrigin(0.5);
+    this.feedbackText = this.add.text(feedbackX, footerY, '', {
+      fontFamily: 'Manrope, Arial, sans-serif',
+      fontSize: fontSize(
+        isWordScramble && hasQuestionFrame ? 8.5 : 16,
+        isWordScramble && hasQuestionFrame ? treasureFrameScale : uiScale,
+      ),
+      fontStyle: 'normal',
+      color: PALETTE.textDark,
+      align: 'center',
+      wordWrap: { width: feedbackWidth, useAdvancedWrap: true },
+      lineSpacing: 1,
+      fixedWidth: feedbackWidth,
+      fixedHeight: feedbackHeight,
+      padding: { left: 2, right: 2, top: 1, bottom: 1 },
+    }).setOrigin(0.5).setVisible(false).setDepth(51);
 
     const showFeedback = (message, color = PALETTE.textDark) => {
-      feedbackContent.style.color = color;
-      feedbackContent.textContent = message;
-      feedbackWrapper.style.visibility = message ? 'visible' : 'hidden';
-      feedbackWrapper.scrollTop = 0;
-      if (message && isWordScramble && hasQuestionFrame) {
-        feedbackContent.style.fontSize = `${Math.round(8.5 * treasureFrameScale)}px`;
-        window.requestAnimationFrame(() => {
-          if (!this.sys.isActive()) return;
-          fitDomTextGroup(feedbackWrapper, [{
-            element: feedbackContent,
-            minSize: Math.max(7, Math.round(6 * treasureFrameScale)),
-            step: 0.5,
-          }], 2);
-        });
-      }
+      this.feedbackText
+        .setColor(color)
+        .setText(message || '')
+        .setVisible(Boolean(message));
+      if (message) fitTextHeight(
+        this.feedbackText,
+        feedbackHeight - 2,
+        Math.max(7, Math.round(6 * (isWordScramble && hasQuestionFrame ? treasureFrameScale : uiScale))),
+      );
     };
 
     const purchasableHints = hints.slice(0, Math.min(3, hints.length));
@@ -979,7 +955,7 @@ export default class QuestionScene extends Phaser.Scene {
       hideHintOverlays();
       unlockNextHint();
     });
-    hintHotspot.on('pointerup', () => {
+    hintHotspot.on('pointerdown', () => {
       hideHintOverlays();
       if (!hasHintsAvailable) {
         showFeedback('This question does not have extra hints yet.', PALETTE.textSoft);
@@ -988,7 +964,7 @@ export default class QuestionScene extends Phaser.Scene {
       }
       unlockNextHint();
     });
-    closeQuestionButton.on('pointerup', (pointer, localX, localY, event) => {
+    closeQuestionButton.on('pointerdown', (pointer, localX, localY, event) => {
       event?.stopPropagation?.();
       closeQuestionScene();
     });
@@ -1100,8 +1076,6 @@ export default class QuestionScene extends Phaser.Scene {
         answerSlots.forEach((slot, index) => { slot.label.setText(letters[index] || ''); });
       });
       this.add.dom(centerX, answerY, answerWrapper).setOrigin(0.5);
-      const answerFocusFrame = window.requestAnimationFrame(() => answerInput.focus());
-      cleanupHandlers.push(() => window.cancelAnimationFrame(answerFocusFrame));
 
       // The green button is painted into the frame around source y=308.
       // Keep its label, hit area, and status message on that same baseline.
@@ -1133,7 +1107,6 @@ export default class QuestionScene extends Phaser.Scene {
         const submittedAnswer = answerInput.value.replace(/[^a-z]/gi, '').toUpperCase();
         if (!submittedAnswer) {
           showFeedback('Enter the unscrambled word before unlocking the treasure.', '#8f4040');
-          answerInput.focus();
           return;
         }
 
@@ -1216,7 +1189,6 @@ export default class QuestionScene extends Phaser.Scene {
         answerInput.removeEventListener('keyup', stopAnswerKeyPropagation);
         answerInput.removeEventListener('keypress', stopAnswerKeyPropagation);
       });
-      this.time.delayedCall(120, () => answerInput.focus());
     } else preparedChoices.forEach((choice, index) => {
       const y = optionsTop + (optionHeight / 2) + (index * (optionHeight + optionGap));
       const optionShadow = this.add.rectangle(centerX + Math.round(4 * uiScale), y + Math.round(4 * uiScale), optionWidth, optionHeight, PALETTE.optionShadow, 0.9);
