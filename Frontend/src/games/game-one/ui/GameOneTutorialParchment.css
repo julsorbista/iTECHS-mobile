@@ -105,6 +105,39 @@
     min-width: 360px;
     padding: 80px 31px 26px;
   }
+
+  /* Page 1 carries the full control legend. Keep both columns readable and
+     leave enough vertical room for the status sentence and navigation. */
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="1"] {
+    height: min(340px, calc(100% - 20px));
+    padding: 78px 29px 25px;
+  }
+  .g1-parchment .g1-parchment__panel[data-page="1"] .g1-parchment__movements {
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 4px;
+  }
+  .g1-parchment .g1-parchment__panel[data-page="1"] .g1-parchment__control-list li {
+    gap: 4px;
+    padding: 0 3px;
+    font-size: clamp(9px, 1.2vw, 11px);
+    line-height: 1.18;
+  }
+  .g1-parchment .g1-parchment__panel[data-page="1"] .g1-coach__instruction {
+    font-size: clamp(10px, 1.35vw, 12px);
+    line-height: 1.25;
+  }
+
+  /* Page 2 needs less decorative whitespace but must retain the complete tip. */
+  .g1-parchment .g1-parchment__panel[data-page="2"] .g1-coach__instruction,
+  .g1-parchment .g1-parchment__panel[data-page="2"] .g1-parchment__note {
+    margin-top: 4px;
+    font-size: clamp(10px, 1.35vw, 12px);
+    line-height: 1.25;
+  }
+  .g1-parchment .g1-parchment__panel[data-page="2"] .g1-parchment__boost-preview {
+    gap: 3px;
+    margin-top: 5px;
+  }
 }
 
 @media (orientation: landscape) and (max-width: 700px) {
@@ -124,4 +157,26 @@
   .g1-parchment__control-list li { font-size: 11px; }
   .g1-parchment__footer { margin-bottom: 8px; }
   .g1-parchment__boost-preview { margin-top: 6px; }
+
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="1"] {
+    width: min(320px, 52%);
+    height: calc(100% - 20px);
+    min-width: 270px;
+    padding: 70px 24px 22px;
+  }
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="2"],
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="3"],
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="4"],
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="5"] {
+    width: min(300px, 44%);
+    height: min(292px, calc(100% - 20px));
+    min-width: 260px;
+    padding: 70px 24px 22px;
+  }
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="6"] {
+    width: min(310px, 45%);
+    height: min(300px, calc(100% - 20px));
+    min-width: 270px;
+    padding: 72px 25px 23px;
+  }
 }

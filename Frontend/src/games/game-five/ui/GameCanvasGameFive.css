@@ -93,6 +93,14 @@
 .game-five-shell .game-five-hud { background: #F3E3B5; border-color: #5A351D; }
 .game-five-keyboard button:not(:disabled) { background: #fff7dc; }
 
+.game-five-hint-button {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .game-five-mobile-score { display: none; }
 @media (max-width: 1024px) {
   #root .student-game-five-panel .game-five-shell { min-height: 0; padding: 8px; border-width: 2px; font-family: Manrope, Arial, sans-serif; }

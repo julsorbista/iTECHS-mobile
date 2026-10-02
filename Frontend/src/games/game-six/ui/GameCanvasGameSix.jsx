@@ -560,7 +560,9 @@ const GameCanvasGameSix = ({
       setTutorialStepIndex(1);
     }
     setTutorialCoachOpen(false);
-    if (!window.matchMedia?.('(pointer: coarse)').matches) inputRef.current?.focus({ preventScroll: true });
+    // Do not summon the software keyboard when the tutorial closes. The
+    // answer field should focus only after the player deliberately taps it.
+    inputRef.current?.blur();
   };
 
   const finish = useCallback((outcome, finalCleared = cleared, finalScore = score, finalMistakes = mistakes) => {
@@ -576,15 +578,6 @@ const GameCanvasGameSix = ({
     if (outcome === 'COMPLETED') onLevelComplete?.(payload);
     else onLevelFail?.(payload);
   }, [cleared, finished, mistakes, onLevelComplete, onLevelFail, score, settings.targetWords]);
-
-  useEffect(() => {
-    if (showTutorial || shouldPauseForTutorialCoach || finished || resultData) return undefined;
-    // Mobile players control the keyboard; drops must not reopen it after dismissal.
-    if (window.matchMedia?.('(pointer: coarse)').matches) return undefined;
-    const focusInput = () => inputRef.current?.focus({ preventScroll: true });
-    const frameId = window.requestAnimationFrame(focusInput);
-    return () => window.cancelAnimationFrame(frameId);
-  }, [answerState.pending, cleared, drops.length, finished, health, resultData, shouldPauseForTutorialCoach, showTutorial]);
 
   useEffect(() => {
     if (showTutorial || shouldPauseForTutorialCoach || finished || resultData) return undefined;

@@ -878,6 +878,14 @@ const GameCanvasGameFive = ({
     }
   }, [clueDepth, coins, current, finished, guessed, hintedIndices, isGeneratingHint, isGeneratingQuestions, isTutorialLevel, onCoinBalanceChange, playHint, playerId, resultData, settings.level, shouldPauseForTutorialCoach, showTutorial, tutorialStepIndex, wordIndex]);
 
+  const activateHint = useCallback(() => {
+    if (activePractice) {
+      activePractice.hint();
+      return;
+    }
+    revealRandomLetterHint();
+  }, [activePractice, revealRandomLetterHint]);
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.target?.tagName === 'INPUT' || event.target?.tagName === 'TEXTAREA') return;
@@ -981,10 +989,10 @@ const GameCanvasGameFive = ({
             <button
               type="button"
               data-g5-target="hint"
-              className="-mt-10 mb-4 inline-block border-4 border-[#5b341d] bg-[#3f8b35] px-5 py-2 text-2xl font-semibold uppercase text-[#fff7df] shadow-[4px_4px_0_#2b170c] transition hover:bg-[#5fad45] disabled:opacity-60"
-              disabled={activePractice ? !activePractice.canHint : isGeneratingQuestions || isGeneratingHint || clueDepth >= 3 || showTutorial || finished || Boolean(resultData) || coins < 1}
-              aria-disabled={activePractice ? !activePractice.canHint : isGeneratingHint || clueDepth >= 3 || showTutorial || Boolean(resultData) || coins < 1}
-              onClick={() => activePractice ? activePractice.hint() : revealRandomLetterHint()}
+              className="game-five-hint-button -mt-10 mb-4 inline-block border-4 border-[#5b341d] bg-[#3f8b35] px-5 py-2 text-2xl font-semibold uppercase text-[#fff7df] shadow-[4px_4px_0_#2b170c] transition hover:bg-[#5fad45] disabled:opacity-60"
+              disabled={activePractice ? !activePractice.canHint : isGeneratingQuestions || isGeneratingHint || clueDepth >= 3 || showTutorial || finished || Boolean(resultData)}
+              aria-disabled={activePractice ? !activePractice.canHint : isGeneratingHint || clueDepth >= 3 || showTutorial || Boolean(resultData)}
+              onClick={activateHint}
             >
               {activePractice ? 'Hint (free practice)' : isGeneratingHint ? <><Loader2 className="mr-2 inline h-5 w-5 animate-spin" />Thinking...</> : 'Hint (-1 coin)'}
             </button>

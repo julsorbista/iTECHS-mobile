@@ -132,7 +132,13 @@ export default class TutorialScene extends Phaser.Scene {
     if (!object || object.active === false || object.visible === false) return null;
     const rect = object instanceof Phaser.Physics.Arcade.StaticBody ? object : object.getBounds ? object.getBounds() : object;
     const camera = this.cameras.main;
-    const transformed = hud ? null : camera.matrix.transformPoint(rect.left, rect.top);
+    // Phaser's camera matrix maps camera-local coordinates. Remove the world
+    // scroll before transforming so tutorial targets stay on their sprites in
+    // rooms wider than the viewport (not in the letterbox beside the canvas).
+    const transformed = hud ? null : camera.matrix.transformPoint(
+      rect.left - camera.scrollX,
+      rect.top - camera.scrollY,
+    );
     const left = hud ? rect.left : transformed.x;
     const top = hud ? rect.top : transformed.y;
     const zoom = hud ? 1 : camera.zoom;
@@ -150,7 +156,16 @@ export default class TutorialScene extends Phaser.Scene {
     if (kind === 'health') return this.rectFor(hud.healthText, true);
     if (kind === 'counters') return this.rectFor(hud.coinText, true);
     if (kind === 'objective') return this.rectFor(hud.objectiveText, true);
-    if (kind === 'scroll') return this.rectFor(hud.healthText, true);
+    if (kind === 'scroll') {
+      const hearts = this.rectFor(hud.healthText, true);
+      return hearts && {
+        ...hearts,
+        // The text bounds reported by Phaser can lag behind its three-heart
+        // value for one frame. Reserve enough width for the complete counter.
+        width: Math.max(hearts.width, 0.075),
+        height: Math.max(hearts.height, 0.05),
+      };
+    }
     if (kind === 'platform') return this.safe && this.rectFor(this.safe.body);
     if (kind === 'player') return this.rectFor(this.player);
     let objects = [];
