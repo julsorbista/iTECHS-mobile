@@ -373,7 +373,7 @@ export default class QuestionScene extends Phaser.Scene {
     const closeButtonHeight = Math.round(hasQuestionFrame ? 62 * treasureFrameScale : 28 * uiScale);
     const topControlGap = Math.round(20 * uiScale);
     const closeQuestionX = hasQuestionFrame
-      ? panelLeft + (555 * treasureFrameScale)
+      ? panelLeft + (575 * treasureFrameScale)
       : innerRight - (closeButtonWidth / 2);
     const coinBadgeY = hasQuestionFrame ? treasureY(64) : topControlsY;
     const coinBadgeX = hasQuestionFrame
@@ -504,8 +504,17 @@ export default class QuestionScene extends Phaser.Scene {
 
     promptDomWrapper.appendChild(promptDomContent);
 
-    const promptText = this.add.dom(promptTextLeft, promptTextTop, promptDomWrapper)
-      .setOrigin(0, 0);
+    const promptText = isWordScramble && hasQuestionFrame
+      ? this.add.text(centerX, treasureY(145), promptBody || 'Use the clues to identify the Java term.', {
+        fontFamily: 'Manrope, Arial, sans-serif',
+        fontSize: fontSize(13, treasureFrameScale),
+        fontStyle: 'normal',
+        color: '#4b2816',
+        align: 'center',
+        wordWrap: { width: promptTextWidth, useAdvancedWrap: true },
+        lineSpacing: Math.max(1, Math.round(2 * treasureFrameScale)),
+      }).setOrigin(0.5, 0)
+      : this.add.dom(promptTextLeft, promptTextTop, promptDomWrapper).setOrigin(0, 0);
     const fitPromptText = () => fitDomTextGroup(promptDomWrapper, [
       promptDomTitle ? { element: promptDomTitle, minSize: Math.round(13 * uiScale), step: 1 } : null,
       {
@@ -514,8 +523,10 @@ export default class QuestionScene extends Phaser.Scene {
         step: 1,
       },
     ], 4);
-    fitPromptText();
-    const promptFitFrame = window.requestAnimationFrame(fitPromptText);
+    if (!(isWordScramble && hasQuestionFrame)) fitPromptText();
+    const promptFitFrame = window.requestAnimationFrame(() => {
+      if (!(isWordScramble && hasQuestionFrame)) fitPromptText();
+    });
     cleanupHandlers.push(() => window.cancelAnimationFrame(promptFitFrame));
 
     const feedbackWidth = isWordScramble && hasQuestionFrame
@@ -594,7 +605,7 @@ export default class QuestionScene extends Phaser.Scene {
       hintHotspot.setAlpha(0.001);
       hintHotspotInner.setAlpha(0.001);
       // Keep the label centered in the clear area to the right of the bulb.
-      hintHotspotLabel.setPosition(panelLeft + (86 * treasureFrameScale), hintButtonY);
+      hintHotspotLabel.setPosition(panelLeft + (105 * treasureFrameScale), hintButtonY);
     }
 
     const hintOverlayBackdrop = this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.modalOverlay, 0.82)
@@ -957,6 +968,8 @@ export default class QuestionScene extends Phaser.Scene {
     });
     let answerInputElement = null;
     let answerFocusHotspot = null;
+    let submitHotspot = null;
+    let activateSubmit = null;
     const blurAnswerInput = () => {
       if (answerInputElement && document.activeElement === answerInputElement) {
         answerInputElement.blur();
@@ -997,6 +1010,11 @@ export default class QuestionScene extends Phaser.Scene {
       }
       if (answerFocusHotspot && containsPointer(answerFocusHotspot, pointer)) {
         focusAnswerInput();
+        return;
+      }
+      if (submitHotspot && containsPointer(submitHotspot, pointer)) {
+        blurAnswerInput();
+        activateSubmit?.();
         return;
       }
       blurAnswerInput();
@@ -1128,6 +1146,7 @@ export default class QuestionScene extends Phaser.Scene {
         1,
       ).setStrokeStyle(2, challengeBorderColor, 1)
         .setInteractive({ useHandCursor: true });
+      submitHotspot = submitButton;
       if (hasQuestionFrame) submitButton.setAlpha(0.001);
       const submitLabel = this.add.text(
         centerX,
@@ -1204,6 +1223,7 @@ export default class QuestionScene extends Phaser.Scene {
           this.scene.stop();
         });
       };
+      activateSubmit = submitWordAnswer;
 
       submitButton.on('pointerover', () => {
         if (!this.hasAnswered) submitButton.setFillStyle(0x8c5129, 1);
