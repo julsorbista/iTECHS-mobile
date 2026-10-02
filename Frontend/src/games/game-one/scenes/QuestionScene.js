@@ -373,7 +373,7 @@ export default class QuestionScene extends Phaser.Scene {
     const closeButtonHeight = Math.round(hasQuestionFrame ? 62 * treasureFrameScale : 28 * uiScale);
     const topControlGap = Math.round(20 * uiScale);
     const closeQuestionX = hasQuestionFrame
-      ? panelLeft + (575 * treasureFrameScale)
+      ? panelLeft + (585 * treasureFrameScale)
       : innerRight - (closeButtonWidth / 2);
     const coinBadgeY = hasQuestionFrame ? treasureY(64) : topControlsY;
     const coinBadgeX = hasQuestionFrame
@@ -605,7 +605,7 @@ export default class QuestionScene extends Phaser.Scene {
       hintHotspot.setAlpha(0.001);
       hintHotspotInner.setAlpha(0.001);
       // Keep the label centered in the clear area to the right of the bulb.
-      hintHotspotLabel.setPosition(panelLeft + (105 * treasureFrameScale), hintButtonY);
+      hintHotspotLabel.setPosition(panelLeft + (112 * treasureFrameScale), hintButtonY);
     }
 
     const hintOverlayBackdrop = this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.modalOverlay, 0.82)
@@ -1026,11 +1026,21 @@ export default class QuestionScene extends Phaser.Scene {
     const handleDocumentTreasureTap = (event) => {
       const canvasBounds = this.game.canvas?.getBoundingClientRect?.();
       if (!canvasBounds?.width || !canvasBounds?.height) return;
-      if (event.clientX < canvasBounds.left || event.clientX > canvasBounds.right
-        || event.clientY < canvasBounds.top || event.clientY > canvasBounds.bottom) return;
+      const sceneAspect = sceneWidth / Math.max(1, sceneHeight);
+      const canvasAspect = canvasBounds.width / Math.max(1, canvasBounds.height);
+      const contentWidth = canvasAspect > sceneAspect
+        ? canvasBounds.height * sceneAspect
+        : canvasBounds.width;
+      const contentHeight = canvasAspect > sceneAspect
+        ? canvasBounds.height
+        : canvasBounds.width / sceneAspect;
+      const contentLeft = canvasBounds.left + ((canvasBounds.width - contentWidth) / 2);
+      const contentTop = canvasBounds.top + ((canvasBounds.height - contentHeight) / 2);
+      if (event.clientX < contentLeft || event.clientX > contentLeft + contentWidth
+        || event.clientY < contentTop || event.clientY > contentTop + contentHeight) return;
       const pointer = {
-        worldX: ((event.clientX - canvasBounds.left) / canvasBounds.width) * sceneWidth,
-        worldY: ((event.clientY - canvasBounds.top) / canvasBounds.height) * sceneHeight,
+        worldX: ((event.clientX - contentLeft) / contentWidth) * sceneWidth,
+        worldY: ((event.clientY - contentTop) / contentHeight) * sceneHeight,
       };
       const handled = handleTreasureControlTap(pointer);
       const tappedAnswer = answerFocusHotspot && containsPointer(answerFocusHotspot, pointer);

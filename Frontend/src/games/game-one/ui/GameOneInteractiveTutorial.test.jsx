@@ -63,4 +63,38 @@ describe('GameOneInteractiveTutorial', () => {
     expect(screen.getAllByText('Jump').length).toBeGreaterThan(0);
     expect(screen.queryByText(/Move Left/)).toBeInTheDocument();
   });
+
+  it('maps tutorial targets inside the centered 16:9 game area instead of the black letterbox', () => {
+    const canvas = document.createElement('canvas');
+    Object.defineProperty(canvas, 'getBoundingClientRect', {
+      value: () => ({ left: 0, top: 0, width: 1000, height: 400, right: 1000, bottom: 400 }),
+    });
+    const wrapper = document.createElement('div');
+    wrapper.appendChild(canvas);
+
+    render(
+      <GameOneInteractiveTutorial
+        state={{
+          step: { id: 'scroll', page: 4, title: 'SCROLL CLUES', target: 'scroll' },
+          page: 4,
+          hud: [],
+          target: { x: 0.1, y: 0.1, width: 0.1, height: 0.1 },
+          player: null,
+          movementControls: [],
+          obstacles: [],
+          completed: false,
+          objectVisible: true,
+        }}
+        canvasRef={{ current: wrapper }}
+        isReplay
+        onPageChange={() => {}}
+        onAcknowledge={() => {}}
+        onFinish={() => {}}
+      />
+    );
+
+    const target = screen.getByRole('button', { name: 'Inspect scroll' });
+    expect(Number.parseFloat(target.style.left)).toBeCloseTo(213.56, 1);
+    expect(Number.parseFloat(target.style.width)).toBeCloseTo(75.11, 1);
+  });
 });
