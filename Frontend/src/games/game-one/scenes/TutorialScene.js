@@ -132,8 +132,9 @@ export default class TutorialScene extends Phaser.Scene {
     if (!object || object.active === false || object.visible === false) return null;
     const rect = object instanceof Phaser.Physics.Arcade.StaticBody ? object : object.getBounds ? object.getBounds() : object;
     const camera = this.cameras.main;
-    const left = hud ? rect.left : camera.matrix.transformPoint(rect.left - camera.scrollX, rect.top - camera.scrollY).x;
-    const top = hud ? rect.top : camera.matrix.transformPoint(rect.left - camera.scrollX, rect.top - camera.scrollY).y;
+    const transformed = hud ? null : camera.matrix.transformPoint(rect.left, rect.top);
+    const left = hud ? rect.left : transformed.x;
+    const top = hud ? rect.top : transformed.y;
     const zoom = hud ? 1 : camera.zoom;
     const width = rect.width * zoom;
     const height = rect.height * zoom;
@@ -144,30 +145,12 @@ export default class TutorialScene extends Phaser.Scene {
       height: (Math.min(viewport.bottom, top + height) - Math.max(0, top)) / this.scale.height };
   }
 
-  getHudGlyphTarget(textObject, glyph) {
-    if (!textObject?.visible || !glyph) return null;
-    const value = String(textObject.text || '');
-    const glyphIndex = value.lastIndexOf(glyph);
-    if (glyphIndex < 0) return null;
-    const bounds = textObject.getBounds();
-    const measure = (text) => textObject.context?.measureText?.(text)?.width || 0;
-    const scaleX = Math.abs(Number(textObject.scaleX) || 1);
-    const prefixWidth = measure(value.slice(0, glyphIndex)) * scaleX;
-    const glyphWidth = Math.max(measure(glyph) * scaleX, Number(textObject.style?.fontSize) || 18);
-    return this.rectFor({
-      left: bounds.left + prefixWidth - 2,
-      top: bounds.top - 2,
-      width: glyphWidth + 4,
-      height: bounds.height + 4,
-    }, true);
-  }
-
   getTarget(kind) {
     const hud = this.source.scene.get('HudScene');
     if (kind === 'health') return this.rectFor(hud.healthText, true);
     if (kind === 'counters') return this.rectFor(hud.coinText, true);
     if (kind === 'objective') return this.rectFor(hud.objectiveText, true);
-    if (kind === 'scroll') return this.getHudGlyphTarget(hud.coinText, '\u{1F4DC}');
+    if (kind === 'scroll') return this.rectFor(hud.healthText, true);
     if (kind === 'platform') return this.safe && this.rectFor(this.safe.body);
     if (kind === 'player') return this.rectFor(this.player);
     let objects = [];
@@ -193,7 +176,10 @@ export default class TutorialScene extends Phaser.Scene {
       objects = this.source.portals;
     }
     if (kind === 'portal') objects = this.source.portals;
-    return objects.map((object) => this.rectFor(object)).find(Boolean) || null;
+    return objects
+      .map((object) => this.rectFor(object))
+      .filter(Boolean)
+      .sort((a, b) => (b.width * b.height) - (a.width * a.height))[0] || null;
   }
 
   publish() {

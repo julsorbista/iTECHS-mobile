@@ -73,7 +73,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
       + (state?.obstacles || []).reduce((sum, rect) => sum + overlaps({ ...point, ...panelSize }, toPixels(rect, stage)), 0);
     Object.assign(panel, candidates.reduce((best, point) => score(point) < score(best) ? point : best, candidates[0]));
     if ([1, 2].includes(page)) panel.x = right;
-    if ([3, 5].includes(page)) panel.x = 14;
+    if ([3, 5, 6].includes(page)) panel.x = 14;
   }
   const jumpingForDash = step?.id === 'dash' && !state.completed && step.jumpKeys?.length > 0 && (state.grounded || state.demoPressed && state.demoControl === 'jump');
   const primaryKeys = jumpingForDash ? step.jumpKeys : step?.id === 'jump' ? ['W'] : step?.keys || [];
@@ -125,7 +125,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
         style={{ left: target.x - targetPadding, top: target.y - targetPadding, width: Math.max(step.id === 'scroll' ? 24 : 36, target.width + targetPadding * 2), height: Math.max(step.id === 'scroll' ? 24 : 30, target.height + targetPadding * 2) }}>
         {target.y > 90 && <span>{state.completed ? '✓' : step.id === 'hazard' ? 'Watch out!' : 'Look here'}</span>}
       </button>}
-      {target && step?.id === 'ready' && hasVisibleObjectTarget && <div className="g1-coach__target" aria-hidden="true" style={{ pointerEvents: 'none', left: target.x - 7, top: target.y - 7, width: target.width + 14, height: target.height + 14 }}><span>Treasure destination</span></div>}
+      {target && step?.id === 'ready' && hasVisibleObjectTarget && <div className="g1-coach__target" aria-hidden="true" style={{ pointerEvents: 'none', left: target.x - 5, top: target.y - 5, width: target.width + 10, height: target.height + 10 }} />}
       {target && step?.id === 'jump' && <div className={`g1-coach__landing ${waitingForLanding ? 'g1-coach__landing--active' : ''}`} style={{ left: target.x, top: target.y - 3, width: target.width }} aria-hidden="true"><span>{state.completed ? '✓ Safe landing' : 'Land here'}</span></div>}
       {marker && !state?.completed && <div className="g1-coach__marker" style={{ left: marker.x, top: marker.y, '--direction': step?.id === 'left' ? '-3px' : '3px' }} aria-hidden="true">{step?.id === 'left' ? <ArrowLeft /> : <ArrowRight />}</div>}
       {player && step?.control && <div className="g1-coach__player-label" style={{ left: player.x + player.width / 2, top: player.y - 24 }} aria-hidden="true">
@@ -133,7 +133,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
       </div>}
 
       <section className={`g1-coach__bubble g1-parchment__panel ${step?.control ? 'g1-parchment__panel--movement' : ''}`} ref={panelRef}
-        style={{ left: panel.x, top: panel.y }} aria-label={`Game 1 tutorial page ${page} of 6`}>
+        data-page={page} style={{ left: panel.x, top: panel.y }} aria-label={`Game 1 tutorial page ${page} of 6`}>
         <img className="g1-parchment__background" src={tutorialParchment} alt="" draggable="false" />
         <header className="g1-coach__header g1-parchment__header">
           <span className="g1-parchment__page" aria-label={`Page ${page} of 6`}>{page} / 6</span>
