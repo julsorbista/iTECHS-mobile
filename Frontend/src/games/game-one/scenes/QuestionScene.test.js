@@ -20,7 +20,7 @@ describe('Room 5 treasure question flow', () => {
     expect(source).toContain("typeof pendingAnswerResult === 'boolean'");
     expect(source).toContain("this.input.on('pointerdown', handleTopControlTap)");
     expect(source).toContain('containsPointer(closeQuestionButton, pointer)');
-    expect(source).toContain('event?.stopPropagation?.()');
+    expect(source).toContain('blurAnswerInput();');
   });
 
   it('processes correct and incorrect answers without a long result delay', () => {
@@ -31,8 +31,10 @@ describe('Room 5 treasure question flow', () => {
   });
 
   it('focuses the answer only when its slots are tapped and renders tile text at frame scale', () => {
-    expect(source).toContain("answerInput.addEventListener('pointerdown', focusAnswerInput)");
-    expect(source).toContain("answerInput.addEventListener('touchend', focusAnswerInput");
+    expect(source).toContain('answerFocusHotspot = this.add.zone(centerX, answerY, actualAnswerWidth, answerSlotSize)');
+    expect(source).toContain('answerFocusHotspot && containsPointer(answerFocusHotspot, pointer)');
+    expect(source).toContain("answerInput.style.pointerEvents = 'none'");
+    expect(source).toContain('blurAnswerInput();');
     expect(source).toContain("answerInput.style.opacity = '1'");
     expect(source).not.toContain('requestAnimationFrame(() => answerInput.focus())');
     expect(source).not.toContain('this.time.delayedCall(120, () => answerInput.focus())');

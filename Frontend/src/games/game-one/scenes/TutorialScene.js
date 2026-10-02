@@ -157,13 +157,14 @@ export default class TutorialScene extends Phaser.Scene {
     if (kind === 'counters') return this.rectFor(hud.coinText, true);
     if (kind === 'objective') return this.rectFor(hud.objectiveText, true);
     if (kind === 'scroll') {
-      const hearts = this.rectFor(hud.healthText, true);
-      return hearts && {
-        ...hearts,
-        // The text bounds reported by Phaser can lag behind its three-heart
-        // value for one frame. Reserve enough width for the complete counter.
-        width: Math.max(hearts.width, 0.075),
-        height: Math.max(hearts.height, 0.05),
+      const counters = this.rectFor(hud.coinText, true);
+      return counters && {
+        // The scroll count is the final segment of the combined coin/key/scroll
+        // HUD label. Highlight that segment instead of the hearts or margin.
+        x: counters.x + (counters.width * 0.68),
+        y: counters.y,
+        width: counters.width * 0.32,
+        height: counters.height,
       };
     }
     if (kind === 'platform') return this.safe && this.rectFor(this.safe.body);
@@ -178,7 +179,7 @@ export default class TutorialScene extends Phaser.Scene {
         .map((object) => this.rectFor(object))
         .find(Boolean);
       if (fireEnemy) return fireEnemy;
-      objects = [...this.source.projectileCasters, ...this.source.ghosts];
+      objects = [...this.source.projectileCasters, ...this.source.ghosts, ...(this.source.projectiles || [])];
     }
     if (kind === 'booster') objects = this.source.sceneObjects.filter((object) => ['shield', 'health', 'speed', 'jump', 'doubleJump'].includes(object.pickupType));
     if (kind === 'coin') objects = this.source.sceneObjects.filter((object) => object.coinId && (!object.pickupType || object.pickupType === 'coin'));
@@ -188,7 +189,13 @@ export default class TutorialScene extends Phaser.Scene {
         .map((object) => this.rectFor(object))
         .find(Boolean);
       if (treasure) return treasure;
-      objects = this.source.portals;
+      // Several linked portals may be active in a wide room. The first visible
+      // one is the on-screen destination; selecting by area could point into a
+      // letterbox at a different room's portal.
+      return this.source.portals
+        .map((object) => this.rectFor(object))
+        .filter(Boolean)
+        .sort((a, b) => a.x - b.x)[0] || null;
     }
     if (kind === 'portal') objects = this.source.portals;
     return objects
@@ -203,8 +210,9 @@ export default class TutorialScene extends Phaser.Scene {
     const measuredTarget = this.getTarget(step.target);
     const objectTarget = measuredTarget;
     // A missing object gets a truthful route/counter cue, never a fabricated pickup.
-    const target = objectTarget || (['coin', 'scroll'].includes(step.target) ? this.getTarget('counters')
-      : step.target === 'monster' ? this.getTarget('health')
+    const target = objectTarget || (step.target === 'coin' ? this.getTarget('counters')
+      : step.target === 'scroll' ? this.getTarget('scroll')
+      : step.target === 'monster' ? this.getTarget('player')
       : step.target === 'treasure' ? this.getTarget('portal') : null);
     const hud = this.source.scene.get('HudScene');
     this.onUpdate({ step, index: this.index, total: this.steps.length, page: step.page, pages: 6, objectVisible: Boolean(objectTarget),

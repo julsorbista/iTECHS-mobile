@@ -955,6 +955,17 @@ export default class QuestionScene extends Phaser.Scene {
       hideHintOverlays();
       unlockNextHint();
     });
+    let answerInputElement = null;
+    let answerFocusHotspot = null;
+    const blurAnswerInput = () => {
+      if (answerInputElement && document.activeElement === answerInputElement) {
+        answerInputElement.blur();
+      }
+    };
+    const focusAnswerInput = () => {
+      if (!answerInputElement || answerInputElement.disabled) return;
+      answerInputElement.focus({ preventScroll: true });
+    };
     const activateHintHotspot = () => {
       hideHintOverlays();
       if (!hasHintsAvailable) {
@@ -975,10 +986,20 @@ export default class QuestionScene extends Phaser.Scene {
     // while the scene pointer still reports the correct game coordinate.
     const handleTopControlTap = (pointer) => {
       if (containsPointer(closeQuestionButton, pointer)) {
+        blurAnswerInput();
         closeQuestionScene();
         return;
       }
-      if (containsPointer(hintHotspot, pointer)) activateHintHotspot();
+      if (containsPointer(hintHotspot, pointer)) {
+        blurAnswerInput();
+        activateHintHotspot();
+        return;
+      }
+      if (answerFocusHotspot && containsPointer(answerFocusHotspot, pointer)) {
+        focusAnswerInput();
+        return;
+      }
+      blurAnswerInput();
     };
     this.input.on('pointerdown', handleTopControlTap);
     cleanupHandlers.push(() => this.input.off('pointerdown', handleTopControlTap));
@@ -1057,6 +1078,7 @@ export default class QuestionScene extends Phaser.Scene {
       answerWrapper.style.position = 'relative';
 
       const answerInput = document.createElement('input');
+      answerInputElement = answerInput;
       answerInput.type = 'text';
       answerInput.autocomplete = 'off';
       answerInput.spellcheck = false;
@@ -1072,9 +1094,9 @@ export default class QuestionScene extends Phaser.Scene {
       answerInput.style.background = 'transparent';
       answerInput.style.color = 'transparent';
       answerInput.style.caretColor = 'transparent';
-      // Keep the input itself fully present so mobile WebViews allow a direct
-      // tap to summon the keyboard. Its text and background remain invisible;
-      // the Phaser letter slots provide the visible representation.
+      // Phaser owns the tap area. Keeping this DOM input out of pointer hit
+      // testing prevents its scaled overlay from covering Hint or Close on
+      // mobile WebViews.
       answerInput.style.opacity = '1';
       answerInput.style.fontFamily = 'Manrope, Arial, sans-serif';
       answerInput.style.fontSize = `${Math.round(21 * uiScale)}px`;
@@ -1083,16 +1105,10 @@ export default class QuestionScene extends Phaser.Scene {
       answerInput.style.textAlign = 'center';
       answerInput.style.textTransform = 'uppercase';
       answerInput.style.padding = '0';
-      answerInput.style.pointerEvents = 'auto';
+      answerInput.style.pointerEvents = 'none';
       answerInput.style.cursor = 'text';
       answerWrapper.appendChild(answerInput);
-      const focusAnswerInput = (event) => {
-        event?.stopPropagation?.();
-        answerInput.focus({ preventScroll: true });
-        answerInput.click();
-      };
-      answerInput.addEventListener('pointerdown', focusAnswerInput);
-      answerInput.addEventListener('touchend', focusAnswerInput, { passive: false });
+      answerFocusHotspot = this.add.zone(centerX, answerY, actualAnswerWidth, answerSlotSize);
       answerInput.addEventListener('input', () => {
         const letters = answerInput.value.replace(/[^a-z]/gi, '').toUpperCase();
         if (answerInput.value !== letters) answerInput.value = letters;
@@ -1208,8 +1224,6 @@ export default class QuestionScene extends Phaser.Scene {
       answerInput.addEventListener('keyup', stopAnswerKeyPropagation);
       answerInput.addEventListener('keypress', stopAnswerKeyPropagation);
       cleanupHandlers.push(() => {
-        answerInput.removeEventListener('pointerdown', focusAnswerInput);
-        answerInput.removeEventListener('touchend', focusAnswerInput);
         answerInput.removeEventListener('keydown', handleAnswerKeyDown);
         answerInput.removeEventListener('keyup', stopAnswerKeyPropagation);
         answerInput.removeEventListener('keypress', stopAnswerKeyPropagation);
