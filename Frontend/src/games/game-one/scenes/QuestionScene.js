@@ -369,8 +369,8 @@ export default class QuestionScene extends Phaser.Scene {
 
     const coinBadgeWidth = Math.round(hasQuestionFrame ? 82 * treasureFrameScale : 148 * uiScale);
     const coinBadgeHeight = Math.round(hasQuestionFrame ? 34 * treasureFrameScale : 30 * uiScale);
-    const closeButtonWidth = Math.round(hasQuestionFrame ? 46 * treasureFrameScale : 96 * uiScale);
-    const closeButtonHeight = Math.round(hasQuestionFrame ? 46 * treasureFrameScale : 28 * uiScale);
+    const closeButtonWidth = Math.round(hasQuestionFrame ? 66 * treasureFrameScale : 96 * uiScale);
+    const closeButtonHeight = Math.round(hasQuestionFrame ? 62 * treasureFrameScale : 28 * uiScale);
     const topControlGap = Math.round(20 * uiScale);
     const closeQuestionX = hasQuestionFrame
       ? panelLeft + (555 * treasureFrameScale)
@@ -565,10 +565,10 @@ export default class QuestionScene extends Phaser.Scene {
 
     const purchasableHints = hints.slice(0, Math.min(3, hints.length));
     const hasHintsAvailable = purchasableHints.length > 0;
-    const hintButtonWidth = Math.round(hasQuestionFrame ? 86 * treasureFrameScale : 78 * uiScale);
-    const hintButtonHeight = Math.round(hasQuestionFrame ? 36 * treasureFrameScale : 34 * uiScale);
+    const hintButtonWidth = Math.round(hasQuestionFrame ? 108 * treasureFrameScale : 78 * uiScale);
+    const hintButtonHeight = Math.round(hasQuestionFrame ? 48 * treasureFrameScale : 34 * uiScale);
     const hintButtonX = hasQuestionFrame
-      ? panelLeft + (103 * treasureFrameScale)
+      ? panelLeft + (86 * treasureFrameScale)
       : innerLeft + Math.round(26 * uiScale);
     const hintButtonY = hasQuestionFrame ? treasureY(64) : topControlsY;
     const hintHotspot = this.add.rectangle(hintButtonX, hintButtonY, hintButtonWidth, hintButtonHeight, isWordScramble ? 0xe7bd68 : PALETTE.hintIconBg, 1)
@@ -594,7 +594,7 @@ export default class QuestionScene extends Phaser.Scene {
       hintHotspot.setAlpha(0.001);
       hintHotspotInner.setAlpha(0.001);
       // Keep the label centered in the clear area to the right of the bulb.
-      hintHotspotLabel.setPosition(panelLeft + (114 * treasureFrameScale), hintButtonY);
+      hintHotspotLabel.setPosition(panelLeft + (86 * treasureFrameScale), hintButtonY);
     }
 
     const hintOverlayBackdrop = this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.modalOverlay, 0.82)
@@ -955,7 +955,7 @@ export default class QuestionScene extends Phaser.Scene {
       hideHintOverlays();
       unlockNextHint();
     });
-    hintHotspot.on('pointerdown', () => {
+    const activateHintHotspot = () => {
       hideHintOverlays();
       if (!hasHintsAvailable) {
         showFeedback('This question does not have extra hints yet.', PALETTE.textSoft);
@@ -963,11 +963,25 @@ export default class QuestionScene extends Phaser.Scene {
         return;
       }
       unlockNextHint();
-    });
-    closeQuestionButton.on('pointerdown', (pointer, localX, localY, event) => {
-      event?.stopPropagation?.();
-      closeQuestionScene();
-    });
+    };
+    const containsPointer = (gameObject, pointer) => {
+      const bounds = gameObject.getBounds();
+      const x = Number(pointer?.worldX ?? pointer?.x);
+      const y = Number(pointer?.worldY ?? pointer?.y);
+      return Number.isFinite(x) && Number.isFinite(y) && bounds.contains(x, y);
+    };
+    // Use one scene-level listener for the two artwork buttons. Android/iOS
+    // WebViews can miss a GameObject event when the canvas itself is scaled,
+    // while the scene pointer still reports the correct game coordinate.
+    const handleTopControlTap = (pointer) => {
+      if (containsPointer(closeQuestionButton, pointer)) {
+        closeQuestionScene();
+        return;
+      }
+      if (containsPointer(hintHotspot, pointer)) activateHintHotspot();
+    };
+    this.input.on('pointerdown', handleTopControlTap);
+    cleanupHandlers.push(() => this.input.off('pointerdown', handleTopControlTap));
 
     const optionButtons = [];
     const optionWidth = innerWidth;
@@ -1058,7 +1072,10 @@ export default class QuestionScene extends Phaser.Scene {
       answerInput.style.background = 'transparent';
       answerInput.style.color = 'transparent';
       answerInput.style.caretColor = 'transparent';
-      answerInput.style.opacity = '0.001';
+      // Keep the input itself fully present so mobile WebViews allow a direct
+      // tap to summon the keyboard. Its text and background remain invisible;
+      // the Phaser letter slots provide the visible representation.
+      answerInput.style.opacity = '1';
       answerInput.style.fontFamily = 'Manrope, Arial, sans-serif';
       answerInput.style.fontSize = `${Math.round(21 * uiScale)}px`;
       answerInput.style.fontWeight = '400';
@@ -1069,7 +1086,13 @@ export default class QuestionScene extends Phaser.Scene {
       answerInput.style.pointerEvents = 'auto';
       answerInput.style.cursor = 'text';
       answerWrapper.appendChild(answerInput);
-      answerWrapper.addEventListener('pointerdown', () => answerInput.focus());
+      const focusAnswerInput = (event) => {
+        event?.stopPropagation?.();
+        answerInput.focus({ preventScroll: true });
+        answerInput.click();
+      };
+      answerInput.addEventListener('pointerdown', focusAnswerInput);
+      answerInput.addEventListener('touchend', focusAnswerInput, { passive: false });
       answerInput.addEventListener('input', () => {
         const letters = answerInput.value.replace(/[^a-z]/gi, '').toUpperCase();
         if (answerInput.value !== letters) answerInput.value = letters;
@@ -1185,6 +1208,8 @@ export default class QuestionScene extends Phaser.Scene {
       answerInput.addEventListener('keyup', stopAnswerKeyPropagation);
       answerInput.addEventListener('keypress', stopAnswerKeyPropagation);
       cleanupHandlers.push(() => {
+        answerInput.removeEventListener('pointerdown', focusAnswerInput);
+        answerInput.removeEventListener('touchend', focusAnswerInput);
         answerInput.removeEventListener('keydown', handleAnswerKeyDown);
         answerInput.removeEventListener('keyup', stopAnswerKeyPropagation);
         answerInput.removeEventListener('keypress', stopAnswerKeyPropagation);

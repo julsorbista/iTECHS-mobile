@@ -18,7 +18,8 @@ describe('Room 5 treasure question flow', () => {
     expect(source).toContain("levelScene.events.emit('question:closed'");
     expect(source).toContain("levelScene.events.emit('question:answered'");
     expect(source).toContain("typeof pendingAnswerResult === 'boolean'");
-    expect(source).toContain("closeQuestionButton.on('pointerdown'");
+    expect(source).toContain("this.input.on('pointerdown', handleTopControlTap)");
+    expect(source).toContain('containsPointer(closeQuestionButton, pointer)');
     expect(source).toContain('event?.stopPropagation?.()');
   });
 
@@ -30,7 +31,9 @@ describe('Room 5 treasure question flow', () => {
   });
 
   it('focuses the answer only when its slots are tapped and renders tile text at frame scale', () => {
-    expect(source).toContain("answerWrapper.addEventListener('pointerdown', () => answerInput.focus())");
+    expect(source).toContain("answerInput.addEventListener('pointerdown', focusAnswerInput)");
+    expect(source).toContain("answerInput.addEventListener('touchend', focusAnswerInput");
+    expect(source).toContain("answerInput.style.opacity = '1'");
     expect(source).not.toContain('requestAnimationFrame(() => answerInput.focus())');
     expect(source).not.toContain('this.time.delayedCall(120, () => answerInput.focus())');
     expect(source).toContain('fontSize: fontSize(16, treasureFrameScale)');
@@ -39,13 +42,13 @@ describe('Room 5 treasure question flow', () => {
   it('uses a bold Hint label and one shared feedback location', () => {
     expect(source).toMatch(/hintHotspotLabel[\s\S]*?fontStyle: 'bold'/);
     expect(source).toContain("this.feedbackText = this.add.text(feedbackX, footerY, '', {");
-    expect(source).toContain('hintHotspotLabel.setPosition(panelLeft + (114 * treasureFrameScale), hintButtonY)');
+    expect(source).toContain('hintHotspotLabel.setPosition(panelLeft + (86 * treasureFrameScale), hintButtonY)');
     expect(source).toContain('coinBadgeY + (2 * treasureFrameScale)');
     expect(source).toContain('? Math.round(238 * treasureFrameScale)');
     expect(source).toContain("wordWrap: { width: feedbackWidth, useAdvancedWrap: true }");
     expect(source).toContain('panelLeft + Math.round(309 * treasureFrameScale)');
     expect(source).toContain("submitButton.on('pointerdown', submitWordAnswer)");
-    expect(source).toContain("hintHotspot.on('pointerdown'");
+    expect(source).toContain('containsPointer(hintHotspot, pointer)');
     expect(source).toContain('hasQuestionFrame ? submitY - (2 * treasureFrameScale) : submitY');
   });
 

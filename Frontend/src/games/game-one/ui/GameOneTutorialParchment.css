@@ -117,36 +117,32 @@
   }
 }
 @media (max-height: 540px), (max-width: 650px) {
-  .g1-parchment .g1-parchment__panel { width: min(520px, calc(100% - 28px)); height: min(360px, calc(100% - 24px)); min-height: 0; max-height: calc(100% - 24px); padding: 96px 38px 34px; }
-  .g1-parchment .g1-parchment__panel--movement { height: min(390px, calc(100% - 24px)); min-height: 0; }
-  .g1-parchment .g1-parchment__body h3 { font-size: 15px; }
-  .g1-parchment .g1-coach__instruction { font-size: 13px; }
-  .g1-parchment__movements { margin-top: 5px; min-height: 86px; }
-  .g1-parchment__control-list li { font-size: 11px; }
-  .g1-parchment__footer { margin-bottom: 8px; }
-  .g1-parchment__boost-preview { margin-top: 6px; }
-
-  /* Stable landscape proportions for every tutorial page. */
+  /* Keep the proven website layout and scale it as one unit on phones. This
+     preserves line lengths and keeps navigation fixed at the parchment foot. */
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel,
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page] {
+    width: 520px;
+    height: 360px;
+    min-width: 520px;
+    min-height: 360px;
+    max-width: none;
+    max-height: none;
+    padding: 110px 48px 44px;
+    transform: scale(.6);
+    transform-origin: left top;
+  }
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel--movement,
   .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="1"] {
-    width: min(430px, 48%);
-    height: min(330px, calc(100% - 20px));
-    min-width: 300px;
-    padding: 78px 28px 25px;
+    height: 390px;
+    min-height: 390px;
   }
-  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="2"],
-  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="3"],
-  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="4"],
-  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="5"] {
-    width: min(420px, 44%);
-    height: min(292px, calc(100% - 20px));
-    min-width: 330px;
-    padding: 76px 29px 24px;
-  }
-  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="6"] {
-    width: min(430px, 45%);
-    height: min(300px, calc(100% - 20px));
-    min-width: 340px;
-    padding: 78px 30px 25px;
-  }
+  .g1-parchment .g1-parchment__body h3 { font-size: 20px; }
+  .g1-parchment .g1-coach__instruction,
+  .g1-parchment .g1-parchment__panel--movement .g1-coach__instruction { font-size: 14px; line-height: 1.4; }
+  .g1-parchment__note { font-size: 14px; line-height: 1.4; }
+  .g1-parchment__movements { grid-template-columns: 92px 1fr; margin-top: 8px; min-height: 88px; }
+  .g1-parchment__control-list li { font-size: 14px; line-height: 1.35; }
+  .g1-parchment__footer { margin-top: auto; margin-bottom: 8px; }
+  .g1-parchment__boost-preview { margin-top: 9px; }
 
 }
