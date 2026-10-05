@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { handleAPIError } from '../utils/api';
+import { authAPI, handleAPIError } from '../utils/api';
 import logo from '../assets/logo.png';
 import loginBackground from '../../assets/Game/game_one/Background/bg plain.png';
 import { markStudentMenuAudioPrimed, stopStudentMenuLoop } from '../utils/studentMenuAudio';
@@ -57,6 +57,7 @@ const LoginPage = () => {
   
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [otpStep, setOtpStep] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
@@ -161,18 +162,19 @@ const LoginPage = () => {
   };
 
   const handleResendOTP = async () => {
-    if (countdown > 0) return;
+    if (countdown > 0 || isResending || !otpEmail) return;
     
     try {
-      // Re-submit login to trigger OTP resend
-      const username = loginForm.getValues('username');
-      const password = loginForm.getValues('password');
-      await login({ username, password });
+      setIsResending(true);
+      await authAPI.requestOTP(otpEmail);
       
       setCountdown(60);
       toast.success('OTP resent successfully');
     } catch (error) {
-      toast.error('Failed to resend OTP');
+      const errorInfo = handleAPIError(error);
+      toast.error(errorInfo.message || 'Failed to resend OTP');
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -353,12 +355,16 @@ const LoginPage = () => {
                   <button
                     type="button"
                     onClick={handleResendOTP}
-                    disabled={countdown > 0}
+                    disabled={countdown > 0 || isResending}
                     className={`text-sm font-medium transition-colors ${
-                      countdown > 0 ? 'text-gray-400' : 'text-emerald-700 hover:text-emerald-900'
+                      countdown > 0 || isResending ? 'text-gray-400' : 'text-emerald-700 hover:text-emerald-900'
                     }`}
                   >
-                    {countdown > 0 ? `Resend code in ${countdown}s` : 'Resend Verification Code'}
+                    {isResending
+                      ? 'Resending...'
+                      : countdown > 0
+                        ? `Resend code in ${countdown}s`
+                        : 'Resend Verification Code'}
                   </button>
                 </div>
               </form>
