@@ -637,3 +637,58 @@
   }
 }
 
+#root .game-four-mobile-controls,
+#root .game-four-mobile-control-button {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root .game-four-mobile-control-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  touch-action: none !important;
+}
+
+#root .game-four-mobile-control-button svg {
+  display: block;
+  flex: none;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.game-four-playfield-back { display: none; }
+
+@media (max-width: 1280px), (pointer: coarse) {
+  #root .student-game-overlay:has(.game-four-play-card) .student-game-four-top-controls {
+    display: none !important;
+  }
+
+  #root .game-four-playfield-back {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 40;
+    width: 76px;
+    min-height: 32px;
+    padding: 4px 10px;
+    border: 2px solid #fff3c8;
+    border-radius: 8px;
+    background: #1769aa;
+    color: white;
+    font: 800 12px/1 Arial, sans-serif;
+    text-transform: uppercase;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+}
+

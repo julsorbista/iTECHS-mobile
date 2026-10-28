@@ -1,0 +1,29 @@
+/* One viewport scroll owner; boards and supporting controls keep their natural height. */
+@media (max-width: 1024px), (pointer: coarse) {
+  #root .student-game-overlay-game-three-scroll {
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  #root .student-game-overlay-game-three-scroll .student-shell-overlay {
+    height: 100dvh !important;
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: auto;
+  }
+
+  #root .student-game-overlay-game-three-scroll :is(.student-shell-main, .student-game-three-overlay-layout, .student-game-three-frame-panel, .student-game-frame-wrap, .student-game-frame-shell, .game-three-shell) {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: 0 0 auto !important;
+    overflow: visible !important;
+  }
+
+  #root .student-game-overlay-game-three-scroll .game-three-shell {
+    touch-action: pan-y;
+  }
+}

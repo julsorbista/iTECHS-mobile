@@ -1747,196 +1747,6 @@ const injectDynamicGameTwoPartQuestions = async (levelData, {
   };
 };
 
-const injectDynamicGameThreePairQuestions = async (levelData, {
-  gameType,
-  skipDynamicQuestions = false,
-  cacheScope = 'global',
-  studentId = '',
-  loginSessionKey = '',
-  levelId = '',
-} = {}) => {
-  if (skipDynamicQuestions || gameType !== 'GAME_THREE') {
-    return levelData;
-  }
-
-  if (!levelData || typeof levelData !== 'object') {
-    return levelData;
-  }
-
-  if (!(await isAiEnabled()) || !hasAIProviderCredentials() || typeof fetch !== 'function') {
-    return levelData;
-  }
-
-  const existingPairs = Array.isArray(levelData.pairs)
-    ? levelData.pairs.filter((pair) => pair && typeof pair === 'object')
-    : [];
-
-  if (existingPairs.length === 0) {
-    return levelData;
-  }
-
-  const pairRequests = new Map();
-  existingPairs.forEach((pair) => {
-    const pairId = typeof pair.id === 'string' ? pair.id.trim() : '';
-    const normalizedPairId = normalizeQuestionIdForGemini(pairId);
-    if (!pairId || !normalizedPairId || pairRequests.has(pairId)) {
-      return;
-    }
-
-    const existingQuestion = pair.question && typeof pair.question === 'object'
-      ? pair.question
-      : {};
-
-    const existingPrompt = typeof existingQuestion.prompt === 'string'
-      ? existingQuestion.prompt.trim()
-      : '';
-
-    const topic = normalizeStatueTopic(
-      pair.aiTopic
-      || pair.topic
-      || existingQuestion.topic
-      || pair.label
-      || (existingPrompt && !isPlaceholderPairQuestionPrompt(existingPrompt) ? existingPrompt : ''),
-    );
-
-    if (!topic) {
-      return;
-    }
-
-    const existingOptionCount = normalizePairQuestionOptions(existingQuestion.options).length;
-
-    pairRequests.set(pairId, {
-      questionId: pairId,
-      normalizedQuestionId: normalizedPairId,
-      topic,
-      choicesCount: normalizeStatueChoicesCount(pair.aiChoicesCount || existingOptionCount || 4),
-      difficulty: normalizeStatueDifficulty(pair.aiDifficulty || existingQuestion.difficulty),
-      language: normalizeStatueLanguage(pair.aiLanguage || existingQuestion.language),
-      gradeLevel: normalizeStatueGradeLevel(pair.aiGradeLevel || existingQuestion.gradeLevel),
-      instructions: normalizeStatueInstructions([
-        pair.aiInstructions,
-        'Generate one concise multiple-choice question about computer systems.',
-        'Return 2 to 3 short hints that help without revealing the answer directly.',
-      ].filter(Boolean).join('\n')),
-    });
-  });
-
-  if (pairRequests.size === 0) {
-    return levelData;
-  }
-
-  const pairRequestList = Array.from(pairRequests.values());
-  const requestFingerprint = buildStatueRequestFingerprint(pairRequestList);
-  const cacheKey = buildDynamicQuestionCacheKey({
-    cacheScope,
-    gameType,
-    statueRequests: pairRequestList,
-  });
-  const sessionScopedCacheKey = buildSessionScopedDynamicCacheKey({
-    cacheKey,
-    studentId,
-    loginSessionKey,
-  });
-
-  let resolvedFromPersistentPool = false;
-
-  let generatedQuestionsById = sessionScopedCacheKey
-    ? getCachedDynamicQuestions(sessionScopedCacheKey)
-    : getCachedDynamicQuestions(cacheKey);
-
-  if (!generatedQuestionsById && sessionScopedCacheKey) {
-    generatedQuestionsById = await resolvePersistentAssignedDynamicQuestions({
-      studentId,
-      levelId,
-      loginSessionKey,
-      cacheScope,
-      gameType,
-      requestFingerprint,
-    });
-
-    if (generatedQuestionsById) {
-      resolvedFromPersistentPool = true;
-      setCachedDynamicQuestions(sessionScopedCacheKey, generatedQuestionsById);
-    }
-  }
-
-  if (!generatedQuestionsById && sessionScopedCacheKey) {
-    generatedQuestionsById = getCachedDynamicQuestions(cacheKey);
-    if (generatedQuestionsById) {
-      setCachedDynamicQuestions(sessionScopedCacheKey, generatedQuestionsById);
-    }
-  }
-
-  if (!generatedQuestionsById) {
-    try {
-      const activeGeneration = dynamicQuestionInFlight.get(cacheKey);
-      if (activeGeneration) {
-        generatedQuestionsById = await activeGeneration;
-      } else {
-        const generationPromise = generateStatueQuestionsForRequests(pairRequestList, {
-          timeoutMs: resolvePlayableDynamicQuestionTimeoutMs(),
-          throwOnMissing: false,
-        });
-        dynamicQuestionInFlight.set(cacheKey, generationPromise);
-
-        try {
-          generatedQuestionsById = await generationPromise;
-          setCachedDynamicQuestions(cacheKey, generatedQuestionsById);
-        } finally {
-          dynamicQuestionInFlight.delete(cacheKey);
-        }
-      }
-    } catch (error) {
-      console.warn('GAME_THREE dynamic question generation skipped:', error.message || error);
-      return levelData;
-    }
-  }
-
-  if (generatedQuestionsById && sessionScopedCacheKey && !resolvedFromPersistentPool) {
-    setCachedDynamicQuestions(sessionScopedCacheKey, generatedQuestionsById);
-    await persistDynamicQuestionVariantAndAssignment({
-      studentId,
-      levelId,
-      loginSessionKey,
-      cacheScope,
-      gameType,
-      requestFingerprint,
-      questionsById: generatedQuestionsById,
-    });
-  }
-
-  const nextPairs = existingPairs.map((pair) => {
-    const pairId = typeof pair.id === 'string' ? pair.id.trim() : '';
-    if (!pairId || !pairRequests.has(pairId)) {
-      return pair;
-    }
-
-    const request = pairRequests.get(pairId);
-    const generatedQuestion = getGeneratedQuestionForRequest(generatedQuestionsById, request);
-    if (!generatedQuestion) {
-      return pair;
-    }
-
-    const currentQuestion = pair.question && typeof pair.question === 'object' ? pair.question : {};
-
-    return {
-      ...pair,
-      question: mergeGeneratedPairQuestion({
-        pairId,
-        pairLabel: typeof pair.label === 'string' ? pair.label.trim() : pairId,
-        currentQuestion,
-        generatedQuestion,
-        topic: request.topic,
-      }),
-    };
-  });
-
-  return {
-    ...levelData,
-    pairs: nextPairs,
-  };
-};
-
 const mapLevelContentResponse = (level, content) => ({
   level: {
     id: level.id,
@@ -2100,14 +1910,8 @@ const getPublishedLevelContent = async (gameType, gameLevelNumber, options = {})
       levelId: level.id,
     });
 
-    const teacherLevelData = await injectDynamicGameThreePairQuestions(teacherLevelDataWithPartQuestions, {
-      gameType: level.gameType,
-      skipDynamicQuestions: Boolean(options.skipDynamicQuestions),
-      cacheScope: `teacher:${scopedTeacherId}:level:${Number(gameLevelNumber)}`,
-      studentId: options.studentId,
-      loginSessionKey: options.loginSessionKey,
-      levelId: level.id,
-    });
+    // Game 3 is matching-only; serve the authored pairs without AI questions.
+    const teacherLevelData = teacherLevelDataWithPartQuestions;
 
     return {
       level: {
@@ -2140,14 +1944,7 @@ const getPublishedLevelContent = async (gameType, gameLevelNumber, options = {})
     levelId: level.id,
   });
 
-  const levelData = await injectDynamicGameThreePairQuestions(levelDataWithPartQuestions, {
-    gameType: level.gameType,
-    skipDynamicQuestions: Boolean(options.skipDynamicQuestions),
-    cacheScope: `catalog:${level.id}:level:${Number(gameLevelNumber)}`,
-    studentId: options.studentId,
-    loginSessionKey: options.loginSessionKey,
-    levelId: level.id,
-  });
+  const levelData = levelDataWithPartQuestions;
 
   return {
     level: {

@@ -520,10 +520,12 @@ export const levelAPI = {
     return response.data;
   },
 
-  generateGameQuestions: async (gameType, levelNumber, payload) => {
+  generateGameQuestions: async (gameType, levelNumber, payload, options = {}) => {
     const aiGenerationTimeoutMs = Number(import.meta.env.VITE_AI_GENERATION_TIMEOUT_MS || 60000);
     const response = await api.post(`/levels/${gameType}/${levelNumber}/questions/generate`, payload, {
-      timeout: Number.isFinite(aiGenerationTimeoutMs) ? aiGenerationTimeoutMs : 60000,
+      timeout: Number.isFinite(options.timeout) && options.timeout > 0
+        ? options.timeout
+        : Number.isFinite(aiGenerationTimeoutMs) ? aiGenerationTimeoutMs : 60000,
     });
     return response.data;
   },

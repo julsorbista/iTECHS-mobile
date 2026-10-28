@@ -1361,3 +1361,22 @@
     letter-spacing: 1.2px;
   }
 }
+#root .game-two-fruit-left .game-two-fruit-progress {
+  display: grid !important;
+  place-items: center;
+  grid-template-rows: 1fr !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 42px !important;
+  max-height: none !important;
+  padding: 6px !important;
+  box-sizing: border-box;
+}
+
+#root .game-two-fruit-left .game-two-fruit-progress strong {
+  margin: 0 !important;
+  font-size: clamp(18px, 4dvh, 30px) !important;
+  line-height: 1.1 !important;
+  text-align: center;
+}
+

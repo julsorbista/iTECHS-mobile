@@ -1268,6 +1268,7 @@ import { TutorialActionHand } from '../../shared/ui/TutorialHandPointer';
 import { addUserCoins, spendUserCoins } from '../../shared/gameSessionPersistence';
 import { buildGameFourGuideContent } from '../../shared/ui/levelGuideBuilders';
 import './GameCanvasGameFour.css';
+import { useComboAudio } from '../../shared/useComboAudio';
 
 // Add screen shake CSS animation
 const shakeStyle = `
@@ -1553,6 +1554,7 @@ const GAME_FOUR_COMBO_SOUND_SRC = new URL(
   '../assets/audio/game4combo.mp3',
   import.meta.url,
 ).href;
+const GAME_FOUR_COMBO_AUDIO = Object.freeze({ combo: GAME_FOUR_COMBO_SOUND_SRC });
 
 const GAME_OVER_SOUND_SRC = new URL(
   '../../game-six/assets/game-over-sfx.mp3',
@@ -2071,6 +2073,7 @@ const GameCanvasGameFour = ({
   const catchCoinSoundRef = useRef(null);
   const catchBombSoundRef = useRef(null);
   const comboSoundRef = useRef(null);
+  const playComboAudio = useComboAudio(GAME_FOUR_COMBO_AUDIO);
   const gameOverSoundRef = useRef(null);
   const correctAnswerSoundRef = useRef(null);
   const incorrectAnswerSoundRef = useRef(null);
@@ -2151,6 +2154,15 @@ const GameCanvasGameFour = ({
 
     return () => observer.disconnect();
   }, [mode]);
+  // Start at the catch playfield once; leave manual scrolling available afterward.
+  useEffect(() => {
+    if (mode !== 'catch' || !window.matchMedia('(orientation: landscape) and (max-height: 640px)').matches) return undefined;
+    const frame = requestAnimationFrame(() => {
+      playfieldViewportRef.current?.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [mode]);
+
   const remainingAssemblyTokens = useMemo(
     () => getRemainingChoiceTokens(assemblyChoices, assembledTokens),
     [assembledTokens, assemblyChoices],
@@ -2731,7 +2743,7 @@ const GameCanvasGameFour = ({
                 bonusDelta += 5 * getGameFourComboMultiplier(nextComboCount);
                 nextFruitCatchCount += 1;
                 if ([3, 5, 10].includes(nextComboCount)) {
-                  window.playGameFourComboSound?.();
+                  playComboAudio('combo');
                   triggerComboFeedback(nextComboCount);
                 }
               }
@@ -3011,6 +3023,7 @@ const GameCanvasGameFour = ({
     spawnIntervalMs,
     triggerCodeCatchEffect,
     triggerComboFeedback,
+    playComboAudio,
     totalRounds,
     concurrentFallingCount,
     points,
@@ -3447,6 +3460,12 @@ const GameCanvasGameFour = ({
                 ref={playfieldViewportRef}
                 className={clsx('game-four-play-card relative overflow-hidden border-[4px] border-[#70415f] bg-[#fff3c8] p-2 shadow-[8px_8px_0_rgba(67,38,68,0.8)]', screenShake && 'screen-shake')}
               >
+                <button
+                  type="button"
+                  className="game-four-playfield-back"
+                  onClick={onExitRequest}
+                  onContextMenu={(event) => event.preventDefault()}
+                >Back</button>
                 <div
                   className="absolute inset-0 overflow-hidden"
                 >
@@ -3575,6 +3594,8 @@ const GameCanvasGameFour = ({
                     type="button"
                     className="game-four-mobile-control-button"
                     aria-label="Move left"
+                    onContextMenu={(event) => event.preventDefault()}
+                    onDragStart={(event) => event.preventDefault()}
                     onPointerDown={(event) => {
                       event.preventDefault();
                       event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -3584,12 +3605,14 @@ const GameCanvasGameFour = ({
                     onPointerCancel={() => { keyStateRef.current.left = false; }}
                     onLostPointerCapture={() => { keyStateRef.current.left = false; }}
                   >
-                    ←
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7" /></svg>
                   </button>
                   <button
                     type="button"
                     className="game-four-mobile-control-button"
                     aria-label="Move right"
+                    onContextMenu={(event) => event.preventDefault()}
+                    onDragStart={(event) => event.preventDefault()}
                     onPointerDown={(event) => {
                       event.preventDefault();
                       event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -3599,7 +3622,7 @@ const GameCanvasGameFour = ({
                     onPointerCancel={() => { keyStateRef.current.right = false; }}
                     onLostPointerCapture={() => { keyStateRef.current.right = false; }}
                   >
-                    →
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7" /></svg>
                   </button>
                 </div>
               </section>

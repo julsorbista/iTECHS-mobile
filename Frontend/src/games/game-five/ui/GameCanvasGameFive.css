@@ -89,6 +89,61 @@
   20% { opacity: 0.95; transform: scale(1.12) rotate(3deg); }
   100% { opacity: 0; transform: scale(1.45) rotate(10deg); }
 }
+/* Fill the mobile viewport without stretching the Game 5 board itself. */
+@media (max-width: 1024px) {
+  #root .student-game-overlay.student-game-overlay-game-five,
+  #root .student-game-overlay-game-five .student-shell-overlay.student-shell {
+    background: #F3E3B5 !important;
+  }
+
+  #root .student-game-overlay-game-five .student-shell::before,
+  #root .student-game-overlay-game-five .student-shell-glow,
+  #root .student-game-overlay-game-five .student-shell-gridlines {
+    display: none;
+  }
+
+  #root .student-game-overlay-game-five .student-shell-overlay.student-shell {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0 !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    box-sizing: border-box;
+    padding-top: max(8px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  }
+
+  #root .student-game-overlay-game-five .student-shell-main {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1 0 auto;
+    min-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))) !important;
+    box-sizing: border-box;
+    background: #F3E3B5 !important;
+  }
+
+  #root .student-game-overlay-game-five .student-game-one-play-layout {
+    flex: 0 0 auto;
+    height: auto !important;
+    margin-block: auto !important;
+  }
+
+  #root .student-game-overlay-game-five .student-game-five-panel,
+  #root .student-game-overlay-game-five .student-game-five-frame-wrap,
+  #root .student-game-overlay-game-five .student-game-five-frame-shell {
+    flex: 0 0 auto;
+    height: auto !important;
+    background: #F3E3B5 !important;
+  }
+
+  #root .student-game-overlay-game-five .game-five-shell {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+}
+
 .game-five-shell { background: #F3E3B5; }
 .game-five-shell .game-five-hud { background: #F3E3B5; border-color: #5A351D; }
 .game-five-keyboard button:not(:disabled) { background: #fff7dc; }

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { usePreloadedComboSounds } from '../../shared/usePreloadedComboSounds';
 import '../gameTwoCodeLab.css';
 import '../../shared/ui/AnnouncementBoard.css';
 import { AlertCircle, CheckCircle2, Loader2, LogOut, RotateCcw } from 'lucide-react';
@@ -21,7 +22,6 @@ import {
 const SWORD_SLICE_SOUND_SRC = new URL('../assets/processed/swordslice.mp3', import.meta.url).href;
 const SYNTAX_SLICE_SOUND_SRC = new URL('../assets/processed/sfxgame2.mp3', import.meta.url).href;
 const BOMB_ERROR_SOUND_SRC = new URL('../assets/processed/error.mp3', import.meta.url).href;
-const COMBO_SOUND_SRC = new URL('../assets/processed/game2combo.mp3', import.meta.url).href;
 
 const getComboMultiplier = (combo) => {
   if (combo >= 10) return 5;
@@ -493,7 +493,7 @@ const GameCanvasGameTwo = ({
   const swordSliceSoundRef = useRef(null);
   const syntaxSliceSoundRef = useRef(null);
   const bombErrorSoundRef = useRef(null);
-  const comboSoundRef = useRef(null);
+  const playComboAudio = usePreloadedComboSounds(1.8);
   const backgroundMusicRef = useRef(null);
   const backgroundMusicBlockedRef = useRef(false);
 
@@ -541,7 +541,6 @@ const GameCanvasGameTwo = ({
       swordSliceSoundRef,
       syntaxSliceSoundRef,
       bombErrorSoundRef,
-      comboSoundRef,
     ].forEach((soundRef) => {
       if (soundRef.current) {
         soundRef.current.pause();
@@ -886,7 +885,7 @@ const resetRun = useCallback(() => {
       burst(ctx, item.x, item.y, '#ffd15d', 18);
       addCorrectSliceEffect(item, sliceStart || { x: item.x - 52, y: item.y + 36 }, sliceEnd || { x: item.x + 52, y: item.y - 36 });
       if (reachedComboMilestone) {
-        playSound(comboSoundRef, COMBO_SOUND_SRC);
+        playComboAudio(state.combo);
         triggerSliceFeedback('combo', `${state.combo} Combo`, `Score multiplier ×${comboMultiplier}`);
       }
       if (state.pieceIndex >= challenge.pieces.length) {
@@ -915,7 +914,7 @@ const resetRun = useCallback(() => {
     window.setTimeout(() => setFlash(null), 700);
     syncHud();
     if (state.lives <= 0) finishRun('FAILED');
-  }, [completeChallenge, finishRun, playSound, syncHud, triggerSliceFeedback]);
+  }, [completeChallenge, finishRun, playSound, playComboAudio, syncHud, triggerSliceFeedback]);
 
   const hit = (item, a, b) => {
     const radius = item.kind === 'bomb'
@@ -1198,12 +1197,7 @@ const resetRun = useCallback(() => {
             <code>{(showFirstHandGuide && tutorialDemo ? tutorialDemo.sliced : javaCodePreview.sliced) || '____'}</code>
           </div>
         </section>
-      </aside>
-
-      <aside className="game-two-fruit-right">
-        <section className="game-two-fruit-card game-two-fruit-output">
-          <span>Output</span>
-          <code>{outputText}</code>
+        <section className="game-two-fruit-card game-two-fruit-output game-two-fruit-progress" aria-label={`Challenges completed: ${outputs} of ${config.target}`}>
           <strong>{outputs} / {config.target}</strong>
         </section>
       </aside>

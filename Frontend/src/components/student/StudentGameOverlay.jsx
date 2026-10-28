@@ -28,6 +28,7 @@ import {
   preserveConfiguredAssemblyTasks,
 } from "../../games/game-two/data/questionBank";
 import GameCanvasGameThree from "../../games/game-three/ui/GameCanvasGameThree";
+import { applyGameThreeLevelProgression } from "../../games/game-three/data/applyLevelProgression";
 import GameCanvasGameFour from "../../games/game-four/ui/GameCanvasGameFour";
 import GameCanvasGameFive from "../../games/game-five/ui/GameCanvasGameFive";
 import GameCanvasGameSix from "../../games/game-six/ui/GameCanvasGameSix";
@@ -518,7 +519,7 @@ const StudentGameOverlay = ({
           numericLevelNumber,
           {
             runToken,
-            prefetch: normalizedGameType === "GAME_ONE",
+            prefetch: normalizedGameType === "GAME_ONE" || normalizedGameType === "GAME_THREE",
           },
         );
 
@@ -534,6 +535,9 @@ const StudentGameOverlay = ({
         }
 
         let resolvedLevelData = contentResponse.data.levelData;
+        if (normalizedGameType === "GAME_THREE") {
+          resolvedLevelData = applyGameThreeLevelProgression(resolvedLevelData, numericLevelNumber);
+        }
         setLoadingProgress(40);
         if (normalizedGameType === "GAME_ONE") {
           resolvedLevelData = randomizeGameOneJumbledWords(
@@ -590,6 +594,7 @@ const StudentGameOverlay = ({
                 fallbackTasks,
                 variationSeed: runToken,
               },
+              { timeout: 15000 },
             );
             if (
               generatedResponse?.status === "success" &&

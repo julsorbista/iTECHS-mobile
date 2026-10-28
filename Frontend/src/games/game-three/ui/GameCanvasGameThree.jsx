@@ -33,6 +33,7 @@ import levelTwoBackground from '../../../assets/game-three/backgrounds/Backgroun
 import levelThreeBackground from '../../../assets/game-three/backgrounds/Background 3.png';
 import levelFourBackground from '../../../assets/game-three/backgrounds/Background 4.png';
 import levelFiveBackground from '../../../assets/game-three/backgrounds/Background 5.png';
+import './GameThreeScroll.css';
 
 const GAME_THREE_LEVEL_BACKGROUNDS = Object.freeze({
   1: levelOneBackground,

@@ -115,7 +115,10 @@ export default function InGameTutorial({ rootRef, steps, onDemo, onStart, finish
         'bottom-left': candidates[2],
         'bottom-right': candidates[3],
       }[step.panelPlacement];
-      const suggestedPanel = (!mobile && fixedPlacement) || candidates.reduce((best, c) => score(c) < score(best) ? c : best, candidates[0]);
+      // Keep Game 5's final word demo at the top as its letter targets change.
+      const suggestedPanel = game === 5 && page === 5
+        ? { left, top }
+        : (!mobile && fixedPlacement) || candidates.reduce((best, c) => score(c) < score(best) ? c : best, candidates[0]);
       // Game 3's animated demo changes card targets mid-step. Keep the
       // instruction parchment still while the highlight and hand move.
       const previousPanel = stablePanelRef.current;

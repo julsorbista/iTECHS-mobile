@@ -27,6 +27,7 @@ import { buildGameFiveGuideContent } from '../../shared/ui/levelGuideBuilders';
 import { levelAPI } from '../../../utils/api';
 import { addUserCoins, spendUserCoins } from '../../shared/gameSessionPersistence';
 import './GameCanvasGameFive.css';
+import { useComboAudio } from '../../shared/useComboAudio';
 
 const WORDS_BY_LEVEL = Object.freeze({
   1: [
@@ -340,49 +341,8 @@ const useAnswerSounds = () => {
   };
 };
 
-const useComboMilestoneSounds = (active = true) => {
-  const soundsRef = useRef(new Map());
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.Audio === 'undefined') return undefined;
-    const sounds = new Map([
-      [3, new Audio(combo3Sound)],
-      [5, new Audio(combo5Sound)],
-      [10, new Audio(combo10Sound)],
-    ]);
-    sounds.forEach((audio) => {
-      audio.preload = 'auto';
-      audio.volume = getStudentSfxVolume(1);
-      audio.load();
-    });
-    soundsRef.current = sounds;
-
-    return () => {
-      sounds.forEach((audio) => {
-        audio.pause();
-        audio.currentTime = 0;
-      });
-      soundsRef.current = new Map();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (active) return;
-    soundsRef.current.forEach((audio) => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
-  }, [active]);
-
-  return useCallback((comboCount) => {
-    if (!getStudentSfxPreference()) return;
-    const audio = soundsRef.current.get(comboCount);
-    if (!audio) return;
-    audio.currentTime = 0;
-    const playPromise = audio.play();
-    if (playPromise?.catch) playPromise.catch(() => {});
-  }, []);
-};
+const COMBO_AUDIO_SOURCES = Object.freeze({ 3: combo3Sound, 5: combo5Sound, 10: combo10Sound });
+const useComboMilestoneSounds = (active = true) => useComboAudio(COMBO_AUDIO_SOURCES, active);
 
 const useRobotDestructionSounds = () => {
   const hitRef = useRef(null);
@@ -558,14 +518,9 @@ const GameCanvasGameFive = ({
   initialCoins = 0,
   onCoinBalanceChange,
 }) => {
-  const baseSettings = useMemo(() => getSettings(levelData), [levelData]);
-  const [generatedQuestions, setGeneratedQuestions] = useState(null);
-  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(true);
-  const variationSeedRef = useRef(`${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const settings = useMemo(() => ({
-    ...baseSettings,
-    words: generatedQuestions?.length ? generatedQuestions : baseSettings.words,
-  }), [baseSettings, generatedQuestions]);
+  // Use the same built-in word list and clues as AI-off mode on every run.
+  const settings = useMemo(() => getSettings(levelData), [levelData]);
+  const isGeneratingQuestions = false;
   const isFinalLevel = settings.level >= 5;
   const guideContent = useMemo(
     () => buildGameFiveGuideContent(levelData),
@@ -668,30 +623,6 @@ const GameCanvasGameFive = ({
     introVoicePlayedRef.current = true;
     playIntroVoice();
   }, [finished, isGeneratingQuestions, playIntroVoice, resultData, shouldPauseForTutorialCoach, showTutorial]);
-
-  useEffect(() => {
-    let active = true;
-    setIsGeneratingQuestions(true);
-
-    levelAPI.generateGameQuestions('GAME_FIVE', baseSettings.level, {
-      count: baseSettings.targetWords,
-      fallbackQuestions: baseSettings.words,
-      variationSeed: variationSeedRef.current,
-    }).then((response) => {
-      const questions = response?.data?.questions;
-      if (active && Array.isArray(questions) && questions.length === baseSettings.targetWords) {
-        setGeneratedQuestions(questions);
-      }
-    }).catch(() => {
-      // Keep the validated built-in questions when AI is unavailable.
-    }).finally(() => {
-      if (active) setIsGeneratingQuestions(false);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [baseSettings]);
 
   const finish = useCallback((outcome, finalSolved = solved, finalScore = score, finalMistakes = mistakes) => {
     if (finished) return;
