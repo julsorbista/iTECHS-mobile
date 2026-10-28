@@ -1,0 +1,19 @@
+{
+  "id": "game-six-level-01",
+  "gameType": "GAME_SIX",
+  "levelNumber": 1,
+  "seedVersion": 2,
+  "title": "Speed-Up Wave",
+  "subtitle": "Type falling Java terms as the wave gradually speeds up.",
+  "objective": "Type each falling Java term before it reaches the bottom.",
+  "settings": {
+    "targetWords": 5,
+    "seconds": 120,
+    "lives": 5,
+    "rewardEvery": 3
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

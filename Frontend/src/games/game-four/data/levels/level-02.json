@@ -1,0 +1,60 @@
+{
+  "id": "game-four-level-02",
+  "gameType": "GAME_FOUR",
+  "levelNumber": 2,
+  "title": "Numbers and Text",
+  "subtitle": "Work with whole numbers, decimals, and character data.",
+  "objective": "Catch the needed tokens for each Java variable statement and assemble them correctly.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "randomizeStatements": true,
+    "spawnIntervalMs": 860,
+    "fallSpeed": 245,
+    "moveSpeed": 475,
+    "maxMistakes": 3,
+    "lives": 3,
+    "coinRewardPerRound": 1,
+    "statementReward": 130
+  },
+  "rounds": [
+    {
+      "id": "g4-l2-r1",
+      "topic": "Java Variables",
+      "prompt": "Build a valid double variable declaration for price.",
+      "targetTokens": ["double", "price", "=", "99.99", ";"],
+      "distractorTokens": ["float", "\"99.99\"", "public", "loop"],
+      "hints": [
+        "Double is used for decimal values.",
+        "The decimal value should not be in quotation marks.",
+        "Place the value after the equals sign."
+      ]
+    },
+    {
+      "id": "g4-l2-r2",
+      "topic": "Java Variables",
+      "prompt": "Build a valid char variable declaration for grade.",
+      "targetTokens": ["char", "grade", "=", "'A'", ";"],
+      "distractorTokens": ["String", "\"A\"", "false", "if"],
+      "hints": [
+        "A char stores one character only.",
+        "Character literals use single quotes.",
+        "Java declarations still end with a semicolon."
+      ]
+    },
+    {
+      "id": "g4-l2-r3",
+      "topic": "Java Variables",
+      "prompt": "Build a valid int variable declaration for lives.",
+      "targetTokens": ["int", "lives", "=", "3", ";"],
+      "distractorTokens": ["double", "\"3\"", "System.out", "return"],
+      "hints": [
+        "Use int for a whole-number value.",
+        "The variable name should come right after int.",
+        "The number 3 is written without quotation marks."
+      ]
+    }
+  ]
+}

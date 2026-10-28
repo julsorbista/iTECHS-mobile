@@ -1,0 +1,534 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model User {
+  id           String    @default(cuid())
+  username     String
+  email        String
+  password     String
+  role         UserRole  @default(STUDENT)
+  firstName    String?
+  lastName     String?
+  section      String?
+  isArchived   Boolean   @default(false)
+  isVerified   Boolean   @default(false)
+  lastLogin    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  otpCode      String?
+  otpExpiry    DateTime?
+  otpVerified  Boolean   @default(false)
+  teacherId    String?
+  courseCode   String?
+  academicYear String?
+  avatarKey    String?
+
+  @@map("users")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LearningMaterial {
+  id               String               @default(cuid())
+  teacherId        String
+  section          String               @db.VarChar(255)
+  subject          String?              @db.Text
+  title            String               @db.Text
+  description      String?              @db.LongText
+  materialType     LearningMaterialType
+  mimeType         String               @db.VarChar(255)
+  originalFileName String               @db.Text
+  storedFileName   String               @db.VarChar(255)
+  fileSize         Int
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  outlineJson      String?              @db.LongText
+  previewText      String?              @db.LongText
+
+  @@map("learning_materials")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LearningMaterialProgress {
+  id                  String                 @default(cuid())
+  studentId           String
+  materialId          String
+  status              MaterialProgressStatus @default(LOCKED)
+  progressPercent     Int                    @default(0)
+  currentOutlineIndex Int                    @default(0)
+  outlineCount        Int                    @default(0)
+  timeSpentSeconds    Int                    @default(0)
+  startedAt           DateTime?
+  lastViewedAt        DateTime?
+  completedAt         DateTime?
+  latestQuizScore     Float?
+  latestQuizAttemptId String?
+  xpEarned            Int                    @default(0)
+  coinsEarned         Int                    @default(0)
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+
+  @@map("learning_material_progress")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LearningMaterialQuizAttempt {
+  id               String   @default(cuid())
+  studentId        String
+  materialId       String
+  examId           String
+  scoreId          String?
+  answersJson      String   @db.LongText
+  correctCount     Int      @default(0)
+  totalQuestions   Int      @default(0)
+  percentage       Float    @default(0)
+  passed           Boolean  @default(false)
+  timeTakenSeconds Int      @default(0)
+  xpReward         Int      @default(0)
+  coinReward       Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("learning_material_quiz_attempts")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model OtpToken {
+  id         String     @default(cuid())
+  userId     String
+  codeHash   String
+  purpose    OtpPurpose @default(LOGIN)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  @@map("otp_tokens")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LoginAttempt {
+  id          String   @default(cuid())
+  userId      String?
+  usernameRaw String
+  ipAddress   String?
+  success     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@map("login_attempts")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model AccountLock {
+  id          String   @default(cuid())
+  userId      String
+  reason      String
+  lockedUntil DateTime
+  createdAt   DateTime @default(now())
+
+  @@map("account_locks")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model AuditLog {
+  id          String   @default(cuid())
+  actorUserId String?
+  action      String
+  entityType  String
+  entityId    String?
+  metadata    String?  @db.LongText
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Exam {
+  id                    String   @default(cuid())
+  title                 String   @db.Text
+  description           String?  @db.LongText
+  examCode              String
+  isActive              Boolean  @default(true)
+  timeLimit             Int?
+  totalMarks            Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  teacherId             String
+  learningMaterialId    String?
+  passingScore          Int      @default(60)
+  showResultsToStudents Boolean  @default(true)
+  shuffleQuestions      Boolean  @default(true)
+  coinReward            Int      @default(10)
+  xpReward              Int      @default(50)
+
+  @@map("exams")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Question {
+  id            String   @default(cuid())
+  question      String   @db.LongText
+  options       String?  @db.LongText
+  correctAnswer String   @db.LongText
+  marks         Int      @default(1)
+  type          String   @default("multiple_choice")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  examId        String
+
+  @@map("questions")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Score {
+  id            String   @default(cuid())
+  totalMarks    Int
+  obtainedMarks Int
+  percentage    Float
+  timeTaken     Int?
+  completedAt   DateTime @default(now())
+  studentId     String
+  examId        String
+
+  @@map("scores")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LevelDefinition {
+  id              String   @default(cuid())
+  levelNumber     Int
+  gameType        GameType
+  gameLevelNumber Int
+  title           String
+  description     String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("level_definitions")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DynamicQuestionVariant {
+  id                 String    @default(cuid())
+  cacheScope         String
+  gameType           GameType  @default(GAME_ONE)
+  requestFingerprint String
+  variantFingerprint String
+  questionsById      String    @db.LongText
+  expiresAt          DateTime?
+  staleAt            DateTime?
+  lastAssignedAt     DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@map("dynamic_question_variants")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DynamicQuestionAssignment {
+  id                 String    @default(cuid())
+  studentId          String
+  levelId            String?
+  cacheScope         String
+  gameType           GameType  @default(GAME_ONE)
+  requestFingerprint String
+  loginSessionKey    String
+  variantId          String
+  assignedAt         DateTime  @default(now())
+  expiresAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@map("dynamic_question_assignments")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StudentLevelState {
+  id            String      @default(cuid())
+  studentId     String
+  levelId       String
+  status        LevelStatus @default(LOCKED)
+  attemptsCount Int         @default(0)
+  bestStars     Int         @default(0)
+  bestScore     Int         @default(0)
+  unlockedAt    DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("student_level_states")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model GameSession {
+  id              String        @default(cuid())
+  studentId       String
+  levelId         String
+  levelNumber     Int
+  gameType        GameType
+  status          SessionStatus @default(IN_PROGRESS)
+  startingStars   Int           @default(3)
+  mistakes        Int           @default(0)
+  hintsUsed       Int           @default(0)
+  starsRemaining  Int           @default(3)
+  starsEarned     Int           @default(0)
+  retryMultiplier Float         @default(1)
+  baseScore       Int           @default(0)
+  finalScore      Int           @default(0)
+  startedAt       DateTime      @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("game_sessions")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LevelAttempt {
+  id              String    @default(cuid())
+  studentId       String
+  levelId         String
+  sessionId       String?
+  attemptNumber   Int
+  gameType        GameType
+  mistakes        Int       @default(0)
+  hintsUsed       Int       @default(0)
+  starsEarned     Int       @default(0)
+  baseScore       Int       @default(0)
+  finalScore      Int       @default(0)
+  retryMultiplier Float     @default(1)
+  completed       Boolean   @default(false)
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@map("level_attempts")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TeacherStudentPolicy {
+  id               String           @default(cuid())
+  teacherId        String
+  studentId        String
+  difficultyPreset DifficultyPreset @default(STANDARD)
+  freeMistakes     Int              @default(3)
+  hintStarCost     Int              @default(1)
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@map("teacher_student_policies")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ContentFlag {
+  id             String            @default(cuid())
+  teacherId      String
+  studentId      String
+  levelId        String
+  gameType       GameType          @default(GAME_ONE)
+  reason         String
+  status         ContentFlagStatus @default(PENDING)
+  resolutionNote String?
+  resolverUserId String?
+  requestedAt    DateTime          @default(now())
+  resolvedAt     DateTime?
+
+  @@map("content_flags")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StudentPerformanceInsight {
+  id                String   @default(cuid())
+  teacherId         String
+  studentId         String
+  strengths         String   @db.LongText
+  weaknesses        String   @db.LongText
+  recommendedAction String   @db.Text
+  sourceSnapshot    String   @db.LongText
+  model             String?
+  generatedAt       DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("student_performance_insights")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model LevelContent {
+  id              String    @default(cuid())
+  levelId         String
+  draftJson       String    @db.LongText
+  publishedJson   String    @db.LongText
+  updatedByUserId String?
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("level_contents")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TeacherLevelRecord {
+  id              String   @default(cuid())
+  teacherId       String
+  levelNumber     Int
+  gridRows        Int      @default(18)
+  gridCols        Int      @default(32)
+  cellBackgrounds String   @db.LongText
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("teacher_level_records")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TeacherLevelWorkspace {
+  id          String   @default(cuid())
+  teacherId   String
+  gameType    GameType @default(GAME_ONE)
+  levelNumber Int
+  title       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("teacher_level_workspaces")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TeacherLevelVersion {
+  id              String                   @default(cuid())
+  workspaceId     String
+  state           TeacherLevelVersionState @default(DRAFT)
+  versionNumber   Int
+  payload         String                   @db.LongText
+  createdByUserId String
+  createdAt       DateTime                 @default(now())
+
+  @@map("teacher_level_versions")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ArchivedUser {
+  id            String   @default(cuid())
+  userId        String
+  username      String
+  email         String
+  role          UserRole
+  firstName     String?
+  lastName      String?
+  section       String?
+  teacherId     String?
+  archivedAt    DateTime @default(now())
+  archivedBy    String
+  archiveReason String?
+  userData      String   @db.LongText
+  academicYear  String?
+
+  @@map("archived_users")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model studentexams {
+  A String
+  B String
+
+  @@map("_studentexams")
+  @@ignore
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum OtpPurpose {
+  ACTIVATE
+  LOGIN
+  RESET
+}
+
+enum LevelStatus {
+  LOCKED
+  UNLOCKED
+  COMPLETED
+}
+
+enum GameType {
+  GAME_ONE
+  GAME_TWO
+  GAME_THREE
+  GAME_FOUR
+  GAME_FIVE
+  GAME_SIX
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum DifficultyPreset {
+  EASY
+  STANDARD
+  HARD
+}
+
+enum ContentFlagStatus {
+  PENDING
+  IN_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum TeacherLevelVersionState {
+  DRAFT
+  PUBLISHED
+}
+
+enum LearningMaterialType {
+  PDF
+  VIDEO
+  WORD
+  POWERPOINT
+}
+
+enum MaterialProgressStatus {
+  LOCKED
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}

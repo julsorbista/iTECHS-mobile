@@ -1,0 +1,162 @@
+{
+  "id": "game-one-level-01",
+  "gameType": "GAME_ONE",
+  "levelNumber": 1,
+  "title": "The Lost Java Treasure",
+  "subtitle": "A Five-Room Treasure Hunt",
+  "congratulatoryMessage": "Treasure found! You recovered all three scroll clues.",
+  "treasureHunt": true,
+  "missionTitle": "MISSION: Find the Lost Java Treasure",
+  "missionText": "The treasure has been sealed away. Explore the rooms, survive the obstacles, collect the three hidden scrolls, and reach the treasure.",
+  "viewport": { "width": 1280, "height": 720 },
+  "settings": { "playerHealth": 3, "timerEnabled": false, "allowMidairDash": true, "allowProjectile": true, "allowDoubleJump": false, "coinGoal": 0 },
+  "questions": [{
+    "id": "java-treasure-riddle",
+    "topic": "Java variables",
+    "challengeType": "WORD_SCRAMBLE",
+    "maxAttempts": 3,
+    "jumbledWord": "AIBLERVE",
+    "answer": "VARIABLE",
+    "formattedQuestion": "FINAL TREASURE RIDDLE\nI can hold numbers, but I am not a number. I have a name, and my value can change. What am I?",
+    "riddleVariants": [
+      "I can hold numbers, but I am not a number. I have a name, and my value can change. What am I?",
+      "Java gives me a name so a value can be stored, read, and changed later. What am I?",
+      "I am a named container in a program that can remember a score, message, or other value. What am I?",
+      "My name stays recognizable while the information I contain may change as a program runs. What am I?",
+      "A programmer declares me before assigning data that the code needs to remember. What am I?",
+      "I provide a reusable name for a piece of stored information in Java. What am I?"
+    ],
+    "prompt": "I can hold numbers, but I am not a number. I have a name, and my value can change. What am I? Jumbled word: AIBLERVE",
+    "choices": ["VARIABLE", "LIBRARY", "INTEGER", "COMPILER"],
+    "answerIndex": 0,
+    "hints": ["The scrolls describe a named container whose value can change.", "Unscramble AIBLERVE."],
+    "successText": "Correct! The Lost Java Treasure is yours.",
+    "failureText": "The chest remains sealed. Use the three scroll clues and try again.",
+    "damageOnWrongAnswer": 1
+  }],
+  "rooms": [
+    {
+      "id": "room-1",
+      "backgroundKey": "tutorialGrove",
+      "objective": "Mission introduction: time the moving platform, cross the blinking bridge, avoid the elemental's fire, and reach the exit.",
+      "spawn": { "x": 100, "y": 570 },
+      "platforms": [
+        { "id": "room1-start", "x": 168, "y": 672, "width": 190, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room1-step-1", "x": 384, "y": 552, "width": 152, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room1-step-2", "x": 600, "y": 456, "width": 114, "bodyHeight": 34, "textureKey": "grass", "moveAxis": "y", "moveDistance": 55, "moveDuration": 1900 },
+        { "id": "room1-step-3", "x": 816, "y": 552, "width": 152, "bodyHeight": 34, "textureKey": "stone", "disappearEveryMs": 3200 },
+        { "id": "room1-step-4", "x": 1008, "y": 432, "width": 114, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room1-exit", "x": 1137, "y": 672, "width": 190, "bodyHeight": 34, "textureKey": "stone" }
+      ],
+      "coins": [
+        { "id": "level1-hint-coin-1", "collectibleType": "coin", "x": 600, "y": 390, "size": 30 }
+      ],
+      "ghosts": [],
+      "projectileEnemies": [
+        { "id": "room1-elemental", "enemyType": "elemental", "x": 1008, "y": 352, "fireDirection": "LEFT", "fireIntervalMs": 2100, "projectileSpeed": 235, "projectileLifetimeMs": 2600, "initialDelayMs": 1300, "size": 64 }
+      ],
+      "portal": { "x": 1160, "y": 590, "locked": false, "endsLevel": false, "targetRoomId": "room-2", "variant": "portal", "size": 84 }
+    },
+    {
+      "id": "room-2",
+      "backgroundKey": "swampTrail",
+      "objective": "Collect 2 keys, avoid the minion, find Scroll #1, and enter the unlocked exit.",
+      "spawn": { "x": 100, "y": 570 },
+      "platforms": [
+        { "id": "room2-start", "x": 168, "y": 672, "width": 190, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room2-low", "x": 384, "y": 552, "width": 152, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room2-high", "x": 576, "y": 456, "width": 114, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room2-bridge", "x": 768, "y": 552, "width": 190, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room2-scroll", "x": 960, "y": 456, "width": 114, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room2-exit", "x": 1137, "y": 672, "width": 190, "bodyHeight": 34, "textureKey": "stone" }
+      ],
+      "coins": [
+        { "id": "room2-key-1", "collectibleType": "key", "keyStyle": "red", "spriteFrame": "key-red", "x": 384, "y": 480, "size": 42 },
+        { "id": "room2-key-2", "collectibleType": "key", "keyStyle": "blue", "spriteFrame": "key-blue", "x": 576, "y": 384, "size": 42 },
+        { "id": "room2-speed", "collectibleType": "speed", "spriteFrame": "speed-potion", "x": 768, "y": 480, "size": 44 },
+        { "id": "scroll-1", "collectibleType": "scroll", "scrollStyle": "red", "spriteFrame": "scroll-red", "scrollId": "scroll-1", "clueText": "A program can give a reusable name to stored information so it can find and use that value again later.", "x": 960, "y": 384, "size": 50 }
+      ],
+      "ghosts": [{ "id": "room2-ghost", "enemyType": "ghost", "x": 720, "y": 480, "patrolDistance": 36, "speed": 94, "size": 58, "chasePlayer": true }],
+      "projectileEnemies": [],
+      "portal": { "x": 1160, "y": 590, "locked": true, "endsLevel": false, "targetRoomId": "room-3", "requiredKeys": 2, "requiredScrollId": "scroll-1", "size": 84 }
+    },
+    {
+      "id": "room-3",
+      "backgroundKey": "ruinsGate",
+      "objective": "Avoid the spikes, use the Jump Boost for the raised path, collect Scroll #2, and exit.",
+      "spawn": { "x": 100, "y": 570 },
+      "platforms": [
+        { "id": "room3-start", "x": 168, "y": 672, "width": 190, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room3-step-1", "x": 384, "y": 552, "width": 114, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room3-step-2", "x": 576, "y": 432, "width": 76, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room3-step-3", "x": 768, "y": 552, "width": 152, "bodyHeight": 34, "textureKey": "stone", "moveAxis": "x", "moveDistance": 76, "moveDuration": 1750 },
+        { "id": "room3-scroll", "x": 960, "y": 408, "width": 114, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room3-exit", "x": 1137, "y": 672, "width": 190, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room3-spikes", "x": 696, "y": 672, "width": 570, "bodyHeight": 16, "textureKey": "stone", "hazard": true, "hazardType": "spikes", "hazardSpriteFrame": "floor-spikes", "damage": 1 }
+      ],
+      "coins": [
+        { "id": "level1-hint-coin-2", "collectibleType": "coin", "x": 576, "y": 360, "size": 30 },
+        { "id": "room3-jump", "collectibleType": "jump", "spriteFrame": "speed-potion", "x": 384, "y": 504, "size": 44 },
+        { "id": "scroll-2", "collectibleType": "scroll", "scrollStyle": "blue", "spriteFrame": "scroll-blue", "scrollId": "scroll-2", "clueText": "Stored information may be a number, word, or truth value, and it can be updated while the program runs.", "x": 960, "y": 336, "size": 50 }
+      ],
+      "ghosts": [{ "id": "room3-ghost", "enemyType": "ghost", "x": 720, "y": 360, "speed": 100, "size": 58, "chasePlayer": true }], "projectileEnemies": [],
+      "portal": { "x": 1160, "y": 590, "locked": true, "endsLevel": false, "targetRoomId": "room-4", "requiredScrollId": "scroll-2", "size": 84 }
+    },
+    {
+      "id": "room-4",
+      "backgroundKey": "swampTrail",
+      "objective": "Ride the moving platform, avoid the two minions, collect the Shield and Scroll #3, and exit.",
+      "spawn": { "x": 100, "y": 570 },
+      "platforms": [
+        { "id": "room4-start", "x": 168, "y": 672, "width": 152, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room4-step-1", "x": 384, "y": 552, "width": 114, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room4-moving", "x": 600, "y": 456, "width": 114, "bodyHeight": 34, "textureKey": "grass", "moveAxis": "y", "moveDistance": 114, "moveDuration": 1900 },
+        { "id": "room4-step-2", "x": 840, "y": 456, "width": 76, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room4-scroll", "x": 1032, "y": 552, "width": 114, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room4-exit", "x": 1156, "y": 672, "width": 152, "bodyHeight": 34, "textureKey": "stone" }
+      ],
+      "coins": [
+        { "id": "level1-hint-coin-3", "collectibleType": "coin", "x": 384, "y": 480, "size": 30 },
+        { "id": "room4-health", "collectibleType": "health", "spriteFrame": "health-heart", "x": 600, "y": 384, "size": 44 },
+        { "id": "room4-shield", "collectibleType": "shield", "spriteFrame": "shield", "x": 840, "y": 384, "size": 46 },
+        { "id": "scroll-3", "collectibleType": "scroll", "scrollStyle": "green", "spriteFrame": "scroll-green", "scrollId": "scroll-3", "clueText": "Use a named storage place when code must remember a score, price, message, or other value for later instructions.", "x": 1032, "y": 480, "size": 50 }
+      ],
+      "ghosts": [
+        { "id": "room4-ghost", "enemyType": "ghost", "x": 920, "y": 520, "patrolDistance": 36, "speed": 105, "size": 58, "chasePlayer": true, "chaseDelayMs": 3000 },
+        { "id": "room4-minion-2", "enemyType": "slimeorange", "x": 1032, "y": 496, "patrolDistance": 36, "speed": 116, "size": 62, "canJump": false }
+      ],
+      "projectileEnemies": [],
+      "portal": { "x": 1160, "y": 590, "locked": true, "endsLevel": false, "targetRoomId": "room-5", "requiredScrollId": "scroll-3", "size": 84 }
+    },
+    {
+      "id": "room-5",
+      "backgroundKey": "ruinsGate",
+      "objective": "Final stage: combine careful jumps and spikes, then reach the Treasure Chest.",
+      "spawn": { "x": 100, "y": 570 },
+      "platforms": [
+        { "id": "room5-start", "x": 144, "y": 672, "width": 152, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room5-step-1", "x": 312, "y": 552, "width": 76, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room5-step-2", "x": 480, "y": 408, "width": 76, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room5-step-3", "x": 648, "y": 528, "width": 76, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room5-step-4", "x": 816, "y": 384, "width": 76, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room5-step-5", "x": 984, "y": 528, "width": 76, "bodyHeight": 34, "textureKey": "stone" },
+        { "id": "room5-chest", "x": 1160, "y": 672, "width": 114, "bodyHeight": 34, "textureKey": "grass" },
+        { "id": "room5-spikes", "x": 648, "y": 672, "width": 228, "bodyHeight": 16, "textureKey": "stone", "hazard": true, "hazardType": "spikes", "hazardSpriteFrame": "floor-spikes", "damage": 1 },
+        { "id": "room5-fire-1", "x": 360, "y": 672, "width": 76, "bodyHeight": 16, "textureKey": "stone", "hazard": true, "hazardType": "fire", "hazardSpriteFrame": "fireball", "damage": 1 },
+        { "id": "room5-fire-2", "x": 936, "y": 672, "width": 76, "bodyHeight": 16, "textureKey": "stone", "hazard": true, "hazardType": "fire", "hazardSpriteFrame": "fireball", "damage": 1 }
+      ],
+      "coins": [
+        { "id": "room5-health", "collectibleType": "health", "spriteFrame": "health-heart", "x": 816, "y": 312, "size": 44 },
+        { "id": "room5-shield", "collectibleType": "shield", "spriteFrame": "shield", "x": 1080, "y": 576, "size": 44 }
+      ],
+      "ghosts": [
+        { "id": "room5-ghost", "enemyType": "ghost", "x": 984, "y": 472, "patrolDistance": 18, "speed": 132, "size": 60, "chasePlayer": true },
+        { "id": "room5-slime-1", "enemyType": "slimeorange", "x": 648, "y": 472, "patrolDistance": 18, "speed": 126, "size": 58, "canJump": false },
+        { "id": "room5-slime-2", "enemyType": "slimegreen", "x": 1160, "y": 616, "patrolDistance": 24, "speed": 138, "size": 58, "canJump": false }
+      ],
+      "projectileEnemies": [],
+      "portal": { "id": "lost-java-treasure", "x": 1160, "y": 580, "locked": true, "endsLevel": true, "appearance": "TREASURE_CHEST", "size": 96, "requiredCoins": 3, "questionId": "java-treasure-riddle", "treasureQuestionId": "java-treasure-riddle" }
+    }
+  ],
+  "treasureQuestionId": "java-treasure-riddle"
+}

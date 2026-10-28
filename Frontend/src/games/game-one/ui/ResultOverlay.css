@@ -1,0 +1,52 @@
+body .game-illustrated-results {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10060 !important;
+  overflow-y: auto;
+}
+.game-illustrated-results .game-one-results-card {
+  position: relative;
+  width: min(94vw, 410px, calc(92dvh * .85));
+  aspect-ratio: 410 / 482;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.game-illustrated-results .game-one-results-heading { display: none; }
+.game-illustrated-results .game-one-results-list {
+  position: absolute;
+  inset: 26% 18% 29% 34%;
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  color: #4b2816;
+}
+.game-illustrated-results .game-one-results-list > div { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: clamp(9px, 2.8vw, 13px); }
+.game-illustrated-results .game-one-results-list p { margin: 0; text-transform: uppercase; font-weight: 700; }
+.game-illustrated-results .game-one-results-actions { position: absolute; inset: 77% 12% auto; display: flex; gap: 4px; }
+.game-illustrated-results .game-one-results-actions button { height: 44px; min-width: 0; padding: 4px; border-width: 2px; border-radius: 8px; font-size: clamp(8px, 2.5vw, 11px); }
+
+/* Approved result placement for Games 1-6: keep both two- and three-button
+   action rows completely inside the light parchment above the wooden footer. */
+.game-illustrated-results .game-one-results-actions {
+  inset: 71.5% 15% auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(3px, 1vw, 6px);
+  width: auto;
+  max-width: none;
+}
+
+.game-illustrated-results .game-one-results-actions button {
+  flex: 1 1 88px;
+  width: auto;
+  max-width: 112px;
+  height: clamp(32px, 8.5vw, 37px);
+  min-width: 0;
+  min-height: 0;
+  padding: 3px 2px;
+  border-width: 2px;
+  border-radius: 6px;
+  font-size: clamp(6.5px, 1.95vw, 9px);
+  line-height: 1.1;
+  white-space: normal;
+}

@@ -1,0 +1,27 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and generated output
+node_modules/
+build/
+dist/
+coverage/
+.gradle/
+*.apk
+*.aab
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local database exports and backups
+Backend/data/backup-*.json
+Backend/data/*.sql
+.tmp-guide-browser/

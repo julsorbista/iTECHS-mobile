@@ -1,0 +1,139 @@
+{
+  "title": "Advanced Programming in Java",
+  "previewText": "Advanced Programming in Java\nIntroduction to Advanced Java Programming\nIntroduction to Advanced Java Programming\n\nAdvanced Java Programming focuses on creating more efficient, organized, and reusable programs. Instead of writing simple statements, programmers learn techniques that reduce repetition and improve program structure.\n\nThese concepts allow developers to create larger and more complex applications while maintaining readability and efficiency.\n\nKey Points\nImproves programming efficiency\nReduces repetitive code\nEncourages code reusability\nHelps develop larger applications\nIntroduces Object-Oriented Programming (OOP)\nLoops in Java\nWhat are Loops?\n\nLoops allow a program to repeat a set of instructions multiple times without rewriting the code.\n\nLoops are useful when performing repetitive tasks such as displaying numbers, processing records, or validating user input.\n\nTypes of Loops\nfor Loop\nwhile Loop\ndo-while Loop\nThe for Loop\nThe for loop is commonly used when the number of repetitions is known.\nWhy Learn Advanced Java Concepts?\nAs programs become larger, managing code becomes more difficult. Advanced Java concepts help programmers organize their code and solve problems more effectively.\n\nBy learning loops, arrays, methods, and classes, students can write programs that are easier to understand, maintain, and expand.\n\nBenefits\nBetter problem-solving skills\nImproved program organization\nFaster program development\nEasier debugging and maintenance\nWhat is an Array?\nAn array is a collection of multiple values stored under a single variable name.\n\nArrays help programmers organize and manage related data efficiently.\nAccessing Array Elements\nEach element in an array has an index number starting from 0.\nReal-World Applications of Advanced Java\nAdvanced Java concepts are used in:\n\nStudent Information Systems\nBanking Applications\nOnline Shopping Systems\nMobile Applications\nEducational Software\nGame Development\n\nThese applications rely on structured programming techniques to handle large amounts of data and user interactions.\nWhat is a Method?\nA method is a block of code that performs a specific task. Methods help reduce repetition and improve code organization.\nIntroduction to Classes and Objects\nJava is an Object-Oriented Programming language.\n\nA class serves as a blueprint, while an object is an instance created from that blueprint.",
+  "outline": [
+    {
+      "id": "1780222142725-cj0wxb",
+      "title": "Advanced Programming in Java",
+      "items": [
+        {
+          "id": "1780222142725-usx0c9",
+          "title": "Introduction to Advanced Java Programming",
+          "order": 0,
+          "pageLabel": "1.1",
+          "pageNumber": null,
+          "content": "Introduction to Advanced Java Programming\n\nAdvanced Java Programming focuses on creating more efficient, organized, and reusable programs. Instead of writing simple statements, programmers learn techniques that reduce repetition and improve program structure.\n\nThese concepts allow developers to create larger and more complex applications while maintaining readability and efficiency.\n\nKey Points\nImproves programming efficiency\nReduces repetitive code\nEncourages code reusability\nHelps develop larger applications\nIntroduces Object-Oriented Programming (OOP)",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780222455101-8fsv4l",
+              "title": "Loops in Java",
+              "content": "What are Loops?\n\nLoops allow a program to repeat a set of instructions multiple times without rewriting the code.\n\nLoops are useful when performing repetitive tasks such as displaying numbers, processing records, or validating user input.\n\nTypes of Loops\nfor Loop\nwhile Loop\ndo-while Loop",
+              "media": null
+            },
+            {
+              "id": "1780222472814-1uxacv",
+              "title": "The for Loop",
+              "content": "The for loop is commonly used when the number of repetitions is known.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222535621-rxyz2web.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 181454.png",
+                "placement": "right",
+                "width": 34,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            }
+          ],
+          "media": null
+        },
+        {
+          "id": "1780222197468-i5e04e",
+          "title": "Why Learn Advanced Java Concepts?",
+          "order": 1,
+          "pageLabel": "1.2",
+          "pageNumber": null,
+          "content": "As programs become larger, managing code becomes more difficult. Advanced Java concepts help programmers organize their code and solve problems more effectively.\n\nBy learning loops, arrays, methods, and classes, students can write programs that are easier to understand, maintain, and expand.\n\nBenefits\nBetter problem-solving skills\nImproved program organization\nFaster program development\nEasier debugging and maintenance",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780222377359-73t343",
+              "title": "What is an Array?",
+              "content": "An array is a collection of multiple values stored under a single variable name.\n\nArrays help programmers organize and manage related data efficiently.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222535621-3vlbctno.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 181312.png",
+                "placement": "right",
+                "width": 70,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780222407930-x8y930",
+              "title": "Accessing Array Elements",
+              "content": "Each element in an array has an index number starting from 0.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222535621-jdvyl73o.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 181345.png",
+                "placement": "right",
+                "width": 34,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            }
+          ],
+          "media": null
+        },
+        {
+          "id": "1780222211715-kupwok",
+          "title": "Real-World Applications of Advanced Java",
+          "order": 2,
+          "pageLabel": "1.3",
+          "pageNumber": null,
+          "content": "Advanced Java concepts are used in:\n\nStudent Information Systems\nBanking Applications\nOnline Shopping Systems\nMobile Applications\nEducational Software\nGame Development\n\nThese applications rely on structured programming techniques to handle large amounts of data and user interactions.",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780222249737-wtm5z9",
+              "title": "What is a Method?",
+              "content": "A method is a block of code that performs a specific task. Methods help reduce repetition and improve code organization.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222535621-b6cdoumy.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 181121.png",
+                "placement": "right",
+                "width": 40,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780222297138-sa675h",
+              "title": "Introduction to Classes and Objects",
+              "content": "Java is an Object-Oriented Programming language.\n\nA class serves as a blueprint, while an object is an instance created from that blueprint.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222535621-4y72gcdj.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 181213.png",
+                "placement": "right",
+                "width": 31,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            }
+          ],
+          "media": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "game-four-level-03",
+  "gameType": "GAME_FOUR",
+  "levelNumber": 3,
+  "title": "Variable Types in Action",
+  "subtitle": "Handle floating-point, long, and String declarations under more pressure.",
+  "objective": "Catch each correct token set and arrange every Java variable declaration before mistakes run out.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "randomizeStatements": true,
+    "spawnIntervalMs": 820,
+    "fallSpeed": 260,
+    "moveSpeed": 490,
+    "maxMistakes": 4,
+    "lives": 3,
+    "coinRewardPerRound": 1,
+    "statementReward": 140
+  },
+  "rounds": [
+    {
+      "id": "g4-l3-r1",
+      "topic": "Java Variables",
+      "prompt": "Build a valid float variable declaration for temperature.",
+      "targetTokens": ["float", "temperature", "=", "36.5f", ";"],
+      "distractorTokens": ["double", "36.5", "\"36.5f\"", "class"],
+      "hints": [
+        "A float literal often ends with the letter f.",
+        "Keep the type keyword at the beginning.",
+        "The variable name should explain the value being stored."
+      ]
+    },
+    {
+      "id": "g4-l3-r2",
+      "topic": "Java Variables",
+      "prompt": "Build a valid long variable declaration for population.",
+      "targetTokens": ["long", "population", "=", "1000000L", ";"],
+      "distractorTokens": ["int", "1000000", "\"1000000L\"", "while"],
+      "hints": [
+        "Long values can use an L suffix.",
+        "Do not wrap numeric literals in quotation marks.",
+        "A declaration needs type, name, equals, value, semicolon."
+      ]
+    },
+    {
+      "id": "g4-l3-r3",
+      "topic": "Java Variables",
+      "prompt": "Build a valid String variable declaration for course.",
+      "targetTokens": ["String", "course", "=", "\"Variables\"", ";"],
+      "distractorTokens": ["char", "'Variables'", "boolean", "static"],
+      "hints": [
+        "Strings store text inside double quotation marks.",
+        "The word Variables is the value, not the variable name.",
+        "Put the semicolon at the very end."
+      ]
+    }
+  ]
+}

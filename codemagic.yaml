@@ -1,0 +1,64 @@
+workflows:
+  ios-testflight:
+    name: iTECHS Learning - iOS TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    integrations:
+      app_store_connect: itechs-apple
+
+    environment:
+      node: 22
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.itechs.student
+      vars:
+        VITE_API_URL: https://api.itechs.dev/api
+        VITE_AI_GENERATION_TIMEOUT_MS: 60000
+        VITE_LEVEL_CONTENT_TIMEOUT_MS: 65000
+
+    scripts:
+      - name: Install frontend dependencies
+        script: |
+          cd "$CM_BUILD_DIR/Frontend"
+          npm ci
+
+      - name: Build web application
+        script: |
+          cd "$CM_BUILD_DIR/Frontend"
+          npm run build
+
+      - name: Sync Capacitor iOS project
+        script: |
+          cd "$CM_BUILD_DIR/Frontend"
+          npx cap sync ios
+
+      - name: Set unique iOS build number
+        script: |
+          cd "$CM_BUILD_DIR/Frontend/ios/App"
+          IOS_BUILD_NUMBER=$((PROJECT_BUILD_NUMBER + 100))
+          echo "Using iOS build number: $IOS_BUILD_NUMBER"
+          agvtool new-version -all "$IOS_BUILD_NUMBER"
+
+      - name: Apply App Store signing
+        script: |
+          cd "$CM_BUILD_DIR/Frontend/ios/App"
+          xcode-project use-profiles
+
+      - name: Build signed IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/Frontend/ios/App/App.xcodeproj" \
+            --scheme "App"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: false

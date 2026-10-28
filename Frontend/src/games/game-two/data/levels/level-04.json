@@ -1,0 +1,204 @@
+{
+  "id": "game-two-level-04",
+  "gameType": "GAME_TWO",
+  "levelNumber": 4,
+  "seedVersion": 3,
+  "title": "Code Quest Lab: Method Forge",
+  "subtitle": "Complete reusable methods and return values.",
+  "objective": "Build Java methods with parameters, returns, and calls.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 300,
+    "maxMistakes": 3,
+    "targetPoints": 1150,
+    "bonusPerSecond": 3
+  },
+  "tasks": [
+    {
+      "id": "g2l4-t1",
+      "type": "complete",
+      "title": "Set Login Status",
+      "prompt": "Complete the Java statement for a signed-out user.",
+      "snippet": "____",
+      "answer": "boolean loggedIn = false;",
+      "acceptedAnswers": [
+        "boolean loggedIn = false;"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "boolean loggedIn == false;"
+        },
+        {
+          "id": "b",
+          "label": "boolean loggedIn = false;"
+        },
+        {
+          "id": "c",
+          "label": "bool loggedIn = no;"
+        },
+        {
+          "id": "d",
+          "label": "loggedIn boolean = false;"
+        }
+      ],
+      "points": 130,
+      "coinReward": 1,
+      "coach": "Java methods use return to send a value back.",
+      "hints": [
+        "It is the keyword that sends back a value.",
+        "It starts with r."
+      ]
+    },
+    {
+      "id": "g2l4-t2",
+      "type": "complete",
+      "title": "Store A Level",
+      "prompt": "Complete the Java statement that stores the current level.",
+      "snippet": "____",
+      "answer": "int level = 2;",
+      "acceptedAnswers": [
+        "int level = 2;"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "int level == 2;"
+        },
+        {
+          "id": "b",
+          "label": "int level = 2;"
+        },
+        {
+          "id": "c",
+          "label": "level int = 2;"
+        },
+        {
+          "id": "d",
+          "label": "int level: 2;"
+        }
+      ],
+      "points": 140,
+      "coinReward": 1,
+      "coach": "Method calls use parentheses for arguments.",
+      "hints": [
+        "Use the method name add.",
+        "Put 2 and 3 inside parentheses."
+      ]
+    },
+    {
+      "id": "g2l4-t3",
+      "type": "debug",
+      "title": "Store A Language",
+      "prompt": "Complete the Java statement that stores the language name.",
+      "snippet": "____",
+      "answer": "String language = \"Java\";",
+      "acceptedAnswers": [
+        "String language = \"Java\";"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "String language = Java;"
+        },
+        {
+          "id": "b",
+          "label": "String language == \"Java\";"
+        },
+        {
+          "id": "c",
+          "label": "String language = \"Java\";"
+        },
+        {
+          "id": "d",
+          "label": "language String = \"Java\";"
+        }
+      ],
+      "points": 150,
+      "coinReward": 1,
+      "coach": "Java methods use return to send a value back.",
+      "hints": [
+        "The keyword is return.",
+        "Keep the semicolon."
+      ]
+    },
+    {
+      "id": "g2l4-t4",
+      "type": "choice",
+      "title": "Store A Height",
+      "prompt": "Complete the Java statement that stores a height value.",
+      "correctOptionId": "c",
+      "points": 130,
+      "coinReward": 1,
+      "coach": "A parameter is the named input a method receives.",
+      "options": [
+        {
+          "id": "a",
+          "label": "double height == 170;"
+        },
+        {
+          "id": "b",
+          "label": "height double = 170;"
+        },
+        {
+          "id": "c",
+          "label": "double height = 170;"
+        },
+        {
+          "id": "d",
+          "label": "double height: 170;"
+        }
+      ],
+      "hints": [
+        "Think method input.",
+        "It appears inside the method parentheses."
+      ]
+    },
+    {
+      "id": "g2l4-t5",
+      "type": "reorder",
+      "title": "Print A Start Message",
+      "prompt": "Arrange the Java statement pieces into the correct order.",
+      "points": 220,
+      "coinReward": 2,
+      "coach": "Define the method, return the computed value, close it, then call it from main.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "System.out"
+        },
+        {
+          "id": "b",
+          "code": ".println"
+        },
+        {
+          "id": "c",
+          "code": "(\"Start!\")"
+        },
+        {
+          "id": "d",
+          "code": ";"
+        }
+      ],
+      "initialOrder": [
+        "c",
+        "a",
+        "d",
+        "b"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "hints": [
+        "The call belongs after the method definition.",
+        "return goes inside the braces."
+      ]
+    }
+  ]
+}

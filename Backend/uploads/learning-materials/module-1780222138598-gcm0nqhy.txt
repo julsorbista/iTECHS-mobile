@@ -1,0 +1,195 @@
+{
+  "title": "Basic Programming in Java",
+  "previewText": "Basic Programming in Java\nWhat is Programming?\nProgramming is the process of creating instructions that tell a computer what to do. These instructions are called code and are written using a programming language such as Java.\n\nProgrammers use code to solve problems, automate tasks, and develop software applications. Every program follows a logical sequence of steps to produce the desired output.\n\nKey Points\nProgramming gives instructions to a computer.\nPrograms are written using programming languages.\nJava is one of the most popular programming languages.\nProgramming helps solve real-world problems.\nVariables and Data Types\nWhat is a Variable?\n\nA variable is a storage location used to hold data in a program.\n\nVariables allow programmers to store information that can be used and changed while the program runs.\nCommon Data Types in Java\nChoosing the correct data type helps manage memory efficiently.\nUsing Variables in Output\npublic class Student {\n public static void main(String[] args) {\n String name = \"Maria\";\n int age = 16;\n\n System.out.println(name);\n System.out.println(age);\n }\n}\n\nOutput:\nMaria\n16\nComponents of a Java Program\nA Java program is made up of several important parts:\nClass\nMain Method\nStatements\nVariables\nComments\n\nEach component has a specific purpose and works together to make the program function correctly.\nOperators in Java\nArithmetic Operators\n\nArithmetic operators perform mathematical operations.\n\nExample\nint sum = 10 + 5;\nSystem.out.println(sum);\n\nOutput= 15\nSubtopic 2\nComparison Operators\nSubtopic 3\nInput, Process, and Output (IPO)\nInput, Process, and Output (IPO)\nMost computer programs follow the IPO Model:\nInput → Data entered by the user\nProcess → Computation or decision performed by the program\nOutput → Result displayed to the user\n\nExample\nInput: 5 and 10\nProcess: Add the numbers\nOutput: 15\nSubtopic 1The if Statement\nThe if Statement\nif-else Statement\nThe if-else statement provides two possible outcomes.\nWriting and Running Java Programs\nBefore running a Java program, programmers must:\nWrite the code.\nSave the file.\nCompile the program.\nRun the program.\n\nThe Java compiler checks for errors before the program is executed.",
+  "outline": [
+    {
+      "id": "1780221164155-rcb48e",
+      "title": "Basic Programming in Java",
+      "items": [
+        {
+          "id": "1780221164155-t5ftc3",
+          "title": "What is Programming?",
+          "order": 0,
+          "pageLabel": "1.1",
+          "pageNumber": null,
+          "content": "Programming is the process of creating instructions that tell a computer what to do. These instructions are called code and are written using a programming language such as Java.\n\nProgrammers use code to solve problems, automate tasks, and develop software applications. Every program follows a logical sequence of steps to produce the desired output.\n\nKey Points\nProgramming gives instructions to a computer.\nPrograms are written using programming languages.\nJava is one of the most popular programming languages.\nProgramming helps solve real-world problems.",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780221310214-s4w78y",
+              "title": "Variables and Data Types",
+              "content": "What is a Variable?\n\nA variable is a storage location used to hold data in a program.\n\nVariables allow programmers to store information that can be used and changed while the program runs.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222138592-l5c9rl63.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 175854.png",
+                "placement": "right",
+                "width": 70,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780221555657-0vznjx",
+              "title": "Common Data Types in Java",
+              "content": "Choosing the correct data type helps manage memory efficiently.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222138592-8hglb0pv.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 175929.png",
+                "placement": "right",
+                "width": 58,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780221616281-l7l5zs",
+              "title": "Using Variables in Output",
+              "content": "public class Student {\n public static void main(String[] args) {\n String name = \"Maria\";\n int age = 16;\n\n System.out.println(name);\n System.out.println(age);\n }\n}\n\nOutput:\nMaria\n16",
+              "media": null
+            }
+          ],
+          "media": null
+        },
+        {
+          "id": "1780221647391-6g6h2j",
+          "title": "Components of a Java Program",
+          "order": 1,
+          "pageLabel": "1.2",
+          "pageNumber": null,
+          "content": "A Java program is made up of several important parts:\nClass\nMain Method\nStatements\nVariables\nComments\n\nEach component has a specific purpose and works together to make the program function correctly.",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780221949662-xrtdg1",
+              "title": "Operators in Java",
+              "content": "Arithmetic Operators\n\nArithmetic operators perform mathematical operations.\n\nExample\nint sum = 10 + 5;\nSystem.out.println(sum);\n\nOutput= 15",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222138596-qzjx3hmn.png",
+                "alt": "example",
+                "caption": "example picture",
+                "name": "Screenshot 2026-05-31 180616.png",
+                "placement": "right",
+                "width": 70,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780222026959-hwa0nj",
+              "title": "Subtopic 2",
+              "content": "Comparison Operators",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222138597-kt4uv5ws.png",
+                "alt": "example",
+                "caption": "example picture",
+                "name": "Screenshot 2026-05-31 180723.png",
+                "placement": "right",
+                "width": 61,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780222062204-d2jet6",
+              "title": "Subtopic 3",
+              "content": "",
+              "media": null
+            }
+          ],
+          "media": {
+            "src": "/api/public/learning-material-assets/lesson-asset-1780222138592-aqf5o41a.png",
+            "alt": "example",
+            "caption": "example code",
+            "name": "Screenshot 2026-05-31 180216.png",
+            "placement": "right",
+            "width": 70,
+            "position": {
+              "x": 8,
+              "y": 8
+            }
+          }
+        },
+        {
+          "id": "1780221756383-45pjfw",
+          "title": "Input, Process, and Output (IPO)",
+          "order": 2,
+          "pageLabel": "1.3",
+          "pageNumber": null,
+          "content": "Input, Process, and Output (IPO)\nMost computer programs follow the IPO Model:\nInput → Data entered by the user\nProcess → Computation or decision performed by the program\nOutput → Result displayed to the user\n\nExample\nInput: 5 and 10\nProcess: Add the numbers\nOutput: 15",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780221839306-q6am5o",
+              "title": "Subtopic 1The if Statement",
+              "content": "The if Statement",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222138592-11p2u5jr.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 180417.png",
+                "placement": "right",
+                "width": 48,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780221878380-op0l2f",
+              "title": "if-else Statement",
+              "content": "The if-else statement provides two possible outcomes.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780222138592-110lcse2.png",
+                "alt": "example",
+                "caption": "example code",
+                "name": "Screenshot 2026-05-31 180453.png",
+                "placement": "right",
+                "width": 46,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            }
+          ],
+          "media": null
+        },
+        {
+          "id": "1780221785543-4m8z8k",
+          "title": "Writing and Running Java Programs",
+          "order": 3,
+          "pageLabel": "1.4",
+          "pageNumber": null,
+          "content": "Before running a Java program, programmers must:\nWrite the code.\nSave the file.\nCompile the program.\nRun the program.\n\nThe Java compiler checks for errors before the program is executed.",
+          "contentType": "lesson",
+          "subtopics": [],
+          "media": {
+            "src": "/api/public/learning-material-assets/lesson-asset-1780222138592-o9h2agbg.png",
+            "alt": "example",
+            "caption": "example code",
+            "name": "Screenshot 2026-05-31 180328.png",
+            "placement": "right",
+            "width": 70,
+            "position": {
+              "x": 8,
+              "y": 8
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

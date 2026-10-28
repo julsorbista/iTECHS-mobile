@@ -1,0 +1,115 @@
+{
+  "title": "Introduction to Java",
+  "previewText": "Introduction to Java\nWhat is Java?\nJava is a high-level, object-oriented programming language developed by Sun Microsystems in 1995. It is designed to be simple, secure, and platform-independent.\n\nJava is one of the most popular programming languages used for developing applications such as desktop software, mobile apps, web systems, and games.\n\nBecause of its versatility and reliability, Java is widely taught in schools and universities around the world.\n\nKey Points:\nDeveloped by Sun Microsystems\nCreated by James Gosling\nReleased in 1995\nObject-Oriented Programming Language\nPlatform Independent\nHistory of Java\nJava was created by James Gosling and a team of developers at Sun Microsystems.\n\nThe project began in 1991 and was originally intended for interactive television devices.\n\nHowever, Java later became one of the most popular programming languages for computers and the internet.\nTimeline of Java\n1991 – Java project started\n1995 – Java officially released\n2009 – Oracle acquired Sun Microsystems\nPresent – Java remains one of the world's leading programming languages\nWhy Learn Java?\nJava is an excellent programming language for beginners because it introduces important programming concepts that are used in many other languages.\n\nLearning Java helps students develop logical thinking, problem-solving skills, and computational thinking.\n\nJava is also widely used in the industry, making it a valuable skill for future careers in Information Technology and Software Development.\n\nBenefits of Learning Java:\nEasy to understand syntax\nUsed worldwide\nStrong community support\nCreates different types of applications\nBuilds programming foundations\nMain Features\nJava has several important features:\n\nSimple\nSecure\nRobust\nPortable\nObject-Oriented\nMultithreaded\n\nThese features make Java suitable for creating reliable application\nObject-Oriented Programming\nJava follows the Object-Oriented Programming (OOP) approach.\n\nOOP organizes programs using:\nClasses\nObjects\nMethods\nAttributes\n\nThis makes programs easier to manage and maintain.",
+  "outline": [
+    {
+      "id": "1780218602822-6lok9j",
+      "title": "Introduction to Java",
+      "items": [
+        {
+          "id": "1780218602822-ggizab",
+          "title": "What is Java?",
+          "order": 0,
+          "pageLabel": "1.1",
+          "pageNumber": null,
+          "content": "Java is a high-level, object-oriented programming language developed by Sun Microsystems in 1995. It is designed to be simple, secure, and platform-independent.\n\nJava is one of the most popular programming languages used for developing applications such as desktop software, mobile apps, web systems, and games.\n\nBecause of its versatility and reliability, Java is widely taught in schools and universities around the world.\n\nKey Points:\nDeveloped by Sun Microsystems\nCreated by James Gosling\nReleased in 1995\nObject-Oriented Programming Language\nPlatform Independent",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780218608536-sara4c",
+              "title": "History of Java",
+              "content": "Java was created by James Gosling and a team of developers at Sun Microsystems.\n\nThe project began in 1991 and was originally intended for interactive television devices.\n\nHowever, Java later became one of the most popular programming languages for computers and the internet.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780220699005-c0cuuvwe.jpg",
+                "alt": "p2",
+                "caption": "The father of java",
+                "name": "p2.jpg",
+                "placement": "right",
+                "width": 70,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780220465762-gt4ouo",
+              "title": "Timeline of Java",
+              "content": "1991 – Java project started\n1995 – Java officially released\n2009 – Oracle acquired Sun Microsystems\nPresent – Java remains one of the world's leading programming languages",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780220699005-rnscq7je.webp",
+                "alt": "p2",
+                "caption": "Java Time line",
+                "name": "p2.webp",
+                "placement": "right",
+                "width": 48,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            }
+          ],
+          "media": {
+            "src": "/api/public/learning-material-assets/lesson-asset-1780220699001-bxfotp5q.png",
+            "alt": "p1",
+            "caption": "Jaca Logo",
+            "name": "p1.png",
+            "placement": "right",
+            "width": 67,
+            "position": {
+              "x": 8,
+              "y": 8
+            }
+          }
+        },
+        {
+          "id": "1780220542835-x0z9y2",
+          "title": "Why Learn Java?",
+          "order": 1,
+          "pageLabel": "1.2",
+          "pageNumber": null,
+          "content": "Java is an excellent programming language for beginners because it introduces important programming concepts that are used in many other languages.\n\nLearning Java helps students develop logical thinking, problem-solving skills, and computational thinking.\n\nJava is also widely used in the industry, making it a valuable skill for future careers in Information Technology and Software Development.\n\nBenefits of Learning Java:\nEasy to understand syntax\nUsed worldwide\nStrong community support\nCreates different types of applications\nBuilds programming foundations",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780220596963-6oolv0",
+              "title": "Main Features",
+              "content": "Java has several important features:\n\nSimple\nSecure\nRobust\nPortable\nObject-Oriented\nMultithreaded\n\nThese features make Java suitable for creating reliable application",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780220699001-cjedqcsv.jpg",
+                "alt": "p3",
+                "caption": "",
+                "name": "p3.jpg",
+                "placement": "right",
+                "width": 70,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            },
+            {
+              "id": "1780220640861-88bp8r",
+              "title": "Object-Oriented Programming",
+              "content": "Java follows the Object-Oriented Programming (OOP) approach.\n\nOOP organizes programs using:\nClasses\nObjects\nMethods\nAttributes\n\nThis makes programs easier to manage and maintain.",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780220699001-iz29qz85.png",
+                "alt": "example",
+                "caption": "Simple Example",
+                "name": "Screenshot 2026-05-31 174439.png",
+                "placement": "right",
+                "width": 70,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            }
+          ],
+          "media": null
+        }
+      ]
+    }
+  ]
+}

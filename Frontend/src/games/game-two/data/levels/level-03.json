@@ -1,0 +1,203 @@
+{
+  "id": "game-two-level-03",
+  "gameType": "GAME_TWO",
+  "levelNumber": 3,
+  "seedVersion": 3,
+  "title": "Code Quest Lab: Loop Runner",
+  "subtitle": "Repair loops and indexes.",
+  "objective": "Use Java loops to repeat work without repeating yourself.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 270,
+    "maxMistakes": 3,
+    "targetPoints": 1000,
+    "bonusPerSecond": 2
+  },
+  "tasks": [
+    {
+      "id": "g2l3-t1",
+      "type": "complete",
+      "title": "Store An Index",
+      "prompt": "Complete the Java statement so index starts at 0.",
+      "snippet": "____",
+      "answer": "int index = 0;",
+      "acceptedAnswers": [
+        "int index = 0;"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "int index == 0;"
+        },
+        {
+          "id": "b",
+          "label": "int index = 0;"
+        },
+        {
+          "id": "c",
+          "label": "index int = 0;"
+        },
+        {
+          "id": "d",
+          "label": "int index: 0;"
+        }
+      ],
+      "points": 120,
+      "coinReward": 1,
+      "coach": "Most array and loop counters start at zero.",
+      "hints": [
+        "The first index is zero."
+      ]
+    },
+    {
+      "id": "g2l3-t2",
+      "type": "debug",
+      "title": "Store A Limit",
+      "prompt": "Complete the Java statement that stores a loop limit.",
+      "snippet": "____",
+      "answer": "int limit = 5;",
+      "acceptedAnswers": [
+        "int limit = 5;"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "int limit == 5;"
+        },
+        {
+          "id": "b",
+          "label": "int limit = 5;"
+        },
+        {
+          "id": "c",
+          "label": "limit int = 5;"
+        },
+        {
+          "id": "d",
+          "label": "int limit: 5;"
+        }
+      ],
+      "points": 160,
+      "coinReward": 1,
+      "coach": "If i gets smaller while the condition waits for i < 5, the loop may never stop.",
+      "hints": [
+        "The update should increase i.",
+        "Use i++."
+      ]
+    },
+    {
+      "id": "g2l3-t3",
+      "type": "complete",
+      "title": "Store A City",
+      "prompt": "Complete the Java statement that stores a city name.",
+      "snippet": "____",
+      "answer": "String city = \"Manila\";",
+      "acceptedAnswers": [
+        "String city = \"Manila\";"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "String city == \"Manila\";"
+        },
+        {
+          "id": "b",
+          "label": "String city = Manila;"
+        },
+        {
+          "id": "c",
+          "label": "String city = \"Manila\";"
+        },
+        {
+          "id": "d",
+          "label": "city String = \"Manila\";"
+        }
+      ],
+      "points": 130,
+      "coinReward": 1,
+      "coach": "Array positions start at index 0.",
+      "hints": [
+        "Use square brackets.",
+        "First item means index 0."
+      ]
+    },
+    {
+      "id": "g2l3-t4",
+      "type": "choice",
+      "title": "Print A Status",
+      "prompt": "Complete the Java statement that prints a status message.",
+      "correctOptionId": "d",
+      "points": 130,
+      "coinReward": 1,
+      "coach": "The values are 0, 1, 2, and 3.",
+      "options": [
+        {
+          "id": "a",
+          "label": "System.out.print(\"Ready!\");"
+        },
+        {
+          "id": "b",
+          "label": "System.println(\"Ready!\");"
+        },
+        {
+          "id": "c",
+          "label": "println(Ready!);"
+        },
+        {
+          "id": "d",
+          "label": "System.out.println(\"Ready!\");"
+        }
+      ],
+      "hints": [
+        "Count every value before 4.",
+        "It includes 0."
+      ]
+    },
+    {
+      "id": "g2l3-t5",
+      "type": "reorder",
+      "title": "Loop Program",
+      "prompt": "Drag the Java blocks so the program prints each name.",
+      "points": 200,
+      "coinReward": 2,
+      "coach": "Create the array, loop through it, print each item, then close the loop.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "String[] names = {\"Ada\", \"Lin\"};"
+        },
+        {
+          "id": "b",
+          "code": "for (int i = 0; i < names.length; i++) {"
+        },
+        {
+          "id": "c",
+          "code": "  System.out.println(names[i]);"
+        },
+        {
+          "id": "d",
+          "code": "}"
+        }
+      ],
+      "initialOrder": [
+        "b",
+        "a",
+        "d",
+        "c"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "hints": [
+        "The array must exist before the loop.",
+        "The print line belongs inside the loop."
+      ]
+    }
+  ]
+}

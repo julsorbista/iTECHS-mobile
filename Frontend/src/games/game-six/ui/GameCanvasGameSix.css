@@ -1,0 +1,677 @@
+.game-six-emerald {
+  --pixel-dark: #073f39;
+  --pixel-mid: #0b6f59;
+  --pixel-bright: #20c9a6;
+  --pixel-cyan: #22d3ee;
+  border: 3px solid var(--pixel-dark);
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(20, 184, 166, 0.16), transparent 26%),
+    var(--panel-surface, #edf7f5);
+  box-shadow: 8px 8px 0 var(--pixel-dark);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, calc(100% - 10px) 4px, 100% 4px, 100% calc(100% - 10px), calc(100% - 4px) calc(100% - 10px), calc(100% - 4px) 100%, 10px 100%, 10px calc(100% - 4px), 0 calc(100% - 4px), 0 10px, 4px 10px, 4px 4px, 10px 4px);
+}
+
+.game-six-shell {
+  max-width: 1560px;
+  margin-inline: auto;
+  --typing-accent: #16876d;
+  --typing-dark: #052f2b;
+  --typing-focus: #6ee7d2;
+  --typing-surface: #effdf9;
+  --panel-surface: #d9eee8;
+  --panel-card: #edf8f5;
+  --panel-chip: #f7fcfa;
+  --panel-heading: #397b6c;
+}
+
+.game-six-level-1 {
+  --typing-accent: #b8752f;
+  --typing-dark: #63391f;
+  --typing-focus: #f0bd68;
+  --typing-surface: #fff1d5;
+  --panel-surface: #d5ad72;
+  --panel-card: #efd29d;
+  --panel-chip: #ffe8bd;
+  --panel-heading: #9b5927;
+  --falling-bubble: rgba(255, 232, 170, 0.9);
+  --falling-bubble-border: #a86428;
+  --falling-bubble-text: #57351f;
+  --falling-bubble-glow: rgba(240, 189, 104, 0.55);
+}
+
+.game-six-level-2 {
+  --typing-accent: #81506f;
+  --typing-dark: #39273d;
+  --typing-focus: #d89ab9;
+  --typing-surface: #f5e5ed;
+  --panel-surface: #765067;
+  --panel-card: #a77a91;
+  --panel-chip: #ead3df;
+  --panel-heading: #573247;
+  --falling-bubble: rgba(104, 72, 105, 0.9);
+  --falling-bubble-border: #e2b0ca;
+  --falling-bubble-text: #fff3fa;
+  --falling-bubble-glow: rgba(216, 154, 185, 0.52);
+}
+
+.game-six-level-3 {
+  --typing-accent: #9a6238;
+  --typing-dark: #4e2f22;
+  --typing-focus: #dfa66c;
+  --typing-surface: #f8e4cc;
+  --panel-surface: #b47b4e;
+  --panel-card: #d6a873;
+  --panel-chip: #f3d7b1;
+  --panel-heading: #744327;
+  --falling-bubble: rgba(239, 202, 148, 0.9);
+  --falling-bubble-border: #8a5431;
+  --falling-bubble-text: #4e2f22;
+  --falling-bubble-glow: rgba(223, 166, 108, 0.55);
+}
+
+.game-six-level-4 {
+  --typing-accent: #95547d;
+  --typing-dark: #472947;
+  --typing-focus: #dd91bc;
+  --typing-surface: #f5dfeb;
+  --panel-surface: #73517f;
+  --panel-card: #9c75a7;
+  --panel-chip: #e3cce8;
+  --panel-heading: #4f3458;
+  --falling-bubble: rgba(244, 177, 166, 0.94);
+  --falling-bubble-border: #713653;
+  --falling-bubble-text: #3a2038;
+  --falling-bubble-glow: rgba(255, 199, 176, 0.66);
+}
+
+.game-six-level-5 {
+  --typing-accent: #a66762;
+  --typing-dark: #503532;
+  --typing-focus: #e5a49a;
+  --typing-surface: #f7e4dc;
+  --panel-surface: #b77d78;
+  --panel-card: #d9aaa0;
+  --panel-chip: #f4d8cf;
+  --panel-heading: #774844;
+  --falling-bubble: rgba(247, 214, 204, 0.92);
+  --falling-bubble-border: #9c5f59;
+  --falling-bubble-text: #503532;
+  --falling-bubble-glow: rgba(229, 164, 154, 0.58);
+}
+
+.game-six-header {
+  border: 2px solid var(--pixel-dark);
+  border-radius: 0;
+  background: var(--panel-card);
+  box-shadow: 5px 5px 0 rgba(7, 63, 57, 0.82);
+}
+
+.game-six-card {
+  border: 2px solid var(--pixel-dark);
+  border-radius: 0;
+  background: var(--panel-card);
+  color: #172033;
+  box-shadow: 4px 4px 0 rgba(7, 63, 57, 0.75);
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, 100% 3px, 100% calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) 100%, 6px 100%, 6px calc(100% - 3px), 0 calc(100% - 3px), 0 6px, 3px 6px, 3px 3px, 6px 3px);
+}
+
+.game-six-top-stat {
+  min-width: 138px;
+  text-align: center;
+  background: var(--panel-chip);
+}
+
+.game-six-section-title {
+  color: #fff;
+  background: var(--panel-heading);
+  text-shadow: 2px 2px 0 #073f39;
+}
+
+.game-six-mini-stat {
+  border-radius: 0;
+  background: var(--panel-chip);
+  box-shadow: 3px 3px 0 rgba(7, 63, 57, 0.68);
+}
+
+.game-six-goal-status,
+.game-six-guide-panel {
+  background: var(--panel-card);
+}
+
+.game-six-progress-track,
+.game-six-combo-track {
+  background: #dce9e5;
+  border: 2px solid var(--pixel-dark);
+  border-radius: 0 !important;
+  box-shadow: inset 2px 2px 0 rgba(7, 63, 57, 0.16);
+  image-rendering: pixelated;
+}
+
+.game-six-progress-track > div {
+  border-radius: 0 !important;
+  background: repeating-linear-gradient(90deg, #20c9a6 0 10px, #13a889 10px 13px) !important;
+}
+
+.game-six-back-button {
+  border: 2px solid var(--pixel-dark);
+  border-radius: 0;
+  color: #0b6f59;
+  background: var(--panel-chip);
+  box-shadow: 4px 4px 0 var(--pixel-dark);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px, 6px 6px);
+}
+
+.game-six-back-button:hover {
+  border-color: rgba(22, 135, 109, 0.55);
+  background: var(--typing-surface);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--pixel-dark);
+}
+
+.game-six-playfield {
+  min-height: clamp(440px, 48dvh, 485px);
+  border: 4px solid var(--pixel-dark);
+  border-radius: 0;
+  background-position: center;
+  background-size: cover;
+  box-shadow: 7px 7px 0 #052f2b;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px, 10px 10px);
+  image-rendering: pixelated;
+}
+
+.game-six-sidebar {
+  overflow: visible;
+  padding: 10px;
+  background: var(--panel-surface);
+}
+
+.game-six-instruction {
+  border: 3px solid var(--pixel-dark);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.91);
+  box-shadow: 5px 5px 0 var(--pixel-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px, 7px 7px);
+}
+
+.game-six-level-3 .game-six-instruction {
+  width: min(440px, calc(100% - 32px));
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* Category names have different lengths. Reserve the longest mission-copy
+   height so changing the Level 3 target cannot resize the grid/playfield. */
+.game-six-level-3 .game-six-mission-copy {
+  height: 4.125rem;
+  overflow: hidden;
+}
+
+.game-six-streak-status {
+  border-color: #b45309;
+  background: #fff7d6;
+  color: #92400e;
+}
+
+.game-six-speed-wave {
+  position: absolute;
+  left: 50%;
+  top: 76px;
+  z-index: 22;
+  transform: translateX(-50%);
+  width: min(720px, calc(100% - 32px));
+  padding: 10px 18px;
+  border: 3px solid #7c2d12;
+  background: #facc15;
+  box-shadow: 5px 5px 0 #7c2d12;
+  color: #7c2d12;
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.01em;
+  white-space: normal;
+  animation: game-six-speed-wave-pulse 600ms steps(2, end) infinite;
+}
+
+.game-six-combo-feedback {
+  position: absolute;
+  left: 50%;
+  top: 118px;
+  z-index: 24;
+  transform: translateX(-50%);
+  min-width: 180px;
+  padding: 12px 22px;
+  color: #fff7c2;
+  filter: drop-shadow(0 8px 5px rgba(23, 10, 3, 0.42));
+  font-size: 1.3rem;
+  font-weight: 900;
+  white-space: nowrap;
+  display: grid;
+  justify-items: center;
+  line-height: 1;
+  pointer-events: none;
+  isolation: isolate;
+  animation: gameSixComboFeedback 1.25s cubic-bezier(.16, .84, .24, 1) both;
+}
+
+.game-six-combo-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  transform: rotate(-1deg);
+  text-shadow:
+    0 3px 0 #9a3412,
+    3px 0 0 #7c2d12,
+    -3px 0 0 #7c2d12,
+    0 -3px 0 #7c2d12,
+    0 7px 8px rgba(0, 0, 0, 0.42);
+}
+
+.game-six-combo-number {
+  color: #fde047;
+  font-size: 1.85em;
+  font-style: italic;
+  letter-spacing: -0.05em;
+}
+
+.game-six-combo-word {
+  font-size: 1.05em;
+  font-style: italic;
+  letter-spacing: 0.06em;
+}
+
+.game-six-combo-multiplier {
+  margin-top: 8px;
+  color: #ffffff;
+  font-size: 1.35em;
+  font-style: italic;
+  text-shadow:
+    0 3px 0 #0f766e,
+    3px 0 0 #115e59,
+    -3px 0 0 #115e59,
+    0 -3px 0 #115e59,
+    0 0 16px rgba(45, 212, 191, 0.95);
+  animation: gameSixMultiplierSlam 1.25s cubic-bezier(.2, .9, .25, 1) both;
+}
+
+.game-six-combo-burst {
+  position: absolute;
+  inset: 4px -18px;
+  z-index: -1;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 3%, transparent 4%),
+    repeating-conic-gradient(from 8deg, rgba(250, 204, 21, 0.78) 0 4deg, transparent 4deg 19deg);
+  clip-path: polygon(50% 0, 58% 35%, 88% 12%, 70% 43%, 100% 50%, 68% 58%, 88% 88%, 57% 66%, 50% 100%, 43% 66%, 12% 88%, 32% 57%, 0 50%, 32% 42%, 12% 12%, 43% 35%);
+  opacity: 0;
+  animation: gameSixComboBurst 650ms ease-out both;
+}
+
+.game-six-combo-feedback--milestone {
+  min-width: 220px;
+  padding: 15px 26px;
+  font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+  animation-name: gameSixComboMilestone;
+}
+
+.game-six-combo-feedback--milestone .game-six-combo-burst {
+  opacity: 1;
+}
+
+.game-six-combo-feedback--reset {
+  min-width: auto;
+  padding: 7px 12px;
+  border: 2px solid #7f1d1d;
+  background: #fee2e2;
+  color: #991b1b;
+  box-shadow: 3px 3px 0 var(--pixel-dark);
+  font-size: 0.9rem;
+  animation: gameSixComboReset 900ms ease-out both;
+}
+
+.game-six-target-feedback {
+  position: absolute;
+  left: 50%;
+  top: 132px;
+  z-index: 25;
+  transform: translateX(-50%);
+  width: min(440px, calc(100% - 32px));
+  min-height: 52px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--pixel-dark);
+  padding: 12px 20px;
+  background: #d9fff5;
+  color: #075e54;
+  box-shadow: 5px 5px 0 var(--pixel-dark);
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-align: center;
+  white-space: normal;
+  animation: gameSixTargetFeedback 1.8s ease both;
+}
+
+.game-six-fusion-feedback {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  z-index: 34;
+  transform: translate(-50%, -50%);
+  padding: 10px 22px;
+  border: 3px solid #075985;
+  background: #cffafe;
+  box-shadow: 5px 5px 0 #075985;
+  color: #0e7490;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-weight: 1000;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  animation: gameSixFusionFeedback 1.1s ease-out both;
+}
+
+.game-six-word-piece {
+  min-width: 72px;
+  transform: translateX(-50%);
+  border: 3px solid #0e7490;
+  border-radius: 12px;
+  background: rgba(207, 250, 254, 0.94);
+  box-shadow: 0 5px 12px rgba(8, 47, 73, 0.35), 0 0 16px rgba(34, 211, 238, 0.55);
+  color: #164e63;
+  transition: left 28ms linear, top 28ms linear;
+}
+
+.game-six-fused-word {
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 3px #0e7490, 0 0 24px 8px rgba(34, 211, 238, 0.72);
+  animation: gameSixFusedWord 520ms ease-out both;
+}
+
+@keyframes gameSixFusionFeedback {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+  25%, 70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(0.9); }
+}
+
+@keyframes gameSixFusedWord {
+  0% { opacity: 0.4; transform: translateX(-50%) scale(1.5); filter: brightness(1.8); }
+  55% { opacity: 1; transform: translateX(-50%) scale(0.92); }
+  100% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+}
+
+@keyframes gameSixTargetFeedback {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  18%, 72% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -12px); }
+}
+
+@keyframes gameSixComboFeedback {
+  0% { opacity: 0; transform: translate(-50%, 14px) scale(0.45) rotate(-5deg); filter: blur(4px); }
+  14% { opacity: 1; transform: translate(-50%, -2px) scale(1.28) rotate(2deg); filter: blur(0); }
+  27% { transform: translate(-50%, 0) scale(0.94) rotate(-1deg); }
+  38%, 70% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(0); }
+  100% { opacity: 0; transform: translate(-50%, -34px) scale(1.04); filter: blur(1px); }
+}
+
+@keyframes gameSixComboMilestone {
+  0% { opacity: 0; transform: translate(-50%, 18px) scale(0.35) rotate(-7deg); filter: brightness(1.7) blur(5px); }
+  12% { opacity: 1; transform: translate(-50%, -5px) scale(1.42) rotate(3deg); filter: brightness(1.35) blur(0); }
+  23% { transform: translate(-50%, 2px) scale(0.9) rotate(-2deg); }
+  34%, 72% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(0); filter: brightness(1); }
+  100% { opacity: 0; transform: translate(-50%, -42px) scale(1.08); filter: blur(2px); }
+}
+
+@keyframes gameSixMultiplierSlam {
+  0%, 17% { opacity: 0; transform: translateY(-12px) scale(2.2); }
+  28% { opacity: 1; transform: translateY(3px) scale(0.82); }
+  39%, 76% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(1.08); }
+}
+
+@keyframes gameSixComboBurst {
+  0% { opacity: 0; transform: scale(0.25) rotate(-18deg); }
+  20% { opacity: 0.95; transform: scale(1.12) rotate(3deg); }
+  100% { opacity: 0; transform: scale(1.45) rotate(10deg); }
+}
+
+@keyframes gameSixComboReset {
+  0% { opacity: 0; transform: translate(-50%, 4px) scale(0.75); }
+  22%, 60% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -14px) scale(0.92); }
+}
+
+@keyframes game-six-speed-wave-pulse {
+  50% { transform: translateX(-50%) scale(1.06); filter: brightness(1.08); }
+}
+
+.game-six-falling-word {
+  width: max-content;
+  min-width: 150px;
+  max-width: min(280px, 72%);
+  border: 2px solid var(--falling-bubble-border, var(--typing-accent));
+  border-radius: 999px;
+  color: var(--falling-bubble-text, var(--typing-dark));
+  background: var(--falling-bubble, rgba(255, 255, 255, 0.9));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.58),
+    0 7px 14px rgba(35, 22, 20, 0.24),
+    0 0 20px var(--falling-bubble-glow, rgba(110, 231, 210, 0.42));
+  transform: translateX(-50%);
+  backdrop-filter: blur(7px) saturate(1.08);
+  -webkit-backdrop-filter: blur(7px) saturate(1.08);
+  isolation: isolate;
+}
+
+.game-six-falling-word::before {
+  position: absolute;
+  inset: 4px 12px auto;
+  height: 35%;
+  content: '';
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.48), transparent);
+  pointer-events: none;
+}
+
+.game-six-falling-word::after {
+  position: absolute;
+  right: 13px;
+  top: 10px;
+  width: 7px;
+  height: 7px;
+  content: '';
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: -7px 5px 0 -2px rgba(255, 255, 255, 0.6);
+}
+
+@keyframes game-six-signal-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+@keyframes game-six-packet-lights {
+  0%, 100% { background: #22d3ee; }
+  50% { background: #fbbf24; }
+}
+
+.game-six-puzzle-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #16876d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.game-six-puzzle-label::before {
+  margin-right: 6px;
+  content: '[JAVA]';
+  color: #0b5f4d;
+}
+
+.game-six-scrambled-letters,
+.game-six-variable-declaration {
+  display: block;
+  overflow-wrap: anywhere;
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: clamp(0.95rem, 1.7vw, 1.18rem);
+  letter-spacing: 0.12em;
+  line-height: 1.25;
+  text-shadow: 2px 2px 0 rgba(34, 211, 238, 0.18);
+}
+
+.game-six-level-2 .game-six-variable-declaration {
+  color: var(--falling-bubble-text);
+  text-shadow: 0 2px 3px rgba(36, 18, 38, 0.72);
+}
+
+
+.game-six-answer-form {
+  padding: 5px;
+  border: 3px solid var(--typing-dark);
+  border-radius: 0;
+  background: var(--typing-surface);
+  box-shadow: 6px 6px 0 var(--typing-dark);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px, 8px 8px);
+}
+
+.game-six-answer-feedback {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  width: max-content;
+  max-width: min(520px, 94vw);
+  transform: translateX(-50%);
+  padding: 7px 12px;
+  border: 2px solid #052f2b;
+  background: #f0fdfa;
+  box-shadow: 3px 3px 0 #052f2b;
+  color: #134e4a;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.game-six-answer-feedback--incorrect,
+.game-six-answer-feedback--error {
+  border-color: #9f1239;
+  background: #fff1f2;
+  box-shadow: 3px 3px 0 #881337;
+  color: #9f1239;
+}
+
+.game-six-answer-feedback--correct {
+  border-color: #047857;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.game-six-variable-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 2px solid var(--typing-dark);
+  color: #fff;
+  background: var(--typing-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.game-six-answer-input {
+  border: 2px solid var(--typing-dark);
+  border-radius: 0;
+  color: #123d38;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 1px 3px rgba(9, 91, 73, 0.06);
+}
+
+.game-six-answer-input::placeholder {
+  color: #839c96;
+}
+
+.game-six-answer-input:focus {
+  border-color: var(--typing-accent);
+  box-shadow: inset 3px 3px 0 color-mix(in srgb, var(--typing-accent) 20%, transparent), 0 0 0 3px var(--typing-focus);
+}
+
+.game-six-enter-button {
+  border: 2px solid var(--typing-dark);
+  border-radius: 0;
+  background: linear-gradient(135deg, var(--typing-accent) 0%, var(--typing-dark) 100%);
+  box-shadow: 4px 4px 0 var(--typing-dark);
+  text-transform: uppercase;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px, 6px 6px);
+}
+
+.game-six-enter-button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--typing-dark);
+}
+
+.game-six-enter-button:active,
+.game-six-back-button:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+@media (max-width: 1023px) {
+  .game-six-top-stat { min-width: 0; }
+  .game-six-playfield { min-height: 450px; }
+}
+
+@media (max-width: 640px) {
+  .game-six-emerald { padding: 10px; border-radius: 0; }
+  .game-six-header { padding: 14px; }
+  .game-six-answer-form { bottom: 18px; width: calc(100% - 24px); }
+  .game-six-variable-prefix { display: none; }
+  .game-six-enter-button { padding-inline: 18px; }
+  .game-six-falling-word { min-width: 150px; max-width: 76%; }
+  .game-six-playfield { min-height: 410px; }
+}
+
+/* Game 6 owns its scroll area and portal styling, including standalone mobile entry. */
+body .student-game-overlay-game-six {
+  height: 100dvh !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  touch-action: pan-y;
+}
+body .student-game-overlay-game-six .student-shell-overlay {
+  height: auto !important;
+  min-height: 100%;
+  overflow: visible !important;
+}
+#root .student-game-overlay-game-six .student-game-six-frame-wrap,
+#root .student-game-overlay-game-six .student-game-frame-shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+}
+#root .student-game-overlay-game-six .game-six-falling-word {
+  width: min(210px, calc(100% - 24px));
+  min-width: 0 !important;
+  max-width: calc(100% - 24px) !important;
+  left: clamp(12px, calc(var(--word-x) - 105px), max(12px, calc(100% - 222px))) !important;
+  transform: none !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+#root .student-game-overlay-game-six .game-six-answer-input { font-size: 16px !important; }
+@media (max-width: 1024px) {
+  #root .student-game-overlay-game-six .game-six-playfield {
+    height: clamp(410px, 58svh, 520px) !important;
+    min-height: 410px !important;
+  }
+}
+.student-game-overlay-game-six .student-loading-viewport { position: fixed; inset: 0; z-index: 10030; display: grid; place-items: center; padding: 12px; background: #172322e8; }
+.student-game-overlay-game-six .student-level-loading-reference { position: relative; width: min(94vw, 560px, calc(90dvh * 1.289)); aspect-ratio: 553 / 429; background-size: 100% 100%; background-repeat: no-repeat; }
+.student-game-overlay-game-six .student-level-loading-copy { position: absolute; inset: 25% 16% 16%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #4b2816; text-align: center; font-size: clamp(11px, 3vw, 16px); }
+.student-game-overlay-game-six .student-level-loading-copy h2 { font-size: 20px; font-weight: 800; }

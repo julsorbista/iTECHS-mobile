@@ -1,0 +1,98 @@
+{
+  "title": "Introduction to Java",
+  "previewText": "A Beginner’s Guide to Object-Oriented Programming\nWhat is Java?\nHigh-level, object-oriented programming language\nDeveloped by Sun Microsystems (1995), now owned by Oracle\nPlatform-independent: “Write Once, Run Anywhere”\nObject-Oriented Programming in Java\nCore OOP Principles:\n\nEncapsulation – Bundling data and methods together\nInheritance – Reusing code by extending classes\nPolymorphism – One interface, many implementations\nAbstraction – Hiding complexity, showing only essentials\nKey Features\nSimple and easy to learn\nObject-Oriented (OOP)\nPlatform-independent (runs on JVM)\nSecure and robust\nMultithreaded (supports concurrent programming)\nWhy Learn Java?\nWidely used in enterprise applications\nPopular for Android app development\nStrong community support and libraries\nFoundation for learning other languages (C#, Kotlin, etc.)\nBasic Syntax Example\npublic class HelloWorld {\n public static void main(String[] args) {\n System.out.println(\"Hello, Java!\");\n }\n}\nApplications of Java\nMobile apps (Android)\nWeb applications\nDesktop software\nGame development\nCloud computing & big data\nSummary\nJava is versatile, secure, and widely used\nGreat starting point for programming beginners\nOpens doors to careers in software development",
+  "outline": [
+    {
+      "id": "1780032489382-w56p2o",
+      "title": "A Beginner’s Guide to Object-Oriented Programming",
+      "items": [
+        {
+          "id": "1780032489382-xamllf",
+          "title": "What is Java?",
+          "order": 0,
+          "pageLabel": "1.1",
+          "pageNumber": null,
+          "content": "High-level, object-oriented programming language\nDeveloped by Sun Microsystems (1995), now owned by Oracle\nPlatform-independent: “Write Once, Run Anywhere”",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780032566397-2ea30f",
+              "title": "Object-Oriented Programming in Java",
+              "content": "Core OOP Principles:\n\nEncapsulation – Bundling data and methods together\nInheritance – Reusing code by extending classes\nPolymorphism – One interface, many implementations\nAbstraction – Hiding complexity, showing only essentials",
+              "media": {
+                "src": "/api/public/learning-material-assets/lesson-asset-1780032764345-7qu8hh8c.png",
+                "alt": "add",
+                "caption": "",
+                "name": "add.png",
+                "placement": "right",
+                "width": 57,
+                "position": {
+                  "x": 8,
+                  "y": 8
+                }
+              }
+            }
+          ],
+          "media": {
+            "src": "/api/public/learning-material-assets/lesson-asset-1780032764301-5dn67s3h.png",
+            "alt": "add",
+            "caption": "",
+            "name": "add.png",
+            "placement": "right",
+            "width": 47,
+            "position": {
+              "x": 8,
+              "y": 8
+            }
+          }
+        },
+        {
+          "id": "1780032603676-8m3l25",
+          "title": "Key Features",
+          "order": 1,
+          "pageLabel": "1.2",
+          "pageNumber": null,
+          "content": "Simple and easy to learn\nObject-Oriented (OOP)\nPlatform-independent (runs on JVM)\nSecure and robust\nMultithreaded (supports concurrent programming)",
+          "contentType": "lesson",
+          "subtopics": [
+            {
+              "id": "1780032632047-lmd1ed",
+              "title": "Why Learn Java?",
+              "content": "Widely used in enterprise applications\nPopular for Android app development\nStrong community support and libraries\nFoundation for learning other languages (C#, Kotlin, etc.)",
+              "media": null
+            },
+            {
+              "id": "1780032664021-ncmbxt",
+              "title": "Basic Syntax Example",
+              "content": "public class HelloWorld {\n public static void main(String[] args) {\n System.out.println(\"Hello, Java!\");\n }\n}",
+              "media": null
+            }
+          ],
+          "media": null
+        },
+        {
+          "id": "1780032687560-mncnyv",
+          "title": "Applications of Java",
+          "order": 2,
+          "pageLabel": "1.3",
+          "pageNumber": null,
+          "content": "Mobile apps (Android)\nWeb applications\nDesktop software\nGame development\nCloud computing & big data",
+          "contentType": "lesson",
+          "subtopics": [],
+          "media": null
+        },
+        {
+          "id": "1780032734843-9mxuy8",
+          "title": "Summary",
+          "order": 3,
+          "pageLabel": "1.4",
+          "pageNumber": null,
+          "content": "Java is versatile, secure, and widely used\nGreat starting point for programming beginners\nOpens doors to careers in software development",
+          "contentType": "lesson",
+          "subtopics": [],
+          "media": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "id": "game-two-level-05",
+  "gameType": "GAME_TWO",
+  "levelNumber": 5,
+  "seedVersion": 3,
+  "title": "Code Quest Lab: Debug Boss",
+  "subtitle": "Solve a mixed Java coding gauntlet under pressure.",
+  "objective": "Combine variables, arrays, loops, methods, and debugging in one final sprint.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "seconds": 330,
+    "maxMistakes": 3,
+    "targetPoints": 1300,
+    "bonusPerSecond": 3
+  },
+  "tasks": [
+    {
+      "id": "g2l5-t1",
+      "type": "debug",
+      "title": "Store A Level",
+      "prompt": "Complete the Java statement that stores the current level.",
+      "snippet": "____",
+      "answer": "int level = 5;",
+      "acceptedAnswers": [
+        "int level = 5;"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "int level == 5;"
+        },
+        {
+          "id": "b",
+          "label": "int level = 5;"
+        },
+        {
+          "id": "c",
+          "label": "level int = 5;"
+        },
+        {
+          "id": "d",
+          "label": "int level: 5;"
+        }
+      ],
+      "points": 160,
+      "coinReward": 1,
+      "coach": "The parameter list must be wrapped in parentheses.",
+      "hints": [
+        "Put String name inside parentheses.",
+        "Keep the opening brace."
+      ]
+    },
+    {
+      "id": "g2l5-t2",
+      "type": "complete",
+      "title": "Store A Player",
+      "prompt": "Complete the Java statement that stores the player's name.",
+      "snippet": "____",
+      "answer": "String player = \"Alex\";",
+      "acceptedAnswers": [
+        "String player = \"Alex\";"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "String player = Alex;"
+        },
+        {
+          "id": "b",
+          "label": "String player == \"Alex\";"
+        },
+        {
+          "id": "c",
+          "label": "String player = \"Alex\";"
+        },
+        {
+          "id": "d",
+          "label": "player String = \"Alex\";"
+        }
+      ],
+      "points": 150,
+      "coinReward": 1,
+      "coach": "String concatenation can join text with a variable.",
+      "hints": [
+        "Use the variable name.",
+        "No quotes around the variable."
+      ]
+    },
+    {
+      "id": "g2l5-t3",
+      "type": "choice",
+      "title": "Set The Door",
+      "prompt": "Complete the Java statement so the door starts open.",
+      "correctOptionId": "b",
+      "points": 150,
+      "coinReward": 1,
+      "coach": "Skipped first items often point to a starting index problem.",
+      "options": [
+        {
+          "id": "a",
+          "label": "boolean open == true;"
+        },
+        {
+          "id": "b",
+          "label": "boolean open = true;"
+        },
+        {
+          "id": "c",
+          "label": "bool open = yes;"
+        },
+        {
+          "id": "d",
+          "label": "boolean = open true;"
+        }
+      ],
+      "hints": [
+        "Arrays start at 0.",
+        "Look at the first value of i."
+      ]
+    },
+    {
+      "id": "g2l5-t4",
+      "type": "complete",
+      "title": "Store Coins",
+      "prompt": "Complete the Java statement that stores the coin count.",
+      "snippet": "____",
+      "answer": "int coins = 25;",
+      "acceptedAnswers": [
+        "int coins = 25;"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "int coins == 25;"
+        },
+        {
+          "id": "b",
+          "label": "int coins = 25;"
+        },
+        {
+          "id": "c",
+          "label": "coins int = 25;"
+        },
+        {
+          "id": "d",
+          "label": "int coins: 25;"
+        }
+      ],
+      "points": 180,
+      "coinReward": 1,
+      "coach": "Both conditions must be true, so use logical AND.",
+      "hints": [
+        "Use && between the two checks.",
+        "One check is lives > 0."
+      ]
+    },
+    {
+      "id": "g2l5-t5",
+      "type": "reorder",
+      "title": "Store A Score",
+      "prompt": "Arrange the Java statement pieces into the correct order.",
+      "points": 260,
+      "coinReward": 2,
+      "coach": "Declare values, create total, test it, print the result, then close the block.",
+      "blocks": [
+        {
+          "id": "a",
+          "code": "double"
+        },
+        {
+          "id": "b",
+          "code": "score"
+        },
+        {
+          "id": "c",
+          "code": "="
+        },
+        {
+          "id": "d",
+          "code": "100"
+        },
+        {
+          "id": "e",
+          "code": ";"
+        }
+      ],
+      "initialOrder": [
+        "b",
+        "a",
+        "c",
+        "d",
+        "e"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "hints": [
+        "The array must exist before total uses it.",
+        "The print line belongs inside the if block."
+      ]
+    },
+    {
+      "id": "g2l5-t6",
+      "type": "complete",
+      "title": "Print Completion",
+      "prompt": "Complete the Java statement that prints the completion message.",
+      "snippet": "____",
+      "answer": "System.out.println(\"Complete!\");",
+      "acceptedAnswers": [
+        "System.out.println(\"Complete!\");"
+      ],
+      "options": [
+        { "id": "a", "label": "System.out.print(\"Complete!\");" },
+        { "id": "b", "label": "System.out.println(\"Complete!\");" },
+        { "id": "c", "label": "System.println(\"Complete!\");" },
+        { "id": "d", "label": "println(Complete!);" }
+      ],
+      "points": 210,
+      "coinReward": 2,
+      "hints": [
+        "Use System.out.println.",
+        "Use double quotes around the message."
+      ]
+    }
+  ]
+}

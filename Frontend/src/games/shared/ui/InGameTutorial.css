@@ -1,0 +1,140 @@
+.in-game-tutorial { position: fixed; z-index: 2147483000; clip-path: inset(0); pointer-events: none; font-family: Manrope, Arial, sans-serif; color: #563a24; }
+.in-game-tutorial * { box-sizing: border-box; }
+.in-game-tutorial__panel { position: fixed; width: min(520px, calc(100vw - 16px)); height: min(360px, calc(100dvh - 16px)); display: flex; flex-direction: column; gap: 16px; padding: 110px 46px 42px; pointer-events: auto; outline: none; filter: drop-shadow(0 5px 7px #32200c55); }
+.in-game-tutorial__frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+.in-game-tutorial__close { position: absolute; top: 14%; right: 3%; width: 8%; height: 12%; border: none; background: transparent; border-radius: 30%; cursor: pointer; }
+.in-game-tutorial__page { position: absolute; top: 21%; right: 13%; font-size: 11px; font-weight: 900; color: #fff4d9; }
+.in-game-tutorial__content { position: relative; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.in-game-tutorial__content h3 { margin: 0; font-size: 20px; font-weight: 900; line-height: 1.2; color: #5c3d26; }
+.in-game-tutorial__content p { margin: 0; font-size: 16px; font-weight: 650; line-height: 1.45; }
+.in-game-tutorial__content small { display: block; font-size: 12px; line-height: 1.5; color: #795e43; }
+.in-game-tutorial__safe { display: block; margin-top: 0; font-size: 10px; color: #765b3e; }
+.in-game-tutorial nav { position: relative; flex-shrink: 0; display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 14px; }
+.in-game-tutorial nav button { display: inline-flex; align-items: center; justify-content: center; gap: 3px; width: 70px; min-height: 30px; border: 1px solid #825731; border-radius: 6px; padding: 6px 8px; background: #e6c28a; box-shadow: 0 2px 0 #a87742; color: #56331e; font-size: 13px; font-weight: 800; text-decoration: none; cursor: pointer; }
+.in-game-tutorial nav button svg { flex: 0 0 auto; filter: drop-shadow(0 1px 0 #fff2cf); }
+.in-game-tutorial nav .in-game-tutorial__finish { width: auto; min-width: 112px; white-space: nowrap; }
+.in-game-tutorial nav button:disabled { opacity: .62; cursor: default; }
+.in-game-tutorial button:focus-visible { outline: 3px solid #618643; outline-offset: 2px; }
+.in-game-tutorial__keys { display: flex; gap: 5px; margin-top: 6px; }
+.in-game-tutorial kbd { padding: 3px 8px; background: #fff5db; box-shadow: 0 3px #a7804c; border: 1px solid #967047; border-radius: 4px; font-size: 13px; }
+.in-game-tutorial kbd.is-pressed { background: #dce6ae; transform: translateY(2px); box-shadow: 0 1px #a7804c; }
+.in-game-tutorial__highlight { position: fixed; border: 2px solid #ffe08b; border-radius: 8px; box-shadow: 0 0 0 4px #e6b45130, 0 0 18px #efbe5780; transition: left 260ms, top 260ms, width 260ms, height 260ms; }
+.in-game-tutorial--warning .in-game-tutorial__highlight { border-color: #f0a27d; box-shadow: 0 0 12px #e57e5366; }
+.in-game-tutorial__hand { position: fixed; width: 45px; height: 52px; transition: left 240ms ease, top 240ms ease; }
+.in-game-tutorial__hand img { position: absolute; left: -9px; top: -5px; width: 45px; max-width: none; transform-origin: 20% 10%; filter: drop-shadow(0 3px 3px #30200e88); animation: in-game-wait 2s ease-in-out infinite; }
+.in-game-tutorial__hand.is-pressed img { animation: none; transform: translateY(3px) scale(.94); }
+.in-game-tutorial__hand i { position: absolute; width: 13px; height: 13px; left: -6px; top: -6px; border-radius: 50%; border: 2px solid #ffe19d; opacity: 0; }
+.in-game-tutorial__hand.is-pressed i { opacity: 1; }
+.in-game-tutorial--swipe .in-game-tutorial__hand { transition: left 90ms linear, top 90ms linear; }
+.in-game-demo-open [data-demo-motion] { transition: left 80ms linear, top 80ms linear; }
+@keyframes in-game-wait { 50% { transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .in-game-tutorial *, .in-game-demo-open [data-demo-motion] { animation: none !important; transition: none !important; } }
+/* Keep the existing board measurable in the narrow, stacked game layout. */
+@media (max-width: 950px) {
+  .in-game-demo-open .game-three-layout { grid-template-columns: minmax(0, 1fr) 228px; align-items: start; }
+  .in-game-demo-open .game-three-side-panel { display: flex; flex-direction: column; }
+  .in-game-demo-open .game-three-board-shell { height: min(440px, 72dvh) !important; flex-shrink: 0; }
+}
+/* On portrait phones, keep Game 3 in the same stacked document layout used
+   during normal play. The wider tutorial rule above must not squeeze the
+   board beside the status panel. */
+@media (max-width: 760px) and (orientation: portrait) {
+  .in-game-demo-open.game-three-shell .game-three-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: start !important;
+  }
+  .in-game-demo-open.game-three-shell .game-three-side-panel {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .in-game-demo-open.game-three-shell .game-three-side-card {
+    grid-column: 1 / -1;
+  }
+  .in-game-demo-open.game-three-shell .game-three-board-shell {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 !important;
+    flex-shrink: 1;
+  }
+}
+.in-game-demo-open [data-tutorial-highlight="true"][data-g5-target^="letter-"] { background: #d9eab1; color: #354b21; opacity: 1; }
+.in-game-tutorial__copy { display: grid; gap: 10px; }
+@media (max-width: 540px), (max-height: 540px) {
+  .in-game-tutorial__panel { padding: 96px 34px 32px; gap: 12px; }
+  .in-game-tutorial nav { margin-bottom: 10px; }
+  .in-game-tutorial__content p { font-size: 14px; }
+  .in-game-tutorial__content h3 { font-size: 18px; }
+}
+
+/* Keep tutorial copy inside the shared parchment on both iOS and Android.
+   Long copy scrolls only inside the paper content area. */
+.in-game-tutorial .in-game-tutorial__content,
+.in-game-tutorial .in-game-tutorial__copy,
+.in-game-tutorial .in-game-tutorial__copy > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.in-game-tutorial .in-game-tutorial__content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.in-game-tutorial .in-game-tutorial__copy > * {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.in-game-tutorial nav button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  text-align: center;
+}
+
+@media (max-width: 540px), (max-height: 540px) {
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__panel {
+    gap: 8px;
+    padding: 94px 32px 34px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__copy {
+    gap: 7px;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content h3 {
+    font-size: clamp(16px, 4.7vw, 18px);
+    line-height: 1.15;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content p {
+    font-size: clamp(12px, 3.7vw, 14px);
+    line-height: 1.35;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__content small {
+    font-size: clamp(10px, 3vw, 12px);
+    line-height: 1.35;
+  }
+
+  .in-game-tutorial[data-game="3"] .in-game-tutorial__safe {
+    font-size: 9px;
+    line-height: 1.25;
+  }
+
+  .in-game-tutorial[data-game="3"] nav {
+    margin: 0 0 9px;
+  }
+
+  .in-game-tutorial[data-game="3"] nav button,
+  .in-game-tutorial[data-game="3"] nav .in-game-tutorial__finish {
+    width: auto;
+    min-width: 70px;
+    max-width: 48%;
+    padding: 6px 7px;
+    font-size: 12px;
+  }
+}

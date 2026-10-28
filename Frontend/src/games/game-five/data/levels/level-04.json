@@ -1,0 +1,18 @@
+{
+  "id": "game-five-level-04",
+  "gameType": "GAME_FIVE",
+  "levelNumber": 4,
+  "seedVersion": 2,
+  "title": "Code Robot: Array Circuit",
+  "subtitle": "Guess eight mixed programming terms under pressure.",
+  "objective": "Guess eight mixed programming terms under pressure.",
+  "settings": {
+    "targetWords": 8,
+    "seconds": 135,
+    "lives": 5
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

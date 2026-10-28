@@ -1,0 +1,16 @@
+/* Tutorial annotations only: retain the exact live room, HUD and keyboard layout. */
+.game-five-guided [data-practice-wrong="true"] { background: #fecaca !important; color: #881337 !important; }
+.game-five-practice-paused { position: absolute; top: 100px; left: 50%; transform: translateX(-50%); white-space: nowrap; z-index: 20; padding: 5px 8px; background: #3F6545; color: #fff7dc; border-radius: 5px; font-size: 10px; font-weight: 800; }
+
+/* The Code Robot board is intentionally spacious, so its tutorial gets a
+   larger parchment with room for the clue and the navigation controls. */
+.in-game-tutorial[data-game="5"] .in-game-tutorial__panel { gap: 12px; padding: 132px 62px 54px; }
+.in-game-tutorial[data-game="5"] .in-game-tutorial__content { padding-right: 4px; }
+.in-game-tutorial[data-game="5"] .in-game-tutorial__content h3 { font-size: 24px; }
+.in-game-tutorial[data-game="5"] .in-game-tutorial__content p { font-size: 17px; line-height: 1.5; }
+.in-game-tutorial[data-game="5"] .in-game-tutorial__content small { font-size: 13px; }
+@media (max-width: 760px), (max-height: 620px) {
+  .in-game-tutorial[data-game="5"] .in-game-tutorial__content h3 { font-size: 20px; }
+  .in-game-tutorial[data-game="5"] .in-game-tutorial__content p { font-size: 15px; }
+  .in-game-tutorial[data-game="5"] .in-game-tutorial__panel { padding: 96px 34px 32px; }
+}

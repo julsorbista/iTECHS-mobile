@@ -1,0 +1,148 @@
+/* Game 1 only: other games share g1-coach, so every override is scoped. */
+.g1-parchment { --ink: #512f1c; --accent: #426c29; --muted: #795b3d; }
+.g1-parchment .g1-parchment__panel {
+  width: min(520px, calc(100% - 28px)); height: min(360px, calc(100% - 64px)); min-height: 310px;
+  max-height: calc(100% - 84px); padding: 110px 48px 44px; display: flex; border: 0; border-radius: 0;
+  background: transparent; box-shadow: none; overflow: hidden;
+  filter: drop-shadow(0 5px 5px #25160055);
+}
+.g1-parchment .g1-parchment__panel--movement { height: min(390px, calc(100% - 64px)); min-height: 360px; }
+.g1-parchment__background { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+.g1-parchment .g1-parchment__header { position: absolute; inset: 0; pointer-events: none; }
+.g1-parchment .g1-parchment__page { position: absolute; right: 13%; top: 21%; color: #fff4d9; font-size: 11px; font-weight: 850; letter-spacing: .06em; }
+.g1-parchment .g1-parchment__close { position: absolute; right: 3%; top: 14%; width: 8%; height: 12%; padding: 0; border-radius: 30%; pointer-events: auto; }
+.g1-parchment .g1-parchment__close:hover { background: #ffffff25; }
+.g1-parchment__body { position: relative; flex: 1 1 0; min-width: 0; max-width: 100%; min-height: 0; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column; padding: 0 4px 4px 0; overscroll-behavior: contain; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.g1-parchment__body > *,
+.g1-parchment .g1-coach__instruction,
+.g1-parchment__note { min-width: 0; max-width: 100%; overflow-wrap: anywhere; word-break: normal; }
+.g1-parchment .g1-parchment__body h3 { margin: 0; color: #613a21; font-size: 20px; font-weight: 900; letter-spacing: .04em; }
+.g1-parchment .g1-coach__instruction { color: #583a22; margin: 9px 0 0; font-size: 16px; line-height: 1.5; font-weight: 650; }
+.g1-parchment .g1-parchment__panel--movement .g1-coach__instruction { font-size: 14px; margin-top: 10px; }
+.g1-parchment__note { color: #806346; margin: 6px 0 0; font-size: 14px; line-height: 1.5; }
+.g1-parchment__boost-preview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: 9px; }
+.g1-parchment__boost-preview span { display: flex; align-items: center; gap: 4px; min-width: 0; padding: 4px 6px; border: 1px solid #c49b63; border-radius: 5px; background: #fff0ca; color: #634123; font-size: 10px; font-weight: 800; }
+.g1-parchment__boost-preview span:nth-child(1) svg { color: #3f9a45; }
+.g1-parchment__boost-preview span:nth-child(2) svg { color: #8d63bd; }
+.g1-parchment__boost-preview span:nth-child(3) svg { color: #4f91ab; }
+.g1-parchment__boost-preview span:nth-child(4) svg { color: #c65055; }
+.g1-parchment__movements { display: grid; grid-template-columns: 92px 1fr; align-items: start; margin-top: 8px; min-height: 88px; }
+.g1-parchment__active-control { padding: 4px 0 0 4px; }
+.g1-parchment .g1-coach__key { min-width: 40px; height: 36px; padding: 0 7px; background: #fff9df; border: 2px solid #b28346; border-radius: 7px; color: #56331e; box-shadow: 0 4px 0 #8d5b2e; font-size: 14px !important; }
+.g1-parchment__control-list { list-style: none; margin: 0; padding: 0; }
+.g1-parchment__control-list li { display: flex; gap: 7px; padding: 1px 6px; border-radius: 4px; font-size: 14px; line-height: 1.5; color: #785a3d; }
+.g1-parchment__control-list b { min-width: 13px; }
+.g1-parchment__control-list .is-current { color: #384b20; background: #a4bc5c38; font-weight: 800; box-shadow: inset 3px 0 #799440; }
+.g1-parchment__footer { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; min-width: 0; max-width: 100%; gap: 8px; margin-top: 8px; margin-bottom: 8px; flex-shrink: 0; color: #836846; font-size: 9px; }
+.g1-parchment__footer > span { display: flex; align-items: center; gap: 4px; }
+.g1-parchment .g1-coach__continue,
+.g1-parchment .g1-parchment__back { display: inline-flex; align-items: center; justify-content: center; gap: 3px; width: 70px; min-height: 30px; margin: 0; padding: 6px 8px; border: 1px solid #825731; border-radius: 6px; background: #e6c28a; box-shadow: 0 2px 0 #a87742; color: #56331e; font-size: 13px !important; font-weight: 800; text-decoration: none; }
+.g1-parchment .g1-coach__continue:disabled { opacity: .7; }
+.g1-parchment .g1-coach__continue--return { width: auto; min-width: 112px; white-space: nowrap; }
+.g1-parchment.g1-coach--success .g1-coach__instruction { color: #426329; }
+.g1-parchment .g1-coach__target span { color: #52301d; background: #fff1d3; border: 1px solid #b68a4d; }
+/* Press state comes from the demo scene, not an unrelated looping animation. */
+.g1-parchment--automatic .g1-coach__key { display: inline-grid; place-items: center; animation: none; transition: transform 90ms, background 90ms; }
+.g1-parchment--automatic .g1-coach__hand--press img,
+.g1-parchment--automatic .g1-coach__hand--hold img { animation: none; transform: translateY(-3px); transition: transform 90ms; }
+.g1-parchment--automatic .g1-coach__touch { animation: none; opacity: 0; }
+.g1-parchment--pressed .g1-coach__key { transform: translateY(3px); background: #dceaae; box-shadow: 0 1px 0 #8d5b2e; }
+.g1-parchment--pressed .g1-coach__hand--press img,
+.g1-parchment--pressed .g1-coach__hand--hold img { transform: translateY(3px) scale(.94); }
+.g1-parchment--pressed .g1-coach__touch { opacity: .9; }
+.g1-parchment--automatic.g1-coach--success .g1-coach__hand { opacity: 1; }
+.g1-parchment .g1-parchment__back:hover { filter: brightness(1.06); }
+
+/* Keep the live room, character, and highlighted target visible beside the
+   coach on landscape phones. The parchment remains scrollable when needed. */
+@media (orientation: landscape), (max-height: 650px) {
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel,
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel--movement {
+    width: min(430px, 48%);
+    height: min(330px, calc(100% - 20px));
+    min-width: 300px;
+    min-height: 0;
+    max-height: calc(100% - 20px);
+    padding: clamp(78px, 20%, 100px) clamp(28px, 7%, 40px) clamp(25px, 7%, 36px);
+  }
+
+  .g1-parchment .g1-parchment__body h3 { font-size: clamp(15px, 2.4vw, 19px); }
+  .g1-parchment .g1-coach__instruction,
+  .g1-parchment .g1-parchment__panel--movement .g1-coach__instruction {
+    margin-top: 6px;
+    font-size: clamp(12px, 1.7vw, 15px);
+    line-height: 1.35;
+  }
+  .g1-parchment__note { font-size: clamp(11px, 1.5vw, 13px); line-height: 1.35; }
+  .g1-parchment__movements { grid-template-columns: 70px 1fr; min-height: 0; margin-top: 5px; }
+  .g1-parchment__control-list { display: grid; width: 100%; min-width: 0; grid-template-columns: 1fr; align-content: start; }
+  .g1-parchment__control-list li { width: 100%; min-width: 0; padding: 1px 5px; font-size: clamp(10px, 1.35vw, 12px); line-height: 1.25; white-space: nowrap; }
+  .g1-parchment__control-list li span { min-width: 0; white-space: nowrap; }
+  .g1-parchment__footer { margin-top: 5px; margin-bottom: 4px; }
+  .g1-parchment .g1-coach__continue,
+  .g1-parchment .g1-parchment__back {
+    width: auto;
+    min-width: 74px;
+    min-height: 32px;
+    padding: 5px 9px;
+    font-size: 11px !important;
+  }
+  .g1-parchment .g1-coach__continue--return { min-width: 112px; }
+
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="2"],
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="3"],
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="4"],
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="5"] {
+    width: min(420px, 40%);
+    height: min(292px, calc(100% - 20px));
+    min-width: 350px;
+    padding: 78px 30px 25px;
+  }
+
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="6"] {
+    width: min(430px, 41%);
+    height: min(300px, calc(100% - 20px));
+    min-width: 360px;
+    padding: 80px 31px 26px;
+  }
+
+}
+
+@media (orientation: landscape) and (max-width: 700px) {
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel,
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel--movement {
+    width: min(320px, 52%);
+    min-width: 270px;
+    padding: 72px 25px 24px;
+  }
+}
+@media (max-height: 540px), (max-width: 650px) {
+  /* Keep the proven website layout and scale it as one unit on phones. This
+     preserves line lengths and keeps navigation fixed at the parchment foot. */
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel,
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page] {
+    width: 520px;
+    height: 360px;
+    min-width: 520px;
+    min-height: 360px;
+    max-width: none;
+    max-height: none;
+    padding: 110px 48px 44px;
+    transform: scale(.6);
+    transform-origin: left top;
+  }
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel--movement,
+  .g1-parchment.g1-parchment--automatic .g1-parchment__panel[data-page="1"] {
+    height: 390px;
+    min-height: 390px;
+  }
+  .g1-parchment .g1-parchment__body h3 { font-size: 20px; }
+  .g1-parchment .g1-coach__instruction,
+  .g1-parchment .g1-parchment__panel--movement .g1-coach__instruction { font-size: 14px; line-height: 1.4; }
+  .g1-parchment__note { font-size: 14px; line-height: 1.4; }
+  .g1-parchment__movements { grid-template-columns: 92px 1fr; margin-top: 8px; min-height: 88px; }
+  .g1-parchment__control-list li { font-size: 14px; line-height: 1.35; }
+  .g1-parchment__footer { margin-top: auto; margin-bottom: 8px; }
+  .g1-parchment__boost-preview { margin-top: 9px; }
+
+}

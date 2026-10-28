@@ -1,0 +1,60 @@
+{
+  "id": "game-four-level-04",
+  "gameType": "GAME_FOUR",
+  "levelNumber": 4,
+  "title": "Mixed Declarations",
+  "subtitle": "Combine constants, booleans, and decimal values while hazards speed up.",
+  "objective": "Stay accurate under pressure by collecting the needed tokens and arranging each declaration correctly.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "settings": {
+    "randomizeStatements": true,
+    "spawnIntervalMs": 780,
+    "fallSpeed": 275,
+    "moveSpeed": 505,
+    "maxMistakes": 4,
+    "lives": 3,
+    "coinRewardPerRound": 1,
+    "statementReward": 150
+  },
+  "rounds": [
+    {
+      "id": "g4-l4-r1",
+      "topic": "Java Variables",
+      "prompt": "Build a valid constant declaration for MAX_STUDENTS.",
+      "targetTokens": ["final", "int", "MAX_STUDENTS", "=", "40", ";"],
+      "distractorTokens": ["String", "\"40\"", "new", "private"],
+      "hints": [
+        "A constant starts with final before the type.",
+        "MAX_STUDENTS is written in uppercase here as a constant name.",
+        "The value comes after the equals sign."
+      ]
+    },
+    {
+      "id": "g4-l4-r2",
+      "topic": "Java Variables",
+      "prompt": "Build a valid boolean variable declaration for hasPassed.",
+      "targetTokens": ["boolean", "hasPassed", "=", "false", ";"],
+      "distractorTokens": ["\"false\"", "int", "switch", "public"],
+      "hints": [
+        "Boolean variables use true or false without quotation marks.",
+        "The variable name should describe a yes-or-no state.",
+        "Use a semicolon to finish the statement."
+      ]
+    },
+    {
+      "id": "g4-l4-r3",
+      "topic": "Java Variables",
+      "prompt": "Build a valid double variable declaration for averageScore.",
+      "targetTokens": ["double", "averageScore", "=", "87.5", ";"],
+      "distractorTokens": ["float", "87,5", "\"87.5\"", "return"],
+      "hints": [
+        "Double variables can store decimal values like 87.5.",
+        "Java decimals use a period, not a comma.",
+        "Put the variable name between the type and equals sign."
+      ]
+    }
+  ]
+}
