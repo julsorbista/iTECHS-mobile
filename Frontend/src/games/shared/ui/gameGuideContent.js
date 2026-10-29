@@ -171,7 +171,7 @@ export const DASHBOARD_GUIDE_CONTENT_BY_GAME = Object.freeze({
           'Use keyboard letters A-Z or click the on-screen letter buttons.',
           'Correct letters reveal parts of the hidden word.',
           'Wrong letters remove Lives.',
-          'Hints provide deeper clue information and may reveal letter information.',
+          'Each hint reveals one hidden letter position. The current word and clue stay unchanged.',
           'Solving words awards points and rewards.',
           'Earn at least 2 Stars to unlock the next level.',
         ],

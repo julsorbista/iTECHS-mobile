@@ -39,6 +39,7 @@ import {
   applyGameOneAiContent,
   buildGameOneAiContentRequest,
   buildSafeGameOneFallbackContent,
+  loadGameOneHintsForRun,
 } from "../../games/game-one/systems/aiLearningContent";
 import { randomizeGameOneJumbledWords } from "../../games/game-one/systems/jumbledWordRandomizer";
 import { buildSubmissionPayload as buildGameTwoSubmissionPayload } from "../../games/game-two/systems/progressBridge";
@@ -550,10 +551,10 @@ const StudentGameOverlay = ({
           );
           if (aiContentRequest.items.length > 0) {
             try {
-              const generatedResponse = await levelAPI.generateGameQuestions(
-                "GAME_ONE",
-                numericLevelNumber,
+              const generatedResponse = await loadGameOneHintsForRun(
+                `${user?.id}:${numericLevelNumber}`,
                 aiContentRequest,
+                () => levelAPI.generateGameQuestions("GAME_ONE", numericLevelNumber, aiContentRequest, { timeout: 20000 }),
               );
               const generatedContent = generatedResponse?.status === "success" && generatedResponse.data?.items
                 ? generatedResponse.data

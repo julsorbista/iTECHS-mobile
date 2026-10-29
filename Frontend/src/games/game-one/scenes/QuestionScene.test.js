@@ -21,7 +21,7 @@ describe('Room 5 treasure question flow', () => {
     expect(source).toContain("document.addEventListener('pointerdown', handleDocumentTreasureTap, true)");
     expect(source).toContain("document.removeEventListener('pointerdown', handleDocumentTreasureTap, true)");
     expect(source).toContain('containsPointer(closeQuestionButton, pointer)');
-    expect(source).toContain('panelLeft + (585 * treasureFrameScale)');
+    expect(source).toContain('artworkX(555)');
     expect(source).toContain('contentLeft = canvasBounds.left + ((canvasBounds.width - contentWidth) / 2)');
     expect(source).toContain('((event.clientX - contentLeft) / contentWidth) * sceneWidth');
     expect(source).toContain('blurAnswerInput();');
@@ -48,15 +48,15 @@ describe('Room 5 treasure question flow', () => {
   it('uses a bold Hint label and one shared feedback location', () => {
     expect(source).toMatch(/hintHotspotLabel[\s\S]*?fontStyle: 'bold'/);
     expect(source).toContain("this.feedbackText = this.add.text(feedbackX, footerY, '', {");
-    expect(source).toContain('hintHotspotLabel.setPosition(panelLeft + (112 * treasureFrameScale), hintButtonY)');
+    expect(source).toContain('hintHotspotLabel.setPosition(artworkX(120), hintButtonY)');
     expect(source).toContain('coinBadgeY + (2 * treasureFrameScale)');
-    expect(source).toContain('? Math.round(238 * treasureFrameScale)');
-    expect(source).toContain("wordWrap: { width: feedbackWidth, useAdvancedWrap: true }");
-    expect(source).toContain('panelLeft + Math.round(309 * treasureFrameScale)');
+    expect(source).toContain('? Math.round(238 * panelWidth / 612)');
+    expect(source).toContain("wordWrap: { width: feedbackWidth - 8, useAdvancedWrap: true }");
+    expect(source).toContain('artworkX(309)');
     expect(source).toContain('submitHotspot && containsPointer(submitHotspot, pointer)');
     expect(source).toContain('activateSubmit = submitWordAnswer');
     expect(source).toContain('containsPointer(hintHotspot, pointer)');
-    expect(source).toContain('hasQuestionFrame ? submitY - (2 * treasureFrameScale) : submitY');
+    expect(source).toContain('const submitY = hasQuestionFrame ? artworkY(321) : treasureY(308)');
   });
 
   it('allows up to three hints for a Game 1 question', () => {

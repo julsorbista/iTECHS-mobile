@@ -57,6 +57,7 @@ export default class HudScene extends Phaser.Scene {
     // touch controls and takes up gameplay space on phones and tablets.
     const usesMobileControls = typeof window !== 'undefined'
       && window.matchMedia?.('(pointer: coarse), (max-width: 1024px)').matches;
+    this.usesMobileHud = usesMobileControls;
     if (usesMobileControls) {
       [
         this.controlsPanel,
@@ -135,6 +136,7 @@ export default class HudScene extends Phaser.Scene {
     }).setOrigin(1, 1).setVisible(false);
 
     this.syncFromRegistry();
+    this.scale.on('resize', this.layoutMobileHud, this);
 
     this.registry.events.on('changedata-roomLabel', this.syncFromRegistry, this);
     this.registry.events.on('changedata-roomIndex', this.syncFromRegistry, this);
@@ -155,6 +157,7 @@ export default class HudScene extends Phaser.Scene {
     this.registry.events.on('changedata-objective', this.syncFromRegistry, this);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.scale.off('resize', this.layoutMobileHud, this);
       this.registry.events.off('changedata-roomLabel', this.syncFromRegistry, this);
       this.registry.events.off('changedata-roomIndex', this.syncFromRegistry, this);
       this.registry.events.off('changedata-roomCount', this.syncFromRegistry, this);
@@ -235,5 +238,36 @@ export default class HudScene extends Phaser.Scene {
     this.timerText.setText(timerEnabled ? `Timer ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}` : '');
     this.objectiveText.setText(objective);
     this.areaText.setText(`Room ${roomIndex}/${roomCount}`);
+    this.layoutMobileHud();
+  }
+
+  layoutMobileHud() {
+    if (!this.usesMobileHud || !this.objectiveText) return;
+    const bounds = this.game.canvas.getBoundingClientRect();
+    const ratio = Math.min(bounds.width / this.scale.width, bounds.height / this.scale.height);
+    if (!(ratio > 0)) return;
+    // Sizes below are visible CSS pixels, independent of the world camera.
+    const px = (value) => value / ratio;
+    const width = this.scale.width;
+    this.hudPanel.setPosition(width / 2, px(21)).setSize(width, px(42))
+      .setFillStyle(0x0f172a, 0);
+    this.healthText.setPosition(px(10), px(3)).setFontSize(px(19));
+    this.coinText.setPosition(px(10), px(27)).setFontSize(px(14));
+    this.timerText.setPosition(width - px(84), px(27)).setOrigin(1, 0).setFontSize(px(10));
+    this.areaText.setPosition(width - px(84), px(this.timerText.visible ? 10 : 21))
+      .setOrigin(1, 0.5).setFontSize(px(11));
+    const left = px(145);
+    const right = width - px(160);
+    const objectiveWidth = Math.max(px(60), right - left);
+    const fullObjective = String(this.registry.get('objective') || 'Explore the room.');
+    const shortObjective = fullObjective.replace(/^Objective complete\.\s*/i, '').split(/\.\s+/)[0];
+    this.objectiveText.setText(shortObjective).setPosition((left + right) / 2, px(21))
+      .setOrigin(0.5).setFontSize(px(11)).setWordWrapWidth(objectiveWidth, true).setLineSpacing(px(1));
+    // Keep the compact summary within two lines; full instructions stay in Mission Control.
+    let summary = shortObjective;
+    while (this.objectiveText.height > px(30) && summary.length > 1) {
+      summary = summary.slice(0, -1).trimEnd();
+      this.objectiveText.setText(`${summary}…`);
+    }
   }
 }

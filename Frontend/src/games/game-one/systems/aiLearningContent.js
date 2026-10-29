@@ -123,8 +123,6 @@ const getScrolls = (levelData = {}) => {
 export const buildGameOneAiContentRequest = (levelData = {}, variationSeed = '') => {
   const questions = Array.isArray(levelData.questions) ? levelData.questions : [];
   const scrambleQuestions = questions.filter((question) => question.challengeType === 'WORD_SCRAMBLE');
-  const treasureQuestion = scrambleQuestions.find((question) => question.id === levelData.treasureQuestionId)
-    || scrambleQuestions[0];
   const levelContext = cleanText(
     [levelData.title, levelData.subtitle, levelData.missionText, levelData.objective].filter(Boolean).join('. '),
     260,
@@ -149,7 +147,8 @@ export const buildSafeGameOneFallbackContent = (request = {}) => ({
       .map((hint) => cleanText(hint, 140))
       .filter((hint) => hint
         && !containsTargetAnswer(hint, item.target)
-        && !containsObviousAnswerReveal(hint));
+        && !containsObviousAnswerReveal(hint))
+      .filter((hint, index, values) => values.indexOf(hint) === index);
     return {
       id: item.id,
       hints: safeHints.length >= 3 ? safeHints.slice(0, 3) : [
@@ -158,16 +157,19 @@ export const buildSafeGameOneFallbackContent = (request = {}) => ({
         'Focus on what the concept does during program execution.',
         'Compare its purpose and behavior with the other Java concepts in this lesson.',
         'Recall how this concept behaves when Java runs the code.',
-      ].filter((hint, index, values) => hint && values.indexOf(hint) === index).slice(0, 3),
+      ].filter((hint, index, values) => hint && values.indexOf(hint) === index
+        && !containsTargetAnswer(hint, item.target) && !containsObviousAnswerReveal(hint)).slice(0, 3),
     };
   }),
 });
 
 const validGeneratedItem = (item, specification) => {
+  if (!Array.isArray(item?.hints) || item.hints.length !== 3
+    || item.hints.some((hint) => typeof hint !== 'string' || !hint.trim() || hint.length > 140)) return false;
   const hints = (Array.isArray(item?.hints) ? item.hints : [])
     .map((hint) => cleanText(hint, 140))
     .filter(Boolean);
-  return hints.length >= 3
+  return hints.length === 3 && new Set(hints.map((hint) => hint.toLowerCase())).size === 3
     && hints.every((hint) => !containsTargetAnswer(hint, specification.target)
       && !containsObviousAnswerReveal(hint)
       && !isGenericGameOneFallback(hint));
@@ -181,25 +183,30 @@ export const applyGameOneAiContent = (levelData = {}, request = {}, responseData
   const fallbackById = new Map(
     buildSafeGameOneFallbackContent(request).items.map((item) => [item.id, item]),
   );
-  specificationsById.forEach((specification, id) => {
-    if (!validGeneratedItem(generatedById.get(id), specification)) {
-      generatedById.set(id, fallbackById.get(id));
-    }
-  });
   if (Array.isArray(nextLevelData.questions)) {
     nextLevelData.questions.forEach((question, index) => {
       const id = `question:${cleanText(question.id || index, 68)}`;
       const generated = generatedById.get(id);
       const specification = specificationsById.get(id);
-      if (!generated || !specification || !validGeneratedItem(generated, specification)) return;
-      const generatedHints = generated.hints.map((hint) => cleanText(hint, 140)).filter(Boolean);
-      const authoredHints = (Array.isArray(question.hints) ? question.hints : [])
-        .map((hint) => cleanText(hint, 140))
-        .filter(Boolean);
-      const combinedHints = [...new Set([...generatedHints, ...authoredHints])];
-      question.hints = combinedHints.slice(0, 3);
+      if (!specification) return;
+      const isAi = responseData.source === 'ai' && generated?.source !== 'fallback' && validGeneratedItem(generated, specification);
+      const selected = isAi ? generated : fallbackById.get(id);
+      question.hints = selected.hints.slice(0, 3);
+      question.hintSource = isAi ? 'ai' : 'fallback';
     });
   }
-  nextLevelData.aiLearningContentSource = responseData.source || 'fallback';
+  nextLevelData.aiLearningContentSource = nextLevelData.questions?.some((question) => question.hintSource === 'ai') ? 'ai' : 'fallback';
   return nextLevelData;
+};
+
+// Share an in-flight/result promise across StrictMode and harmless rerenders.
+// A retry's new run token always gets a fresh request; keep the cache bounded.
+const hintRuns = new Map();
+export const loadGameOneHintsForRun = (scope, request, send) => {
+  const key = JSON.stringify([scope, request]);
+  if (!hintRuns.has(key)) {
+    hintRuns.set(key, Promise.resolve().then(send));
+    if (hintRuns.size > 20) hintRuns.delete(hintRuns.keys().next().value);
+  }
+  return hintRuns.get(key);
 };

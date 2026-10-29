@@ -13,8 +13,10 @@ const { getPublishedLevelContent } = require('../services/levelContentService');
 const {
   generateGameHintWithGemini,
   generateGameTwoTasksWithGemini,
-  generateGameFiveQuestionsWithGemini
+  generateGameFiveQuestionsWithGemini,
+  generateGameOneHints
 } = require('../services/aiQuestionService');
+const { validateGameOneHintRequest } = require('../services/gameOneHintPolicy');
 
 const normalizeRunToken = (value) => {
   if (typeof value !== 'string') {
@@ -196,8 +198,18 @@ const generateGameFiveQuestions = async (req, res) => {
       });
       return res.status(200).json(successResponse(result, 'Game 2 retry tasks generated successfully'));
     }
+    if (normalizedGameType === 'GAME_ONE') {
+      if (!validateGameOneHintRequest(req.body)) {
+        return res.status(400).json(errorResponse('Game 1 requires a run seed and 1–10 hints-only items with an answer and lesson context.'));
+      }
+      const result = await generateGameOneHints({
+        items: req.body.items,
+        variationSeed: `${req.user.id}:${levelNumber}:${req.body.variationSeed}`,
+      });
+      return res.status(200).json(successResponse(result, 'Game 1 hints loaded successfully'));
+    }
     if (normalizedGameType !== 'GAME_FIVE') {
-      return res.status(400).json(errorResponse('AI question generation is available for Games 2 and 5 only'));
+      return res.status(400).json(errorResponse('AI generation is available for Games 1, 2 and 5 only'));
     }
 
     const result = await generateGameFiveQuestionsWithGemini({

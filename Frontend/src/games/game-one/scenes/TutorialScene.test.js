@@ -24,6 +24,28 @@ const createScene = () => {
 };
 
 describe('Game 1 automatic tutorial scene', () => {
+  it('points at a visible scroll pickup rather than the hearts', () => {
+    const scene = new TutorialScene();
+    const scroll = { pickupType: 'scroll' };
+    const hearts = {};
+    scene.source = { scene: { get: () => ({ healthText: hearts }) }, sceneObjects: [scroll] };
+    const bounds = { x: .4, y: .2, width: .03, height: .1 };
+    scene.rectFor = vi.fn((object) => object === scroll ? bounds : null);
+    expect(scene.getTarget('scroll')).toEqual(bounds);
+    expect(scene.rectFor).not.toHaveBeenCalledWith(hearts, true);
+    scene.source.sceneObjects = [];
+    expect(scene.getTarget('scroll')).toBeNull();
+  });
+  it('isolates the scroll count from the combined HUD counter when no scroll is visible', () => {
+    const scene = new TutorialScene();
+    const coinText = { text: 'coins 0    \u{1F4DC} 0/3', context: { measureText: (text) => ({ width: text.length * 10 }) } };
+    scene.source = { scene: { get: () => ({ coinText }) } };
+    scene.rectFor = () => ({ x: .01, y: .08, width: .2, height: .04 });
+    const target = scene.getTarget('scroll-counter');
+    expect(target.y).toBe(.08);
+    expect(target.x).toBeGreaterThan(.01);
+    expect(target.width).toBeLessThan(.2);
+  });
   it('moves the demo player and synchronizes the press without keyboard input', () => {
     const scene = createScene();
     const before = { ...scene.source };

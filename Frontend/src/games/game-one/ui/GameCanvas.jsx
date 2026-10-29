@@ -23,6 +23,7 @@ import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
 import GameOneInteractiveTutorial from './GameOneInteractiveTutorial';
 import { buildGameOneGuideContent } from '../../shared/ui/gameGuideContent';
 import ResultOverlay from './ResultOverlay';
+import './GameCanvas.mobile.css';
 
 const renderScreenModal = (content) => (
   typeof document !== 'undefined'
@@ -84,6 +85,8 @@ const GameCanvas = forwardRef(({
     showLevelGuideline ? 'guide' : null,
   );
   const [isAutomaticFirstPlayTutorial, setIsAutomaticFirstPlayTutorial] = useState(false);
+  const automaticTutorialStartedRef = useRef(false);
+  const handledTutorialRequestRef = useRef(Number(gameTutorialRequested) || 0);
   const [guideOpenedDuringGameplay, setGuideOpenedDuringGameplay] = useState(false);
   const showGuide = runtimeReady && tutorialView === 'guide';
   const showTutorial = runtimeReady && tutorialView === 'practice';
@@ -118,7 +121,10 @@ const GameCanvas = forwardRef(({
   }, [levelData, showLevelGuideline]);
 
   useEffect(() => {
-    if (Number(gameTutorialRequested) > 0) {
+    const request = Number(gameTutorialRequested) || 0;
+    const previous = handledTutorialRequestRef.current;
+    handledTutorialRequestRef.current = request;
+    if (request > previous) {
       setIsAutomaticFirstPlayTutorial(false);
       setTutorialView('practice');
     }
@@ -188,6 +194,7 @@ const GameCanvas = forwardRef(({
       },
     };
 
+    const wideMobileView = window.matchMedia('(pointer: coarse), (orientation: landscape) and (max-height: 640px)').matches;
     const game = new Phaser.Game({
       type: Phaser.AUTO,
       width: levelData.viewport.width,
@@ -231,13 +238,35 @@ const GameCanvas = forwardRef(({
       callbacks: {
         preBoot: (instance) => {
           instance.__ITECHS_BOOT__ = bootPayload;
+          instance.__ITECHS_WIDE_MOBILE__ = wideMobileView;
         },
       },
     });
 
     gameRef.current = game;
 
+    const resizeMobileView = () => {
+      const host = containerRef.current;
+      if (!wideMobileView || !host || !game.isBooted || host.clientHeight <= 0) return;
+      // The question scene lays out its text and interactive areas once.
+      if (game.scene.isActive('QuestionScene')) { game.scale.refresh(); return; }
+      const height = levelData.viewport.height;
+      const width = Math.max(1, Math.round(height * host.clientWidth / host.clientHeight));
+      if (game.scale.width === width && game.scale.height === height) return;
+      game.scale.resize(width, height);
+      const scene = game.scene.keys.LevelScene;
+      const cell = scene?.currentCellRecord;
+      if (cell && scene.player) {
+        scene.cameras.main.setZoom(Math.max(width / cell.bounds.width, height / cell.bounds.height));
+        scene.updateCameraBoundsForCell(cell, { snap: true });
+      }
+    };
+    const mobileResizeObserver = wideMobileView ? new ResizeObserver(resizeMobileView) : null;
+    if (mobileResizeObserver) mobileResizeObserver.observe(containerRef.current);
+    game.events.once('ready', resizeMobileView);
+
     return () => {
+      mobileResizeObserver?.disconnect();
       setIsPaused(false);
       setIsQuestionOpen(false);
       if (gameRef.current) {
@@ -366,7 +395,7 @@ const GameCanvas = forwardRef(({
   }, [gameTutorialRequested, guideOpenedDuringGameplay, isSubmitting, resultData, showGuide, showTutorial, hintCoinCost, hintStarCost, levelData, runtimeAssets, showLevelGuideline, suppressPreloadUi]);
 
   return (
-    <div className={`game-one-frame-shell relative box-border w-full ${frameClassName}`}>
+    <div className={`game-one-frame-shell relative box-border w-full ${isPaused ? 'game-one-frame-shell--paused' : ''} ${frameClassName}`}>
       <div
         className="game-one-canvas-viewport relative w-full overflow-hidden rounded-[16px] border-2 border-slate-600 bg-slate-950 shadow-[0_10px_24px_rgba(2,6,23,0.28)]"
         style={{ aspectRatio: viewportAspectRatio }}
@@ -478,7 +507,8 @@ const GameCanvas = forwardRef(({
                     closeGameplayGuidelines();
                     return;
                   }
-                  if (continueToTutorialAfterGuide) {
+                  if (initialShowTutorial && continueToTutorialAfterGuide && !automaticTutorialStartedRef.current) {
+                    automaticTutorialStartedRef.current = true;
                     setIsAutomaticFirstPlayTutorial(true);
                     setTutorialView('practice');
                     return;

@@ -244,7 +244,8 @@ export default class LevelScene extends Phaser.Scene {
     if (currentCellRecord) {
       const cellBounds = currentCellRecord.bounds;
       const paddingFactor = 1;
-      const zoomLevel = Math.min(
+      const fitRoom = this.game.__ITECHS_WIDE_MOBILE__ ? Math.max : Math.min;
+      const zoomLevel = fitRoom(
         (this.cameras.main.width * paddingFactor) / cellBounds.width,
         (this.cameras.main.height * paddingFactor) / cellBounds.height
       );
@@ -252,10 +253,10 @@ export default class LevelScene extends Phaser.Scene {
       this.updateCameraBoundsForCell(currentCellRecord, { snap: true });
     }
 
-    this.time.delayedCall(1800, () => {
-      this.updateCameraBoundsForCell(this.currentCellRecord, { snap: true });
-      this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
-    });
+    // Start at the player immediately instead of showing the room center for
+    // 1.8 seconds (which crops the floor in the wide mobile viewport).
+    this.cameras.main.startFollow(this.player, true, 0.15, 0.15);
+    this.updateCameraBoundsForCell(this.currentCellRecord, { snap: true });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off('question:answered', this.handleQuestionAnswered, this);
@@ -1921,7 +1922,7 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     if (snap) {
-      camera.centerOn(centerX, centerY);
+      camera.centerOn(this.player?.x ?? centerX, this.player?.y ?? centerY);
     }
   }
 
@@ -2156,7 +2157,7 @@ export default class LevelScene extends Phaser.Scene {
     const cellChanged = this.currentCellRecord?.cellId !== nextRecord.cellId;
     if (!force && !cellChanged) return;
     this.currentCellRecord = nextRecord;
-    this.updateCameraBoundsForCell(nextRecord, { snap: force });
+    this.updateCameraBoundsForCell(nextRecord, { snap: force || cellChanged });
     this.ghosts.forEach((enemy) => {
       const belongsToCurrentRoom = !enemy.assignedRoomId || enemy.assignedRoomId === nextRecord.cellId;
       enemy.setRoomActive?.(belongsToCurrentRoom, this.time.now);
@@ -2381,6 +2382,9 @@ export default class LevelScene extends Phaser.Scene {
 
   handleQuestionHintPurchased(payload = {}) {
     const questionId = typeof payload?.questionId === 'string' ? payload.questionId.trim() : '';
+    const hintIndex = Number(payload?.hintIndex);
+    const previousHintIndex = this.questionHintProgress.get(questionId) || 0;
+    if (!questionId || !Number.isInteger(hintIndex) || hintIndex !== previousHintIndex + 1) return;
     const hintCoinCost = normalizeHintCoinCost(payload?.hintCoinCost ?? payload?.hintStarCost ?? this.hintCoinCost);
     if (hintCoinCost > 0) {
       if (this.coinBalance < hintCoinCost) {

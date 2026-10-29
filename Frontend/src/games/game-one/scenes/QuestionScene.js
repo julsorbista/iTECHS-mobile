@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { getStudentSfxVolume } from '../../../utils/studentMenuAudio';
+import { createHintTapGuard } from '../systems/hintPurchaseGuard';
 
 const CHOICE_LABEL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const PALETTE = Object.freeze({
@@ -271,6 +272,9 @@ export default class QuestionScene extends Phaser.Scene {
     // content in that coordinate system so scaling cannot cause text drift.
     const treasureFrameScale = panelWidth / 608;
     const treasureY = (sourceY) => panelTop + (sourceY * treasureFrameScale);
+    // Use the PNG's real coordinates for controls and the enlarged footer.
+    const artworkX = (x) => panelLeft + x * panelWidth / 612;
+    const artworkY = (y) => panelTop + y * panelHeight / 408;
     const innerInset = Math.round((isWordScramble ? 72 : 34) * uiScale);
     const innerLeft = panelLeft + innerInset;
     const innerRight = panelRight - innerInset;
@@ -318,7 +322,7 @@ export default class QuestionScene extends Phaser.Scene {
     this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.overlay, 0.78).setInteractive();
     const hasQuestionFrame = isWordScramble && this.textures.exists('game-one-ui-question-frame');
     if (hasQuestionFrame) {
-      this.add.image(centerX, centerY, 'game-one-ui-question-frame')
+        this.add.image(centerX, centerY, 'game-one-ui-question-frame', '__BASE')
         .setDisplaySize(panelWidth, panelHeight);
     } else if (isWordScramble && this.textures.exists('game-one-treasure-jb-background')) {
       const panelRadius = Math.round(34 * uiScale);
@@ -369,13 +373,13 @@ export default class QuestionScene extends Phaser.Scene {
 
     const coinBadgeWidth = Math.round(hasQuestionFrame ? 82 * treasureFrameScale : 148 * uiScale);
     const coinBadgeHeight = Math.round(hasQuestionFrame ? 34 * treasureFrameScale : 30 * uiScale);
-    const closeButtonWidth = Math.round(hasQuestionFrame ? 66 * treasureFrameScale : 96 * uiScale);
-    const closeButtonHeight = Math.round(hasQuestionFrame ? 62 * treasureFrameScale : 28 * uiScale);
+    const closeButtonWidth = Math.round(hasQuestionFrame ? 44 * panelWidth / 612 : 96 * uiScale);
+    const closeButtonHeight = Math.round(hasQuestionFrame ? 44 * panelHeight / 408 : 28 * uiScale);
     const topControlGap = Math.round(20 * uiScale);
     const closeQuestionX = hasQuestionFrame
-      ? panelLeft + (585 * treasureFrameScale)
+      ? artworkX(555)
       : innerRight - (closeButtonWidth / 2);
-    const coinBadgeY = hasQuestionFrame ? treasureY(64) : topControlsY;
+    const coinBadgeY = hasQuestionFrame ? artworkY(69) : topControlsY;
     const coinBadgeX = hasQuestionFrame
       ? panelLeft + (493 * treasureFrameScale)
       : closeQuestionX - (closeButtonWidth / 2) - topControlGap - (coinBadgeWidth / 2);
@@ -530,13 +534,13 @@ export default class QuestionScene extends Phaser.Scene {
     cleanupHandlers.push(() => window.cancelAnimationFrame(promptFitFrame));
 
     const feedbackWidth = isWordScramble && hasQuestionFrame
-      ? Math.round(238 * treasureFrameScale)
+      ? Math.round(238 * panelWidth / 612)
       : innerWidth - Math.round(56 * uiScale);
     const feedbackHeight = isWordScramble && hasQuestionFrame
-      ? Math.round(30 * treasureFrameScale)
+      ? Math.round(24 * panelHeight / 408)
       : Math.round(90 * uiScale);
     const footerY = isWordScramble
-      ? treasureY(356)
+      ? (hasQuestionFrame ? artworkY(361) : treasureY(356))
       : Math.min(
         panelBottom - (feedbackHeight / 2) - Math.round(8 * uiScale),
         optionsBottom + Math.round(12 * uiScale) + (feedbackHeight / 2),
@@ -544,26 +548,31 @@ export default class QuestionScene extends Phaser.Scene {
     // The reference footer starts every status line immediately after the
     // bulb. A fixed left edge keeps Hint, Correct, and Incorrect aligned.
     const feedbackX = isWordScramble && hasQuestionFrame
-      ? panelLeft + Math.round(309 * treasureFrameScale)
+      ? artworkX(309)
       : centerX;
     this.feedbackText = this.add.text(feedbackX, footerY, '', {
       fontFamily: 'Manrope, Arial, sans-serif',
       fontSize: fontSize(
-        isWordScramble && hasQuestionFrame ? 8.5 : 16,
+        isWordScramble && hasQuestionFrame ? 13 : 16,
         isWordScramble && hasQuestionFrame ? treasureFrameScale : uiScale,
       ),
-      fontStyle: 'normal',
+      fontStyle: isWordScramble && hasQuestionFrame ? 'bold' : 'normal',
       color: PALETTE.textDark,
       align: 'center',
-      wordWrap: { width: feedbackWidth, useAdvancedWrap: true },
+      wordWrap: { width: feedbackWidth - 8, useAdvancedWrap: true },
       lineSpacing: 1,
-      fixedWidth: feedbackWidth,
-      fixedHeight: feedbackHeight,
+      fixedWidth: 0,
+      fixedHeight: 0,
       padding: { left: 2, right: 2, top: 1, bottom: 1 },
     }).setOrigin(0.5).setVisible(false).setDepth(51);
 
     const showFeedback = (message, color = PALETTE.textDark) => {
       this.feedbackText
+        .setScale(1)
+        .setFontSize(fontSize(
+          isWordScramble && hasQuestionFrame ? 13 : 16,
+          isWordScramble && hasQuestionFrame ? treasureFrameScale : uiScale,
+        ))
         .setColor(color)
         .setText(message || '')
         .setVisible(Boolean(message));
@@ -572,16 +581,20 @@ export default class QuestionScene extends Phaser.Scene {
         feedbackHeight - 2,
         Math.max(7, Math.round(6 * (isWordScramble && hasQuestionFrame ? treasureFrameScale : uiScale))),
       );
+      if (message) {
+        const fit = Math.min(1, (feedbackHeight - 2) / Math.max(1, this.feedbackText.height));
+        this.feedbackText.setScale(fit).setOrigin(0.5).setPosition(feedbackX, footerY);
+      }
     };
 
     const purchasableHints = hints.slice(0, Math.min(3, hints.length));
     const hasHintsAvailable = purchasableHints.length > 0;
-    const hintButtonWidth = Math.round(hasQuestionFrame ? 108 * treasureFrameScale : 78 * uiScale);
-    const hintButtonHeight = Math.round(hasQuestionFrame ? 48 * treasureFrameScale : 34 * uiScale);
+    const hintButtonWidth = Math.round(hasQuestionFrame ? 76 * panelWidth / 612 : 78 * uiScale);
+    const hintButtonHeight = Math.round(hasQuestionFrame ? 32 * panelHeight / 408 : 34 * uiScale);
     const hintButtonX = hasQuestionFrame
-      ? panelLeft + (86 * treasureFrameScale)
+      ? artworkX(109)
       : innerLeft + Math.round(26 * uiScale);
-    const hintButtonY = hasQuestionFrame ? treasureY(64) : topControlsY;
+    const hintButtonY = hasQuestionFrame ? artworkY(69) : topControlsY;
     const hintHotspot = this.add.rectangle(hintButtonX, hintButtonY, hintButtonWidth, hintButtonHeight, isWordScramble ? 0xe7bd68 : PALETTE.hintIconBg, 1)
       .setStrokeStyle(2, isWordScramble ? challengeBorderColor : PALETTE.hintIconBorder, 1)
       .setInteractive({ useHandCursor: true });
@@ -605,7 +618,7 @@ export default class QuestionScene extends Phaser.Scene {
       hintHotspot.setAlpha(0.001);
       hintHotspotInner.setAlpha(0.001);
       // Keep the label centered in the clear area to the right of the bulb.
-      hintHotspotLabel.setPosition(panelLeft + (112 * treasureFrameScale), hintButtonY);
+      hintHotspotLabel.setPosition(artworkX(120), hintButtonY);
     }
 
     const hintOverlayBackdrop = this.add.rectangle(centerX, centerY, sceneWidth, sceneHeight, PALETTE.modalOverlay, 0.82)
@@ -834,7 +847,9 @@ export default class QuestionScene extends Phaser.Scene {
         showFeedback(`Hint: ${latestHint}`, PALETTE.textDark);
       }
     };
+    const acceptHintTap = createHintTapGuard();
     const unlockNextHint = () => {
+      if (!acceptHintTap()) return;
       if (!canPurchaseAnotherHint()) {
         if (this.hintIndex > 0) {
           showLatestHintFeedback();
@@ -1163,12 +1178,13 @@ export default class QuestionScene extends Phaser.Scene {
 
       // The green button is painted into the frame around source y=308.
       // Keep its label, hit area, and status message on that same baseline.
-      const submitY = treasureY(308);
+      const submitY = hasQuestionFrame ? artworkY(321) : treasureY(308);
+      const submitX = hasQuestionFrame ? artworkX(297) : centerX;
       const submitButton = this.add.rectangle(
-        centerX,
+        submitX,
         submitY,
-        Math.round(270 * uiScale),
-        Math.round(42 * uiScale),
+        Math.round(hasQuestionFrame ? 188 * panelWidth / 612 : 270 * uiScale),
+        Math.round(hasQuestionFrame ? 36 * panelHeight / 408 : 42 * uiScale),
         challengeHeaderColor,
         1,
       ).setStrokeStyle(2, challengeBorderColor, 1)
@@ -1176,8 +1192,8 @@ export default class QuestionScene extends Phaser.Scene {
       submitHotspot = submitButton;
       if (hasQuestionFrame) submitButton.setAlpha(0.001);
       const submitLabel = this.add.text(
-        centerX,
-        hasQuestionFrame ? submitY - (2 * treasureFrameScale) : submitY,
+        submitX,
+        submitY,
         'UNLOCK TREASURE',
         {
         fontFamily: 'Manrope, Arial, sans-serif',

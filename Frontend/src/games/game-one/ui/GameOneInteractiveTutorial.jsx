@@ -12,11 +12,12 @@ const overlaps = (a, b) => b ? Math.max(0, Math.min(a.x + a.width, b.x + b.width
 const GAME_ONE_ASPECT_RATIO = 1280 / 720;
 const getGameContentBounds = (stage) => {
   const stageAspect = stage.width / Math.max(1, stage.height);
-  if (stageAspect > GAME_ONE_ASPECT_RATIO) {
-    const width = stage.height * GAME_ONE_ASPECT_RATIO;
+  const aspect = stage.aspect || GAME_ONE_ASPECT_RATIO;
+  if (stageAspect > aspect) {
+    const width = stage.height * aspect;
     return { x: (stage.width - width) / 2, y: 0, width, height: stage.height };
   }
-  const height = stage.width / GAME_ONE_ASPECT_RATIO;
+  const height = stage.width / aspect;
   return { x: 0, y: (stage.height - height) / 2, width: stage.width, height };
 };
 const toPixels = (rect, stage) => {
@@ -46,7 +47,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
     if (!element) return;
     const measure = () => {
       const r = element.getBoundingClientRect();
-      setStage({ left: r.left, top: r.top, width: r.width, height: r.height });
+      setStage({ left: r.left, top: r.top, width: r.width, height: r.height, aspect: element.width / Math.max(1, element.height) });
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -73,7 +74,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
 
 
   const measuredTarget = stage && toPixels(state?.target, stage);
-  const target = measuredTarget && step?.id === 'scroll'
+  const target = measuredTarget && step?.id === 'scroll' && state?.objectVisible !== false
     ? {
       ...measuredTarget,
       x: measuredTarget.x - (getGameContentBounds(stage).width * 0.002),
@@ -99,7 +100,22 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
       + (state?.obstacles || []).reduce((sum, rect) => sum + overlaps({ ...point, ...panelSize }, toPixels(rect, stage)), 0);
     Object.assign(panel, candidates.reduce((best, point) => score(point) < score(best) ? point : best, candidates[0]));
     if ([1, 2].includes(page)) panel.x = right;
-    if ([3, 5, 6].includes(page)) panel.x = 14;
+    // Information pages share one reading position; only the target and hand
+    // move. Use the measured, CSS-scaled panel size to stay inside the canvas.
+    if (infoStep || step?.id === 'ready') {
+      panel.x = Math.max(0, (stage.width - panelSize.width) / 2);
+      panel.y = Math.max(0, stage.height - panelSize.height - 12);
+      if (target) {
+        // Reserve both the highlighted pickup and the pointing hand beside it.
+        const focus = { x: target.x - 10, y: target.y - 10,
+          width: target.width + 76, height: target.height + 70 };
+        const placements = [panel, { x: 14, y: panel.y }, { x: right, y: panel.y }];
+        const clearPlacement = placements.reduce((best, point) =>
+          overlaps({ ...point, ...panelSize }, focus) < overlaps({ ...best, ...panelSize }, focus) ? point : best,
+        placements[0]);
+        Object.assign(panel, clearPlacement);
+      }
+    }
   }
   const jumpingForDash = step?.id === 'dash' && !state.completed && step.jumpKeys?.length > 0 && (state.grounded || state.demoPressed && state.demoControl === 'jump');
   const primaryKeys = jumpingForDash ? step.jumpKeys : step?.id === 'jump' ? ['W'] : step?.keys || [];
@@ -144,7 +160,7 @@ export default function GameOneInteractiveTutorial({ state, canvasRef, levelNumb
   const gestureKey = `${step?.id}-${primaryControl}-${actionGesture}`;
 
   return createPortal(
-    <div className={`g1-coach g1-parchment g1-parchment--automatic ${state?.demoPressed ? 'g1-parchment--pressed' : ''} ${state?.completed ? 'g1-coach--success' : ''} ${warning ? 'g1-coach--warning' : ''}`} style={stage} data-testid="game-one-tutorial" data-page={page}>
+    <div className={`g1-coach g1-parchment g1-parchment--automatic ${state?.demoPressed ? 'g1-parchment--pressed' : ''} ${state?.completed ? 'g1-coach--success' : ''} ${warning ? 'g1-coach--warning' : ''}`} style={{ left: stage.left, top: stage.top, width: stage.width, height: stage.height }} data-testid="game-one-tutorial" data-page={page}>
       {target && !step?.control && <div className="g1-coach__focus-shade" aria-hidden="true" style={{ left: target.x - 8, top: target.y - 8, width: target.width + 16, height: target.height + 16 }} />}
       {target && infoStep && <button type="button" className={`g1-coach__target ${step.id === 'hazard' ? 'g1-coach__target--warning' : ''}`}
         aria-label={`Inspect ${step.target}`} onClick={onAcknowledge} disabled={state.completed}

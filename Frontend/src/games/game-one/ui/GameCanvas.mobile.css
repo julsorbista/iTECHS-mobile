@@ -1,0 +1,67 @@
+@media (pointer: coarse), (orientation: landscape) and (max-height: 640px) {
+  #root .student-game-overlay-game-one .student-game-frame-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: auto;
+  }
+  #root .student-game-overlay-game-one .game-one-frame-shell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    background: #080b1a;
+  }
+  #root .student-game-overlay-game-one .game-one-canvas-viewport {
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+  }
+  /* Pause menus center in the full game frame, including the space normally
+     occupied by touch controls. Question popups keep the reserved row. */
+  #root .student-game-overlay-game-one .game-one-frame-shell--paused {
+    padding-bottom: 0;
+  }
+  #root .student-game-overlay-game-one .game-one-mobile-hud-menu {
+    top: 8px;
+    right: 8px;
+    width: 64px;
+    min-width: 64px;
+    height: 26px;
+    min-height: 26px;
+    font-size: 11px;
+    box-sizing: border-box;
+  }
+  /* Reserve this row even when a question hides the controls. Opening a
+     popup therefore cannot resize the canvas underneath its hit areas. */
+  #root .student-game-overlay-game-one .game-one-mobile-controls {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    align-items: center !important;
+    justify-content: space-between;
+    height: calc(56px + env(safe-area-inset-bottom));
+    padding: 6px max(12px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)) !important;
+    box-sizing: border-box;
+    border: 0;
+    background: #080b1a;
+  }
+  #root .student-game-overlay-game-one .game-one-mobile-control-button,
+  #root .student-game-overlay-game-one .game-one-mobile-jump-button {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 2px !important;
+    border: 1px solid #85899f;
+    border-radius: 50% !important;
+    background: #282c40;
+    font-size: 11px !important;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+}

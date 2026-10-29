@@ -157,14 +157,23 @@ export default class TutorialScene extends Phaser.Scene {
     if (kind === 'counters') return this.rectFor(hud.coinText, true);
     if (kind === 'objective') return this.rectFor(hud.objectiveText, true);
     if (kind === 'scroll') {
-      const hearts = this.rectFor(hud.healthText, true);
-      return hearts && {
-        ...hearts,
-        // Keep all three hearts inside the tutorial outline even if Phaser's
-        // text bounds briefly lag behind the current heart string.
-        width: Math.max(hearts.width, 0.075),
-        height: Math.max(hearts.height, 0.05),
-      };
+      const scroll = this.source.sceneObjects
+        .filter((object) => object.pickupType === 'scroll' || object.scrollId)
+        .map((object) => this.rectFor(object))
+        .find(Boolean);
+      if (scroll) return scroll;
+      return null;
+    }
+    if (kind === 'scroll-counter') {
+      const counter = this.rectFor(hud.coinText, true);
+      const text = hud.coinText.text || '';
+      const index = text.indexOf('\u{1F4DC}');
+      const context = hud.coinText.context;
+      if (!counter || index < 0 || !context) return null;
+      const total = context.measureText(text).width;
+      const prefix = context.measureText(text.slice(0, index)).width;
+      return total > 0 ? { ...counter, x: counter.x + counter.width * prefix / total,
+        width: counter.width * (total - prefix) / total } : null;
     }
     if (kind === 'platform') return this.safe && this.rectFor(this.safe.body);
     if (kind === 'player') return this.rectFor(this.player);
@@ -210,7 +219,7 @@ export default class TutorialScene extends Phaser.Scene {
     const objectTarget = measuredTarget;
     // A missing object gets a truthful route/counter cue, never a fabricated pickup.
     const target = objectTarget || (step.target === 'coin' ? this.getTarget('counters')
-      : step.target === 'scroll' ? this.getTarget('scroll')
+      : step.target === 'scroll' ? this.getTarget('scroll-counter')
       : step.target === 'monster' ? this.getTarget('player')
       : step.target === 'treasure' ? this.getTarget('portal') : null);
     const hud = this.source.scene.get('HudScene');

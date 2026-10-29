@@ -24,7 +24,7 @@ import GameGuideOverlay from '../../shared/ui/GameGuideOverlay';
 import GameFiveInteractiveTutorial from './GameFiveInteractiveTutorial';
 import PlayableTutorialCoach from '../../shared/ui/PlayableTutorialCoach';
 import { buildGameFiveGuideContent } from '../../shared/ui/levelGuideBuilders';
-import { levelAPI } from '../../../utils/api';
+import { shuffleWordRun, selectHiddenLetter } from '../data/wordRun';
 import { addUserCoins, spendUserCoins } from '../../shared/gameSessionPersistence';
 import './GameCanvasGameFive.css';
 import { useComboAudio } from '../../shared/useComboAudio';
@@ -179,23 +179,6 @@ const getRobotImpactKey = (nextLives, maxLives) => {
   if (damageRatio <= 0.34) return 'hurt1';
   if (damageRatio <= 0.67) return 'hurt2';
   return 'hurt3';
-};
-
-const buildAiClue = (entry, level, clueDepth, guessedLetters) => {
-  const word = String(entry?.word || '').toUpperCase();
-  const baseClue = String(entry?.clue || 'Think about a programming concept from your ICT lesson.');
-  const revealed = word.split('').map((letter) => (guessedLetters.includes(letter) ? letter : '_')).join(' ');
-  const vowels = word.split('').filter((letter) => 'AEIOU'.includes(letter)).length;
-  const topicType = level <= 2
-    ? 'basic programming vocabulary'
-    : level <= 4
-      ? 'code structure and problem-solving'
-      : 'object-oriented programming';
-
-  if (clueDepth <= 0) return baseClue;
-  if (clueDepth === 1) return `This is a ${word.length}-letter ${topicType} term. ${baseClue}`;
-  if (clueDepth === 2) return `Current pattern is ${revealed}. It starts with "${word.charAt(0)}" and has ${vowels} vowel${vowels === 1 ? '' : 's'}.`;
-  return `Think of this when you ${baseClue.charAt(0).toLowerCase() + baseClue.slice(1)}`;
 };
 
 const useArcadeAudio = (musicSrc, sfxSrc, active) => {
@@ -519,7 +502,10 @@ const GameCanvasGameFive = ({
   onCoinBalanceChange,
 }) => {
   // Use the same built-in word list and clues as AI-off mode on every run.
-  const settings = useMemo(() => getSettings(levelData), [levelData]);
+  const [settings] = useState(() => {
+    const initial = getSettings(levelData);
+    return { ...initial, words: shuffleWordRun(initial.words) };
+  });
   const isGeneratingQuestions = false;
   const isFinalLevel = settings.level >= 5;
   const guideContent = useMemo(
@@ -550,8 +536,6 @@ const GameCanvasGameFive = ({
   const [tutorialPractice, setTutorialPractice] = useState(null);
   const [tutorialCoachOpen, setTutorialCoachOpen] = useState(isTutorialLevel);
   const [clueDepth, setClueDepth] = useState(0);
-  const [aiClue, setAiClue] = useState('');
-  const [isGeneratingHint, setIsGeneratingHint] = useState(false);
   const [hintPurchaseNotice, setHintPurchaseNotice] = useState('');
   const [hintedIndices, setHintedIndices] = useState([]);
   const [hintReveal, setHintReveal] = useState(null);
@@ -598,10 +582,7 @@ const GameCanvasGameFive = ({
     setTutorialCoachOpen(false);
   };
 
-  const fallbackClue = useMemo(() => (
-    buildAiClue(current, settings.level, clueDepth, guessed)
-  ), [current, settings.level, clueDepth, guessed]);
-  const activeClue = aiClue || fallbackClue;
+  const activeClue = current.clue;
   const isCurrentWordSolved = useMemo(() => (
     current.word
       .split('')
@@ -661,8 +642,6 @@ const GameCanvasGameFive = ({
   useEffect(() => {
     setHintReveal(null);
     setHintedIndices([]);
-    setAiClue('');
-    setIsGeneratingHint(false);
   }, [current.word]);
 
   const completeCurrentWord = useCallback((finalMistakes = mistakes) => {
@@ -696,7 +675,6 @@ const GameCanvasGameFive = ({
     setGuessed([]);
     setClueDepth(0);
     setHintedIndices([]);
-    setAiClue('');
   }, [combo, finish, mistakes, onCoinBalanceChange, playComboMilestone, playerId, score, settings.level, settings.targetWords, solved, timeLeft]);
 
   const chooseLetter = useCallback((rawLetter) => {
@@ -749,14 +727,11 @@ const GameCanvasGameFive = ({
     completeCurrentWord(mistakes);
   }, [completeCurrentWord, finished, isCurrentWordSolved, isGeneratingQuestions, mistakes, resultData, shouldPauseForTutorialCoach, showTutorial]);
 
-  const revealRandomLetterHint = useCallback(async () => {
-    if (isGeneratingQuestions || isGeneratingHint || clueDepth >= 3 || showTutorial || shouldPauseForTutorialCoach || finished || Boolean(resultData)) return;
+  const revealRandomLetterHint = useCallback(() => {
+    if (isGeneratingQuestions || clueDepth >= 3 || showTutorial || shouldPauseForTutorialCoach || finished || Boolean(resultData)) return;
 
-    const hiddenIndices = current.word
-      .split('')
-      .map((letter, index) => ({ letter, index }))
-      .filter(({ letter, index }) => !guessed.includes(letter) && !hintedIndices.includes(index));
-    if (hiddenIndices.length === 0) return;
+    const selection = selectHiddenLetter(current.word, guessed, hintedIndices);
+    if (!selection) return;
 
     const purchase = spendUserCoins(playerId, 1);
     if (!purchase.success) {
@@ -767,10 +742,8 @@ const GameCanvasGameFive = ({
     onCoinBalanceChange?.(purchase.balance);
     setHintPurchaseNotice('');
 
-    const selection = hiddenIndices[Math.floor(Math.random() * hiddenIndices.length)];
     const nextHintedIndices = [...hintedIndices, selection.index];
     const nextClueDepth = Math.min(3, clueDepth + 1);
-    const fallbackHint = buildAiClue(current, settings.level, nextClueDepth, guessed);
 
     playHint();
     if (isTutorialLevel && tutorialStepIndex < 3) {
@@ -786,28 +759,7 @@ const GameCanvasGameFive = ({
       key: `${wordIndex}-${selection.index}-${Date.now()}`,
     });
 
-    setIsGeneratingHint(true);
-    try {
-      const pattern = current.word
-        .split('')
-        .map((letter, index) => (
-          guessed.includes(letter) || nextHintedIndices.includes(index) ? letter : '_'
-        ))
-        .join(' ');
-      const response = await levelAPI.generateGameHint('GAME_FIVE', settings.level, {
-        topic: current.word,
-        objective: current.clue,
-        answerPattern: pattern,
-        hintNumber: nextClueDepth,
-        fallbackHint,
-      });
-      setAiClue(String(response?.data?.hint || fallbackHint).trim() || fallbackHint);
-    } catch {
-      setAiClue(fallbackHint);
-    } finally {
-      setIsGeneratingHint(false);
-    }
-  }, [clueDepth, coins, current, finished, guessed, hintedIndices, isGeneratingHint, isGeneratingQuestions, isTutorialLevel, onCoinBalanceChange, playHint, playerId, resultData, settings.level, shouldPauseForTutorialCoach, showTutorial, tutorialStepIndex, wordIndex]);
+  }, [clueDepth, coins, current, finished, guessed, hintedIndices, isGeneratingQuestions, isTutorialLevel, onCoinBalanceChange, playHint, playerId, resultData, settings.level, shouldPauseForTutorialCoach, showTutorial, tutorialStepIndex, wordIndex]);
 
   const activateHint = useCallback(() => {
     if (activePractice) {
@@ -921,11 +873,11 @@ const GameCanvasGameFive = ({
               type="button"
               data-g5-target="hint"
               className="game-five-hint-button -mt-10 mb-4 inline-block border-4 border-[#5b341d] bg-[#3f8b35] px-5 py-2 text-2xl font-semibold uppercase text-[#fff7df] shadow-[4px_4px_0_#2b170c] transition hover:bg-[#5fad45] disabled:opacity-60"
-              disabled={activePractice ? !activePractice.canHint : isGeneratingQuestions || isGeneratingHint || clueDepth >= 3 || showTutorial || finished || Boolean(resultData)}
-              aria-disabled={activePractice ? !activePractice.canHint : isGeneratingHint || clueDepth >= 3 || showTutorial || Boolean(resultData)}
+              disabled={activePractice ? !activePractice.canHint : isGeneratingQuestions || clueDepth >= 3 || showTutorial || finished || Boolean(resultData)}
+              aria-disabled={activePractice ? !activePractice.canHint : clueDepth >= 3 || showTutorial || Boolean(resultData)}
               onClick={activateHint}
             >
-              {activePractice ? 'Hint (free practice)' : isGeneratingHint ? <><Loader2 className="mr-2 inline h-5 w-5 animate-spin" />Thinking...</> : 'Hint (-1 coin)'}
+              {activePractice ? 'Hint (free practice)' : 'Hint (-1 coin)'}
             </button>
 
             {hintPurchaseNotice && (

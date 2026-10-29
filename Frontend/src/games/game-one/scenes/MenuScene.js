@@ -77,10 +77,22 @@ export default class MenuScene extends Phaser.Scene {
   }
 
   create() {
-    this.overlay = this.add.rectangle(640, 360, 1280, 720, 0x020617, 0.82)
+    this.overlay = this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x020617, 0.82)
       .setDepth(500)
       .setVisible(false);
     this.overlay.disableInteractive();
+    this.scale.on('resize', this.alignMenuToViewport, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.scale.off('resize', this.alignMenuToViewport, this);
+    });
+  }
+
+  alignMenuToViewport() {
+    const { width, height } = this.scale;
+    this.overlay?.setPosition(width / 2, height / 2).setSize(width, height);
+    if (!this.panel) return;
+    const fit = Math.min(1, (width - 32) / this.panel.width, (height - 32) / this.panel.height);
+    this.panel.setScale(fit).setPosition(width / 2, height / 2);
   }
 
   hideMenu(mode = null) {
@@ -307,8 +319,8 @@ export default class MenuScene extends Phaser.Scene {
     this.overlay.setInteractive();
 
     this.panel = this.rexUI.add.sizer({
-      x: 640,
-      y: 360,
+      x: this.scale.width / 2,
+      y: this.scale.height / 2,
       width: 760,
       orientation: 'y',
       space: {
@@ -384,6 +396,7 @@ export default class MenuScene extends Phaser.Scene {
 
     this.panel.layout();
     this.panel.setDepth(510);
+    this.alignMenuToViewport();
   }
 
   createStatCard({ label, value, tone = 'slate' }) {
