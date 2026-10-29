@@ -202,6 +202,21 @@ export const applyGameOneAiContent = (levelData = {}, request = {}, responseData
 // Share an in-flight/result promise across StrictMode and harmless rerenders.
 // A retry's new run token always gets a fresh request; keep the cache bounded.
 const hintRuns = new Map();
+export const GAME_ONE_HINT_STARTUP_TIMEOUT_MS = 2500;
+
+// Provider/transport retries must never hold the loading screen indefinitely.
+// Late results remain cached but cannot replace content in an active game.
+export const waitForGameOneStartupHints = async (pending, timeoutMs = GAME_ONE_HINT_STARTUP_TIMEOUT_MS) => {
+  let timer;
+  try {
+    return await Promise.race([
+      pending,
+      new Promise((resolve) => { timer = setTimeout(() => resolve(null), timeoutMs); }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+};
 export const loadGameOneHintsForRun = (scope, request, send) => {
   const key = JSON.stringify([scope, request]);
   if (!hintRuns.has(key)) {

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import { applyGameOneAiContent, buildGameOneAiContentRequest, loadGameOneHintsForRun } from './aiLearningContent';
+import { applyGameOneAiContent, buildGameOneAiContentRequest, loadGameOneHintsForRun, waitForGameOneStartupHints } from './aiLearningContent';
 import { createHintTapGuard } from './hintPurchaseGuard';
 import levelOne from '../data/levels/level-01.json';
 import levelTwo from '../data/levels/level-02.json';
@@ -10,6 +10,23 @@ import levelFour from '../data/levels/level-04.json';
 import levelFive from '../data/levels/level-05.json';
 
 describe('Game 1 hints-only application', () => {
+  it('continues with fallback after 2.5 seconds even if the provider never responds', async () => {
+    vi.useFakeTimers();
+    try {
+      const pending = waitForGameOneStartupHints(new Promise(() => {}));
+      await vi.advanceTimersByTimeAsync(2500);
+      expect(await pending).toBeNull();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally { vi.useRealTimers(); }
+  });
+  it('keeps fast AI responses and clears the startup deadline', async () => {
+    vi.useFakeTimers();
+    try {
+      const response = { status: 'success', data: { source: 'ai' } };
+      expect(await waitForGameOneStartupHints(Promise.resolve(response))).toBe(response);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally { vi.useRealTimers(); }
+  });
   it.each([levelOne, levelTwo, levelThree, levelFour, levelFive])('applies three fallback hints and preserves $title content', (level) => {
     const request = buildGameOneAiContentRequest(level, 'fallback-run');
     const result = applyGameOneAiContent(level, request, {});

@@ -40,6 +40,8 @@ import {
   buildGameOneAiContentRequest,
   buildSafeGameOneFallbackContent,
   loadGameOneHintsForRun,
+  waitForGameOneStartupHints,
+  GAME_ONE_HINT_STARTUP_TIMEOUT_MS,
 } from "../../games/game-one/systems/aiLearningContent";
 import { randomizeGameOneJumbledWords } from "../../games/game-one/systems/jumbledWordRandomizer";
 import { buildSubmissionPayload as buildGameTwoSubmissionPayload } from "../../games/game-two/systems/progressBridge";
@@ -540,6 +542,14 @@ const StudentGameOverlay = ({
           resolvedLevelData = applyGameThreeLevelProgression(resolvedLevelData, numericLevelNumber);
         }
         setLoadingProgress(40);
+        // Session creation is independent of local content/hint preparation.
+        // Start it now so these waits overlap rather than run sequentially.
+        // Capture failures immediately to avoid an unhandled rejection while
+        // optional AI preparation is still in flight.
+        const sessionRequest = levelAPI.startLevelSession(
+          normalizedGameType,
+          numericLevelNumber,
+        ).then((response) => ({ response }), (error) => ({ error }));
         if (normalizedGameType === "GAME_ONE") {
           resolvedLevelData = randomizeGameOneJumbledWords(
             resolvedLevelData,
@@ -551,11 +561,11 @@ const StudentGameOverlay = ({
           );
           if (aiContentRequest.items.length > 0) {
             try {
-              const generatedResponse = await loadGameOneHintsForRun(
+              const generatedResponse = await waitForGameOneStartupHints(loadGameOneHintsForRun(
                 `${user?.id}:${numericLevelNumber}`,
                 aiContentRequest,
-                () => levelAPI.generateGameQuestions("GAME_ONE", numericLevelNumber, aiContentRequest, { timeout: 20000 }),
-              );
+                () => levelAPI.generateGameQuestions("GAME_ONE", numericLevelNumber, aiContentRequest, { timeout: GAME_ONE_HINT_STARTUP_TIMEOUT_MS }),
+              ));
               const generatedContent = generatedResponse?.status === "success" && generatedResponse.data?.items
                 ? generatedResponse.data
                 : buildSafeGameOneFallbackContent(aiContentRequest);
@@ -645,10 +655,9 @@ const StudentGameOverlay = ({
             }
           });
 
-        const sessionResponse = await levelAPI.startLevelSession(
-          normalizedGameType,
-          numericLevelNumber,
-        );
+        const sessionResult = await sessionRequest;
+        if (sessionResult.error) throw sessionResult.error;
+        const sessionResponse = sessionResult.response;
 
         if (!cancelled && sessionResponse.status === "success") {
           setSessionInfo(sessionResponse.data);
